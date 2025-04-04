@@ -142,7 +142,14 @@ module big_pots() {
 
 module big_pot() {
    translate([roundness+end_gap+control_gap, 51+big_pot_full_length/2, big_pot_stand_height/2+wall_thickness+big_pot_stand_height]) {
-      cube([big_pot_full_width, big_pot_full_length, big_pot_module_height], center=true);
+      difference() {
+         cube([big_pot_full_width, big_pot_full_length, big_pot_module_height], center=true);
+         // Mounting holes
+         translate([0, -big_pot_full_length/2+3.5, 0])
+            cylinder(d=3, h=big_pot_module_height);
+         translate([0, +big_pot_full_length/2-3.5, 0])
+            cylinder(d=3, h=big_pot_module_height);
+      }
       // Ear
       translate([0, 0, 16/2+big_pot_module_height/2])
          cube([1, 5, 16], center=true);
@@ -151,7 +158,14 @@ module big_pot() {
 
 module small_pot() {
    translate([roundness+end_gap, 49+small_pot_full_length/2, small_pot_stand_height/2+wall_thickness+small_pot_stand_height]) {
-      cube([small_pot_full_width, small_pot_full_length, small_pot_module_height], center=true);
+      difference() {
+         cube([small_pot_full_width, small_pot_full_length, small_pot_module_height], center=true);
+         // Mounting holes
+         translate([0, -small_pot_full_length/2+1.5, 0])
+            cylinder(d=2, h=small_pot_module_height);
+         translate([0, +small_pot_full_length/2-1.5, 0])
+            cylinder(d=2, h=small_pot_module_height);
+      }
       // Ear
       translate([0, 0, 16/2+small_pot_module_height/2])
          cube([1, 5, 16], center=true);
