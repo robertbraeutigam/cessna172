@@ -20,7 +20,15 @@ big_pot_stand_thickness = 5;
 big_pot_stand_height = 7;
 big_pot_full_width = 15;
 big_pot_module_height = 6;
-big_pot_full_length = 125;
+big_pot_full_length = 120;
+
+// Small linear pot dimensions
+small_pot_stand_distance = 60;
+small_pot_stand_thickness = 5;
+small_pot_stand_height = 7;
+small_pot_full_width = 7;
+small_pot_module_height = 6;
+small_pot_full_length = 75;
 
 module rounded_box(local_width, local_depth) {
    hull() {
@@ -60,11 +68,13 @@ module box_underside() {
    }
    // Rod supports
    rod_supports();
-   // Throttle pot stand
+   // Linear pot stands
    translate([roundness+end_gap+control_gap, 55, 0])
       big_pot_stand();
    translate([roundness+end_gap+2*control_gap, 55, 0])
       big_pot_stand();
+   translate([roundness+end_gap, 55, 0])
+      small_pot_stand();
 }
 
 module big_pot_stand() {
@@ -90,6 +100,29 @@ module big_pot_leg() {
       }
 }
 
+module small_pot_stand() {
+   translate([0, 0, wall_thickness]) {
+      small_pot_leg();
+      translate([0, small_pot_stand_distance+2, 0])
+         small_pot_leg();
+   }
+}
+
+module small_pot_leg() {
+   translate([0, 0, small_pot_stand_height/2])
+      cube([small_pot_full_width+3, small_pot_stand_thickness, small_pot_stand_height], center=true);
+   translate([-small_pot_full_width/2-6/2, 0, 0])
+      difference() {
+         cylinder(d=6, h=small_pot_stand_height+small_pot_module_height);
+         cylinder(d=3.2, h=small_pot_stand_height+small_pot_module_height);
+      }
+   translate([+small_pot_full_width/2+6/2, 0, 0])
+      difference() {
+         cylinder(d=6, h=small_pot_stand_height+small_pot_module_height);
+         cylinder(d=3.2, h=small_pot_stand_height+small_pot_module_height);
+      }
+}
+
 module rod_supports() {
    translate([0, 40, 0])
       cube([full_width, wall_thickness, height]);
@@ -108,7 +141,7 @@ module big_pots() {
 }
 
 module big_pot() {
-   translate([roundness+end_gap+control_gap, 48+big_pot_full_length/2, big_pot_stand_height/2+wall_thickness+big_pot_stand_height]) {
+   translate([roundness+end_gap+control_gap, 51+big_pot_full_length/2, big_pot_stand_height/2+wall_thickness+big_pot_stand_height]) {
       cube([big_pot_full_width, big_pot_full_length, big_pot_module_height], center=true);
       // Ear
       translate([0, 0, 16/2+big_pot_module_height/2])
@@ -116,7 +149,20 @@ module big_pot() {
    }
 }
 
+module small_pot() {
+   translate([roundness+end_gap, 49+small_pot_full_length/2, small_pot_stand_height/2+wall_thickness+small_pot_stand_height]) {
+      cube([small_pot_full_width, small_pot_full_length, small_pot_module_height], center=true);
+      // Ear
+      translate([0, 0, 16/2+small_pot_module_height/2])
+         cube([1, 5, 16], center=true);
+   }
+}
+
 box_underside(); // Make module underside
 
 #big_pots(); // Ignore module
+
+#small_pot(); // Ignore module
+
+
 
