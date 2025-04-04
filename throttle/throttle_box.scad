@@ -4,7 +4,7 @@ $fn = 30;
 
 // Box dimensions
 height = 50;
-depth = 150;
+depth = 180;
 roundness = 10;
 control_gap = 55;
 end_gap = 40;
@@ -13,6 +13,13 @@ wall_thickness = 3;
 // Calculated
 width = 2 * control_gap + 2 * end_gap;
 full_width = width + 2*roundness;
+
+// Big linear pot dimensions
+big_pot_stand_distance = 110;
+big_pot_stand_thickness = 5;
+big_pot_stand_height = 7;
+big_pot_stand_width = 15;
+big_pot_stand_bridge = 6;
 
 module rounded_box(local_width, local_depth) {
    hull() {
@@ -52,6 +59,34 @@ module box_underside() {
    }
    // Rod supports
    rod_supports();
+   // Throttle pot stand
+   translate([roundness+end_gap+control_gap, 55, 0])
+      big_pot_stand();
+   translate([roundness+end_gap+2*control_gap, 55, 0])
+      big_pot_stand();
+}
+
+module big_pot_stand() {
+   translate([0, 0, wall_thickness]) {
+      big_pot_leg();
+      translate([0, big_pot_stand_distance+2, 0])
+         big_pot_leg();
+   }
+}
+
+module big_pot_leg() {
+   translate([0, 0, big_pot_stand_height/2])
+      cube([big_pot_stand_width+3, big_pot_stand_thickness, big_pot_stand_height], center=true);
+   translate([-big_pot_stand_width/2-6/2, 0, 0])
+      difference() {
+         cylinder(d=6, h=big_pot_stand_height+big_pot_stand_bridge);
+         cylinder(d=3.2, h=big_pot_stand_height+big_pot_stand_bridge);
+      }
+   translate([+big_pot_stand_width/2+6/2, 0, 0])
+      difference() {
+         cylinder(d=6, h=big_pot_stand_height+big_pot_stand_bridge);
+         cylinder(d=3.2, h=big_pot_stand_height+big_pot_stand_bridge);
+      }
 }
 
 module rod_supports() {
@@ -65,5 +100,5 @@ module rod_supports() {
    }
 }
 
-box_underside();
+box_underside(); // Make module underside
 
