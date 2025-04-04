@@ -18,8 +18,9 @@ full_width = width + 2*roundness;
 big_pot_stand_distance = 110;
 big_pot_stand_thickness = 5;
 big_pot_stand_height = 7;
-big_pot_stand_width = 15;
-big_pot_stand_bridge = 6;
+big_pot_full_width = 15;
+big_pot_module_height = 6;
+big_pot_full_length = 125;
 
 module rounded_box(local_width, local_depth) {
    hull() {
@@ -76,16 +77,16 @@ module big_pot_stand() {
 
 module big_pot_leg() {
    translate([0, 0, big_pot_stand_height/2])
-      cube([big_pot_stand_width+3, big_pot_stand_thickness, big_pot_stand_height], center=true);
-   translate([-big_pot_stand_width/2-6/2, 0, 0])
+      cube([big_pot_full_width+3, big_pot_stand_thickness, big_pot_stand_height], center=true);
+   translate([-big_pot_full_width/2-6/2, 0, 0])
       difference() {
-         cylinder(d=6, h=big_pot_stand_height+big_pot_stand_bridge);
-         cylinder(d=3.2, h=big_pot_stand_height+big_pot_stand_bridge);
+         cylinder(d=6, h=big_pot_stand_height+big_pot_module_height);
+         cylinder(d=3.2, h=big_pot_stand_height+big_pot_module_height);
       }
-   translate([+big_pot_stand_width/2+6/2, 0, 0])
+   translate([+big_pot_full_width/2+6/2, 0, 0])
       difference() {
-         cylinder(d=6, h=big_pot_stand_height+big_pot_stand_bridge);
-         cylinder(d=3.2, h=big_pot_stand_height+big_pot_stand_bridge);
+         cylinder(d=6, h=big_pot_stand_height+big_pot_module_height);
+         cylinder(d=3.2, h=big_pot_stand_height+big_pot_module_height);
       }
 }
 
@@ -100,5 +101,22 @@ module rod_supports() {
    }
 }
 
+module big_pots() {
+   big_pot();
+   translate([control_gap, 0, 0])
+      big_pot();
+}
+
+module big_pot() {
+   translate([roundness+end_gap+control_gap, 48+big_pot_full_length/2, big_pot_stand_height/2+wall_thickness+big_pot_stand_height]) {
+      cube([big_pot_full_width, big_pot_full_length, big_pot_module_height], center=true);
+      // Ear
+      translate([0, 0, 16/2+big_pot_module_height/2])
+         cube([1, 5, 16], center=true);
+   }
+}
+
 box_underside(); // Make module underside
+
+#big_pots(); // Ignore module
 
