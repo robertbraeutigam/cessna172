@@ -6,12 +6,12 @@ $fn = 30;
 height = 50;
 depth = 150;
 roundness = 10;
-control_gaps = 55;
-end_gaps = 30;
+control_gap = 55;
+end_gap = 40;
 wall_thickness = 3;
 
 // Calculated
-width = 2 * control_gaps + 2 * end_gaps;
+width = 2 * control_gap + 2 * end_gap;
 full_width = width + 2*roundness;
 
 module rounded_box(local_width, local_depth) {
@@ -57,6 +57,12 @@ module box_underside() {
 module rod_supports() {
    translate([0, 40, 0])
       cube([full_width, wall_thickness, height]);
+   for(i=[0:1:2]) {
+      translate([roundness+end_gap+i*control_gap-15-wall_thickness/2, 0, 0])
+         cube([wall_thickness, 40, height]);
+      translate([roundness+end_gap+i*control_gap+15-wall_thickness/2, 0, 0])
+         cube([wall_thickness, 40, height]);
+   }
 }
 
 box_underside();
