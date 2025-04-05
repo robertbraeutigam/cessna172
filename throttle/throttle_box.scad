@@ -67,8 +67,14 @@ module box_underside() {
          cube([20, 30, 20]);
       translate([roundness+width-20-wall_thickness, 0, wall_thickness])
          cube([20, 30, 20]);
-      // Rod holes
+      // Rod & rod nut holes
       throttle_rods();
+      translate([roundness+end_gap+control_gap, wall_thickness*2, wall_thickness+big_pot_stand_height+big_pot_module_height+15+7])
+         rotate([90, 0, 0])
+            cylinder(d=11.2, h=wall_thickness*2);
+      translate([roundness+end_gap+2*control_gap, wall_thickness*2, wall_thickness+big_pot_stand_height+big_pot_module_height+15+7])
+         rotate([90, 0, 0])
+            cylinder(d=11.2, h=wall_thickness*2);
    }
    // Linear pot stands
    translate([roundness+end_gap+control_gap, 55, 0])
