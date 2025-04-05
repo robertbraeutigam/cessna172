@@ -71,28 +71,7 @@ module box_underside() {
          translate([width+roundness, depth+roundness, 0])
             top_screw_column();
          // CPU pedestal
-         translate([roundness+5, depth-55/2, wall_thickness]) {
-            translate([1.75, 1.75, 0])
-               difference() {
-                  cylinder(d=5, h=8);
-                  cylinder(d=2.1, h=8);
-               }
-            translate([55-1.75, 1.75, 0])
-               difference() {
-                  cylinder(d=5, h=8);
-                  cylinder(d=2.1, h=8);
-               }
-            translate([1.75, 27-1.75, 0])
-               difference() {
-                  cylinder(d=5, h=8);
-                  cylinder(d=2.1, h=8);
-               }
-            translate([55-1.75, 27-1.75, 0])
-               difference() {
-                  cylinder(d=5, h=8);
-                  cylinder(d=2.1, h=8);
-               }
-         }
+         cpu_pedestal();
       }
       // Remove clamp space
       translate([roundness+wall_thickness, -wall_thickness, wall_thickness])
@@ -115,6 +94,31 @@ module box_underside() {
       big_pot_stand();
    translate([roundness+end_gap, 55, 0])
       small_pot_stand();
+}
+
+module cpu_pedestal() {
+   translate([roundness+5, depth-55/2, wall_thickness]) {
+      translate([1.75, 1.75, 0])
+         difference() {
+            cylinder(d=5, h=8);
+            cylinder(d=2.1, h=8);
+         }
+      translate([55-1.75, 1.75, 0])
+         difference() {
+            cylinder(d=5, h=8);
+            cylinder(d=2.1, h=8);
+         }
+      translate([1.75, 27-1.75, 0])
+         difference() {
+            cylinder(d=5, h=8);
+            cylinder(d=2.1, h=8);
+         }
+      translate([55-1.75, 27-1.75, 0])
+         difference() {
+            cylinder(d=5, h=8);
+            cylinder(d=2.1, h=8);
+         }
+   }
 }
 
 module top_screw_column() {
