@@ -59,15 +59,17 @@ module box_underside() {
             cube([20+wall_thickness*2, 30, 20+wall_thickness*2]);
          translate([roundness+width-20-wall_thickness*2, 0, 0])
             cube([20+wall_thickness*2, 30, 20+wall_thickness*2]);
+         // Rod supports
+         rod_supports();
       }
       // Remove clamp space
       translate([roundness+wall_thickness, 0, wall_thickness])
          cube([20, 30, 20]);
       translate([roundness+width-20-wall_thickness, 0, wall_thickness])
          cube([20, 30, 20]);
+      // Rod holes
+      throttle_rods();
    }
-   // Rod supports
-   rod_supports();
    // Linear pot stands
    translate([roundness+end_gap+control_gap, 55, 0])
       big_pot_stand();
@@ -183,7 +185,22 @@ module throttle_rods() {
 module throttle_rod() {
    translate([roundness+end_gap, depth+roundness, wall_thickness+big_pot_stand_height+big_pot_module_height+15+7])
       rotate([90, 0, 0])
-         cylinder(d=6, h=depth+roundness*2+10);
+         cylinder(d=6.2, h=depth+roundness*2+10);
+}
+
+module esp32() {
+   translate([roundness+5, depth-55/2, wall_thickness+8])
+      difference() {
+         cube([55, 27, 5]);
+         translate([1.75, 1.75, 0])
+            cylinder(d=2, h=6);
+         translate([55-1.75, 1.75, 0])
+            cylinder(d=2, h=6);
+         translate([1.75, 27-1.75, 0])
+            cylinder(d=2, h=6);
+         translate([55-1.75, 27-1.75, 0])
+            cylinder(d=2, h=6);
+      }
 }
 
 box_underside(); // Make module underside
@@ -194,4 +211,5 @@ box_underside(); // Make module underside
 
 #throttle_rods(); // Ignore module
 
+#esp32(); // Ignore module
 
