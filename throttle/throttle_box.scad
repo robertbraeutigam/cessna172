@@ -86,6 +86,10 @@ module box_underside() {
       translate([roundness+end_gap+2*control_gap, wall_thickness*2, wall_thickness+big_pot_stand_height+big_pot_module_height+15+7])
          rotate([90, 0, 0])
             cylinder(d=11.2, h=wall_thickness*2);
+      // USB power cable hole
+      translate([roundness+end_gap+control_gap/2, wall_thickness+depth+roundness*2, height/2])
+         rotate([90, 0, 0])
+            cylinder(d=4.2, h=wall_thickness*3);
    }
    // Linear pot stands
    translate([roundness+end_gap+control_gap, 55, 0])
@@ -97,7 +101,7 @@ module box_underside() {
 }
 
 module cpu_pedestal() {
-   translate([roundness+5, depth-55/2, wall_thickness]) {
+   translate([roundness+5, depth-35, wall_thickness]) {
       translate([1.75, 1.75, 0])
          difference() {
             cylinder(d=5, h=8);
@@ -239,7 +243,7 @@ module throttle_rod() {
 }
 
 module esp32() {
-   translate([roundness+5, depth-55/2, wall_thickness+8])
+   translate([roundness+5, depth-35, wall_thickness+8])
       difference() {
          cube([55, 27, 5]);
          translate([1.75, 1.75, 0])
