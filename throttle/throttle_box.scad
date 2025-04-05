@@ -70,6 +70,29 @@ module box_underside() {
             top_screw_column();
          translate([width+roundness, depth+roundness, 0])
             top_screw_column();
+         // CPU pedestal
+         translate([roundness+5, depth-55/2, wall_thickness]) {
+            translate([1.75, 1.75, 0])
+               difference() {
+                  cylinder(d=5, h=8);
+                  cylinder(d=2.1, h=8);
+               }
+            translate([55-1.75, 1.75, 0])
+               difference() {
+                  cylinder(d=5, h=8);
+                  cylinder(d=2.1, h=8);
+               }
+            translate([1.75, 27-1.75, 0])
+               difference() {
+                  cylinder(d=5, h=8);
+                  cylinder(d=2.1, h=8);
+               }
+            translate([55-1.75, 27-1.75, 0])
+               difference() {
+                  cylinder(d=5, h=8);
+                  cylinder(d=2.1, h=8);
+               }
+         }
       }
       // Remove clamp space
       translate([roundness+wall_thickness, -wall_thickness, wall_thickness])
