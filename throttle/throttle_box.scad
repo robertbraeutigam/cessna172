@@ -61,11 +61,20 @@ module box_underside() {
             cube([20+wall_thickness*2, 30, 20+wall_thickness*2]);
          // Rod supports
          rod_supports();
+         // Top screw columns
+         translate([roundness, roundness, 0])
+            top_screw_column();
+         translate([roundness, depth+roundness, 0])
+            top_screw_column();
+         translate([width+roundness, roundness, 0])
+            top_screw_column();
+         translate([width+roundness, depth+roundness, 0])
+            top_screw_column();
       }
       // Remove clamp space
-      translate([roundness+wall_thickness, 0, wall_thickness])
+      translate([roundness+wall_thickness, -wall_thickness, wall_thickness])
          cube([20, 30, 20]);
-      translate([roundness+width-20-wall_thickness, 0, wall_thickness])
+      translate([roundness+width-20-wall_thickness, -wall_thickness, wall_thickness])
          cube([20, 30, 20]);
       // Rod & rod nut holes
       throttle_rods();
@@ -83,6 +92,14 @@ module box_underside() {
       big_pot_stand();
    translate([roundness+end_gap, 55, 0])
       small_pot_stand();
+}
+
+module top_screw_column() {
+   difference() {
+      cylinder(d=8, h=height);
+      translate([0, 0, height-16])
+         cylinder(d=3.2, h=16);
+   }
 }
 
 module big_pot_stand() {
