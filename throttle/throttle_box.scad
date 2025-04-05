@@ -72,6 +72,8 @@ module box_underside() {
             top_screw_column();
          // CPU pedestal
          cpu_pedestal();
+         // Cable cradle
+         cable_cradle();
       }
       // Remove clamp space
       translate([roundness+wall_thickness, -wall_thickness, wall_thickness])
@@ -89,7 +91,7 @@ module box_underside() {
       // USB power cable hole
       translate([roundness+end_gap+control_gap/2, wall_thickness+depth+roundness*2, height/2])
          rotate([90, 0, 0])
-            cylinder(d=4.2, h=wall_thickness*3);
+            cylinder(d=4.2, h=50);
    }
    // Linear pot stands
    translate([roundness+end_gap+control_gap, 55, 0])
@@ -98,6 +100,18 @@ module box_underside() {
       big_pot_stand();
    translate([roundness+end_gap, 55, 0])
       small_pot_stand();
+}
+
+module cable_cradle() {
+   translate([roundness+end_gap+control_gap/2-20/2, depth, wall_thickness]) {
+      difference() {
+         cube([20, 20, height/2-wall_thickness]);
+         translate([4, 10, 10])
+            cylinder(d=3.2, h=12);
+         translate([16, 10, 10])
+            cylinder(d=3.2, h=12);
+      }
+   }
 }
 
 module cpu_pedestal() {
