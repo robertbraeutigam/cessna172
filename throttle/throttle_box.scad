@@ -4,7 +4,7 @@ $fn = 30;
 
 // Box dimensions
 height = 50;
-depth = 180;
+depth = 170;
 roundness = 10;
 control_gap = 55;
 end_gap = 40;
@@ -172,11 +172,26 @@ module small_pot() {
    }
 }
 
+module throttle_rods() {
+   throttle_rod();
+   translate([control_gap, 0, 0])
+      throttle_rod();
+   translate([2*control_gap, 0, 0])
+      throttle_rod();
+}
+
+module throttle_rod() {
+   translate([roundness+end_gap, depth+roundness, wall_thickness+big_pot_stand_height+big_pot_module_height+15+7])
+      rotate([90, 0, 0])
+         cylinder(d=6, h=depth+roundness*2+10);
+}
+
 box_underside(); // Make module underside
 
 #big_pots(); // Ignore module
 
 #small_pot(); // Ignore module
 
+#throttle_rods(); // Ignore module
 
 
