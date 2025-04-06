@@ -211,6 +211,24 @@ module small_pot_leg() {
 module rod_supports() {
    translate([0, 40, 0])
       cube([full_width, wall_thickness, height]);
+   translate([roundness+end_gap+control_gap-15-wall_thickness/2, 0, 0])
+      rod_support_support();
+   translate([roundness+end_gap+control_gap+15-wall_thickness/2, 0, 0])
+      rod_support_support();
+   translate([roundness+end_gap+15-wall_thickness/2, 0, 0])
+      rod_support_support();
+   translate([roundness+end_gap+2*control_gap-15-wall_thickness/2, 0, 0])
+      rod_support_support();
+}
+
+rod_support_support_thickness = 7;
+
+module rod_support_support() {
+   difference() {
+      cube([wall_thickness, 40, height]);
+      translate([0, rod_support_support_thickness+wall_thickness/2, rod_support_support_thickness+wall_thickness/2])
+         cube([wall_thickness, 40-rod_support_support_thickness*2, height-rod_support_support_thickness*2]);
+   }
 }
 
 module big_pots() {
