@@ -89,7 +89,7 @@ module box_underside() {
          rotate([90, 0, 0])
             cylinder(d=11.2, h=wall_thickness*2);
       // USB power cable hole
-      translate([roundness+end_gap+control_gap/2, wall_thickness+depth+roundness*2, height/2])
+      translate([roundness+end_gap+10, wall_thickness+depth+roundness*2, 15])
          rotate([90, 0, 0])
             cylinder(d=4.2, h=50);
    }
@@ -116,12 +116,12 @@ module box_underside() {
 }
 
 module cable_cradle() {
-   translate([roundness+end_gap+control_gap/2-20/2, depth, wall_thickness]) {
+   translate([roundness+end_gap-20/2+10, depth, wall_thickness]) {
       difference() {
-         cube([20, 20, height/2-wall_thickness]);
-         translate([4, 10, 10])
+         cube([20, 20, 15-wall_thickness]);
+         translate([4, 10, 0])
             cylinder(d=3.2, h=12);
-         translate([16, 10, 10])
+         translate([16, 10, 0])
             cylinder(d=3.2, h=12);
       }
    }
@@ -130,7 +130,7 @@ module cable_cradle() {
 cpu_pedestal_height = 18;
 
 module cpu_pedestal() {
-   translate([roundness, depth-40, wall_thickness]) {
+   translate([wall_thickness+5, depth-40, wall_thickness]) {
       translate([1.75, 1.75, 0])
          difference() {
             cylinder(d=5, h=cpu_pedestal_height);
@@ -266,7 +266,7 @@ module throttle_rod() {
 }
 
 module esp32() {
-   translate([roundness, depth-40, wall_thickness+cpu_pedestal_height])
+   translate([wall_thickness+5, depth-40, wall_thickness+cpu_pedestal_height])
       difference() {
          cube([55, 27, 5]);
          translate([1.75, 1.75, 0])
@@ -287,9 +287,26 @@ module box_underside_slice3() {
    }
 }
 
-box_underside(); // Ignore module
+module box_underside_slice2() {
+   difference() {
+      box_underside();
+      cube([roundness+end_gap+1*control_gap-control_gap/2, depth+2*roundness, height]);
+      translate([roundness+end_gap+2*control_gap-control_gap/2, 0, 0])
+         cube([roundness+end_gap+1*control_gap-control_gap/2, depth+2*roundness, height]);
+   }
+}
 
-//box_underside_slice3(); // Make module underside3
+module box_underside_slice1() {
+   difference() {
+      box_underside();
+      translate([roundness+end_gap+control_gap/2, 0, 0])
+         cube([roundness+end_gap+2*control_gap-control_gap/2, depth+2*roundness, height]);
+   }
+}
+
+box_underside_slice1(); // Make module underside1
+box_underside_slice2(); // Make module underside2
+box_underside_slice3(); // Make module underside3
 
 #big_pots(); // Ignore module
 
