@@ -7,7 +7,7 @@ height = 50;
 depth = 170;
 roundness = 10;
 control_gap = 55;
-end_gap = 40;
+end_gap = 20;
 wall_thickness = 3;
 
 // Calculated
@@ -114,27 +114,29 @@ module cable_cradle() {
    }
 }
 
+cpu_pedestal_height = 18;
+
 module cpu_pedestal() {
-   translate([roundness+5, depth-35, wall_thickness]) {
+   translate([roundness+5, depth-40, wall_thickness]) {
       translate([1.75, 1.75, 0])
          difference() {
-            cylinder(d=5, h=8);
-            cylinder(d=2.1, h=8);
+            cylinder(d=5, h=cpu_pedestal_height);
+            cylinder(d=2.1, h=cpu_pedestal_height);
          }
       translate([55-1.75, 1.75, 0])
          difference() {
-            cylinder(d=5, h=8);
-            cylinder(d=2.1, h=8);
+            cylinder(d=5, h=cpu_pedestal_height);
+            cylinder(d=2.1, h=cpu_pedestal_height);
          }
       translate([1.75, 27-1.75, 0])
          difference() {
-            cylinder(d=5, h=8);
-            cylinder(d=2.1, h=8);
+            cylinder(d=5, h=cpu_pedestal_height);
+            cylinder(d=2.1, h=cpu_pedestal_height);
          }
       translate([55-1.75, 27-1.75, 0])
          difference() {
-            cylinder(d=5, h=8);
-            cylinder(d=2.1, h=8);
+            cylinder(d=5, h=cpu_pedestal_height);
+            cylinder(d=2.1, h=cpu_pedestal_height);
          }
    }
 }
@@ -257,7 +259,7 @@ module throttle_rod() {
 }
 
 module esp32() {
-   translate([roundness+5, depth-35, wall_thickness+8])
+   translate([roundness+5, depth-40, wall_thickness+cpu_pedestal_height])
       difference() {
          cube([55, 27, 5]);
          translate([1.75, 1.75, 0])
