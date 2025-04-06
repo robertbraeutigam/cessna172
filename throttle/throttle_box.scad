@@ -7,7 +7,7 @@ height = 50;
 depth = 170;
 roundness = 10;
 control_gap = 55;
-end_gap = 20;
+end_gap = 10;
 wall_thickness = 3;
 
 // Calculated
@@ -100,6 +100,19 @@ module box_underside() {
       big_pot_stand();
    translate([roundness+end_gap, 55, 0])
       small_pot_stand();
+   // Seams
+   translate([roundness+end_gap-wall_thickness+control_gap/2, 40, 0])
+      difference() {
+         cube([wall_thickness*2, depth+roundness*2-40, height]);
+         translate([0, 10, 10])
+            cube([wall_thickness*2, depth+roundness*2-20-40, height]);
+      }
+   translate([roundness+end_gap-wall_thickness+3*control_gap/2, 40, 0])
+      difference() {
+         cube([wall_thickness*2, depth+roundness*2-40, height]);
+         translate([0, 10, 10])
+            cube([wall_thickness*2, depth+roundness*2-20-40, height]);
+      }
 }
 
 module cable_cradle() {
@@ -117,7 +130,7 @@ module cable_cradle() {
 cpu_pedestal_height = 18;
 
 module cpu_pedestal() {
-   translate([roundness+5, depth-40, wall_thickness]) {
+   translate([roundness, depth-40, wall_thickness]) {
       translate([1.75, 1.75, 0])
          difference() {
             cylinder(d=5, h=cpu_pedestal_height);
@@ -198,12 +211,6 @@ module small_pot_leg() {
 module rod_supports() {
    translate([0, 40, 0])
       cube([full_width, wall_thickness, height]);
-   for(i=[0:1:2]) {
-      translate([roundness+end_gap+i*control_gap-15-wall_thickness/2, 0, 0])
-         cube([wall_thickness, 40, height]);
-      translate([roundness+end_gap+i*control_gap+15-wall_thickness/2, 0, 0])
-         cube([wall_thickness, 40, height]);
-   }
 }
 
 module big_pots() {
@@ -259,7 +266,7 @@ module throttle_rod() {
 }
 
 module esp32() {
-   translate([roundness+5, depth-40, wall_thickness+cpu_pedestal_height])
+   translate([roundness, depth-40, wall_thickness+cpu_pedestal_height])
       difference() {
          cube([55, 27, 5]);
          translate([1.75, 1.75, 0])
@@ -273,7 +280,16 @@ module esp32() {
       }
 }
 
-box_underside(); // Make module underside
+module box_underside_slice3() {
+   difference() {
+      box_underside();
+      cube([roundness+end_gap+2*control_gap-control_gap/2, depth+2*roundness, height]);
+   }
+}
+
+box_underside(); // Ignore module
+
+//box_underside_slice3(); // Make module underside3
 
 #big_pots(); // Ignore module
 
