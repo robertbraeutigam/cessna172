@@ -186,15 +186,17 @@ module big_pot_stand() {
 module big_pot_leg() {
    translate([0, 0, big_pot_stand_height/2])
       cube([big_pot_full_width+3, big_pot_stand_thickness, big_pot_stand_height], center=true);
-   translate([-big_pot_full_width/2-6/2, 0, 0])
+   translate([-big_pot_full_width+wall_thickness/2, -10, 0])
       difference() {
-         cylinder(d=6, h=big_pot_stand_height+big_pot_module_height);
-         cylinder(d=3.2, h=big_pot_stand_height+big_pot_module_height);
+         cube([5, 20, big_pot_stand_height+big_pot_stand_height]);
+         translate([5/2,20/2,1])
+            cylinder(d=3.2, h=big_pot_stand_height+big_pot_module_height+1);
       }
-   translate([+big_pot_full_width/2+6/2, 0, 0])
+   translate([+big_pot_full_width-5-wall_thickness/2, -10, 0])
       difference() {
-         cylinder(d=6, h=big_pot_stand_height+big_pot_module_height);
-         cylinder(d=3.2, h=big_pot_stand_height+big_pot_module_height);
+         cube([5, 20, big_pot_stand_height+big_pot_stand_height]);
+         translate([5/2,20/2,1])
+            cylinder(d=3.2, h=big_pot_stand_height+big_pot_module_height+1);
       }
 }
 
