@@ -16,7 +16,7 @@ module carb_heat_knob() {
 module carb_heat_stem() {
    difference() {
       cylinder(d=12, h=15);
-      translate([0, 0, 1])
+      translate([0, 0, -1])
          cylinder(d=6.2, h=15+2);
    }
 }
