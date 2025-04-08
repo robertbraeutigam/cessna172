@@ -110,11 +110,11 @@ module box_underside() {
 module seam() {
    difference() {
       cube([wall_thickness*2, depth+roundness*2-40, height]);
-      translate([0, 10, 10])
-         cube([wall_thickness*2, depth+roundness*2-20-40, height]);
+      translate([-1, 10, 10])
+         cube([wall_thickness*2+2, depth+roundness*2-20-40, height]);
       for (i = [0:1:4]) {
          for (o= [0:1:14]) {
-            translate([-wall_thickness/2, 7+o*9.7, 7+i*9.5])
+            translate([-wall_thickness/2, 6+o*9.8, 7+i*9.5])
                rotate([0, 90, 0])
                   cylinder(d=3.3, h=wall_thickness*3);
          }
