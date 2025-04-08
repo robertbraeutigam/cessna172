@@ -33,6 +33,9 @@ small_pot_full_length = 75;
 // Clamp
 clamp_depth = 35;
 
+// Connector columns
+top_screw_d = roundness;
+
 module rounded_box(local_width, local_depth) {
    hull() {
       cylinder(h = height, r=roundness);
@@ -65,13 +68,13 @@ module box_underside() {
          // Rod supports
          rod_supports();
          // Top screw columns
-         translate([roundness, roundness, 0])
+         translate([roundness/2+wall_thickness, roundness/2+wall_thickness, 0])
             top_screw_column();
-         translate([roundness, depth+roundness, 0])
+         translate([roundness/2+wall_thickness, depth+roundness+wall_thickness-1, 0])
             top_screw_column();
-         translate([width+roundness, roundness, 0])
+         translate([width+roundness+wall_thickness-1, roundness/2+wall_thickness, 0])
             top_screw_column();
-         translate([width+roundness, depth+roundness, 0])
+         translate([width+roundness+wall_thickness-1, depth+roundness+wall_thickness-1, 0])
             top_screw_column();
          // CPU pedestal
          cpu_pedestal();
@@ -166,9 +169,9 @@ module cpu_pedestal() {
 
 module top_screw_column() {
    difference() {
-      cylinder(d=8, h=height);
+      cylinder(d=top_screw_d, h=height);
       translate([0, 0, height-16])
-         cylinder(d=3.2, h=16);
+         cylinder(d=4.2, h=17);
    }
 }
 
