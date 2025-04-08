@@ -30,6 +30,9 @@ small_pot_full_width = 10;
 small_pot_module_height = 6;
 small_pot_full_length = 75;
 
+// Clamp
+clamp_depth = 35;
+
 module rounded_box(local_width, local_depth) {
    hull() {
       cylinder(h = height, r=roundness);
@@ -56,9 +59,9 @@ module box_underside() {
             }
          // Clamp housings
          translate([roundness, 0, 0])
-            cube([20+wall_thickness*2, 30, 20+wall_thickness*2]);
+            cube([20+wall_thickness*2, clamp_depth, 20+wall_thickness*2]);
          translate([roundness+width-20-wall_thickness*2, 0, 0])
-            cube([20+wall_thickness*2, 30, 20+wall_thickness*2]);
+            cube([20+wall_thickness*2, clamp_depth, 20+wall_thickness*2]);
          // Rod supports
          rod_supports();
          // Top screw columns
@@ -77,9 +80,9 @@ module box_underside() {
       }
       // Remove clamp space
       translate([roundness+wall_thickness, -wall_thickness, wall_thickness])
-         cube([20, 30, 20]);
+         cube([20, clamp_depth, 20]);
       translate([roundness+width-20-wall_thickness, -wall_thickness, wall_thickness])
-         cube([20, 30, 20]);
+         cube([20, clamp_depth, 20]);
       // Rod & rod nut holes
       throttle_rods();
       translate([roundness+end_gap+control_gap, wall_thickness*2, wall_thickness+big_pot_stand_height+big_pot_module_height+15+7])
