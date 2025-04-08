@@ -4,12 +4,28 @@ $fn = 50;
 
 module carb_heat_knob() {
    carb_heat_stem();
+   // Head
    hull() {
       translate([0, 0, 15])
          cylinder(d=12, h=1);
       translate([0, 0, 20])
          rotate([180, 0 ,0])
             carb_heat_head();
+   }
+   // Pattern
+   translate([0, 0, 23]) {
+      difference() {
+         cube([25, 25, 2], center=true);
+         translate([0, 0, -1])
+            cube([23, 23, 4], center=true);
+      }
+   }
+   translate([0, 0, 22]) {
+      difference() {
+         cylinder(d=20, h=2);
+         translate([0, 0, -1])
+            cylinder(d=18, h=4);
+      }
    }
 }
 
