@@ -209,15 +209,17 @@ module small_pot_stand() {
 module small_pot_leg() {
    translate([0, 0, small_pot_stand_height/2])
       cube([small_pot_full_width+3, small_pot_stand_thickness, small_pot_stand_height], center=true);
-   translate([-small_pot_full_width/2-6/2, 0, 0])
+   translate([-small_pot_full_width, -10, 0])
       difference() {
-         cylinder(d=6, h=small_pot_stand_height+small_pot_module_height);
-         cylinder(d=3.2, h=small_pot_stand_height+small_pot_module_height);
+         cube([5, 20, small_pot_stand_height+small_pot_stand_height]);
+         translate([5/2,20/2,1])
+            cylinder(d=3.2, h=small_pot_stand_height+small_pot_module_height+1);
       }
-   translate([+small_pot_full_width/2+6/2, 0, 0])
+   translate([+5, -10, 0])
       difference() {
-         cylinder(d=6, h=small_pot_stand_height+small_pot_module_height);
-         cylinder(d=3.2, h=small_pot_stand_height+small_pot_module_height);
+         cube([5, 20, small_pot_stand_height+small_pot_stand_height]);
+         translate([5/2,20/2,1])
+            cylinder(d=3.2, h=small_pot_stand_height+small_pot_module_height+1);
       }
 }
 
