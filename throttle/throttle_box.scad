@@ -144,25 +144,21 @@ cpu_pedestal_height = 18;
 
 module cpu_pedestal() {
    translate([wall_thickness+5, depth-40, wall_thickness]) {
-      translate([1.75, 1.75, 0])
+      translate([-10/2-1, -0.5, 0])
          difference() {
-            cylinder(d=5, h=cpu_pedestal_height);
-            cylinder(d=2.1, h=cpu_pedestal_height);
+            cube([10, 30, cpu_pedestal_height]);
+            translate([7.75, 2.25, 1])
+               cylinder(d=2.1, h=cpu_pedestal_height);
+            translate([7.75, 27-1.25, 1])
+               cylinder(d=2.1, h=cpu_pedestal_height);
          }
-      translate([55-1.75, 1.75, 0])
+      translate([55-2*1.75-10/2-1, -0.5, 0])
          difference() {
-            cylinder(d=5, h=cpu_pedestal_height);
-            cylinder(d=2.1, h=cpu_pedestal_height);
-         }
-      translate([1.75, 27-1.75, 0])
-         difference() {
-            cylinder(d=5, h=cpu_pedestal_height);
-            cylinder(d=2.1, h=cpu_pedestal_height);
-         }
-      translate([55-1.75, 27-1.75, 0])
-         difference() {
-            cylinder(d=5, h=cpu_pedestal_height);
-            cylinder(d=2.1, h=cpu_pedestal_height);
+            cube([10, 30, cpu_pedestal_height]);
+            translate([7.75, 2.25, 1])
+               cylinder(d=2.1, h=cpu_pedestal_height);
+            translate([7.75, 27-1.25, 1])
+               cylinder(d=2.1, h=cpu_pedestal_height);
          }
    }
 }
