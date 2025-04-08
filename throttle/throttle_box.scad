@@ -18,7 +18,7 @@ full_width = width + 2*roundness;
 big_pot_stand_distance = 110;
 big_pot_stand_thickness = 5;
 big_pot_stand_height = 7;
-big_pot_full_width = 15;
+big_pot_full_width = 16;
 big_pot_module_height = 6;
 big_pot_full_length = 120;
 
@@ -26,7 +26,7 @@ big_pot_full_length = 120;
 small_pot_stand_distance = 60;
 small_pot_stand_thickness = 5;
 small_pot_stand_height = 7;
-small_pot_full_width = 7;
+small_pot_full_width = 10;
 small_pot_module_height = 6;
 small_pot_full_length = 75;
 
