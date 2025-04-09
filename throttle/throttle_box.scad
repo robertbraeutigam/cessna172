@@ -335,9 +335,32 @@ module box_underside_slice1() {
    }
 }
 
+module small_pot_holder() {
+   translate([roundness+end_gap, 55, 20]) {
+      translate([-small_pot_full_width, -10, 0])
+         difference() {
+            cube([5, 20, 3]);
+            translate([5/2,20/2,-1])
+               cylinder(d=3.5, h=5);
+         }
+      translate([+small_pot_full_width-5, -10, 0])
+         difference() {
+            cube([5, 20, 3]);
+            translate([5/2,20/2,-1])
+               cylinder(d=3.5, h=5);
+         }
+      translate([-small_pot_full_width, -10, 0])
+         cube([small_pot_full_width*2, 7, 3]);
+      translate([-small_pot_full_width+5+0.5, -10, -3])
+         cube([small_pot_full_width-1, 5, 6]);
+   }
+}
+
 box_underside_slice1(); // Make module underside1
 box_underside_slice2(); // Make module underside2
 box_underside_slice3(); // Make module underside3
+
+small_pot_holder(); // Make module holder_small_pot
 
 #big_pots(); // Ignore module
 
