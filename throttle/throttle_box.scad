@@ -133,12 +133,28 @@ module cable_cradle() {
       difference() {
          cube([20, 20, 15-wall_thickness]);
          translate([4, 10, 0])
-            cylinder(d=3.2, h=12);
+            cylinder(d=3.2, h=13);
          translate([16, 10, 0])
-            cylinder(d=3.2, h=12);
+            cylinder(d=3.2, h=13);
       }
    }
 }
+
+module cable_cradle_top() {
+   translate([roundness+end_gap-20/2+10, depth, wall_thickness+20]) {
+      difference() {
+         cube([20, 20, 5]);
+         translate([4, 10, -1])
+            cylinder(d=3.2, h=10);
+         translate([16, 10, -1])
+            cylinder(d=3.2, h=10);
+         translate([20/2, 20, -1])
+            rotate([90, 0, 0])
+               cylinder(d=4.2, h=21);
+      }
+   }
+}
+
 
 cpu_pedestal_height = 18;
 
@@ -361,6 +377,8 @@ box_underside_slice2(); // Make module underside2
 box_underside_slice3(); // Make module underside3
 
 small_pot_holder(); // Make module holder_small_pot
+
+cable_cradle_top(); // Make module cradle_top
 
 #big_pots(); // Ignore module
 
