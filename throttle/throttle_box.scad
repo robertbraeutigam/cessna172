@@ -15,12 +15,12 @@ width = 2 * control_gap + 2 * end_gap;
 full_width = width + 2*roundness;
 
 // Big linear pot dimensions
-big_pot_stand_distance = 110;
+big_pot_stand_distance = 115;
 big_pot_stand_thickness = 5;
 big_pot_stand_height = 7;
 big_pot_full_width = 16;
 big_pot_module_height = 6;
-big_pot_full_length = 120;
+big_pot_full_length = 130;
 
 // Small linear pot dimensions
 small_pot_stand_distance = 60;
@@ -182,13 +182,13 @@ module big_pot_stand() {
 module big_pot_leg() {
    translate([0, 0, big_pot_stand_height/2])
       cube([big_pot_full_width+3, big_pot_stand_thickness, big_pot_stand_height], center=true);
-   translate([-big_pot_full_width+wall_thickness/2, -10, 0])
+   translate([-big_pot_full_width+3, -10, 0])
       difference() {
          cube([5, 20, big_pot_stand_height+big_pot_stand_height]);
          translate([5/2,20/2,1])
             cylinder(d=3.2, h=big_pot_stand_height+big_pot_module_height+1);
       }
-   translate([+big_pot_full_width-5-wall_thickness/2, -10, 0])
+   translate([+big_pot_full_width-5-3, -10, 0])
       difference() {
          cube([5, 20, big_pot_stand_height+big_pot_stand_height]);
          translate([5/2,20/2,1])
