@@ -61,7 +61,7 @@ module knob_top() {
    }
 }
 
-carb_heat_knob(); // Module carb_heat_knob
+carb_heat_knob(); // Make module carb_heat_knob
 
-knob_top(); // Module knob_top
+knob_top(); // Make module knob_top
 
