@@ -41,5 +41,17 @@ module carb_heat_head() {
    }
 }
 
+module button() {
+   translate([0, 0, 25]) {
+      cylinder(d=16, h=2);
+      translate([0, 0, 2])
+         rotate_extrude(convexity = 10)
+             translate([7, 0, 0])
+                 circle(r = 1, $fn = 100);
+   }
+}
+
 carb_heat_knob(); // Make module knob
+
+button(); // Make module button
 
