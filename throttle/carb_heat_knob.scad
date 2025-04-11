@@ -45,7 +45,23 @@ module carb_heat_head() {
    }
 }
 
+module knob_top() {
+   translate([0, 0, 30]) {
+      cube([25, 25, 1], center=true);
+      /*
+      translate([8,8,-1.2])
+         cylinder(d=3, h=1);
+      translate([-8,-8,-1.2])
+         cylinder(d=3, h=1);
+      */
+      translate([0,0,0.5])
+         rotate_extrude(convexity = 10)
+            translate([10, 0, 0])
+               circle(r = 0.8, $fn = 100);
+   }
+}
+
 carb_heat_knob(); // Module carb_heat_knob
 
-
+knob_top(); // Module knob_top
 
