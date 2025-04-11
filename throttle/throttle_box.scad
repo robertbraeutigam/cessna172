@@ -141,9 +141,9 @@ module cable_cradle() {
 }
 
 module cable_cradle_top() {
-   translate([roundness+end_gap-20/2+10, depth, wall_thickness+20]) {
+   translate([roundness+end_gap-20/2+10, depth, 20]) {
       difference() {
-         cube([20, 20, 5]);
+         cube([20, 20-wall_thickness, 5]);
          translate([4, 10, -1])
             cylinder(d=3.2, h=10);
          translate([16, 10, -1])
