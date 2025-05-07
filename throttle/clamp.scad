@@ -10,7 +10,7 @@ module clamp(width) {
             cube([9, 4+2, width]);
       }
       translate([0, 0, -1])
-         cylinder(h=width+2, d=6);
+         cylinder(h=width+2, d=6.2);
       translate([1, -1, -1])
          cube([width+2, 2, width+2]);
       translate([6, 5, width/2])
@@ -21,11 +21,11 @@ module clamp(width) {
 
 module clamp_slider() {
    clamp(10);
-   translate([-18, -1.5, 0]) {
+   translate([-15, -2, 0]) {
       difference() {
-         cube([15, 3, 10]);
-         translate([-2, 1, 2.5])
-            cube([15, 1, 5]);
+         cube([12, 4, 10]);
+         translate([-1, 1.25, 2.5])
+            cube([15, 1.5, 5]);
       }
    }
 }
