@@ -11,6 +11,12 @@ VIEW_BACKGROUND=\#f8f8f8
 VIEW_RENDER_SIZE=3200,2400
 VIEW_OPTS=--preview --viewall --autocenter --projection=p --colorscheme=Tomorrow
 
+# Montage: title, the "main" view, then the other views as thumbnails. The
+# thumbnail tiles (380+2*10 wide) fill the 1600 width of VIEW_SIZE.
+MONTAGE_TITLE_SIZE=1600x190
+MONTAGE_COLUMNS=4
+MONTAGE_THUMB=380x285+10+10
+
 # Comments out every marker line, the recipes then uncomment one at a time
 COMMENT_MARKERS=-e "s/{{gitrev}}/$(GITREV)/g" \
 	-e "s/\(.*Make module.*\)/\/\/\1/g" \
@@ -59,6 +65,37 @@ target/%.views: %.scad
 				target/$*_$$name.png; \
 		fi; \
 	done
+	@if grep "Make view" >/dev/null $< && command -v montage >/dev/null; \
+	then \
+		echo "Making montage"; \
+		views=`grep -o "Make view .*" <$< | cut -d " " -f 3`; \
+		main=`echo "$$views" | head -1`; \
+		if echo "$$views" | grep -x main >/dev/null; then main=main; fi; \
+		set --; \
+		for v in $$views; \
+		do \
+			[ $$v = $$main ] || set -- "$$@" -label "`echo $$v | tr _ ' '`" target/$*_$$v.png; \
+		done; \
+		convert -size $(MONTAGE_TITLE_SIZE) xc:"$(VIEW_BACKGROUND)" -gravity north \
+			-font DejaVu-Sans-Bold -pointsize 56 -fill "#22262b" \
+			-annotate +0+36 "`head -1 $< | sed 's|^// *||'`" \
+			-font DejaVu-Sans -pointsize 26 -fill "#7a828c" \
+			-annotate +0+116 "$(notdir $(CURDIR))/$< · $(GITREV) · `date +%Y-%m-%d`" \
+			-fill "#3d7bd9" -draw "rectangle 740,166 860,170" \
+			target/.title_$*.png; \
+		if [ $$# -gt 0 ]; \
+		then \
+			montage "$$@" -tile $(MONTAGE_COLUMNS)x -geometry $(MONTAGE_THUMB) \
+				-font DejaVu-Sans -pointsize 26 -fill "#4a525c" \
+				-background "$(VIEW_BACKGROUND)" target/.thumbs_$*.png; \
+		else \
+			convert -size 1x1 xc:"$(VIEW_BACKGROUND)" target/.thumbs_$*.png; \
+		fi; \
+		convert target/.title_$*.png target/$*_$$main.png target/.thumbs_$*.png \
+			-background "$(VIEW_BACKGROUND)" -gravity center -append \
+			-bordercolor "$(VIEW_BACKGROUND)" -border 0x30 +repage -depth 8 \
+			target/$*_montage.png; \
+	fi
 	@touch $@
 
 clean:

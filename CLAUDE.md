@@ -86,7 +86,10 @@ comments out and uncomments whole lines.
 from +z) and automatically framed. Views use the colored OpenSCAD preview
 renderer (OpenCSG), so they need a display, and they are rendered at twice
 the size and then trimmed, scaled and padded with ImageMagick (`convert`) if it
-is installed. View lines are usually commented out in the source so the GUI
+is installed. With ImageMagick, `target/<file>_montage.png` combines them: a
+title (the first comment line of the scad file), the `main` view (or the first
+view if there is no `main`) and the other views as captioned thumbnails.
+View lines are usually commented out in the source so the GUI
 preview shows the parts; as with modules, that does not stop them from being
 built. Keep view-only geometry and colors (bought parts, labels, exploded
 layouts) in `*_view` / `*_part` modules so they never end up in an STL.
