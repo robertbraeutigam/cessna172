@@ -27,8 +27,8 @@ follow the same layout.
     has the parts list and assembly order. The `lock_*` values are guesses
     until the real lock is measured.
   - `switches.scad` — a separate panel with the switch row: a red double
-    rocker for MASTER (ALT, BAT), MTS-202 mini toggles in the middle
-    (lights, pitot heat, fuel pump) and a black double rocker for
+    rocker for MASTER (ALT, BAT), M12 toggles in the middle (lights,
+    pitot heat, fuel pump) and a black double rocker for
     AVIONICS (BUS 1, BUS 2), with the labels engraved. The switch list
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
@@ -115,8 +115,9 @@ so a version can be embossed into a part. Files are rendered from the copy in
 - Hole clearances used so far: 3.2–3.3 mm for M3 screws, 2.1 mm for M2 pilot
   holes, 4.2 mm for M4 / the USB cable, 6.2 mm for the 6 mm rods, 11.2 mm for
   the rod nuts.
-- Pieces must fit the printer bed, which is why large parts are sliced (see
-  `box_underside_slice1..3`).
+- The printer is an Anycubic Kobra 3 V2 with a 255 x 255 mm bed. Pieces must
+  fit it, which is why large parts are sliced (see `box_underside_slice1..3`);
+  files with big parts check it with a `bed = [255, 255]` parameter.
 - Values that depend on bought parts are grouped as parameters marked
   MEASURE, and `assert()`s check that derived geometry still fits, so a
   wrong measurement fails the build instead of printing a bad part.

@@ -8,9 +8,10 @@
 //   rockers in one housing, 6 pins). They snap into a cutout from the
 //   front: ramps on their top and bottom end catch behind the panel, which
 //   is thinned to rk_grip there by a pocket in the back.
-// - The middle switches are mini toggle switches (MTS-202, ON-ON). They go
-//   in from the back and a nut on the front clamps them. Their body sits
-//   in a shallow pocket in the back so they cannot turn.
+// - The middle switches are toggle switches with an M12 neck and an 18 mm
+//   lever, about the size of the real ones. They go in from the back and
+//   a nut on the front clamps them. Their body sits in a shallow pocket in
+//   the back so they cannot turn.
 // - A rim and bosses on the back stiffen the long, thin panel.
 //
 // Wiring: every switch closes one contact: one side to a common GND wire,
@@ -23,7 +24,7 @@
 //
 // Parts to buy (details in switches.md):
 // - 1 red and 1 black double rocker switch, 6 pin
-// - 7 MTS-202 mini toggle switches
+// - 7 toggle switches, M12 neck (2 pin ON-OFF or 6 pin ON-ON)
 // - mount_count x M3 screws to mount the panel
 // - wire: one GND wire daisy chained over all switches, one wire per switch
 //
@@ -37,7 +38,7 @@ $fn = 48;
 view_on = [1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1];
 
 // --- Printer ---
-bed = [220, 220];            // MEASURE: the printer bed
+bed = [255, 255];            // Kobra 3 V2
 
 // --- Double rocker switch, 6 pin (MEASURE: from the listing) ---
 rk_bezel = [24.3, 31.3];     // front lip, width x height
@@ -56,24 +57,26 @@ rk_rocker_h = 3;             // rocker center height in front of the lip
 rk_rocker_tilt = 10;
 
 // --- Toggle switch ---
-toggle = "MTS-202";          // "MTS-202" (mini, M6) or "KN3C-202" (standard, M12)
+toggle = "M12";              // "M12" (standard size, like the real ones) or "MTS-202" (mini, M6)
 mts = toggle == "MTS-202";
-// MEASURE: from listings, the KN3C values are rough guesses
+// MEASURE: M12 values from the listing (30 x 15.5 x 15 mm, 12 mm neck,
+// 18 mm lever), the rest are guesses
 tg_thread_d = mts ? 6 : 12;
 tg_hole = tg_thread_d + 0.2;
-tg_thread_len = mts ? 9 : 9.5;  // from the body
-tg_body = mts ? [12.8, 11.4] : [13, 18];  // body, orientation unknown (the pocket is square)
-tg_body_depth = mts ? 9.5 : 20;
+tg_thread_len = mts ? 9 : 9.5;  // from the body (guess for M12)
+tg_body = mts ? [12.8, 11.4] : [15.5, 15];  // body, orientation unknown (the pocket is square)
+tg_depth = mts ? 14 : 30;    // top of the body to the end of the lugs
+tg_tab = mts ? [2, 0.5, 4.5] : [3, 0.8, 7];
+tg_body_depth = tg_depth - tg_tab.z;
 tg_nut_af = mts ? 8 : 14;    // nut across flats
 tg_nut_t = mts ? 2 : 2.5;
-tg_washer_d = mts ? 10 : 16;
+tg_washer_d = mts ? 10 : 15;
 tg_washer_t = 0.6;
-tg_lever_len = mts ? 10 : 20;
-tg_lever_d = mts ? [3, 2.4] : [4.5, 3.5];  // base, tip
+tg_lever_len = mts ? 10 : 18;
+tg_lever_d = mts ? [3, 2.4] : [4.5, 3.2];  // base, tip
 tg_lever_tilt = 14;
-tg_tab = mts ? [2, 0.5, 4.5] : [3, 0.8, 6];
-tg_pin_pitch = mts ? [4.7, 4.7] : [6, 6];  // between the 2 poles, along the throw
-tg_pitch = mts ? 19 : 24;
+tg_pin_pitch = mts ? [4.7, 4.7] : [7, 6];  // between the 2 poles, along the throw
+tg_pitch = 19;
 tg_pocket_depth = 1;         // body pocket in the back, keeps the toggle from turning
 
 // --- Layout ---

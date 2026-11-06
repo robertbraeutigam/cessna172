@@ -8,7 +8,7 @@ separate panel; its parts are listed in the `ignition.scad` header.
 |-----|------|-----|
 | 1 | double rocker switch, 6 pin, red | MASTER: ALT, BAT |
 | 1 | double rocker switch, 6 pin, black (there is no white one) | AVIONICS: BUS 1, BUS 2 |
-| 7 | MTS-202 mini toggle switch, ON-ON | FUEL PUMP, BEACON, LAND, TAXI, NAV, STROBE, PITOT HEAT |
+| 7 | toggle switch, M12 neck, 18 mm lever | FUEL PUMP, BEACON, LAND, TAXI, NAV, STROBE, PITOT HEAT |
 | 6 | M3 pan head screw + nut | mounting (`mount_count`) |
 | - | wire, heat shrink, connectors | see Wiring |
 
@@ -36,45 +36,41 @@ The lamps are neon (250 V) and will not light on 5 V; leave the lamp pin
 unconnected. Each rocker has 3 pins: find the two that close when the
 rocker is ON with a multimeter.
 
-## Toggle switches: MTS-202
+## Toggle switches: M12
 
-MTS-202 is a mini toggle, DPDT, ON-ON, 6 solder lugs, M6 thread. Use
-the ON-ON MTS-202, not the MTS-203: that one is ON-OFF-ON, with a center
-stop the real switch does not have. The MTS-1xx and -2xx are all the same
-size; the number only says how many poles and positions.
+Standard size toggle switches, about the size of the real ones. From the
+listing: body 30 x 15.5 x 15 mm, 12 mm neck (M12 thread), 18 mm lever.
+Either a 2 pin ON-OFF or a 6 pin ON-ON (DPDT) switch works. Do not take an
+ON-OFF-ON one (e.g. "-203"): its center stop is not on the real switch.
 
-Listings found on amazon.de (prices not checked, Amazon blocks automated
-access):
-
-- [ETOPARS mini toggle switch ON-ON, 6 pin DPDT, pack of 10](https://www.amazon.de/ETOPARS-Kippschalter-Armaturenbrett-Wippschalter-L%C3%B6tanschluss/dp/B08Z7R4RB9)
-- [Taiss 10 pcs MTS-202 ON-ON (with waterproof caps, not needed)](https://www.amazon.de/MTS-202-Terminals-Positionen-Kippschalter-wasserdichte/dp/B07JNV6SCJ)
-- [MTS-202 / MTS-203 mini toggle, choose the ON-ON variant](https://www.amazon.de/MTS-202-DPDT-Schalter-6-Pin-Mini-Kippschalter-MTS-203/dp/B0CPDP58KQ)
-- [Miniatur Kippschalter 2x EIN/EIN, 6 pin, Gewinde Ø 6 mm](https://www.amazon.de/Miniatur-Kippschalter-L%C3%B6t%C3%B6sen-6-Pin-Gewinde/dp/B00P2EZ9T6)
-
-Listings give a 6 mm hole, M6 x 0.75 thread about 9 mm long, a body of
-about 12.8 x 11.4 mm and 31.7 mm overall height. A reviewer broke a thread
-by over-tightening, so tighten the nut gently.
-
-The toggles go in from the back, the nut and washer on the front clamp
+The toggles go in from the back, and a nut and washer on the front clamp
 them. The body sits in a square pocket 1 mm deep in the back of the panel
 so it cannot turn.
 
-**MEASURE when they arrive:** the body (`tg_body`), the thread length, the
-nut, the lever and the pin positions.
+**MEASURE when they arrive** (`tg_*`, `toggle = "M12"`):
 
-The real airplane's toggles are bigger (about 12 mm thread, 20 mm lever).
-Standard size toggles (KN3C-202 style, M12) would be closer. Set
-`toggle = "KN3C-202"` in `switches.scad` to try them; their values are
-rough guesses. The panel then gets wider than a 220 mm bed (the build
-fails on the `bed` check) and would need to be split.
+- The 30 mm is assumed to be from the top of the body to the end of the
+  lugs, and 15.5 x 15 mm the body.
+- The thread length (now 9.5 mm; the panel is 2 mm thick there, the
+  washer and nut need about 4 mm of it).
+- The nut across flats (now 14 mm). The switches are 19 mm apart, so a
+  nut up to about 15 mm fits; the build checks this.
+- The lever and the lug positions.
+
+The mini MTS-202 (M6, 10 mm lever) still works too: set
+`toggle = "MTS-202"`. amazon.de listings for it:
+[ETOPARS, 10 pieces](https://www.amazon.de/ETOPARS-Kippschalter-Armaturenbrett-Wippschalter-L%C3%B6tanschluss/dp/B08Z7R4RB9),
+[Taiss, 10 pieces](https://www.amazon.de/MTS-202-Terminals-Positionen-Kippschalter-wasserdichte/dp/B07JNV6SCJ).
 
 ## Wiring
 
 Every switch is wired like a switch to GND, which is what SimVim inputs
 expect (active low):
 
-- Toggle: use one pole. Its middle lug (common) goes to GND. The lug at
-  the bottom goes to the SimVim input: the lever up (ON) connects the
+- Toggle, 2 pin: one lug to GND, the other to the SimVim input. Mount it
+  so it is ON with the lever up.
+- Toggle, 6 pin: use one pole. Its middle lug (common) goes to GND, the
+  lug at the bottom to the SimVim input: the lever up (ON) connects the
   common to the bottom lug. Check with a multimeter.
 - Rocker: the two pins of each rocker that close when it is ON; one to
   GND, the other to the input.
@@ -91,5 +87,5 @@ they are hard to get out again.
   it.
 - The switch list in `switches.scad` (`groups`) follows the X-Plane 172 SP.
   For a 172N, remove FUEL PUMP; the layout adapts.
-- The panel is 211.6 x 63.3 mm and is checked against `bed` (220 x 220 mm).
-  Set `bed` to the real printer bed.
+- The panel is 211.6 x 63.3 mm and is checked against `bed` (255 x 255 mm,
+  Kobra 3 V2).
