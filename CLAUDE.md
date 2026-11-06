@@ -26,6 +26,14 @@ follow the same layout.
     and one magnet with a digital hall sensor per position. The header comment
     has the parts list and assembly order. The `lock_*` values are guesses
     until the real lock is measured.
+  - `switches.scad` — a separate panel with the rocker switches: the red
+    split MASTER (ALT, BAT), the single switches (lights, pitot heat, fuel
+    pump) and the white split AVIONICS (BUS 1, BUS 2). It is a printed
+    plate for cheap KCD1 snap-in rockers, with the labels engraved. The
+    switch list (`groups`) drives the layout. The `sw_*` values are
+    guesses until the switches are measured.
+  - `switches.md` — hardware for `switches.scad`: amazon.de listings,
+    wiring and mounting parts.
 
 ## Building
 
