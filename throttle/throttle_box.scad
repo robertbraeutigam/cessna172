@@ -36,15 +36,15 @@ clamp_depth = 35;
 // Connector columns
 top_screw_d = roundness;
 
-module rounded_box(local_width, local_depth) {
+module rounded_box(local_width, local_depth, local_height) {
    hull() {
-      cylinder(h = height, r=roundness);
+      cylinder(h = local_height, r=roundness);
       translate([local_width, 0 , 0])
-         cylinder(h = height, r=roundness);
+         cylinder(h = local_height, r=roundness);
       translate([local_width, local_depth , 0])
-         cylinder(h = height, r=roundness);
+         cylinder(h = local_height, r=roundness);
       translate([0, local_depth , 0])
-         cylinder(h = height, r=roundness);
+         cylinder(h = local_height, r=roundness);
    }
 }
 
@@ -54,10 +54,10 @@ module box_underside() {
          // The main box area
          translate([roundness, roundness, 0])
             difference() {
-               rounded_box(width, depth);
+               rounded_box(width, depth, height);
                // Box inside
                translate([wall_thickness, wall_thickness, wall_thickness])
-                  rounded_box(width-wall_thickness*2, depth-wall_thickness*2);
+                  rounded_box(width-wall_thickness*2, depth-wall_thickness*2, height);
                // Clamp holes
             }
          // Clamp housings
@@ -372,19 +372,67 @@ module small_pot_holder() {
    }
 }
 
+module box_lid() {
+   translate([0,0,height+10]) {
+      difference() {
+         translate([roundness, roundness, 0]) {
+            rounded_box(width, depth, 2);
+         }
+         translate([roundness/2+wall_thickness, roundness/2+wall_thickness, -1])
+            cylinder(d=4.4, h=5);
+         translate([roundness/2+wall_thickness, depth+roundness+wall_thickness-1, 0])
+            cylinder(d=4.4, h=3);
+         translate([width+roundness+wall_thickness-1, roundness/2+wall_thickness, 0])
+            cylinder(d=4.4, h=3);
+         translate([width+roundness+wall_thickness-1, depth+roundness+wall_thickness-1, 0])
+            cylinder(d=4.4, h=3);
+      }
+      difference() {
+         translate([roundness+wall_thickness+0.6, roundness+wall_thickness+0.6, -1]) {
+            rounded_box(width-wall_thickness*2-0.6*2, depth-wall_thickness*2-0.6*2, 1);
+         }
+         translate([roundness+wall_thickness+2, roundness+wall_thickness+2, -1.5]) {
+            rounded_box(width-wall_thickness*2-4, depth-wall_thickness*2-4, 2);
+         }
+         translate([0, 0, -2])
+            cube([20, 60, 5]);
+         translate([full_width-20, 0, -2])
+            cube([20, 60, 5]);
+         translate([end_gap+20, 0, -2])
+            cube([10, 60, 5]);
+         translate([end_gap+control_gap-10, 0, -2])
+            cube([10, 60, 5]);
+         translate([end_gap+control_gap*1.5-5, 0, -2])
+            cube([10, 60, 5]);
+         translate([end_gap+control_gap*2-10, 0, -2])
+            cube([10, 60, 5]);
+         translate([end_gap+control_gap/2, depth, -2])
+            cube([20, 60, 5]);
+         translate([end_gap+control_gap*1.5, depth, -2])
+            cube([20, 60, 5]);
+         translate([0, depth, -2])
+            cube([20, 60, 5]);
+         translate([full_width-20, depth, -2])
+            cube([20, 60, 5]);
+      }
+   }
+}
+
 box_underside_slice1(); // Make module underside1
 box_underside_slice2(); // Make module underside2
 box_underside_slice3(); // Make module underside3
 
-small_pot_holder(); // Make module holder_small_pot
+box_lid(); // Make module lid
 
-cable_cradle_top(); // Make module cradle_top
+//small_pot_holder(); // Make module holder_small_pot
 
-#big_pots(); // Ignore module
+//cable_cradle_top(); // Make module cradle_top
 
-#small_pot(); // Ignore module
+//#big_pots(); // Ignore module
 
-#throttle_rods(); // Ignore module
+//#small_pot(); // Ignore module
 
-#esp32(); // Ignore module
+//#throttle_rods(); // Ignore module
+
+//#esp32(); // Ignore module
 
