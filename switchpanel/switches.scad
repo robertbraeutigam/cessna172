@@ -21,13 +21,13 @@
 // the other to a mux input (active low, like any switch to GND). ALT and
 // BAT are independent, there is no mechanical interlock between them.
 // Mux inputs C0.. are the switches in label order, then the ignition
-// positions (details in switches.md).
+// positions (details in the README).
 //
 // Coordinates: the front of the panel is at z=0, +z points towards the
 // pilot, x to the pilot's right, y up. The panel starts at x=-margin_x, the
 // switch centers are at y=0. The panel is printed front side down.
 //
-// Parts to buy (details in switches.md):
+// Parts to buy (details in the README):
 // - 1 red and 1 black double rocker switch, 6 pin
 // - 7 toggle switches, M12 neck (2 pin ON-OFF or 6 pin ON-ON)
 // - mount_count x M3 screws to mount the panel
