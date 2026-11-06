@@ -35,13 +35,18 @@ to an OpenSCAD 2021.01 AppImage; the Makefile does not define it):
 
 ```sh
 cd throttle
-make                       # render every .scad that changed
+make                       # render every .scad that changed (STLs + views)
+make models                # only the STLs
+make views                 # only the PNG views
 make target/throttle_box   # render a single file
 make clean                 # remove target/
 ```
 
-Output goes to `target/` (not committed). `target/<file>` is an empty marker
-used by make to skip up-to-date files; the STLs sit next to it. Old STLs are not
+All projects share the same Makefile; keep the copies identical.
+
+Output goes to `target/` (not committed). `target/<file>` and
+`target/<file>.views` are empty markers used by make to skip up-to-date files;
+the STLs and PNGs sit next to them. Old STLs are not
 removed when a module is renamed or deleted, so `make clean` if in doubt.
 
 ### Modules: one scad file, several printable STLs
@@ -69,6 +74,22 @@ spaces, and it must be the last thing on the line (trailing spaces are OK).
 The whole statement must fit on that one line, e.g.
 `translate([0, 0, z]) rotor(); // Make module rotor`, because the Makefile
 comments out and uncomments whole lines.
+
+### Views: PNG pictures of the design
+
+```openscad
+//exploded_view(pos = 0); // Make view main 62,0,32
+```
+
+`// Make view <name> <rx>,<ry>,<rz>` renders that line alone to
+`target/<file>_<name>.png`, with the camera rotated as given (`0,0,0` looks
+from +z) and automatically framed. Views use the colored OpenSCAD preview
+renderer (OpenCSG), so they need a display, and they are rendered at twice
+the size and then trimmed, scaled and padded with ImageMagick (`convert`) if it
+is installed. View lines are usually commented out in the source so the GUI
+preview shows the parts; as with modules, that does not stop them from being
+built. Keep view-only geometry and colors (bought parts, labels, exploded
+layouts) in `*_view` / `*_part` modules so they never end up in an STL.
 
 The Makefile also replaces `{{gitrev}}` in the source with the short git hash,
 so a version can be embossed into a part. Files are rendered from the copy in
