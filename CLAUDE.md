@@ -29,11 +29,13 @@ follow the same layout.
   - `switches.scad` — a separate panel with the switch row: a red double
     rocker for MASTER (ALT, BAT), M12 toggles in the middle (lights,
     pitot heat, fuel pump) and a black double rocker for
-    AVIONICS (BUS 1, BUS 2), with the labels engraved. The switch list
+    AVIONICS (BUS 1, BUS 2), with the labels engraved. A CD74HC4067
+    input mux on standoffs on the back collects all switches and the
+    ignition, so one cable runs to the SimVim Mega. The switch list
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
   - `switches.md` — hardware for `switches.scad`: amazon.de listings,
-    wiring and mounting parts.
+    the mux input table, wiring and mounting parts.
 
 ## Building
 

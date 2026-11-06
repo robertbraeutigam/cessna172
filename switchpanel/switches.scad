@@ -13,10 +13,15 @@
 //   a nut on the front clamps them. Their body sits in a shallow pocket in
 //   the back so they cannot turn.
 // - A rim and bosses on the back stiffen the long, thin panel.
+// - A CD74HC4067 input multiplexer board sits on two standoffs on the back,
+//   in the strip behind the group labels. All switches (and the ignition)
+//   are soldered to it, so only one 7 wire cable runs to the SimVim Mega.
 //
 // Wiring: every switch closes one contact: one side to a common GND wire,
-// the other to a SimVim input (active low, like any switch to GND). ALT and
+// the other to a mux input (active low, like any switch to GND). ALT and
 // BAT are independent, there is no mechanical interlock between them.
+// Mux inputs C0.. are the switches in label order, then the ignition
+// positions (details in switches.md).
 //
 // Coordinates: the front of the panel is at z=0, +z points towards the
 // pilot, x to the pilot's right, y up. The panel starts at x=-margin_x, the
@@ -26,11 +31,13 @@
 // - 1 red and 1 black double rocker switch, 6 pin
 // - 7 toggle switches, M12 neck (2 pin ON-OFF or 6 pin ON-ON)
 // - mount_count x M3 screws to mount the panel
+// - CD74HC4067 16 channel mux breakout board, 2 x M2 x 6 screws
 // - wire: one GND wire daisy chained over all switches, one wire per switch
 //
-// Assembly: solder the wires first (the rockers are hard to get out again),
-// put the toggles in from the back and tighten their nuts, snap the rockers
-// in from the front, then mount the panel.
+// Assembly: solder the wires to the switches first (the rockers are hard to
+// get out again), put the toggles in from the back and tighten their nuts,
+// snap the rockers in from the front, solder the other wire ends to the mux
+// and screw it onto its standoffs, then mount the panel.
 
 $fn = 48;
 
@@ -78,6 +85,22 @@ tg_lever_tilt = 14;
 tg_pin_pitch = mts ? [4.7, 4.7] : [7, 6];  // between the 2 poles, along the throw
 tg_pitch = 19;
 tg_pocket_depth = 1;         // body pocket in the back, keeps the toggle from turning
+
+// --- Input multiplexer, CD74HC4067 breakout (MEASURE: from listings) ---
+mux_board = [40.6, 18];      // PCB, along the pin rows x across
+mux_board_t = 1.6;
+mux_holes = [[-17.5, 0], [17.5, 0]];  // MEASURE: guess, from the board center
+mux_hole_d = 2.2;            // in the board, for the view
+mux_pin_inset = 1.3;         // pin row to the board edge
+mux_pin_stub = 3;            // pin ends (header pins) below the board
+mux_channels = 16;
+mux_ctl_names = ["SIG", "S3", "S2", "S1", "S0", "EN", "VCC", "GND"];  // MEASURE: order on the board
+ignition_inputs = 5;         // OFF, R, L, BOTH, START, after the switches
+mux_x = 45;                  // board center; left half, the ignition is left of the panel
+mux_standoff_d = 6;
+mux_standoff_h = 5;          // panel back to the board
+mux_screw_hole = 2.1;        // M2 pilot hole
+mux_clear = 0.3;
 
 // --- Layout ---
 // Groups from left to right: label above the group, type ("rocker2" or
@@ -158,6 +181,14 @@ mount_holes = concat(
    mount_center ? [[panel_cx, panel_y0 + mount_inset], [panel_cx, panel_y1 - mount_inset]] : []);
 mount_count = len(mount_holes);
 
+// Mux board as high as the rim allows. Its panel side is at mux_z.
+mux_y = panel_y1 - rim_w - mux_clear - mux_board.y / 2;
+mux_z = -panel_t - mux_standoff_h;
+mux_switch_y = max(rk_cutout_c.y, tg_pocket.y) / 2;  // the switches reach up to here behind the panel
+function mux_ch_pin(i) = [mux_x + (i - 7.5) * 2.54, mux_y - mux_board.y / 2 + mux_pin_inset];
+function mux_ctl_pin(name) = [mux_x + (search([name], mux_ctl_names)[0] - 3.5) * 2.54,
+                              mux_y + mux_board.y / 2 - mux_pin_inset];
+
 // Distance from a point to a centered box
 function box_dist(p, c, size) = norm([max(0, abs(p.x - c.x) - size.x / 2), max(0, abs(p.y - c.y) - size.y / 2)]);
 min_boss_dist = min([for (h = mount_holes, u = units) box_dist(h, [u[0], 0], unit_pocket(u)) - boss_d / 2]);
@@ -166,7 +197,7 @@ min_web = min([for (i = [1 : len(units) - 1])
 min_front_gap = min([for (i = [1 : len(units) - 1])
                   units[i][0] - units[i - 1][0] - (unit_front_w(units[i]) + unit_front_w(units[i - 1])) / 2]);
 
-echo(panel_size = panel_size, switches = switch_count);
+echo(panel_size = panel_size, switches = switch_count, mux_inputs = switch_count + ignition_inputs);
 
 // --- Sanity checks ---
 assert(panel_size.x <= bed.x && panel_size.y <= bed.y, "Panel does not fit the printer bed");
@@ -184,6 +215,14 @@ assert(min_boss_dist >= 0.5, "A mount boss runs into a switch pocket, increase t
 assert(panel_y0 + rim_w + 0.5 <= -max(rk_pocket.y, tg_pocket.y) / 2, "Rim runs into a switch pocket, increase margin_bottom");
 assert(mount_inset - boss_d / 2 <= rim_w - 0.3, "Mount bosses must overlap the rim");
 assert(len(view_on) <= switch_count, "view_on has more entries than there are switches");
+assert(switch_count + ignition_inputs <= mux_channels, "More switches than mux inputs");
+assert(mux_y - mux_board.y / 2 >= mux_switch_y + mux_clear, "Mux board runs into the switches, increase margin_top");
+assert(min([for (h = mount_holes) box_dist(h, [mux_x, mux_y], mux_board)]) >= boss_d / 2 + mux_clear,
+       "Mux board runs into a mount boss, move mux_x");
+assert(mux_x - mux_board.x / 2 >= panel_x0 + rim_w + mux_clear && mux_x + mux_board.x / 2 <= panel_x1 - rim_w - mux_clear,
+       "Mux board does not fit inside the rim, move mux_x");
+assert(mux_standoff_h >= mux_pin_stub + 1, "Mux standoffs too short for the pin ends");
+assert(mux_standoff_d >= mux_screw_hole + 3, "Mux standoff wall too thin");
 
 // --- Helpers ---
 module rrect(size, r) {
@@ -234,7 +273,14 @@ module panel() {
          for (h = mount_holes)
             translate([h.x, h.y, -panel_t - rim_h])
                cylinder(d = boss_d, h = rim_h + 0.01);
+         for (h = mux_holes)
+            translate([mux_x + h.x, mux_y + h.y, mux_z])
+               cylinder(d = mux_standoff_d, h = mux_standoff_h + 0.01);
       }
+      // Mux screw holes, not through the front
+      for (h = mux_holes)
+         translate([mux_x + h.x, mux_y + h.y, mux_z - 1])
+            cylinder(d = mux_screw_hole, h = mux_standoff_h + 2);
       for (u = units)
          translate([u[0], 0, 0])
             if (is_rocker(u)) {
@@ -279,6 +325,7 @@ c_steel = "#b9c0c8";
 c_chrome = "#e2e6ea";
 c_line = "#8fd0ff";
 c_gnd = "#1d1f22";
+c_pcb = "#5a3d8a";
 wire_colors = ["#e8433a", "#f5a030", "#f2d03b", "#4caf50", "#3d7bd9", "#8e5bd6", "#9aa3ad", "#eceff2"];
 wire_d = 1.2;
 
@@ -397,6 +444,43 @@ module toggle_nut_part(cut = false) {
          }
 }
 
+// Mux board with its pin holes, panel side at mux_z
+module mux_part() {
+   pins = concat([for (i = [0 : mux_channels - 1]) mux_ch_pin(i)],
+                 [for (n = mux_ctl_names) mux_ctl_pin(n)]);
+   color(c_pcb)
+      difference() {
+         translate([mux_x, mux_y, mux_z - mux_board_t])
+            linear_extrude(mux_board_t)
+               square(mux_board, center = true);
+         for (p = pins)
+            translate([p.x, p.y, mux_z - mux_board_t - 1])
+               cylinder(d = 1, h = mux_board_t + 2, $fn = 8);
+         for (h = mux_holes)
+            translate([mux_x + h.x, mux_y + h.y, mux_z - mux_board_t - 1])
+               cylinder(d = mux_hole_d, h = mux_board_t + 2);
+      }
+   // The chip
+   color(c_body)
+      translate([mux_x, mux_y, mux_z - mux_board_t - 0.75])
+         cube([10, 5.3, 1.5], center = true);
+   // Header pins on the control row
+   color(c_tab)
+      for (n = mux_ctl_names)
+         translate([mux_ctl_pin(n).x, mux_ctl_pin(n).y, mux_z - mux_board_t - 6])
+            cube([0.64, 0.64, 6 + mux_pin_stub], center = false);
+}
+
+module mux_screws() {
+   color(c_steel)
+      for (h = mux_holes)
+         translate([mux_x + h.x, mux_y + h.y, mux_z - mux_board_t]) {
+            translate([0, 0, -1.3])
+               cylinder(d = 3.8, h = 1.3);
+            cylinder(d = 2, h = 6 - mux_board_t);
+         }
+}
+
 module unit_part(u, cut = false, nuts = true) {
    translate([u[0], 0, 0])
       if (is_rocker(u))
@@ -465,22 +549,37 @@ function wire_tabs() = [for (u = units)
          ? [[u[0] + p.x, rk_pin_pitch, -rk_body_depth - rk_tab.z], [u[0] + p.x, 0, -rk_body_depth - rk_tab.z]]
          : [[u[0] + p.x, 0, tg_body_z - tg_body_depth - tg_tab.z], [u[0] + p.x, -tg_pin_pitch.y, tg_body_z - tg_body_depth - tg_tab.z]]];
 
-// GND daisy chained over the switches, a signal wire from every switch,
-// all running down to a connector below the panel
+// GND daisy chained over the switches to the mux GND, a signal wire from
+// every switch to its mux input, and the cable to the Mega leaving upwards.
+// The ignition cable (C11..C15, VCC, GND) is not shown.
 module wires_part() {
    t = wire_tabs();
    z = min([for (w = t) w[0].z]) - 2;
+   zb = mux_z - mux_board_t - 0.3;   // solder joints on the outer face of the mux
+   gnd = mux_ctl_pin("GND");
    wire(concat(
-      [for (w = t) [w[0].x, w[0].y, z]],
-      [[panel_x1 - 4, t[len(t) - 1][0].y, z], [panel_x1 - 4, panel_y0 - 15, z]]), c_gnd);
+      [[gnd.x, gnd.y, zb], [gnd.x, gnd.y, z], [gnd.x, t[0][0].y, z]],
+      [for (w = t) [w[0].x, w[0].y, z]]), c_gnd);
    for (w = t)
       wire([w[0] + [0, 0, 0.5], [w[0].x, w[0].y, z]], c_gnd);
    for (i = [0 : len(t) - 1]) {
       s = t[i][1];
+      p = mux_ch_pin(i);
       zs = z - 2 - (i % 3) * 1.6;
-      wire([s + [0, 0, 0.5], [s.x + 1.5, s.y, zs], [s.x + 1.5, panel_y0 + 3, zs], [s.x + 1.5, panel_y0 - 15, zs]],
+      wire([s + [0, 0, 0.5], [s.x + 1.5, s.y, zs], [s.x + 1.5, p.y - 1.5, zs], [p.x, p.y - 1.5, zs], [p.x, p.y, zb]],
            wire_colors[i % len(wire_colors)]);
    }
+   // EN to GND: the mux is always enabled
+   en = mux_ctl_pin("EN");
+   wire([[en.x, en.y, zb], [en.x, en.y - 1.5, zb - 1], [gnd.x, gnd.y - 1.5, zb - 1], [gnd.x, gnd.y, zb]], c_gnd);
+   // Cable to the Mega, plugged onto the header
+   zc = mux_z - mux_board_t - 6;
+   for (j = [0 : len(mux_ctl_names) - 1])
+      if (mux_ctl_names[j] != "EN") {
+         p = mux_ctl_pin(mux_ctl_names[j]);
+         wire([[p.x, p.y, zc], [p.x, p.y, zc - 4], [p.x, panel_y1 + 15, zc - 4]],
+              mux_ctl_names[j] == "GND" ? c_gnd : wire_colors[j % len(wire_colors)]);
+      }
 }
 
 module dashed_line(from_z, to_z, d = 0.5) {
@@ -493,6 +592,8 @@ module dashed_line(from_z, to_z, d = 0.5) {
 module assembled_view() {
    panel_part();
    switches_part();
+   mux_part();
+   mux_screws();
    mount_screws();
 }
 
@@ -522,6 +623,14 @@ module exploded_view(e = 30) {
             translate([0, 0, e])
                toggle_nut_part();
          }
+   // The mux goes on from the back
+   for (h = mux_holes)
+      translate([mux_x + h.x, mux_y + h.y, 0])
+         dashed_line(-1.6 * e, mux_z, 0.35);
+   translate([0, 0, -e])
+      mux_part();
+   translate([0, 0, -1.6 * e])
+      mux_screws();
    for (h = mount_holes)
       translate([h.x, h.y, 0])
          dashed_line(0, 1.6 * e, 0.35);
