@@ -1,85 +1,95 @@
 # Switch panel hardware
 
 Hardware for `switches.scad`: the switch row with MASTER (ALT, BAT), the
-single switches and AVIONICS (BUS 1, BUS 2). The ignition switch is a
+toggle switches and AVIONICS (BUS 1, BUS 2). The ignition switch is a
 separate panel; its parts are listed in the `ignition.scad` header.
 
-## Rocker switches: KCD1-101
+| Qty | Part | Use |
+|-----|------|-----|
+| 1 | double rocker switch, 6 pin, red | MASTER: ALT, BAT |
+| 1 | double rocker switch, 6 pin, black (there is no white one) | AVIONICS: BUS 1, BUS 2 |
+| 7 | MTS-202 mini toggle switch, ON-ON | FUEL PUMP, BEACON, LAND, TAXI, NAV, STROBE, PITOT HEAT |
+| 6 | M3 pan head screw + nut | mounting (`mount_count`) |
+| - | wire, heat shrink, connectors | see Wiring |
 
-The cheapest usable part is the common **KCD1-101** snap-in rocker switch:
+## Double rocker switch
 
-- 2 pin, SPST, ON-OFF, latching ("rastend"); no LED needed
-- bezel 21 x 15 mm, panel cutout 19 x 13 mm
-- snaps into a thin panel from the front. The printed panel is 3 mm thick,
-  but it is thinned to `sw_grip` (1.5 mm) behind each switch
-- one tab to GND, the other to a SimVim input. SimVim inputs are active low,
-  so this works like any other switch to GND. The current is tiny, so the
-  6 A / 250 V rating does not matter
+[Double Rocker Switch 6-Pin 250V 16A/AC Red Rocker Illuminated On/Off](https://www.amazon.de/-/en/Double-Rocker-Switch-6-Pin-Illuminated/dp/B0DLTMGKSS),
+in red for MASTER and black for AVIONICS. Two independent rockers in one
+housing, each side by side, tall and narrow like the real split switches.
 
-| Qty | Colour | Use |
-|-----|--------|-----|
-| 2 | red | MASTER: ALT, BAT |
-| 7 | black | FUEL PUMP, BEACON, LAND, TAXI, NAV, STROBE, PITOT HEAT |
-| 2 | white | AVIONICS: BUS 1, BUS 2 |
+Dimensions from the listing (in `rk_*`):
 
-### Listings found on amazon.de
+- panel cutout 22 x 28.5 mm (width x height)
+- front lip 24.3 x 31.3 mm, 2 mm thick
+- body 21.7 x 25.3 mm. In the height direction, ramps on the top and bottom
+  end widen it to the cutout; they snap behind the panel. There are no
+  mounting holes.
+- 31.5 mm from the front to the end of the pins
 
-Amazon blocked automated page access, so I could not check the prices,
-the delivery times or which variant pictures belong to which listing.
-These packs usually cost a few euros. Check the listing before ordering.
+**MEASURE when they arrive:** the gap between the lip and the ramps, i.e.
+the panel thickness they snap onto (`rk_grip`, now 1.5 mm; the panel is
+thinned to that at the top and bottom of the cutout). Also check the pin
+positions.
 
-- **Red, black or white, one listing:**
-  [Mini-Wippschalter KCD1, 2-polig, 15 x 21 mm, rot / schwarz / weiß, keine LED (1 or 5 pieces)](https://www.amazon.de/elektronischer-Wippschalter-Mini-Wippschalter-elektrische-Ausr%C3%BCstung/dp/B0CRDNDPMG).
-  It is the best match: all three colours come from the same seller, so
-  the bezels should be identical. Five red and five white cover the pairs,
-  with spares. A similar listing:
-  [B0CQFPC59K](https://www.amazon.de/Wippschalter-Mini-Wippschalter-elektrische-Ausr%C3%BCstung-industrieller/dp/B0CQFPC59K).
-- **Black, 10 pieces with wires already attached:**
-  [HUAREW Mini Rocker Switch T85 KCD1-101, 2 pin SPST, with wiring](https://www.amazon.de/HUAREW-Wippschalter-2-poliger-SPST-Kippschalter-Verdrahtung/dp/B0BD39FPRQ).
-  It saves soldering the 7 middle switches. A similar listing:
-  [YIZWINS 10 pcs KCD1 with wiring](https://www.amazon.de/YIZWINS-Wippschalter-SPST-Kippschalter-Kippschalter-KCD1-Schalter/dp/B0D5QQFW4M).
-- **Red, 10 pieces:**
-  [10 Stück rot KCD1-101 19 x 13 mm 2 pin ON-OFF](https://www.amazon.de/st%C3%BCcke-rot-KCD1-101-perforiert-19x13mm/dp/B0FZT1CMZK).
-  Also [Oiyagai KCD1-101 red, pack of 30](https://www.amazon.de/Oiyagai-St%C3%BCck-KCD1-101-2-polig-Wippschalter/dp/B078JC6BH5).
-- **White, 10 pieces:**
-  [BADIKA KCD1-101 19 x 13 mm, 2 pin, colour "Black and White"](https://www.amazon.de/BADIKA-Wippschalter-KCD1-101-perforieren-19x13mm/dp/B0DFGH8H3D).
-  This should be a white rocker in a black bezel, but check the picture.
-- **Mixed pack of 5:**
-  [KCD1-101 2 pin 21 x 15 mm, black / red / white](https://www.amazon.de/Wippschalter-KCD1-101-2-polig-21x15MM-Schwarz/dp/B0CTPT3CBX).
+The lamps are neon (250 V) and will not light on 5 V; leave the lamp pin
+unconnected. Each rocker has 3 pins: find the two that close when the
+rocker is ON with a multimeter.
 
-Avoid these look-alikes:
+## Toggle switches: MTS-202
 
-- KCD11 (10 x 15 mm): too small
-- KCD1-105: round
-- 3 pin, 4 pin or LED versions: they work, but are bigger and cost more
-- anything sold as a push button or momentary switch ("Taster")
+MTS-202 is a mini toggle, DPDT, ON-ON, 6 solder lugs, M6 thread. Use
+the ON-ON MTS-202, not the MTS-203: that one is ON-OFF-ON, with a center
+stop the real switch does not have. The MTS-1xx and -2xx are all the same
+size; the number only says how many poles and positions.
 
-Prefer plain rockers without an "O / I" print, if the listing shows it.
-Mount them with "I" (ON) up, the Cessna switches are ON when up.
+Listings found on amazon.de (prices not checked, Amazon blocks automated
+access):
 
-**MEASURE when they arrive:** KCD1 clones differ a little between sellers.
-Measure the bezel, the body (cutout), the clip position, the body depth and
-the tab positions, and update the `sw_*` parameters in `switches.scad`.
-Ideally buy all switches from the same seller.
+- [ETOPARS mini toggle switch ON-ON, 6 pin DPDT, pack of 10](https://www.amazon.de/ETOPARS-Kippschalter-Armaturenbrett-Wippschalter-L%C3%B6tanschluss/dp/B08Z7R4RB9)
+- [Taiss 10 pcs MTS-202 ON-ON (with waterproof caps, not needed)](https://www.amazon.de/MTS-202-Terminals-Positionen-Kippschalter-wasserdichte/dp/B07JNV6SCJ)
+- [MTS-202 / MTS-203 mini toggle, choose the ON-ON variant](https://www.amazon.de/MTS-202-DPDT-Schalter-6-Pin-Mini-Kippschalter-MTS-203/dp/B0CPDP58KQ)
+- [Miniatur Kippschalter 2x EIN/EIN, 6 pin, Gewinde Ø 6 mm](https://www.amazon.de/Miniatur-Kippschalter-L%C3%B6t%C3%B6sen-6-Pin-Gewinde/dp/B00P2EZ9T6)
 
-## Mounting and wiring
+Listings give a 6 mm hole, M6 x 0.75 thread about 9 mm long, a body of
+about 12.8 x 11.4 mm and 31.7 mm overall height. A reviewer broke a thread
+by over-tightening, so tighten the nut gently.
 
-| Qty | Part | Note |
-|-----|------|------|
-| 6 | M3 pan head screw + nut | through the panel and its 8 mm bosses into the cockpit frame, so 3 + 8 mm + the frame thickness long (`mount_count`) |
-| 1 | thin hookup wire, black | GND, daisy chained over one tab of every switch |
-| 11 | thin hookup wire / ribbon cable | one signal wire per switch to the SimVim board |
-| - | heat shrink, Dupont or JST connectors | so the panel can be unplugged |
+The toggles go in from the back, the nut and washer on the front clamp
+them. The body sits in a square pocket 1 mm deep in the back of the panel
+so it cannot turn.
 
-Solder the wires before snapping the switches into the panel. A switch is
-hard to pull out again without breaking its clips.
+**MEASURE when they arrive:** the body (`tg_body`), the thread length, the
+nut, the lever and the pin positions.
+
+The real airplane's toggles are bigger (about 12 mm thread, 20 mm lever).
+Standard size toggles (KN3C-202 style, M12) would be closer. Set
+`toggle = "KN3C-202"` in `switches.scad` to try them; their values are
+rough guesses. The panel then gets wider than a 220 mm bed (the build
+fails on the `bed` check) and would need to be split.
+
+## Wiring
+
+Every switch is wired like a switch to GND, which is what SimVim inputs
+expect (active low):
+
+- Toggle: use one pole. Its middle lug (common) goes to GND. The lug at
+  the bottom goes to the SimVim input: the lever up (ON) connects the
+  common to the bottom lug. Check with a multimeter.
+- Rocker: the two pins of each rocker that close when it is ON; one to
+  GND, the other to the input.
+
+So: one GND wire daisy chained over all 11 switches, and 11 signal wires
+(ribbon cable works) to the SimVim board, best with a connector (Dupont or
+JST) so the panel can be unplugged. Solder before snapping the rockers in;
+they are hard to get out again.
 
 ## Notes
 
 - ALT and BAT are two independent switches. The real split master has an
   interlock: ALT pushes BAT on, BAT pushes ALT off. X-Plane does not need
-  it, but it could be added later as a printed bridge between the paddles.
+  it.
 - The switch list in `switches.scad` (`groups`) follows the X-Plane 172 SP.
   For a 172N, remove FUEL PUMP; the layout adapts.
-- The panel is 217 x 53 mm and is checked against `bed` (220 x 220 mm).
+- The panel is 211.6 x 63.3 mm and is checked against `bed` (220 x 220 mm).
   Set `bed` to the real printer bed.
