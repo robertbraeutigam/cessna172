@@ -1,0 +1,78 @@
+# Renders every component (STLs, PNG views, montages) and publishes them to
+# GitHub Pages, which is where the README takes its images from. Every push
+# is built, so a broken model shows up on any branch; only master deploys.
+name: Build
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      # Ubuntu 24.04 ships OpenSCAD 2021.01, the version the designs use.
+      # Views need a display (xvfb), the montages ImageMagick and DejaVu,
+      # the panel labels Liberation Sans.
+      - name: Install OpenSCAD
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            openscad xvfb xauth imagemagick fonts-dejavu-core fonts-liberation
+
+      - name: Render
+        run: |
+          for makefile in */Makefile; do
+            make -C "$(dirname "$makefile")" OPENSCAD="xvfb-run -a openscad"
+          done
+
+      - name: Collect site
+        run: |
+          mkdir -p _site
+          for target in */target; do
+            component=$(dirname "$target")
+            mkdir -p "_site/$component"
+            find "$target" -maxdepth 1 ! -name '.*' \( -name '*.png' -o -name '*.stl' \) \
+              -exec cp {} "_site/$component/" \;
+          done
+          {
+            echo '<!doctype html><meta charset="utf-8">'
+            echo '<title>Cessna 172 home cockpit</title>'
+            echo "<h1>Cessna 172 home cockpit</h1><p>Built from ${GITHUB_SHA::7}</p>"
+            for dir in _site/*/; do
+              component=$(basename "$dir")
+              echo "<h2>$component</h2><ul>"
+              for file in "$dir"*; do
+                name=$(basename "$file")
+                echo "<li><a href=\"$component/$name\">$name</a></li>"
+              done
+              echo '</ul>'
+            done
+          } > _site/index.html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -14,7 +14,6 @@ follow the same layout.
     sliced into three printable pieces joined by screwed seams, plus a lid.
   - `carb_heat_knob.scad`, `clamp.scad`, `pin.scad` — small parts (knob,
     rod clamps, pot hold-down pins).
-  - `TODO` — open design tasks.
 - `switchpanel/` — the Cessna 172N lower-left switch panel (ignition key,
   master, light switches, ...). Similar in function to the Saitek Switch Panel,
   but it should look as close to the real 172N panel as possible, and every
@@ -34,8 +33,20 @@ follow the same layout.
     ignition, so one cable runs to the SimVim Mega. The switch list
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
-  - `switches.md` — hardware for `switches.scad`: amazon.de listings,
-    the mux input table, wiring and mounting parts.
+
+## Documentation
+
+`README.md` at the top level is the only documentation file: it describes
+every component (working principle, hardware with shop links, wiring,
+assembly) and embeds the montage images. Keep it in sync when a design,
+part list or wiring changes; do not add per-component docs files. The scad
+header comments stay as the in-source summary.
+
+The README images are not committed. The `Build` workflow
+(`.github/workflows/build.yml`) runs `make` in every component on each push
+and, on `master`, deploys the STLs and PNGs to GitHub Pages at
+`https://robertbraeutigam.github.io/cessna172/<component>/<file>`; the
+README links there.
 
 ## Building
 
