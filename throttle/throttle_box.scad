@@ -1,4 +1,12 @@
 // Throttle box with carb heat, throttle, mixture
+//
+// Mounted in the cockpit frame (frame/): the box goes through a cut-out in
+// the panel sheet and stands on the front rail. Its front wall is the face,
+// with a flange on the top and the two sides that is screwed onto the sheet
+// (M3, nuts behind the sheet; drill the sheet through the flange's holes
+// with the box in place). Two M5 bolts through the floor go into T-nuts in
+// the front rail's top slot. The box is behind the sheet, so it needs no
+// lid; its top stays open.
 
 $fn = 30;
 
@@ -13,11 +21,33 @@ wall_thickness = 3;
 // Printer bed
 bed = [255, 255];
 
+// Face flange, the same as the switch panels (switchpanel/panel.inc.scad)
+face_t = wall_thickness;     // the front wall, in front of the sheet
+flange_w = 10;               // face beyond the box: top and sides, none at the bottom (rail)
+face_corner_r = 4;
+mount_d = 3.3;               // M3
+mount_inset = 4.5;           // mount hole center to the face edge
+mount_nut_r = 3.2;           // M3 nut, across the corners / 2, behind the sheet
+mount_low_z = 8;             // the lower holes in the side flanges
+sheet_cut_clear = 1;         // sheet cut-out beyond the box (frame/ throttle_play)
+
+// Floor bolts into the front rail (frame/): M5, the rail's top slot is
+// 10 mm behind the sheet, and the sheet and face_t are in front of y = 6
+sheet_t = 3;
+rail_slot_y = 10;
+m5_d = 5.3;
+floor_bolt_y = face_t + sheet_t + rail_slot_y;
+
 // Calculated
 width = 2 * control_gap + 2 * end_gap;
 full_width = width + 2*roundness;
-assert(full_width <= bed.x && depth + 2*roundness <= bed.y,
+face_w = full_width + 2 * flange_w;
+face_h = height + flange_w;
+assert(face_w <= bed.x && depth + 2*roundness <= bed.y,
        "box underside does not fit the printer bed");
+assert(mount_inset + mount_nut_r + 0.3 <= flange_w - sheet_cut_clear,
+       "Mount nuts do not sit on the sheet, make flange_w wider");
+assert(mount_low_z >= mount_nut_r + 1, "Lower mount holes too close to the face bottom");
 
 // Big linear pot dimensions
 big_pot_stand_distance = 115;
@@ -34,12 +64,6 @@ small_pot_stand_height = 7;
 small_pot_full_width = 10;
 small_pot_module_height = 6;
 small_pot_full_length = 75;
-
-// Clamp
-clamp_depth = 35;
-
-// Connector columns
-top_screw_d = roundness;
 
 module rounded_box(local_width, local_depth, local_height) {
    hull() {
@@ -63,34 +87,25 @@ module box_underside() {
                // Box inside
                translate([wall_thickness, wall_thickness, wall_thickness])
                   rounded_box(width-wall_thickness*2, depth-wall_thickness*2, height);
-               // Clamp holes
             }
-         // Clamp housings
-         translate([roundness, 0, 0])
-            cube([20+wall_thickness*2, clamp_depth, 20+wall_thickness*2]);
-         translate([roundness+width-20-wall_thickness*2, 0, 0])
-            cube([20+wall_thickness*2, clamp_depth, 20+wall_thickness*2]);
+         // Face with the flange
+         face();
          // Rod supports
          rod_supports();
-         // Top screw columns
-         translate([roundness/2+wall_thickness, roundness/2+wall_thickness, 0])
-            top_screw_column();
-         translate([roundness/2+wall_thickness, depth+roundness+wall_thickness-1, 0])
-            top_screw_column();
-         translate([width+roundness+wall_thickness-1, roundness/2+wall_thickness, 0])
-            top_screw_column();
-         translate([width+roundness+wall_thickness-1, depth+roundness+wall_thickness-1, 0])
-            top_screw_column();
          // CPU pedestal
          cpu_pedestal();
          // Cable cradle
          cable_cradle();
       }
-      // Remove clamp space
-      translate([roundness+wall_thickness, -wall_thickness, wall_thickness])
-         cube([20, clamp_depth, 20]);
-      translate([roundness+width-20-wall_thickness, -wall_thickness, wall_thickness])
-         cube([20, clamp_depth, 20]);
+      // Face mount holes
+      for (h = mount_holes)
+         translate([h.x, -1, h.y])
+            rotate([-90, 0, 0])
+               cylinder(d=mount_d, h=face_t+2);
+      // Floor bolts into the front rail
+      for (x = floor_bolt_xs)
+         translate([x, floor_bolt_y, -1])
+            cylinder(d=m5_d, h=wall_thickness+2);
       // Rod & rod nut holes
       throttle_rods();
       translate([roundness+end_gap+control_gap, wall_thickness*2, wall_thickness+big_pot_stand_height+big_pot_module_height+15+7])
@@ -111,6 +126,31 @@ module box_underside() {
       big_pot_stand();
    translate([roundness+end_gap, 55, 0])
       small_pot_stand();
+}
+
+// Mount holes in the flange, [x, z]: the top row and low on the sides
+mount_holes = [
+   [-flange_w + mount_inset, face_h - mount_inset],
+   [full_width / 2, face_h - mount_inset],
+   [full_width + flange_w - mount_inset, face_h - mount_inset],
+   [-flange_w + mount_inset, mount_low_z],
+   [full_width + flange_w - mount_inset, mount_low_z]];
+
+// Floor bolts between the rod support walls, clear of the rods above
+floor_bolt_xs = [(rod_support_x(0) + rod_support_x(1)) / 2 + wall_thickness / 2,
+                 (rod_support_x(2) + rod_support_x(3)) / 2 + wall_thickness / 2];
+
+// The front wall widened to the face, top corners rounded
+module face() {
+   r = face_corner_r;
+   translate([0, face_t, 0])
+      rotate([90, 0, 0])
+         linear_extrude(face_t)
+            hull() {
+               translate([-flange_w, 0]) square([face_w, 1]);
+               for (x = [-flange_w + r, full_width + flange_w - r])
+                  translate([x, face_h - r]) circle(r = r);
+            }
 }
 
 module cable_cradle() {
@@ -164,14 +204,6 @@ module cpu_pedestal() {
    }
 }
 
-module top_screw_column() {
-   difference() {
-      cylinder(d=top_screw_d, h=height);
-      translate([0, 0, height-16])
-         cylinder(d=4.2, h=17);
-   }
-}
-
 module big_pot_stand() {
    translate([0, 0, wall_thickness]) {
       big_pot_leg();
@@ -222,17 +254,15 @@ module small_pot_leg() {
       }
 }
 
+// Left side of rod support wall i, left to right
+function rod_support_x(i) = roundness + end_gap - wall_thickness/2 + [15, control_gap-15, control_gap+15, 2*control_gap-15][i];
+
 module rod_supports() {
    translate([0, 40, 0])
       cube([full_width, wall_thickness, height]);
-   translate([roundness+end_gap+control_gap-15-wall_thickness/2, 0, 0])
-      rod_support_support();
-   translate([roundness+end_gap+control_gap+15-wall_thickness/2, 0, 0])
-      rod_support_support();
-   translate([roundness+end_gap+15-wall_thickness/2, 0, 0])
-      rod_support_support();
-   translate([roundness+end_gap+2*control_gap-15-wall_thickness/2, 0, 0])
-      rod_support_support();
+   for (i = [0 : 3])
+      translate([rod_support_x(i), 0, 0])
+         rod_support_support();
 }
 
 rod_support_support_thickness = 7;
@@ -333,52 +363,6 @@ module small_pot_holder() {
    }
 }
 
-module box_lid() {
-   translate([0,0,height+10]) {
-      difference() {
-         translate([roundness, roundness, 0]) {
-            rounded_box(width, depth, 2);
-         }
-         translate([roundness/2+wall_thickness, roundness/2+wall_thickness, -1])
-            cylinder(d=4.4, h=5);
-         translate([roundness/2+wall_thickness, depth+roundness+wall_thickness-1, 0])
-            cylinder(d=4.4, h=3);
-         translate([width+roundness+wall_thickness-1, roundness/2+wall_thickness, 0])
-            cylinder(d=4.4, h=3);
-         translate([width+roundness+wall_thickness-1, depth+roundness+wall_thickness-1, 0])
-            cylinder(d=4.4, h=3);
-      }
-      difference() {
-         translate([roundness+wall_thickness+0.6, roundness+wall_thickness+0.6, -1]) {
-            rounded_box(width-wall_thickness*2-0.6*2, depth-wall_thickness*2-0.6*2, 1);
-         }
-         translate([roundness+wall_thickness+2, roundness+wall_thickness+2, -1.5]) {
-            rounded_box(width-wall_thickness*2-4, depth-wall_thickness*2-4, 2);
-         }
-         translate([0, 0, -2])
-            cube([20, 60, 5]);
-         translate([full_width-20, 0, -2])
-            cube([20, 60, 5]);
-         translate([end_gap+20, 0, -2])
-            cube([10, 60, 5]);
-         translate([end_gap+control_gap-10, 0, -2])
-            cube([10, 60, 5]);
-         translate([end_gap+control_gap*1.5-5, 0, -2])
-            cube([10, 60, 5]);
-         translate([end_gap+control_gap*2-10, 0, -2])
-            cube([10, 60, 5]);
-         translate([end_gap+control_gap/2, depth, -2])
-            cube([20, 60, 5]);
-         translate([end_gap+control_gap*1.5, depth, -2])
-            cube([20, 60, 5]);
-         translate([0, depth, -2])
-            cube([20, 60, 5]);
-         translate([full_width-20, depth, -2])
-            cube([20, 60, 5]);
-      }
-   }
-}
-
 // ---------------------------------------------------------------------------
 // Views: bought parts and the assembly, for the PNG views only. Nothing
 // below ends up in an STL.
@@ -402,7 +386,7 @@ usb_cable_d = 4;
 wire_d = 1.2;
 
 c_box = "#3d7bd9";
-c_lid = "#eceff2";
+c_sheet = "#4a4f57";
 c_print = "#f5a030";  // small printed parts: pins, holders
 c_clamp = "#e8433a";
 c_pot = "#2a2b2e";
@@ -652,9 +636,28 @@ module underside_part() {
    color(c_box) render() box_underside();
 }
 
-module lid_part(alpha = 1) {
-   color(c_lid, alpha)
-      translate([0, 0, -10]) render() box_lid();
+// A piece of the cockpit sheet with the box's cut-out, behind the face,
+// the front rail under it (frame/)
+module sheet_part() {
+   m = 40;
+   c = sheet_cut_clear;
+   color(c_sheet, 0.85)
+      translate([0, face_t + sheet_t, 0])
+         rotate([90, 0, 0])
+            linear_extrude(sheet_t)
+               difference() {
+                  translate([-flange_w - m, -20]) square([face_w + 2 * m, face_h + 20 + m]);
+                  translate([-c, -1]) square([full_width + 2 * c, height + c + 1]);
+               }
+   color("#c3c9d0")
+      translate([-flange_w - m, face_t + sheet_t, -20]) cube([face_w + 2 * m, 40, 20]);
+   // Mount screws and floor bolts
+   color(c_steel) {
+      for (h = mount_holes)
+         translate([h.x, 0, h.y]) rotate([90, 0, 0]) cylinder(d = 5.5, h = 2);
+      for (x = floor_bolt_xs)
+         translate([x, floor_bolt_y, wall_thickness]) cylinder(d = 9.5, h = 3);
+   }
 }
 
 module inside_parts() {
@@ -666,15 +669,14 @@ module inside_parts() {
    wires_part();
 }
 
-// Closed box, as it sits on the desk
-module assembled_view() {
+// Mounted on the cockpit sheet and the front rail
+module mounted_view() {
    underside_part();
-   lid_part();
-   controls_part();
-   wires_part();
+   sheet_part();
+   inside_parts();
 }
 
-// Lid off, to see the pots, clamps and the ESP32
+// The box with everything in it
 module inside_view() {
    underside_part();
    inside_parts();
@@ -683,7 +685,6 @@ module inside_view() {
 // Everything lifted out of the underside
 module exploded_view(e = 35) {
    underside_part();
-   translate([0, 0, 3.5 * e]) lid_part();
    for (i = [0 : 2]) {
       translate([0, 0, e])
          pot_part(i > 0, rod_x(i), ear_y(i));
@@ -704,8 +705,6 @@ module small_pot_holder_part() {
 
 box_underside(); // Make module underside
 
-box_lid(); // Make module lid
-
 //small_pot_holder(); // Make module holder_small_pot
 
 //cable_cradle_top(); // Make module cradle_top
@@ -719,7 +718,7 @@ box_lid(); // Make module lid
 //#esp32(); // Ignore module
 
 //inside_view(); // Make view main 55,0,-35
-//assembled_view(); // Make view assembled 60,0,-30
+//mounted_view(); // Make view mounted 60,0,-30
 //exploded_view(); // Make view exploded 55,0,-35
 //inside_view(); // Make view top 0,0,-90
 //inside_view(); // Make view back 60,0,150
