@@ -58,11 +58,15 @@ printing a bad part.
 
 [`throttle/`](throttle): throttle, mixture and carb heat in one box.
 
+[![Throttle quadrant](https://robertbraeutigam.github.io/cessna172/throttle/throttle_box_montage.png)](https://robertbraeutigam.github.io/cessna172/throttle/throttle_box_montage.png)
+
 Each control is a 6 mm rod that comes out of the front of the box and moves
 the slider of a linear potentiometer inside: long pots (130 mm) for the
 throttle and mixture, a short one (75 mm) for the carb heat. The pots sit on
-stands and are held down by printed pins. An ESP32 on a pedestal at the back
-reads them and connects to the simulator over USB.
+stands and are held down by printed pins. A printed clamp on each rod has a
+slot that takes the pot's slider ear, so pulling the knob moves the slider.
+An ESP32 on a pedestal at the back reads them and connects to the simulator
+over USB.
 
 | File | Parts |
 |------|-------|

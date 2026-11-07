@@ -12,6 +12,9 @@ follow the same layout.
     inside, 6 mm rods (one per control) exit the front, an ESP32 sits on a
     pedestal at the back, and there are two clamp housings at the front. The underside is
     sliced into three printable pieces joined by screwed seams, plus a lid.
+    Its views show the pots, rods with knobs, clamps, pins, ESP32 and wiring
+    as view-only parts; the knob, clamp and pin shapes there are copies of
+    the other files, keep them in sync.
   - `carb_heat_knob.scad`, `clamp.scad`, `pin.scad` — small parts (knob,
     rod clamps, pot hold-down pins).
 - `switchpanel/` — the Cessna 172N lower-left switch panel (ignition key,
