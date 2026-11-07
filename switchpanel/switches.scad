@@ -12,6 +12,10 @@
 //   lever, about the size of the real ones. They go in from the back and
 //   a nut on the front clamps them. Their body sits in a shallow pocket in
 //   the back so they cannot turn.
+// - Above the toggles is a row of circuit breakers, like in the 172N, with
+//   their names engraved above them. They are for show only: printed dummy
+//   push-to-reset buttons (hex nut, button with the rating on it), glued
+//   into hex pockets in the front.
 // - A rim and bosses on the back stiffen the long, thin panel.
 // - A CD74HC4067 input multiplexer board sits on two standoffs on the back,
 //   in the strip behind the group labels. All switches (and the ignition)
@@ -32,12 +36,14 @@
 // - 7 toggle switches, M12 neck (2 pin ON-OFF or 6 pin ON-ON)
 // - mount_count x M3 screws to mount the panel
 // - CD74HC4067 16 channel mux breakout board, 2 x M2 x 6 screws
+// - glue for the printed dummy breakers
 // - wire: one GND wire daisy chained over all switches, one wire per switch
 //
 // Assembly: solder the wires to the switches first (the rockers are hard to
 // get out again), put the toggles in from the back and tighten their nuts,
 // snap the rockers in from the front, solder the other wire ends to the mux
-// and screw it onto its standoffs, then mount the panel.
+// and screw it onto its standoffs, glue the dummy breakers into their
+// pockets, then mount the panel.
 
 $fn = 48;
 
@@ -113,6 +119,27 @@ groups = [
 ];
 group_space = 4;             // between two groups
 
+// --- Circuit breakers, for show ---
+// Name engraved above the breaker, rating (A) on its button. In a row over
+// the first toggle group, one above each toggle, from the left.
+breakers = [
+   ["FUEL PUMP", 5], ["BCN", 5], ["LAND LT", 15], ["TAXI LT", 10],
+   ["NAV LT", 10], ["STROBE", 5], ["PITOT HT", 10]
+];
+cb_nut_af = 11;              // hex nut across flats
+cb_nut_t = 2.5;              // of which cb_pocket_depth sits in the panel
+cb_pocket_depth = 1;         // hex pocket in the front, locates the breaker for gluing
+cb_pocket_clear = 0.15;      // added on every side of the pocket
+cb_button_d = 6.5;
+cb_button_h = 4;             // above the nut
+cb_button_chamfer = 0.5;
+cb_rating_size = 2.6;        // number engraved into the button
+cb_rating_depth = 0.4;
+cb_label_size = 2.2;
+cb_label_gap = 1.5;          // nut to its label
+cb_gap = 2;                  // top of the toggle labels to the nuts
+cb_print_space = 3;          // between the breakers on the print bed
+
 // --- Panel ---
 panel_t = 3;
 corner_r = 4;
@@ -169,16 +196,30 @@ function unit_label_y(u) = is_rocker(u) ? rk_label_y : tg_label_y;
 group_line_y = rk_label_y + label_line + label_size + 1;
 group_label_y = group_line_y + group_line_w + 1.5;
 
+// Breakers: centered over the first toggle group, at the toggle pitch
+cb_group = [for (g = [0 : len(groups) - 1]) if (groups[g][1] == "toggle") g][0];
+cb_r = cb_nut_af / cos(30) / 2;                    // nut corner radius
+cb_xs = [for (i = [0 : len(breakers) - 1])
+            group_left(cb_group) + (i + 0.5 + (len(groups[cb_group][2]) - len(breakers)) / 2) * tg_pitch];
+tg_label_top = tg_label_y + (max([for (u = units) if (!is_rocker(u)) len(u[2][0])]) - 1) * label_line + label_size;
+cb_y = tg_label_top + cb_gap + cb_r;
+cb_label_y = cb_y + cb_r + cb_label_gap;
+cb_label_top = cb_label_y + cb_label_size;
+function cb_label_w(i) = len(breakers[i][0]) * cb_label_size * 0.75;  // estimate, for the checks
+
 panel_x0 = -margin_x;
 panel_x1 = group_left(len(groups) - 1) + group_w(len(groups) - 1) + margin_x;
 panel_y0 = -rk_bezel.y / 2 - margin_bottom;
-panel_y1 = group_label_y + group_label_size + margin_top;
+panel_y1 = max(group_label_y + group_label_size, len(breakers) > 0 ? cb_label_top : 0) + margin_top;
 panel_size = [panel_x1 - panel_x0, panel_y1 - panel_y0];
 panel_cx = (panel_x0 + panel_x1) / 2;
 
+// The top middle hole goes between the two breakers nearest the middle
+function closest(v, x) = [for (a = v) if (abs(a - x) == min([for (b = v) abs(b - x)])) a][0];
+mount_top_cx = len(breakers) > 1 ? closest([for (i = [1 : len(cb_xs) - 1]) (cb_xs[i - 1] + cb_xs[i]) / 2], panel_cx) : panel_cx;
 mount_holes = concat(
    [for (x = [panel_x0 + mount_inset, panel_x1 - mount_inset], y = [panel_y0 + mount_inset, panel_y1 - mount_inset]) [x, y]],
-   mount_center ? [[panel_cx, panel_y0 + mount_inset], [panel_cx, panel_y1 - mount_inset]] : []);
+   mount_center ? [[panel_cx, panel_y0 + mount_inset], [mount_top_cx, panel_y1 - mount_inset]] : []);
 mount_count = len(mount_holes);
 
 // Mux board as high as the rim allows. Its panel side is at mux_z.
@@ -196,8 +237,13 @@ min_web = min([for (i = [1 : len(units) - 1])
                   units[i][0] - units[i - 1][0] - (unit_pocket(units[i]).x + unit_pocket(units[i - 1]).x) / 2]);
 min_front_gap = min([for (i = [1 : len(units) - 1])
                   units[i][0] - units[i - 1][0] - (unit_front_w(units[i]) + unit_front_w(units[i - 1])) / 2]);
+mount_head_r = 2.8;          // pan head on the front
+// Mount screw heads to the breaker nuts and labels
+min_cb_mount_dist = len(breakers) == 0 ? 99 : min([for (h = mount_holes, i = [0 : len(breakers) - 1])
+                  min(norm(h - [cb_xs[i], cb_y]) - cb_r,
+                      box_dist(h, [cb_xs[i], cb_label_y + cb_label_size / 2], [cb_label_w(i), cb_label_size]))]) - mount_head_r;
 
-echo(panel_size = panel_size, switches = switch_count, mux_inputs = switch_count + ignition_inputs);
+echo(panel_size = panel_size, switches = switch_count, mux_inputs = switch_count + ignition_inputs, breakers = len(breakers));
 
 // --- Sanity checks ---
 assert(panel_size.x <= bed.x && panel_size.y <= bed.y, "Panel does not fit the printer bed");
@@ -223,6 +269,12 @@ assert(mux_x - mux_board.x / 2 >= panel_x0 + rim_w + mux_clear && mux_x + mux_bo
        "Mux board does not fit inside the rim, move mux_x");
 assert(mux_standoff_h >= mux_pin_stub + 1, "Mux standoffs too short for the pin ends");
 assert(mux_standoff_d >= mux_screw_hole + 3, "Mux standoff wall too thin");
+assert(len(breakers) <= len(groups[cb_group][2]), "More breakers than toggles below them");
+assert(tg_pitch >= 2 * cb_r + 1.5 && tg_pitch >= max([for (i = [0 : len(breakers) - 1]) cb_label_w(i)]) + 1, "Breakers too close to each other, increase tg_pitch");
+assert(cb_pocket_depth <= panel_t - 1.5, "Breaker pockets too deep");
+assert(cb_pocket_depth < cb_nut_t, "Breaker nut sunk completely into the panel");
+assert(min_cb_mount_dist >= 0.5, "A mount screw runs into a breaker or its label");
+assert(cb_rating_size * 1.4 <= cb_button_d - 2 * cb_button_chamfer, "Breaker rating too big for the button");
 
 // --- Helpers ---
 module rrect(size, r) {
@@ -254,6 +306,13 @@ module labels_2d() {
          translate([x0, group_line_y])
             square([x1 - x0, group_line_w]);
       }
+   for (i = [0 : len(breakers) - 1])
+      translate([cb_xs[i], cb_label_y])
+         text(breakers[i][0], size = cb_label_size, font = font, halign = "center");
+}
+
+module cb_rating_2d(amps) {
+   text(str(amps), size = cb_rating_size, font = font, halign = "center", valign = "center");
 }
 
 // --- Parts ---
@@ -305,12 +364,45 @@ module panel() {
       translate([0, 0, -label_depth])
          linear_extrude(label_depth + 1)
             labels_2d();
+      // Breaker pockets
+      for (x = cb_xs)
+         translate([x, cb_y, -cb_pocket_depth])
+            cylinder(r = cb_r + cb_pocket_clear / cos(30), h = cb_pocket_depth + 1, $fn = 6);
       // Version on the back, mirrored so it reads from behind
       translate([panel_x1 - 30, panel_y1 - mount_inset, -panel_t - 1])
          linear_extrude(gitrev_depth + 1)
             mirror([1, 0])
                text("{{gitrev}}", size = 3, halign = "center", valign = "center");
    }
+}
+
+// Breaker button with the rating engraved, on z=0
+module cb_button(amps) {
+   difference() {
+      cylinder(d = cb_button_d, h = cb_button_h);
+      translate([0, 0, cb_button_h - cb_button_chamfer])
+         difference() {
+            cylinder(d = cb_button_d + 1, h = cb_button_chamfer + 1);
+            cylinder(d1 = cb_button_d, d2 = cb_button_d - 2 * (cb_button_chamfer + 1), h = cb_button_chamfer + 1);
+         }
+      translate([0, 0, cb_button_h - cb_rating_depth])
+         linear_extrude(cb_rating_depth + 1)
+            cb_rating_2d(amps);
+   }
+}
+
+// Dummy breaker, back of the nut at z=0
+module breaker(amps) {
+   cylinder(r = cb_r, h = cb_nut_t, $fn = 6);
+   translate([0, 0, cb_nut_t - 0.01])
+      cb_button(amps);
+}
+
+// All breakers in a row, as they are printed: nut down
+module breakers_plate() {
+   for (i = [0 : len(breakers) - 1])
+      translate([i * (2 * cb_r + cb_print_space), 0, 0])
+         breaker(breakers[i][1]);
 }
 
 // --- Views (rendered to PNG by "make views") ---
@@ -497,6 +589,22 @@ module switches_part() {
       unit_part(u);
 }
 
+// Breakers in their pockets: steel nut, black button, white rating
+module breakers_part() {
+   for (i = [0 : len(breakers) - 1])
+      translate([cb_xs[i], cb_y, -cb_pocket_depth]) {
+         color(c_steel)
+            cylinder(r = cb_r, h = cb_nut_t, $fn = 6);
+         color(c_body)
+            translate([0, 0, cb_nut_t - 0.01])
+               cb_button(breakers[i][1]);
+         color(c_label)
+            translate([0, 0, cb_nut_t + cb_button_h - cb_rating_depth])
+               linear_extrude(cb_rating_depth - 0.02)
+                  cb_rating_2d(breakers[i][1]);
+      }
+}
+
 // Panel with the engraved labels filled in
 module panel_part() {
    color(c_panel)
@@ -592,6 +700,7 @@ module dashed_line(from_z, to_z, d = 0.5) {
 module assembled_view() {
    panel_part();
    switches_part();
+   breakers_part();
    mux_part();
    mux_screws();
    mount_screws();
@@ -623,6 +732,12 @@ module exploded_view(e = 30) {
             translate([0, 0, e])
                toggle_nut_part();
          }
+   // The breakers are glued in from the front
+   for (x = cb_xs)
+      translate([x, cb_y, 0])
+         dashed_line(0, e);
+   translate([0, 0, e])
+      breakers_part();
    // The mux goes on from the back
    for (h = mux_holes)
       translate([mux_x + h.x, mux_y + h.y, 0])
@@ -651,6 +766,7 @@ module section_view(u, w = 40) {
 }
 
 rotate([0, 180, 0]) panel(); // Make module panel
+breakers_plate(); // Make module breakers
 
 //switches_part(); // Ignore module
 

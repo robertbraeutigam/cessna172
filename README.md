@@ -157,11 +157,12 @@ The positions (30° apart) should be verified against the real switch.
 `switches.scad`: the switch row. The red split MASTER (ALT, BAT) on the
 left, toggle switches in the middle (FUEL PUMP, BEACON, LAND, TAXI, NAV,
 STROBE, PITOT HEAT) and the split AVIONICS (BUS 1, BUS 2) on the right, with
-the labels engraved. Up is ON, like in the airplane.
+the labels engraved. Up is ON, like in the airplane. Above the toggles is a
+row of circuit breakers, like on the real panel; they are for show only.
 
 The switch list (`groups` in the source) drives the layout; it follows the
 X-Plane 172 SP. For a 172N remove FUEL PUMP and the panel adapts. The panel
-is 211.6 x 63.3 mm, printed front side down. A rim and bosses on the back
+is 211.6 x 67.8 mm, printed front side down. A rim and bosses on the back
 stiffen it.
 
 ### Hardware
@@ -174,6 +175,7 @@ stiffen it.
 | 6 | M3 pan head screw + nut | panel mounting (`mount_count`) |
 | 1 | CD74HC4067 16 channel mux breakout board | all inputs, see [Multiplexer](#multiplexer) |
 | 2 | M2 x 6 screw | mux onto its standoffs |
+| 7 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
 | 1 | 8 pin straight header + Dupont housing | cable to the Mega |
 | - | wire, heat shrink | see [Wiring](#wiring) |
 
@@ -225,6 +227,25 @@ The mini MTS-202 (M6, 10 mm lever) works too: set `toggle = "MTS-202"`.
 amazon.de listings:
 [ETOPARS, 10 pieces](https://www.amazon.de/ETOPARS-Kippschalter-Armaturenbrett-Wippschalter-L%C3%B6tanschluss/dp/B08Z7R4RB9),
 [Taiss, 10 pieces](https://www.amazon.de/MTS-202-Terminals-Positionen-Kippschalter-wasserdichte/dp/B07JNV6SCJ).
+
+### Circuit breakers
+
+The real 172N has a row of push-to-reset circuit breakers above the
+switches, each with its name on the panel above it and its rating (A) on
+the button. Here they are non-functional dummies: a hex nut with a button
+on top and the rating engraved into the button, all printed as one part
+(`switches_breakers.stl`, nut side down). They are glued into 1 mm deep hex
+pockets in the front of the panel, which locate them and keep them
+straight; nothing goes through the panel. Print them in black and paint the
+nut silver and the rating white, or print the nut and the button in
+different colors.
+
+The list (`breakers` in the source, name and rating) is placed over the
+toggles, one above each, from the left; the panel grows to fit the row and
+the top middle mount screw moves between two breakers. Real breakers
+(e.g. Klixon push-to-reset) would need a bigger hole and room behind the
+panel, so making them functional later means changing the pockets into
+holes.
 
 ### Multiplexer
 
@@ -318,7 +339,8 @@ solder and heat shrink.
 2. Put the toggles in from the back and tighten their nuts.
 3. Snap the rockers in from the front.
 4. Solder the other wire ends to the mux and screw it onto its standoffs.
-5. Mount the panel.
+5. Glue the dummy breakers into their pockets.
+6. Mount the panel.
 
 ### Notes
 
