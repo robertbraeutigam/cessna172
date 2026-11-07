@@ -1,7 +1,7 @@
 // Cockpit frame basics, shared by the files in frame/
 //
-// The frame is an aluminium extrusion ladder that lies on the desk and is
-// held by desk clamps, with a vertical panel frame on its front edge. One
+// The frame is an aluminium extrusion ladder that lies on the desk, with a
+// vertical panel frame on its front edge. One
 // 3 mm aluminium composite (ACM) sheet covers the panel frame; every
 // cockpit component brings its own front face, a hole is cut into the
 // sheet for it and its face is screwed onto the sheet. Heavy or pulled
@@ -22,14 +22,20 @@
 // of the bay and at the two outer ends, a top bar joins them, and a 45
 // degree brace behind each upright stops it from rocking.
 //
-// Below the desk top, in front of the desk edge, hang two aprons for the
-// controls that are under the panel in the airplane: the left one carries
-// the parking brake, the right one, under the throttle, the pedestal with
-// the trim wheel and the fuel selector. Each apron is two 2020 hangers
-// under the front rail, a lower bar between their bottom ends and a small
-// ACM sheet in front. The space between the aprons (knee_w, around the
-// yoke) stays open for the pilot's legs. The frame overhangs the desk edge
-// by a hanger, so the hangers are in front of the desk.
+// The frame overhangs the desk edge by a 2020 (plus play), so extrusion can
+// go down in front of the desk edge:
+// - Clamps: four 2020 hangers under the front rail, each with a printed
+//   clamp foot that reaches back under the desk top and an M6 thumb screw
+//   in it that presses up against the desk underside. Two short hangers on
+//   the left, the two apron hangers on the right.
+// - Apron, under the throttle: the two right hangers go further down, a
+//   lower bar joins their ends and a small ACM sheet covers them. It
+//   carries the pedestal (trim wheel, fuel selector).
+// - Bay bar: a 2020 under the yoke bay, under the two front rail ends. The
+//   parking brake hangs under it, directly below the yoke: a thin body under
+//   the desk top and a T-handle in front of the bar.
+// knee_w around the yoke stays open for the legs; only the bay bar and the
+// thin parking brake are there, just under the desk top.
 
 // --- Extrusion: 2020 / 2040, 6 mm slot, M5 T-nuts everywhere ---
 ext = 20;                    // 2020 profile, and the small side of 2040
@@ -103,18 +109,41 @@ switch_depth = 40;           // switches behind the sheet (view only)
 switch_z = rail.y + 5;       // face bottom above the desk
 
 // --- Under-desk controls, future components (guesses until designed) ---
-// Same rule as the throttle box: the body (width x depth x height) goes
-// through its cut-out in the apron sheet and stands on the lower bar, the
-// face flange (top and sides) is screwed onto the sheet with M3, and two M5
-// bolts through the floor go into the lower bar's top slot. The body must
-// be below the desk.
+// Pedestal (trim wheel, fuel selector), same rule as the throttle box: the
+// body (width x depth x height) goes through its cut-out in the apron sheet
+// and stands on the lower bar, the face flange (top and sides) is screwed
+// onto the sheet with M3, and two M5 bolts through the floor go into the
+// lower bar's top slot. The body must be below the desk.
 under_face_t = 3;
 under_flange = 10;
 under_play = 1;              // body to its cut-out
 under_bolt_y = 16;           // floor bolts from the face front, over the lower bar's slot
-pedestal_size = [90, 120, 150];   // trim wheel and fuel selector, under the throttle
-park_size = [50, 80, 50];         // parking brake, a T-handle pulled out of the face
+pedestal_size = [90, 120, 150];
 desk_clear = 3;              // a body to the desk underside, at least
+// Parking brake: no face. A thin body (width x depth x height) under the
+// desk top, behind the bay bar, hangs from the bay bar's bottom slot (two
+// M5). Its T-handle is in front of the bar: released, it is almost flush
+// and lies sideways; set, it is pulled out by park_pull and turned to point
+// down.
+park_size = [40, 90, 22];
+park_bolt_dx = 12;           // bolts from its center, into the bay bar's bottom slot
+park_pull = 50;              // handle travel
+park_handle = 60;            // T-handle length (view only)
+// MEASURE: the Saitek yoke's own desk clamps, the free width between them
+// at the desk edge; the parking brake body goes there
+yoke_clamp_gap = 120;
+
+// --- Clamp feet, printed (clamp_foot.scad) ---
+// Screwed with two M5 into a T-nut slot on a hanger's side, reaching back
+// under the desk top; an M6 thumb screw through a captured nut presses up
+// against the desk underside, so the frame is clamped onto the desk edge.
+foot_t = 20;                 // across the hanger side (x)
+foot_len = 70;               // from the hanger front back under the desk (y)
+foot_h = 25;                 // the arm under the desk (z)
+foot_gap = 2;                // arm top to the desk underside, the screw closes it
+foot_screw_d = 6.4;          // M6
+foot_nut = [10.4, 5.4];      // M6 nut across flats, depth of its pocket
+foot_screw_y = foot_len - 12;
 
 // --- Layout ---
 gap = 25;                    // between two parts; the bay uprights stand in it
@@ -147,29 +176,56 @@ switch_cut = [x_sw0 + switch_flange - switch_cut_clear, switch_z + switch_flange
 bay_cut = [x_bay0, 0, x_bay1, yoke_housing.z + yoke_play];
 cuts = [switch_cut, bay_cut, throttle_cut, radio_cut];   // [x0, z0, x1, z1] on the sheet
 
-// --- Aprons, below the desk top (z < 0) ---
+// --- Below the desk top (z < 0) ---
 yoke_c = (x_bay0 + x_bay1) / 2;
 legs = [yoke_c - knee_w / 2, yoke_c + knee_w / 2];       // open for the legs
 under_z = desk.z + desk_skirt + desk_clear;              // desk top to the top of the bodies
-apron_h = under_z + max(pedestal_size.z, park_size.z) + under_play + ext;
-apron_bar_z = -apron_h + ext;                            // top of the lower bars
-// [x0, x1] of each apron sheet; hangers at their ends, a hanger's own width
-// of rail beside it for a corner bracket on each side
-aprons = [[0, legs[0]], [legs[1], frame_w]];
-hanger_xs = [ext, legs[0] - ext, legs[1], frame_w - 2 * ext];   // left sides
-apron_bars = [[hanger_xs[0] + ext, hanger_xs[1]], [hanger_xs[2] + ext, hanger_xs[3]]];
-park_x = (apron_bars[0][0] + apron_bars[0][1]) / 2;      // centers
+// Hangers: a hanger's own width of rail beside it for a corner bracket on
+// each side. [left side, foot side (+1 right, -1 left), length]
+foot_z1 = -(desk.z + desk_skirt + foot_gap);             // arm top
+foot_z0 = foot_z1 - foot_h;
+clamp_h = -foot_z0;                                      // short hanger
+apron_h = under_z + pedestal_size.z + under_play + ext;
+apron_bar_z = -apron_h + ext;                            // top of the lower bar
+apron = [legs[1], frame_w];                              // [x0, x1] of the apron sheet
+hangers = [[ext, 1, clamp_h], [x_bay0 - 3 * ext, -1, clamp_h],
+           [apron[0], -1, apron_h], [frame_w - 2 * ext, 1, apron_h]];
+apron_bar = [hangers[2][0] + ext, hangers[3][0]];
+function foot_x(h) = h[1] > 0 ? h[0] + ext : h[0] - foot_t;   // foot left side
+foot_hole_zs = [-ext - 7, foot_z0 + 7];                  // M5 into the hanger's side slot
+// Bay bar under the two front rail ends, an M5 at each end through the bar
+// into the rail's front bottom slot
+bay_bar = [x_bay0 - ext, x_bay1 + ext];
+bay_bar_bolts = [bay_bar[0] + ext / 2, bay_bar[1] - ext / 2];
+park_x = yoke_c;
+park_z = -under_z - park_size.z;                         // body bottom
+// pedestal cut-out and face, [x0, z0, x1, z1] on the apron sheet
 pedestal_x = x_rc;
-// body cut-out and face, [x0, z0, x1, z1] on the apron sheet
 function under_cut(x, size) = [x - size.x / 2 - under_play, apron_bar_z,
                                x + size.x / 2 + under_play, apron_bar_z + size.z + under_play];
 function under_face(x, size) = [x - size.x / 2 - under_flange, apron_bar_z,
                                 x + size.x / 2 + under_flange, apron_bar_z + size.z + under_flange];
-park_cut = under_cut(park_x, park_size);
 pedestal_cut = under_cut(pedestal_x, pedestal_size);
-under_cuts = [park_cut, pedestal_cut];
-under_faces = [under_face(park_x, park_size), under_face(pedestal_x, pedestal_size)];
+pedestal_face = under_face(pedestal_x, pedestal_size);
 under_y0 = -sheet_t - under_face_t;                     // face front
+
+// Clamp foot, in place: x across the hanger side from its left side, y from
+// the hanger front, z as in the frame
+module clamp_foot() {
+   nut_r = foot_nut[0] / sqrt(3);
+   difference() {
+      union() {
+         translate([0, 0, foot_z0]) cube([foot_t, foot_len, foot_h]);
+         translate([0, 0, foot_z0]) cube([foot_t, ext, -ext - 1 - foot_z0]);
+      }
+      for (z = foot_hole_zs)
+         translate([-1, ext / 2, z]) rotate([0, 90, 0]) cylinder(d = m5_d, h = foot_t + 2);
+      translate([foot_t / 2, foot_screw_y, foot_z0 - 1]) {
+         cylinder(d = foot_screw_d, h = foot_h + 2);
+         translate([0, 0, foot_h + 1 - foot_nut[1]]) cylinder(r = nut_r, h = foot_nut[1] + 1, $fn = 6);
+      }
+   }
+}
 
 frame_d = max(yoke_front_y + yoke_housing.y, throttle_y0 + throttle_size.y) + ext + rail.x;
 rear_y = frame_d - rail.x;
@@ -189,16 +245,15 @@ sheet_screws = [for (p = concat(
       [for (x = spread(ext / 2, x_bay0 - ext / 2, screw_step)) [x, rail.y / 2]],
       [for (x = spread(x_bay1 + ext / 2, frame_w - ext / 2, screw_step)) [x, rail.y / 2]]))
    if (clear_of(p, avoid, screw_edge)) p];
-// apron sheets: hangers and lower bars, [x, z]
+// apron sheet: its hangers and the lower bar, [x, z]
 apron_screws = [for (p = concat(
-      [for (hx = hanger_xs, z = spread(-apron_h + ext / 2, -ext / 2, screw_step_upright)) [hx + ext / 2, z]],
-      [for (b = apron_bars, x = spread(b[0] + ext / 2, b[1] - ext / 2, screw_step)) [x, -apron_h + ext / 2]]))
-   if (clear_of(p, concat(under_cuts, under_faces), screw_edge)) p];
+      [for (i = [2, 3], z = spread(-apron_h + ext / 2, -ext / 2, screw_step_upright)) [hangers[i][0] + ext / 2, z]],
+      [for (x = spread(apron_bar[0] + ext / 2, apron_bar[1] - ext / 2, screw_step)) [x, -apron_h + ext / 2]]))
+   if (clear_of(p, [pedestal_cut, pedestal_face], screw_edge)) p];
 // M5 through the throttle box floor into T-nuts in the front rail's top slot, [x, y]
 throttle_bolts = [for (x = throttle_bolt_xs) [throttle_x0 + x, throttle_y0 + throttle_bolt_y]];
-// M5 through the under-desk floors into T-nuts in the lower bars' top slots, [x, y]
-under_bolts = [for (c = [[park_x, park_size], [pedestal_x, pedestal_size]], s = [-1, 1])
-   [c[0] + s * c[1].x / 4, under_y0 + under_bolt_y]];
+// M5 through the pedestal floor into T-nuts in the lower bar's top slot, [x, y]
+pedestal_bolts = [for (s = [-1, 1]) [pedestal_x + s * pedestal_size.x / 4, under_y0 + under_bolt_y]];
 
 // --- Checks ---
 assert(gap >= ext + 3 && sheet_edge >= ext + 3, "No room for the uprights next to the cut-outs");
@@ -216,12 +271,23 @@ assert(ext + brace_rise + ext * sqrt(2) <= rear_y, "Braces do not land on the cr
 assert(frame_w <= desk.x && frame_d <= frame_overhang + desk.y, "Frame does not fit on the desk");
 assert(rail.x - frame_overhang >= 10, "Front rail barely on the desk");
 assert(legs[0] <= x_bay0 && legs[1] >= x_bay1, "Leg room narrower than the yoke bay");
-assert(hanger_xs[1] + 2 * ext <= x_bay0 && hanger_xs[2] - ext >= x_bay1,
-       "Inner hangers not under the front rail");
-assert(abs(under_y0 + under_bolt_y - ext / 2) < 0.01, "Under-desk floor bolts miss the lower bar slot");
-for (i = [0 : 1]) {
-   assert(under_faces[i][0] >= apron_bars[i][0] && under_faces[i][2] <= apron_bars[i][1],
-          "Under-desk component does not fit between its hangers");
-   assert(under_cuts[i][3] <= -under_z + under_play, "Under-desk component runs into the desk");
-   assert(under_faces[i][3] <= -screw_edge, "Under-desk face runs off its apron sheet");
-}
+assert(hangers[2][0] - ext >= x_bay1 && hangers[3][0] + 2 * ext <= frame_w,
+       "Apron hangers not under the front rail");
+assert(hangers[1][0] + 2 * ext <= bay_bar[0], "Left clamp hanger runs into the bay bar");
+assert(hangers[2][0] - foot_t >= bay_bar[1], "Right clamp foot runs into the bay bar");
+assert(abs(under_y0 + under_bolt_y - ext / 2) < 0.01, "Pedestal floor bolts miss the lower bar slot");
+assert(pedestal_face[0] >= apron_bar[0] && pedestal_face[2] <= apron_bar[1],
+       "Pedestal does not fit between its hangers");
+assert(pedestal_cut[3] <= -under_z + under_play, "Pedestal runs into the desk");
+assert(pedestal_face[3] <= -screw_edge, "Pedestal face runs off its apron sheet");
+assert(foot_x(hangers[2]) + foot_t <= apron[0] && foot_x(hangers[3]) + foot_t <= frame_w,
+       "Apron clamp feet must be outside the apron (the pedestal is inside) and the frame");
+assert(foot_len > frame_overhang + 2 * foot_nut[0] && foot_screw_y - frame_overhang >= 20,
+       "Clamp foot screw not under the desk");
+assert(foot_hole_zs[0] - foot_hole_zs[1] >= 12 && foot_hole_zs[1] >= foot_z0 + 6,
+       "Clamp foot holes do not fit");
+assert(foot_nut[1] + 6 <= foot_h, "Clamp foot arm too thin for the nut");
+assert(park_size.x + 10 <= yoke_clamp_gap, "Parking brake runs into the yoke's desk clamps");
+assert(park_size.y <= desk.y / 3, "Parking brake body too deep under the desk");
+assert(abs(park_x - yoke_c) < 0.01 && park_bolt_dx * 2 + m5_head_d <= park_size.x + 10,
+       "Parking brake bolts do not fit");

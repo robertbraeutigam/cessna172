@@ -1,18 +1,19 @@
 // Cockpit frame
 //
 // Aluminium extrusion ladder on the desk, panel frame on its front edge and
-// one ACM sheet over it, with a cut-out for every component; two aprons
-// hang below the desk top for the under-panel controls. Values,
-// layout and checks are in frame.inc.scad; this file has the views and the
-// cut list (echo). The frame has no printed parts.
+// one ACM sheet over it, with a cut-out for every component; below the
+// desk top the clamp hangers, the apron under the throttle and the bay bar
+// with the parking brake. Values, layout and checks are in frame.inc.scad;
+// this file has the views and the cut list (echo). The only printed parts
+// are the clamp feet (clamp_foot.scad).
 //
 // Bought parts (lengths: see the echo of the build, or the README):
 // - 2040 extrusion: front rail left, front rail right, rear rail
 // - 2020 extrusion: 5 crossbars, 4 uprights, top bar, 4 braces (45 degree
-//   ends), 4 hangers, 2 lower bars
+//   ends), 4 hangers (2 short), lower bar, bay bar
 // - corner brackets, M5 screws and T-nuts (6 mm slot)
-// - 3 mm ACM sheet, frame_w x sheet_h, and two apron sheets
-// - desk clamps (the ones the throttle used), on the rails
+// - 3 mm ACM sheet, frame_w x sheet_h, and the apron sheet
+// - 4 M6 x 40 thumb screws + M6 nuts, for the clamp feet
 //
 // Assembly:
 // 1. Bolt the ladder together: rails, crossbars. Stand the uprights on the
@@ -20,16 +21,21 @@
 //    crossbars.
 // 2. Cut the sheet (cuts, sheet_screws in the echo, the "sheet" view),
 //    drill its screw holes, and screw it onto the front slots with T-nuts.
-// 3. Hang the aprons: each hanger under the front rail with a corner
-//    bracket on each side in the rail's front bottom slot, the lower bar
-//    between the hanger ends, the apron sheet on their front slots.
-// 4. Put the frame on the desk, its front a hanger in front of the desk
-//    edge, the yoke into the bay, clamp both.
+// 3. Hang the hangers under the front rail, a corner bracket on each side in
+//    the rail's front bottom slot; the lower bar between the two long ones,
+//    the apron sheet on their front slots. Screw the bay bar under the two
+//    rail ends (bay_bar_bolts: drill through the bar, T-nut in the rail's
+//    front bottom slot). Screw a clamp foot (M6 nut in its pocket) onto each
+//    hanger's side slot, below the brackets.
+// 4. Put the frame on the desk, the hangers just in front of the desk edge,
+//    and tighten the thumb screws in the feet up against the desk
+//    underside. Put the yoke into the bay and clamp it with its own clamps.
 // 5. Push the throttle box through its cut-out onto the rail and the middle
 //    crossbar until its face is on the sheet, bolt its floor into the rail
 //    (throttle_bolts), drill the sheet through its flange holes and screw
-//    the flange on (M3, nuts behind the sheet). The pedestal and the
-//    parking brake go in the same way onto the lower bars, when they exist.
+//    the flange on (M3, nuts behind the sheet). The pedestal goes in the
+//    same way onto the lower bar, the parking brake under the bay bar, when
+//    they exist.
 
 include <frame.inc.scad>
 
@@ -52,10 +58,11 @@ echo(braces_2020 = len(upright_xs), brace_long_edge = brace_long);
 echo(sheet = [frame_w, sheet_h], screws = len(sheet_screws));
 echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut);
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
-echo(hangers_2020 = len(hanger_xs), hanger_len = apron_h,
-     lower_bars_2020 = [for (b = apron_bars) b[1] - b[0]]);
-echo(apron_sheets = [for (a = aprons) [a[1] - a[0], apron_h]], apron_screws = len(apron_screws));
-echo(apron_cuts = [for (c = under_cuts) [c[0], c[1], c[2], c[3]]], under_bolts = under_bolts);
+echo(hangers_2020 = [for (h = hangers) h[2]], lower_bar = apron_bar[1] - apron_bar[0],
+     bay_bar = bay_bar[1] - bay_bar[0]);
+echo(apron_sheet = [apron[1] - apron[0], apron_h], apron_screws = len(apron_screws));
+echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts, bay_bar_bolts = bay_bar_bolts);
+echo(m5 = len(sheet_screws) + len(apron_screws) + 2 * len(hangers) + 2 + 2 + 2 + 2);
 
 // --- Frame ---
 
@@ -88,11 +95,22 @@ module frame_part() {
       brace(x);
    }
    bar([0, 0, sheet_h - ext], [frame_w, ext, ext]);
-   // aprons
-   for (x = hanger_xs)
-      bar([x, 0, -apron_h], [ext, ext, apron_h]);
-   for (b = apron_bars)
-      bar([b[0], 0, -apron_h], [b[1] - b[0], ext, ext]);
+   // below the desk top
+   for (h = hangers)
+      bar([h[0], 0, -h[2]], [ext, ext, h[2]]);
+   bar([apron_bar[0], 0, -apron_h], [apron_bar[1] - apron_bar[0], ext, ext]);
+   bar([bay_bar[0], 0, -ext], [bay_bar[1] - bay_bar[0], ext, ext]);
+}
+
+module feet_part() {
+   for (h = hangers) {
+      color("#e08a2c") translate([foot_x(h), 0, 0]) clamp_foot();
+      // thumb screw from below, its tip on the desk underside
+      color("#b9c0c8") translate([foot_x(h) + foot_t / 2, foot_screw_y, foot_z0 - 12]) {
+         cylinder(d = 6, h = 12 + foot_h + foot_gap);
+         cylinder(d = 20, h = 4);
+      }
+   }
 }
 
 // --- Sheet, x / z on the sheet ---
@@ -110,12 +128,11 @@ module sheet_2d() {
    }
 }
 
-// apron sheet i, x / z on the sheet (z < 0)
-module apron_2d(i) {
-   a = aprons[i];
+// apron sheet, x / z on the sheet (z < 0)
+module apron_2d() {
    difference() {
-      translate([a[0], -apron_h]) square([a[1] - a[0], apron_h]);
-      rect(under_cuts[i]);
+      translate([apron[0], -apron_h]) square([apron[1] - apron[0], apron_h]);
+      rect(pedestal_cut);
       for (p = apron_screws)
          translate(p) circle(d = m5_d);
    }
@@ -126,7 +143,7 @@ module sheet_part() {
       rotate([90, 0, 0])
          linear_extrude(sheet_t) {
             sheet_2d();
-            for (i = [0 : 1]) apron_2d(i);
+            apron_2d();
          }
 }
 
@@ -253,12 +270,26 @@ module pedestal_part() {
    }
 }
 
-module park_part() {
-   under_box(park_x, park_size);
-   translate([park_x, under_y0, apron_bar_z + park_size.z / 2]) {
-      color("#b9c0c8") rotate([90, 0, 0]) cylinder(d = 6, h = 20);
-      color("#c0392b") translate([0, -24, 0]) rotate([0, 90, 0]) cylinder(d = 10, h = 50, center = true);
+// Parking brake: body under the desk top behind the bay bar, a tab up to
+// the bar's bottom slot; the T-handle released (sideways, almost flush) or
+// set (pulled out, pointing down)
+module park_part(set = false) {
+   z = park_z + park_size.z / 2;
+   pull = set ? park_pull : 0;
+   color(c_box) {
+      translate([park_x - park_size.x / 2, 0, park_z]) cube(park_size);
+      translate([park_x - park_size.x / 2, 0, park_z]) cube([park_size.x, ext, -ext - park_z]);
    }
+   color("#b9c0c8") {
+      for (s = [-1, 1])
+         translate([park_x + s * park_bolt_dx, ext / 2, -ext]) cylinder(d = 5, h = 1);
+      translate([park_x, 1, z]) rotate([90, 0, 0]) cylinder(d = 6, h = 6 + pull);
+   }
+   color("#c0392b")
+      translate([park_x, -10 - pull, z])
+         rotate([0, set ? 0 : 90, 0])
+            translate([0, 0, set ? -park_handle + 8 : 0])
+               cylinder(d = 10, h = park_handle, center = !set);
 }
 
 module components() {
@@ -268,6 +299,7 @@ module components() {
    throttle_part();
    pedestal_part();
    park_part();
+   feet_part();
 }
 
 module cockpit_view() {
@@ -291,7 +323,8 @@ module under_view() {
          frame_part();
          sheet_part();
          pedestal_part();
-         park_part();
+         park_part(set = true);
+         feet_part();
          throttle_part();
       }
       translate([-110, -200, -apron_h - 1]) cube([frame_w + 220, 600, apron_h + 120]);
