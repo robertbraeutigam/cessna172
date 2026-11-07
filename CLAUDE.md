@@ -11,7 +11,7 @@ follow the same layout.
   - `throttle_box.scad` — the main box. Linear potentiometers sit on stands
     inside, 6 mm rods (one per control) exit the front, an ESP32 sits on a
     pedestal at the back, and there are two clamp housings at the front. The underside is
-    sliced into three printable pieces joined by screwed seams, plus a lid.
+    printed in one piece, plus a lid.
     Its views show the pots, rods with knobs, clamps, pins, ESP32 and wiring
     as view-only parts; the knob, clamp and pin shapes there are copies of
     the other files, keep them in sync.
@@ -138,8 +138,7 @@ so a version can be embossed into a part. Files are rendered from the copy in
   holes, 4.2 mm for M4 / the USB cable, 6.2 mm for the 6 mm rods, 11.2 mm for
   the rod nuts.
 - The printer is an Anycubic Kobra 3 V2 with a 255 x 255 mm bed. Pieces must
-  fit it, which is why large parts are sliced (see `box_underside_slice1..3`);
-  files with big parts check it with a `bed = [255, 255]` parameter.
+  fit it; files with big parts check it with a `bed = [255, 255]` parameter.
 - Values that depend on bought parts are grouped as parameters marked
   MEASURE, and `assert()`s check that derived geometry still fits, so a
   wrong measurement fails the build instead of printing a bad part.
