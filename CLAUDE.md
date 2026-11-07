@@ -51,7 +51,11 @@ The README images are not committed. The `Build` workflow
 (`.github/workflows/build.yml`) runs `make` in every component on each push
 and, on `master`, deploys the STLs and PNGs to GitHub Pages at
 `https://robertbraeutigam.github.io/cessna172/<component>/<file>`; the
-README links there.
+README links there. It caches each component's `target/` together with
+`target/.sources.sha256` (hashes of the sources it was made from), so only
+changed `.scad` files are rendered again; a changed Makefile re-renders the
+whole component. Unchanged parts therefore keep the `{{gitrev}}` and montage
+date of the build that last rendered them.
 
 ## Building
 

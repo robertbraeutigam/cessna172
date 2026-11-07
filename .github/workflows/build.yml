@@ -29,11 +29,76 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             openscad xvfb xauth imagemagick fonts-dejavu-core fonts-liberation
 
-      - name: Render
+      # The renders of the last successful build. Each component's
+      # target/.sources.sha256 lists the hashes of the sources they were
+      # made from, so only the .scad files that changed are rendered again.
+      - name: Restore renders
+        uses: actions/cache/restore@v4
+        with:
+          path: '*/target'
+          key: render-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: render-
+
+      # A fresh checkout makes every source newer than the restored make
+      # markers. Touch the markers of unchanged files so make skips them, and
+      # remove the markers and outputs of changed or deleted files (and of
+      # files whose names start with theirs, as the output globs cover them).
+      # A changed Makefile renders the whole component again.
+      - name: Keep unchanged renders
         run: |
           for makefile in */Makefile; do
-            make -C "$(dirname "$makefile")" OPENSCAD="xvfb-run -a openscad"
+            dir=$(dirname "$makefile")
+            sums=target/.sources.sha256
+            (
+              cd "$dir"
+              [ -d target ] || exit 0
+              if ! awk '$2 == "Makefile"' "$sums" 2>/dev/null | sha256sum -c --status 2>/dev/null; then
+                echo "$dir: Makefile changed, rendering everything"
+                rm -rf target
+                exit 0
+              fi
+              awk '$2 ~ /\.scad$/ { print $2 }' "$sums" | while read -r scad; do
+                if [ -f "$scad" ] && awk -v f="$scad" '$2 == f' "$sums" | sha256sum -c --status 2>/dev/null; then
+                  continue
+                fi
+                name=${scad%.scad}
+                echo "$dir: $scad changed or deleted"
+                rm -f "target/$name" "target/$name.views" "target/$name.stl" \
+                  target/"$name"_*.stl target/"$name"_*.png
+                for other in "$name"_*.scad; do
+                  if [ -f "$other" ]; then rm -f "target/${other%.scad}" "target/${other%.scad}.views"; fi
+                done
+              done
+              find target -maxdepth 1 -type f ! -name '*.*' -exec touch {} +
+              find target -maxdepth 1 -type f -name '*.views' -exec touch {} +
+            )
           done
+
+      # Components and the files in them are rendered in parallel, sharing
+      # one virtual display (parallel xvfb-run -a calls race for a display)
+      - name: Render
+        run: |
+          Xvfb :99 -screen 0 1280x1024x24 &
+          export DISPLAY=:99
+          sleep 1
+          for makefile in */Makefile; do
+            dir=$(dirname "$makefile")
+            make -C "$dir" -j"$(nproc)" -Otarget OPENSCAD=openscad &
+            pids="$pids $!"
+          done
+          status=0
+          for pid in $pids; do wait "$pid" || status=1; done
+          kill %1
+          [ $status = 0 ] || exit 1
+          for makefile in */Makefile; do
+            (cd "$(dirname "$makefile")" && sha256sum *.scad Makefile > target/.sources.sha256)
+          done
+
+      - name: Save renders
+        uses: actions/cache/save@v4
+        with:
+          path: '*/target'
+          key: render-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Collect site
         run: |
