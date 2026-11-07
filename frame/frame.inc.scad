@@ -75,12 +75,17 @@ throttle_housing_h = 26;
 throttle_play = 1;           // box to its cut-out
 
 // --- Switch panel, from switchpanel/ ---
-// ignition (92) + switches (211.6), both panel_h high; the rim on the back
-// (rim_w wide, rim_h deep) sits on the sheet.
-switch_panel = [304, 80];
-switch_rim_w = 2.5;
+// The backs of the ignition (77) and the switches (211.6), panel_h high,
+// go through one hole in the sheet; the face flange (flange_w, on the top,
+// the bottom and the two outer ends) is screwed onto the sheet with M3
+// (drill through the panel's holes).
+switch_ign_w = 77;
+switch_back = [switch_ign_w + 211.6, 80];  // panel_h
+switch_flange = 10;          // flange_w
+switch_cut_clear = 1;        // sheet_cut_clear
+switch_panel = switch_back + 2 * [switch_flange, switch_flange];   // the face
 switch_depth = 40;           // switches behind the sheet (view only)
-switch_z = rail.y + 5;       // panel bottom above the desk
+switch_z = rail.y + 5;       // face bottom above the desk
 
 // --- Layout ---
 gap = 25;                    // between two parts; the bay uprights stand in it
@@ -106,8 +111,8 @@ throttle_cut = [throttle_x0 - throttle_play, rail.y,
 radio_cut = [x_rc - radio_body.x / 2 - 0.5, throttle_cut[3] + sheet_web,
              x_rc + radio_body.x / 2 + 0.5, throttle_cut[3] + sheet_web + radio_body.y + 1];
 radio_front_z0 = radio_cut[1] + 0.5 - (radio_front.y - radio_body.y) / 2;
-switch_cut = [x_sw0 + switch_rim_w, switch_z + switch_rim_w,
-              x_sw1 - switch_rim_w, switch_z + switch_panel.y - switch_rim_w];
+switch_cut = [x_sw0 + switch_flange - switch_cut_clear, switch_z + switch_flange - switch_cut_clear,
+              x_sw1 - switch_flange + switch_cut_clear, switch_z + switch_flange + switch_back.y + switch_cut_clear];
 bay_cut = [x_bay0, 0, x_bay1, yoke_housing.z + yoke_play];
 cuts = [switch_cut, bay_cut, throttle_cut, radio_cut];   // [x0, z0, x1, z1] on the sheet
 

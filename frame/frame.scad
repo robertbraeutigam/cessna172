@@ -145,27 +145,30 @@ module radio_part() {
 }
 
 module switch_panel_part() {
-   y_face = -sheet_t - 8 - 3;       // rim_h, panel_t
+   f = switch_flange;
+   y_face = -sheet_t - 3;           // panel_t, the face on the sheet
+   z_back = switch_z + f;
    color(c_sheet) {
       translate([x_sw0, y_face, switch_z])
-         cube([92 - 0.3, 3, switch_panel.y]);
-      translate([x_sw0 + 92, y_face, switch_z])
-         cube([switch_panel.x - 92, 3, switch_panel.y]);
-      difference() {
-         translate([x_sw0, y_face + 3, switch_z]) cube([switch_panel.x, 8, switch_panel.y]);
-         translate([x_sw0 + switch_rim_w, y_face, switch_z + switch_rim_w])
-            cube([switch_panel.x - 2 * switch_rim_w, 20, switch_panel.y - 2 * switch_rim_w]);
-      }
+         cube([f + switch_ign_w - 0.3, 3, switch_panel.y]);
+      translate([x_sw0 + f + switch_ign_w, y_face, switch_z])
+         cube([switch_panel.x - f - switch_ign_w, 3, switch_panel.y]);
+      // rims, through the sheet
+      for (p = [[x_sw0 + f, switch_ign_w - 0.3], [x_sw0 + f + switch_ign_w, switch_back.x - switch_ign_w]])
+         difference() {
+            translate([p[0], y_face + 3, z_back]) cube([p[1], 8, switch_back.y]);
+            translate([p[0] + 2.5, y_face, z_back + 2.5]) cube([p[1] - 5, 20, switch_back.y - 5]);
+         }
    }
    color(c_switch)
-      translate([switch_cut[0] + 2, 0, switch_cut[1] + 2])
-         cube([switch_cut[2] - switch_cut[0] - 4, switch_depth, switch_cut[3] - switch_cut[1] - 4]);
+      translate([switch_cut[0] + 4, 5, switch_cut[1] + 4])
+         cube([switch_cut[2] - switch_cut[0] - 8, switch_depth, switch_cut[3] - switch_cut[1] - 8]);
    // key, rockers and toggles on the face
-   color("#b9c0c8") translate([x_sw0 + 46, y_face, switch_z + 40]) rotate([90, 0, 0]) cylinder(d = 24, h = 4);
-   color("#c0392b") translate([x_sw0 + 105, y_face - 4, switch_z + 22]) cube([24, 4, 31]);
-   color("#222") translate([x_sw1 - 32, y_face - 4, switch_z + 22]) cube([24, 4, 31]);
+   color("#b9c0c8") translate([x_sw0 + f + 38.5, y_face, z_back + 40]) rotate([90, 0, 0]) cylinder(d = 24, h = 4);
+   color("#c0392b") translate([x_sw0 + f + 92, y_face - 4, z_back + 22]) cube([24, 4, 31]);
+   color("#222") translate([x_sw1 - f - 32, y_face - 4, z_back + 22]) cube([24, 4, 31]);
    for (i = [0 : 6])
-      color("#d0d4da") translate([x_sw0 + 145 + i * 18, y_face, switch_z + 36])
+      color("#d0d4da") translate([x_sw0 + f + 132 + i * 18, y_face, z_back + 36])
          rotate([90, 0, 0]) cylinder(d = 4, h = 18);
 }
 

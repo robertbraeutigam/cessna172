@@ -91,8 +91,8 @@ components are cut when they arrive.
 
 All values are in `frame.inc.scad`; the layout (cut-outs, screw holes) is
 computed from the component sizes, and the build prints the cut list
-(`echo`). With the current guesses the frame is 980 x 342 mm, the sheet
-980 x 260 mm.
+(`echo`). With the current guesses the frame is 985 x 342 mm, the sheet
+985 x 260 mm.
 
 | File | Parts |
 |------|-------|
@@ -105,11 +105,9 @@ wheel), the radio panel body that goes through the sheet (`radio_body`,
 from Logitech's "Construction dimensions for Flight Panels" drawing) and
 the panel height the monitor allows (`sheet_h`).
 
-**Open:** the switch panel's rim sits on its outer edge, with the mount
-bosses on it and the mux board right inside it, so its cut-out can only be
-the inside of the rim, and the sheet does not reach under the mount screws.
-Before the switch panel is printed it needs a flange (rim moved inwards,
-screws in the flange outside it).
+The switch panel's two backs go through one hole, 1 mm larger than the
+backs all round; drill its M3 mount holes through the panel's own holes,
+with the panels in place.
 
 ## Hardware
 
@@ -176,10 +174,15 @@ SimVim, active low, like a switch to GND.
 
 It is two panels, printed separately and mounted side by side: the ignition
 on the left and the switch row, which also carries the input multiplexer
-for both. Their basics are in `panel.inc.scad`: both are 80 mm high
-(`panel_h`) and 3 mm thick, with the same rim, corner mount holes and
-lettering. The two corners where they meet are square, so together they
-look like the one piece panel of the airplane (about 304 x 80 mm).
+for both. Their basics are in `panel.inc.scad`: both are 3 mm thick,
+with the same rim, flange, mount holes and lettering. The back of each
+panel is 80 mm high (`panel_h`), closed by an 8 mm rim, and goes through a
+hole in the cockpit sheet ([frame](#cockpit-frame)); a 10 mm face flange
+(`flange_w`) on the top, the bottom and the outer end sits on the sheet
+and is screwed to it with M3 screws, nuts behind the sheet. Where the two
+panels meet there is no flange and the corners are square, so together
+they look like the one piece panel of the airplane (about 309 x 100 mm,
+the face 3 mm in front of the sheet).
 
 ## Ignition switch
 
@@ -213,7 +216,7 @@ closed by a cover:
 
 Printed parts: panel, housing, rotor, shoe, cover.
 
-The panel is 92 x 80 mm, printed front side down, with the position labels,
+The panel is 87 x 100 mm (the back 77 x 80 mm), printed front side down, with the position labels,
 tick marks and MAGNETOS engraved around the key. The lock body goes through
 a cutout with flats, so it cannot turn, and the housing sits on the back,
 between the rims. The labels are placed for the key pointing at OFF in the
@@ -232,7 +235,7 @@ lock's home position: **MEASURE** where the key really points
 | 4 | M3 screw | cover |
 | 4 | M3 x 10 screw | panel to housing |
 | 1 | M3 x 8 screw | START pin |
-| 4 | M3 pan head screw + nut | panel mounting |
+| 4 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet |
 
 ### Assembly
 
@@ -258,9 +261,10 @@ row of circuit breakers, like on the real panel; they are for show only.
 
 The switch list (`groups` in the source) drives the layout; it follows the
 X-Plane 172 SP. For a 172N remove FUEL PUMP and the panel gets shorter. The
-panel is 211.6 x 80 mm, printed front side down; the switches and labels
-need about 68 mm of the height, the rest is split between above and below
-them. A rim and bosses on the back stiffen it.
+panel is 221.6 x 100 mm (the back 211.6 x 80 mm), printed front side
+down; the switches and labels need about 68 mm of the back's height, the
+rest is split between above and below them. The rim on the back stiffens
+it.
 
 ### Hardware
 
@@ -269,7 +273,7 @@ them. A rim and bosses on the back stiffen it.
 | 1 | double rocker switch, 6 pin, red | MASTER: ALT, BAT |
 | 1 | double rocker switch, 6 pin, black (there is no white one) | AVIONICS: BUS 1, BUS 2 |
 | 7 | toggle switch, M12 neck, 18 mm lever | FUEL PUMP, BEACON, LAND, TAXI, NAV, STROBE, PITOT HEAT |
-| 6 | M3 pan head screw + nut | panel mounting (`mount_count`) |
+| 6 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet (`mount_count`) |
 | 1 | CD74HC4067 16 channel mux breakout board | all inputs, see [Multiplexer](#multiplexer) |
 | 2 | M2 x 6 screw | mux onto its standoffs |
 | 7 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
@@ -359,7 +363,7 @@ switches.)
 The board sits on two standoffs in the strip behind the group labels, on
 the left (pilot side) half, where the ignition cable comes in. Mount it with
 the chip outwards, so the solder joints face you; `assert`s check that it
-clears the switches and the mount bosses.
+clears the switches and fits inside the rim.
 
 **MEASURE when it arrives** (`mux_*`): the board is 40 x 18 mm in the
 listings (one says 41 x 18.7 mm). The mounting holes (`mux_holes`, guessed

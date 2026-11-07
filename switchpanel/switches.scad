@@ -16,9 +16,11 @@
 //   their names engraved above them. They are for show only: printed dummy
 //   push-to-reset buttons (hex nut, button with the rating on it), glued
 //   into hex pockets in the front.
-// - A rim and bosses on the back stiffen the long, thin panel. It mounts to
-//   the right of the ignition panel and has the same height, rim and mount
-//   holes (panel.inc.scad); its left corners are square where they meet.
+// - A rim on the back stiffens the long, thin panel; it goes through the
+//   hole in the cockpit sheet and the face flange around it is screwed onto
+//   the sheet. It mounts to the right of the ignition panel and has the same
+//   height, rim, flange and mount holes (panel.inc.scad); its left corners
+//   are square and without a flange where they meet.
 // - A CD74HC4067 input multiplexer board sits on two standoffs on the back,
 //   in the strip behind the group labels. All switches (and the ignition)
 //   are soldered to it, so only one 7 wire cable runs to the SimVim Mega.
@@ -207,15 +209,16 @@ content_y0 = -rk_bezel.y / 2 - margin_bottom;
 content_y1 = max(group_label_y + group_label_size, len(breakers) > 0 ? cb_label_top : 0) + margin_top;
 panel_y0 = content_y0 - (panel_h - (content_y1 - content_y0)) / 2;
 panel_y1 = panel_y0 + panel_h;
-panel_size = [panel_x1 - panel_x0, panel_y1 - panel_y0];
+panel_size = [panel_x1 - panel_x0, panel_y1 - panel_y0];   // the back
+face_size = panel_size + [flange_w, 2 * flange_w];             // flange on the top, bottom and right
 panel_cx = (panel_x0 + panel_x1) / 2;
 
 // The top middle hole goes between the two breakers nearest the middle
 function closest(v, x) = [for (a = v) if (abs(a - x) == min([for (b = v) abs(b - x)])) a][0];
 mount_top_cx = len(breakers) > 1 ? closest([for (i = [1 : len(cb_xs) - 1]) (cb_xs[i - 1] + cb_xs[i]) / 2], panel_cx) : panel_cx;
 mount_holes = concat(
-   panel_corner_holes(panel_x0, panel_x1, panel_y0),
-   mount_center ? [[panel_cx, panel_y0 + mount_inset], [mount_top_cx, panel_y1 - mount_inset]] : []);
+   panel_corner_holes(panel_x0, panel_x1, panel_y0, round0 = false),
+   mount_center ? [[panel_cx, panel_mount_y0(panel_y0)], [mount_top_cx, panel_mount_y1(panel_y0)]] : []);
 mount_count = len(mount_holes);
 
 // Mux board as high as the rim allows. Its panel side is at mux_z.
@@ -228,7 +231,6 @@ function mux_ctl_pin(name) = [mux_x + (search([name], mux_ctl_names)[0] - 3.5) *
 
 // Distance from a point to a centered box
 function box_dist(p, c, size) = norm([max(0, abs(p.x - c.x) - size.x / 2), max(0, abs(p.y - c.y) - size.y / 2)]);
-min_boss_dist = min([for (h = mount_holes, u = units) box_dist(h, [u[0], 0], unit_pocket(u)) - boss_d / 2]);
 min_web = min([for (i = [1 : len(units) - 1])
                   units[i][0] - units[i - 1][0] - (unit_pocket(units[i]).x + unit_pocket(units[i - 1]).x) / 2]);
 min_front_gap = min([for (i = [1 : len(units) - 1])
@@ -239,10 +241,10 @@ min_cb_mount_dist = len(breakers) == 0 ? 99 : min([for (h = mount_holes, i = [0 
                   min(norm(h - [cb_xs[i], cb_y]) - cb_r,
                       box_dist(h, [cb_xs[i], cb_label_y + cb_label_size / 2], [cb_label_w(i), cb_label_size]))]) - mount_head_r;
 
-echo(panel_size = panel_size, switches = switch_count, mux_inputs = switch_count + ignition_inputs, breakers = len(breakers));
+echo(panel_size = panel_size, face_size = face_size, switches = switch_count, mux_inputs = switch_count + ignition_inputs, breakers = len(breakers));
 
 // --- Sanity checks ---
-assert(panel_size.x <= bed.x && panel_size.y <= bed.y, "Panel does not fit the printer bed");
+assert(face_size.x <= bed.x && face_size.y <= bed.y, "Panel does not fit the printer bed");
 assert(content_y1 - content_y0 <= panel_h, "Switches and labels do not fit panel_h, make it higher or the margins smaller");
 assert([for (g = groups) if (g[1] == "rocker2" && len(g[2]) != 2) g] == [], "A rocker2 group needs exactly two switches");
 assert(panel_t - rk_grip >= 1, "Rocker pockets too shallow, make panel_t thicker or rk_grip thinner");
@@ -254,13 +256,10 @@ assert(tg_pocket_depth < panel_t - 1, "Toggle body pocket too deep");
 assert(norm(tg_body) >= tg_pocket.x + 1, "Toggle body could turn in its square pocket");
 assert(min_front_gap >= 1, "Switches too close to each other, increase tg_pitch or group_space");
 assert(min_web >= 1.2, "Too thin a wall between two pockets, increase tg_pitch or group_space");
-assert(min_boss_dist >= 0.5, "A mount boss runs into a switch pocket, increase the margins");
 assert(panel_y0 + rim_w + 0.5 <= -max(rk_pocket.y, tg_pocket.y) / 2, "Rim runs into a switch pocket, increase margin_bottom");
 assert(len(view_on) <= switch_count, "view_on has more entries than there are switches");
 assert(switch_count + ignition_inputs <= mux_channels, "More switches than mux inputs");
 assert(mux_y - mux_board.y / 2 >= mux_switch_y + mux_clear, "Mux board runs into the switches, increase margin_top");
-assert(min([for (h = mount_holes) box_dist(h, [mux_x, mux_y], mux_board)]) >= boss_d / 2 + mux_clear,
-       "Mux board runs into a mount boss, move mux_x");
 assert(mux_x - mux_board.x / 2 >= panel_x0 + rim_w + mux_clear && mux_x + mux_board.x / 2 <= panel_x1 - rim_w - mux_clear,
        "Mux board does not fit inside the rim, move mux_x");
 assert(mux_standoff_h >= mux_pin_stub + 1, "Mux standoffs too short for the pin ends");
@@ -347,7 +346,7 @@ module panel() {
          translate([x, cb_y, -cb_pocket_depth])
             cylinder(r = cb_r + cb_pocket_clear / cos(30), h = cb_pocket_depth + 1, $fn = 6);
       // Version on the back, mirrored so it reads from behind
-      translate([panel_x1 - 30, panel_y1 - mount_inset, -panel_t - 1])
+      translate([panel_x1 - 30, panel_y1 + flange_w / 2, -panel_t - 1])
          linear_extrude(gitrev_depth + 1)
             mirror([1, 0])
                text("{{gitrev}}", size = 3, halign = "center", valign = "center");
@@ -595,7 +594,7 @@ module mount_screws() {
    for (h = mount_holes)
       translate([h.x, h.y, 0])
          mirror([0, 0, 1])
-            mount_screw(panel_t + rim_h + 4, c_steel);
+            mount_screw(panel_t + 7, c_steel);  // face, sheet, nut
 }
 
 // Wire through a list of points

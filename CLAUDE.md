@@ -22,9 +22,12 @@ its own top-level directory; new components should follow the same layout.
   switch position is a raw output wire for SimVim (active low, like a switch
   to GND). It is two panels printed separately and mounted side by side,
   ignition on the left.
-  - `panel.inc.scad` — included by both: panel height (`panel_h`, the same
-    for both), thickness, rim, corner mount holes, lettering, and the
-    `panel_blank` plate (square corners where the panels meet).
+  - `panel.inc.scad` — included by both: back height (`panel_h`, the same
+    for both), thickness, rim, face flange (`flange_w`) with the mount
+    holes, lettering, and the `panel_blank` plate (square corners and no
+    flange where the panels meet). The back goes through a hole in the
+    frame's sheet, the flange is screwed onto it; `frame/frame.inc.scad`
+    repeats these sizes.
   - `ignition.scad` — its panel (labels engraved) and the
     OFF/R/L/BOTH/START key switch built around a cheap
     mailbox cam lock (its 90° stop removed). It has a ball detent, end stops
