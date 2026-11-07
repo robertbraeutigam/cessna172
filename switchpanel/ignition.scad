@@ -152,14 +152,16 @@ slot_narrow_end = start_pin_angle + arc_deg(start_pin_d / 2 + 0.5, start_pin_r) 
 slot_wide_end = slot_step - arc_deg(start_shoe_len + start_spring_inst, start_pin_r);
 pin_protrusion = start_pin_len - cover_t - gap;
 
-// Panel, centered on the key, as wide as the housing and the mount bosses
-// next to it need. Its pilot's right side (-x) meets the switch panel.
-panel_w = 2 * (half + mount_inset + boss_d / 2 + 0.5);
-mount_holes = panel_corner_holes(-panel_w / 2, panel_w / 2, -panel_h / 2);
+// Panel back, centered on the key, as wide as the housing needs inside
+// the rim. Its pilot's right side (-x) meets the switch panel; the flange
+// is on the other three sides.
+panel_w = 2 * (half + rim_w + 0.5);
+face_w = panel_w + flange_w;
+mount_holes = panel_corner_holes(-panel_w / 2, panel_w / 2, -panel_h / 2, round0 = false);
 function label_pos(i) = label_r * [cos(key_off_angle + pos_angle(i)), sin(key_off_angle + pos_angle(i))];
 title_y = max([for (i = [0 : 4]) label_pos(i).y]) + label_size / 2 + title_gap;
 
-echo(panel_size = [panel_w, panel_h]);
+echo(panel_size = [panel_w, panel_h], face_size = [face_w, face_h]);
 
 // --- Sanity checks ---
 assert(z_cam >= front_t + lock_nut_t + 1, "Lock body too short for panel + front plate + nut");
@@ -347,8 +349,8 @@ module panel() {
       translate([0, 0, -panel_t - 1])
          linear_extrude(label_depth + 1)
             labels_2d();
-      // Version on the back, beside the housing
-      translate([-(half + panel_w / 2 - rim_w) / 2, 0, -gitrev_depth])
+      // Version on the back of the flange
+      translate([panel_w / 2 + flange_w / 2, 0, -gitrev_depth])
          linear_extrude(gitrev_depth + 1)
             rotate([0, 0, 90])
                text("{{gitrev}}", size = 3, halign = "center", valign = "center");
@@ -493,7 +495,7 @@ module panel_part() {
 module mount_screws() {
    for (h = mount_holes)
       translate([h.x, h.y, -panel_t])
-         mount_screw(panel_t + rim_h + 4, c_steel);
+         mount_screw(panel_t + 7, c_steel);  // face, sheet, nut
 }
 
 module panel_screws() {

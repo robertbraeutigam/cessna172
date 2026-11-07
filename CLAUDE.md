@@ -2,8 +2,7 @@
 
 Hardware project to build a Cessna 172 cockpit for the X-Plane flight simulator.
 Parts are designed in OpenSCAD and 3D printed. Each cockpit component lives in
-its own top-level directory (currently only `throttle/`); new components should
-follow the same layout.
+its own top-level directory; new components should follow the same layout.
 
 ## Projects
 
@@ -23,9 +22,12 @@ follow the same layout.
   switch position is a raw output wire for SimVim (active low, like a switch
   to GND). It is two panels printed separately and mounted side by side,
   ignition on the left.
-  - `panel.inc.scad` — included by both: panel height (`panel_h`, the same
-    for both), thickness, rim, corner mount holes, lettering, and the
-    `panel_blank` plate (square corners where the panels meet).
+  - `panel.inc.scad` — included by both: back height (`panel_h`, the same
+    for both), thickness, rim, face flange (`flange_w`) with the mount
+    holes, lettering, and the `panel_blank` plate (square corners and no
+    flange where the panels meet). The back goes through a hole in the
+    frame's sheet, the flange is screwed onto it; `frame/frame.inc.scad`
+    repeats these sizes.
   - `ignition.scad` — its panel (labels engraved) and the
     OFF/R/L/BOTH/START key switch built around a cheap
     mailbox cam lock (its 90° stop removed). It has a ball detent, end stops
@@ -43,6 +45,15 @@ follow the same layout.
     ignition, so one cable runs to the SimVim Mega. The switch list
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
+
+- `frame/` — the aluminium extrusion frame on the desk and the ACM panel
+  sheet over it. `frame.inc.scad` holds the extrusion/sheet standard, the
+  sizes of the components it carries (copies of the other components'
+  values and MEASURE values for the bought Saitek yoke and radio panel,
+  keep them in sync), the layout and its checks; `frame.scad` has the
+  views, the cut list (echo) and the printed throttle mount. Every
+  component brings its own front face and is screwed onto a cut-out in the
+  sheet; heavy or pulled ones also stand on the frame.
 
 ## Documentation
 
@@ -147,7 +158,7 @@ so a version can be embossed into a part. Files are rendered from the copy in
   computed from them; reuse the same names across files (e.g. `pin.scad`
   repeats the `big_pot_*` values from `throttle_box.scad`).
 - Hole clearances used so far: 3.2–3.3 mm for M3 screws, 2.1 mm for M2 pilot
-  holes, 4.2 mm for M4 / the USB cable, 6.2 mm for the 6 mm rods, 11.2 mm for
+  holes, 4.2 mm for M4 / the USB cable, 5.3 mm for M5 (frame), 6.2 mm for the 6 mm rods, 11.2 mm for
   the rod nuts.
 - The printer is an Anycubic Kobra 3 V2 with a 255 x 255 mm bed. Pieces must
   fit it; files with big parts check it with a `bed = [255, 255]` parameter.
