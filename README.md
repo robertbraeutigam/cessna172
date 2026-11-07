@@ -79,11 +79,28 @@ Seen from the pilot, left to right:
   A future force feedback yoke bolts to a crossbar in the bay instead.
 - **Saitek radio panel**, with the **throttle box** under it.
 
+Below the desk top hang two **aprons** for the controls that are under the
+panel in the airplane: the left one carries the **parking brake**, the right
+one, under the throttle, the **pedestal** with the trim wheel and the fuel
+selector. Each apron is two 2020 hangers under the front rail (a corner
+bracket on each side, in the rail's front bottom slot), a 2020 lower bar
+between their ends and a small ACM sheet in front, flush under the main
+sheet. Between the aprons, around the yoke, `knee_w` (460 mm) stays open
+for the legs. For the hangers the frame overhangs the desk edge by 25 mm
+(`frame_overhang`, a hanger and 5 mm play), so the front rail still lies
+15 mm on the desk and the yoke housing sits 25 mm behind the sheet. The
+pedestal and the parking brake are future components; their sizes
+(`pedestal_size`, `park_size`) are guesses that reserve the space and set
+the apron height (199 mm below the desk top), and their holes are cut when
+they exist. Their bodies must stay below the desk underside.
+
 The rule for every component: it brings its own front face, a hole is cut
 into the sheet for it and its face is screwed onto the sheet. Heavy or
 pulled components also stand on the frame: the throttle box sits on the
 front rail and a crossbar, its face flange is screwed onto the sheet like
-the switch panel's and two M5 bolts through its floor go into the rail. The extrusion carries the
+the switch panel's and two M5 bolts through its floor go into the rail.
+The under-desk components do the same on the lower bar of their apron.
+The extrusion carries the
 loads, the sheet only covers the front, so cut-outs do not weaken it.
 Keep at least 25 mm of sheet to the edge and 20 mm between cut-outs, and
 drill the corners of a cut-out before sawing it. Holes for future
@@ -91,15 +108,17 @@ components are cut when they arrive.
 
 All values are in `frame.inc.scad`; the layout (cut-outs, screw holes) is
 computed from the component sizes, and the build prints the cut list
-(`echo`). With the current guesses the frame is 985 x 342 mm, the sheet
-985 x 260 mm.
+(`echo`). With the current guesses the frame is 985 x 365 mm, the sheet
+985 x 260 mm, the apron sheets 275 x 199 and 250 x 199 mm.
 
 | File | Parts |
 |------|-------|
 | `frame.inc.scad` | extrusion and sheet standard, component sizes, layout, checks |
 | `frame.scad` | views, cut list (no printed parts) |
 
-**MEASURE:** the desk (`desk`), the Saitek yoke housing (`yoke_housing`,
+**MEASURE:** the desk (`desk`, and `desk_skirt` if it has a frame or
+drawer under the top at the front edge), the leg room the pilot needs
+(`knee_w`), the Saitek yoke housing (`yoke_housing`,
 guessed 283 mm wide like the radio panel; spec sheet: 310 x 185 mm with the
 wheel), the radio panel body that goes through the sheet (`radio_body`,
 from Logitech's "Construction dimensions for Flight Panels" drawing) and
@@ -116,10 +135,10 @@ flange holes are drilled with the box in place.
 | Qty | Part | Use |
 |-----|------|-----|
 | 3 | 2040 extrusion, 6 mm slot | front rail left and right, rear rail |
-| 14 | 2020 extrusion, 6 mm slot | 5 crossbars, 4 uprights, top bar, 4 braces (45 degree ends) |
-| - | corner brackets, M5 screws, M5 T-nuts | frame joints |
-| 1 | 3 mm ACM sheet | panel, cut to frame_w x sheet_h |
-| 30 | M5 button head screw + T-nut | sheet, throttle box floor into the front rail |
+| 20 | 2020 extrusion, 6 mm slot | 5 crossbars, 4 uprights, top bar, 4 braces (45 degree ends), 4 hangers, 2 lower bars |
+| - | corner brackets, M5 screws, M5 T-nuts | frame joints (2 per hanger at the rail) |
+| 3 | 3 mm ACM sheet | panel, cut to frame_w x sheet_h; the two apron sheets |
+| 52 | M5 button head screw + T-nut | sheets, throttle box floor into the front rail, under-desk floors into the lower bars |
 | 2-4 | desk clamp | frame onto the desk |
 
 ## Connections (plan)

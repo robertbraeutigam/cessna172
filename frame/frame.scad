@@ -1,16 +1,17 @@
 // Cockpit frame
 //
 // Aluminium extrusion ladder on the desk, panel frame on its front edge and
-// one ACM sheet over it, with a cut-out for every component. Values,
+// one ACM sheet over it, with a cut-out for every component; two aprons
+// hang below the desk top for the under-panel controls. Values,
 // layout and checks are in frame.inc.scad; this file has the views and the
 // cut list (echo). The frame has no printed parts.
 //
 // Bought parts (lengths: see the echo of the build, or the README):
 // - 2040 extrusion: front rail left, front rail right, rear rail
 // - 2020 extrusion: 5 crossbars, 4 uprights, top bar, 4 braces (45 degree
-//   ends)
+//   ends), 4 hangers, 2 lower bars
 // - corner brackets, M5 screws and T-nuts (6 mm slot)
-// - 3 mm ACM sheet, frame_w x sheet_h
+// - 3 mm ACM sheet, frame_w x sheet_h, and two apron sheets
 // - desk clamps (the ones the throttle used), on the rails
 //
 // Assembly:
@@ -19,11 +20,16 @@
 //    crossbars.
 // 2. Cut the sheet (cuts, sheet_screws in the echo, the "sheet" view),
 //    drill its screw holes, and screw it onto the front slots with T-nuts.
-// 3. Put the frame on the desk, the yoke into the bay, clamp both.
-// 4. Push the throttle box through its cut-out onto the rail and the middle
+// 3. Hang the aprons: each hanger under the front rail with a corner
+//    bracket on each side in the rail's front bottom slot, the lower bar
+//    between the hanger ends, the apron sheet on their front slots.
+// 4. Put the frame on the desk, its front a hanger in front of the desk
+//    edge, the yoke into the bay, clamp both.
+// 5. Push the throttle box through its cut-out onto the rail and the middle
 //    crossbar until its face is on the sheet, bolt its floor into the rail
 //    (throttle_bolts), drill the sheet through its flange holes and screw
-//    the flange on (M3, nuts behind the sheet).
+//    the flange on (M3, nuts behind the sheet). The pedestal and the
+//    parking brake go in the same way onto the lower bars, when they exist.
 
 include <frame.inc.scad>
 
@@ -46,6 +52,10 @@ echo(braces_2020 = len(upright_xs), brace_long_edge = brace_long);
 echo(sheet = [frame_w, sheet_h], screws = len(sheet_screws));
 echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut);
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
+echo(hangers_2020 = len(hanger_xs), hanger_len = apron_h,
+     lower_bars_2020 = [for (b = apron_bars) b[1] - b[0]]);
+echo(apron_sheets = [for (a = aprons) [a[1] - a[0], apron_h]], apron_screws = len(apron_screws));
+echo(apron_cuts = [for (c = under_cuts) [c[0], c[1], c[2], c[3]]], under_bolts = under_bolts);
 
 // --- Frame ---
 
@@ -78,6 +88,11 @@ module frame_part() {
       brace(x);
    }
    bar([0, 0, sheet_h - ext], [frame_w, ext, ext]);
+   // aprons
+   for (x = hanger_xs)
+      bar([x, 0, -apron_h], [ext, ext, apron_h]);
+   for (b = apron_bars)
+      bar([b[0], 0, -apron_h], [b[1] - b[0], ext, ext]);
 }
 
 // --- Sheet, x / z on the sheet ---
@@ -95,10 +110,24 @@ module sheet_2d() {
    }
 }
 
+// apron sheet i, x / z on the sheet (z < 0)
+module apron_2d(i) {
+   a = aprons[i];
+   difference() {
+      translate([a[0], -apron_h]) square([a[1] - a[0], apron_h]);
+      rect(under_cuts[i]);
+      for (p = apron_screws)
+         translate(p) circle(d = m5_d);
+   }
+}
+
 module sheet_part() {
    color(c_sheet)
       rotate([90, 0, 0])
-         linear_extrude(sheet_t) sheet_2d();
+         linear_extrude(sheet_t) {
+            sheet_2d();
+            for (i = [0 : 1]) apron_2d(i);
+         }
 }
 
 // --- Components, view only ---
@@ -193,11 +222,52 @@ module throttle_part() {
    }
 }
 
+// Under-desk component on its lower bar: box, face with flange, floor bolts
+module under_box(x, size) {
+   f = under_flange;
+   translate([x - size.x / 2, under_y0, apron_bar_z]) {
+      color(c_box) {
+         difference() {
+            cube(size);
+            translate([3, 3, 3]) cube(size - [6, 6, 0]);
+         }
+         translate([-f, 0, 0]) cube([size.x + 2 * f, under_face_t, size.z + f]);
+      }
+      color("#b9c0c8")
+         for (s = [-1, 1])
+            translate([size.x / 2 + s * size.x / 4, under_bolt_y, 3]) cylinder(d = m5_head_d, h = 3);
+   }
+}
+
+module pedestal_part() {
+   under_box(pedestal_x, pedestal_size);
+   // trim wheel rim out of a slot in the face, fuel selector below it
+   z = apron_bar_z + pedestal_size.z;
+   color("#222") {
+      translate([pedestal_x - 6, under_y0 + 40, z - 55])
+         rotate([0, 90, 0]) cylinder(d = 100, h = 12);
+      translate([pedestal_x, under_y0, apron_bar_z + 35]) {
+         rotate([90, 0, 0]) cylinder(d = 50, h = 6);
+         translate([0, -10, 0]) cube([12, 10, 50], center = true);
+      }
+   }
+}
+
+module park_part() {
+   under_box(park_x, park_size);
+   translate([park_x, under_y0, apron_bar_z + park_size.z / 2]) {
+      color("#b9c0c8") rotate([90, 0, 0]) cylinder(d = 6, h = 20);
+      color("#c0392b") translate([0, -24, 0]) rotate([0, 90, 0]) cylinder(d = 10, h = 50, center = true);
+   }
+}
+
 module components() {
    yoke_part();
    radio_part();
    switch_panel_part();
    throttle_part();
+   pedestal_part();
+   park_part();
 }
 
 module cockpit_view() {
@@ -211,6 +281,21 @@ module cockpit_view() {
 module sheet_view() {
    frame_part();
    sheet_part();
+}
+
+// Below the desk top: aprons, under-desk components and the leg room
+module under_view() {
+   intersection() {
+      union() {
+         desk_part();
+         frame_part();
+         sheet_part();
+         pedestal_part();
+         park_part();
+         throttle_part();
+      }
+      translate([-110, -200, -apron_h - 1]) cube([frame_w + 220, 600, apron_h + 120]);
+   }
 }
 
 module throttle_view() {
@@ -230,3 +315,4 @@ module throttle_view() {
 //frame_part(); // Make view frame 55,0,-35
 //sheet_view(); // Make view sheet 90,0,0
 //throttle_view(); // Make view throttle 55,0,150
+//under_view(); // Make view under 80,0,-20
