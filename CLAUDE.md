@@ -56,7 +56,11 @@ its own top-level directory; new components should follow the same layout.
   keep them in sync), the layout and its checks; `frame.scad` has the
   views and the cut list (echo), no printed parts. Every
   component brings its own front face and is screwed onto a cut-out in the
-  sheet; heavy or pulled ones also stand on the frame.
+  sheet; heavy or pulled ones also stand on the frame. Two aprons hang
+  below the desk top, in front of the desk edge, for the under-panel
+  controls (parking brake left, trim wheel / fuel selector pedestal right);
+  those stand on the aprons' lower bars, and `knee_w` around the yoke stays
+  open for the legs.
 
 ## Documentation
 
