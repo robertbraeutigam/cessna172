@@ -11,6 +11,7 @@ Each cockpit component has its own directory:
 |-----------|-----------|
 | [`throttle/`](throttle) | throttle quadrant: throttle, mixture and carb heat |
 | [`switchpanel/`](switchpanel) | the 172N lower left switch panel: ignition key, master, lights, avionics |
+| [`frame/`](frame) | the aluminium frame and panel sheet that everything mounts on |
 
 The pictures below are rendered from the current `master` by the
 [Build](.github/workflows/build.yml) workflow and published, together with
@@ -57,6 +58,83 @@ fit on it, and the files check it. Values that depend on bought parts
 are marked MEASURE in the source; `assert()`s check that the derived
 geometry still fits, so a wrong measurement fails the build instead of
 printing a bad part.
+
+# Cockpit frame
+
+[`frame/`](frame): the frame on the desk that carries all components, and
+the panel sheet over it.
+
+[![Cockpit frame](https://robertbraeutigam.github.io/cessna172/frame/frame_montage.png)](https://robertbraeutigam.github.io/cessna172/frame/frame_montage.png)
+
+An aluminium extrusion ladder lies on the desk and is held by desk clamps
+on its rails. On its front edge stands a panel frame: four 2020 uprights,
+a top bar and a 45 degree brace behind each upright. One 3 mm aluminium
+composite (ACM) sheet is screwed onto its front slots.
+
+Seen from the pilot, left to right:
+
+- **Switch panel** (ignition + switches), low on the left.
+- **Yoke bay**: the front rail is split here, so the Saitek yoke stays
+  on the desk with its own clamps, its housing in a notch in the sheet.
+  A future force feedback yoke bolts to a crossbar in the bay instead.
+- **Saitek radio panel**, with the **throttle box** under it.
+
+The rule for every component: it brings its own front face, a hole is cut
+into the sheet for it and its face is screwed onto the sheet. Heavy or
+pulled components also stand on the frame: the throttle box sits on the
+front rail and a crossbar, held by two printed mounts in its clamp pockets
+that are bolted through the sheet into the rail. The extrusion carries the
+loads, the sheet only covers the front, so cut-outs do not weaken it.
+Keep at least 25 mm of sheet to the edge and 20 mm between cut-outs, and
+drill the corners of a cut-out before sawing it. Holes for future
+components are cut when they arrive.
+
+All values are in `frame.inc.scad`; the layout (cut-outs, screw holes) is
+computed from the component sizes, and the build prints the cut list
+(`echo`). With the current guesses the frame is 980 x 342 mm, the sheet
+980 x 260 mm.
+
+| File | Parts |
+|------|-------|
+| `frame.inc.scad` | extrusion and sheet standard, component sizes, layout, checks |
+| `frame.scad` | views, cut list, `throttle_mount` (print 2) |
+
+**MEASURE:** the desk (`desk`), the Saitek yoke housing (`yoke_housing`,
+guessed 283 mm wide like the radio panel; spec sheet: 310 x 185 mm with the
+wheel), the radio panel body that goes through the sheet (`radio_body`,
+from Logitech's "Construction dimensions for Flight Panels" drawing) and
+the panel height the monitor allows (`sheet_h`).
+
+**Open:** the switch panel's rim sits on its outer edge, with the mount
+bosses on it and the mux board right inside it, so its cut-out can only be
+the inside of the rim, and the sheet does not reach under the mount screws.
+Before the switch panel is printed it needs a flange (rim moved inwards,
+screws in the flange outside it).
+
+## Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 3 | 2040 extrusion, 6 mm slot | front rail left and right, rear rail |
+| 14 | 2020 extrusion, 6 mm slot | 5 crossbars, 4 uprights, top bar, 4 braces (45 degree ends) |
+| - | corner brackets, M5 screws, M5 T-nuts | frame joints |
+| 1 | 3 mm ACM sheet | panel, cut to frame_w x sheet_h |
+| 30 | M5 button head screw + T-nut | sheet and throttle mounts |
+| 2-4 | desk clamp | frame onto the desk |
+
+## Connections (plan)
+
+- One hub box under the frame: the SimVim Arduino Mega and a powered USB
+  hub, so one USB cable runs to the PC (Mega, throttle ESP32, Saitek yoke,
+  Saitek radio panel, later the FFB yoke).
+- SimVim modules connect with Cat5 patch cables (RJ45): 5 V, GND, mux
+  S0-S3 (shared by all ports), mux SIG (one Mega pin per port) and one
+  analog line. Each module has one mux and one jack. The switch panel's
+  7 wire mux cable is port 1; the under-desk controls (trim wheel, fuel
+  selector, parking brake) share port 2.
+- Power: USB only for now. With lighting, gauges or the FFB yoke comes one
+  24 V PSU with fused branches, buck converters for 5 V, a separate cut-off
+  switch on the FFB motor power and one star ground at the PSU.
 
 # Throttle quadrant
 
