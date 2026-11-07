@@ -48,8 +48,8 @@ A leading `//` only hides a line from the OpenSCAD preview; the build still
 renders it. `{{gitrev}}` in the source is replaced with the short git hash,
 so the version is embossed into the parts.
 
-The printer is an Anycubic Kobra 3 V2 (255 x 255 mm bed). Large parts are
-sliced to fit, and the files check it. Values that depend on bought parts
+The printer is an Anycubic Kobra 3 V2 (255 x 255 mm bed). Large parts must
+fit on it, and the files check it. Values that depend on bought parts
 are marked MEASURE in the source; `assert()`s check that the derived
 geometry still fits, so a wrong measurement fails the build instead of
 printing a bad part.
@@ -70,7 +70,7 @@ over USB.
 
 | File | Parts |
 |------|-------|
-| `throttle_box.scad` | the box: underside sliced into three printable pieces joined by screwed seams, the lid, pot holder, cable cradle |
+| `throttle_box.scad` | the box: underside (printed in one piece), the lid, pot holder, cable cradle |
 | `carb_heat_knob.scad` | carb heat knob and button |
 | `clamp.scad` | rod clamps for the pot sliders |
 | `pin.scad` | pot hold-down pins |
@@ -83,7 +83,7 @@ over USB.
 | 1 | linear potentiometer, 75 mm | carb heat |
 | 3 | 6 mm rod, with nuts | one per control |
 | 1 | ESP32 board | reads the pots, USB to the PC |
-| - | M3 screws | seams, lid |
+| - | M3 screws | lid, pot hold-downs, cable cradle |
 
 # Switch panel
 

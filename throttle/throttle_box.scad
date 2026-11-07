@@ -10,9 +10,14 @@ control_gap = 55;
 end_gap = 10;
 wall_thickness = 3;
 
+// Printer bed
+bed = [255, 255];
+
 // Calculated
 width = 2 * control_gap + 2 * end_gap;
 full_width = width + 2*roundness;
+assert(full_width <= bed.x && depth + 2*roundness <= bed.y,
+       "box underside does not fit the printer bed");
 
 // Big linear pot dimensions
 big_pot_stand_distance = 115;
@@ -106,26 +111,6 @@ module box_underside() {
       big_pot_stand();
    translate([roundness+end_gap, 55, 0])
       small_pot_stand();
-   // Seams
-   translate([roundness+end_gap-wall_thickness+control_gap/2, 40, 0])
-      seam();
-   translate([roundness+end_gap-wall_thickness+3*control_gap/2, 40, 0])
-      seam();
-}
-
-module seam() {
-   difference() {
-      cube([wall_thickness*2, depth+roundness*2-40, height]);
-      translate([-1, 10, 10])
-         cube([wall_thickness*2+2, depth+roundness*2-20-40, height]);
-      for (i = [0:1:4]) {
-         for (o= [0:1:14]) {
-            translate([-wall_thickness/2, 6+o*9.8, 7+i*9.5])
-               rotate([0, 90, 0])
-                  cylinder(d=3.3, h=wall_thickness*3);
-         }
-      }
-   }
 }
 
 module cable_cradle() {
@@ -327,30 +312,6 @@ module esp32() {
       }
 }
 
-module box_underside_slice3() {
-   difference() {
-      box_underside();
-      cube([roundness+end_gap+2*control_gap-control_gap/2, depth+2*roundness, height]);
-   }
-}
-
-module box_underside_slice2() {
-   difference() {
-      box_underside();
-      cube([roundness+end_gap+1*control_gap-control_gap/2, depth+2*roundness, height]);
-      translate([roundness+end_gap+2*control_gap-control_gap/2, 0, 0])
-         cube([roundness+end_gap+1*control_gap-control_gap/2, depth+2*roundness, height]);
-   }
-}
-
-module box_underside_slice1() {
-   difference() {
-      box_underside();
-      translate([roundness+end_gap+control_gap/2, 0, 0])
-         cube([roundness+end_gap+2*control_gap-control_gap/2, depth+2*roundness, height]);
-   }
-}
-
 module small_pot_holder() {
    translate([roundness+end_gap, 55, 20]) {
       translate([-small_pot_full_width, -10, 0])
@@ -453,7 +414,6 @@ c_mixture = "#c62828";
 c_pcb = "#1d1f22";
 c_gold = "#d9b24a";
 c_cable = "#26282b";
-c_line = "#8fd0ff";
 wire_colors = ["#e8433a", "#1d1f22", "#f2d03b"]; // VCC, GND, wiper
 
 module wire(points, c, d = wire_d) {
@@ -462,18 +422,6 @@ module wire(points, c, d = wire_d) {
          hull() {
             translate(points[i - 1]) sphere(d = d, $fn = 10);
             translate(points[i]) sphere(d = d, $fn = 10);
-         }
-}
-
-// Dashed assembly line from a to b
-module dashed_line(a, b, d = 0.6) {
-   l = norm(b - a);
-   n = floor(l / 6);
-   color(c_line, 0.6)
-      for (i = [0 : n - 1])
-         hull() {
-            translate(a + (b - a) * (i * 6) / l) sphere(d = d, $fn = 8);
-            translate(a + (b - a) * (i * 6 + 3) / l) sphere(d = d, $fn = 8);
          }
 }
 
@@ -700,14 +648,8 @@ module wires_part() {
         c_cable, usb_cable_d);
 }
 
-module underside_part(e = 0) {
-   // render(): the slice cuts share faces with the box, which the preview
-   // renderer cannot subtract cleanly
-   color(c_box) {
-      translate([-e, 0, 0]) render() box_underside_slice1();
-      render() box_underside_slice2();
-      translate([e, 0, 0]) render() box_underside_slice3();
-   }
+module underside_part() {
+   color(c_box) render() box_underside();
 }
 
 module lid_part(alpha = 1) {
@@ -738,39 +680,29 @@ module inside_view() {
    inside_parts();
 }
 
-// The three underside pieces apart, everything else lifted out
+// Everything lifted out of the underside
 module exploded_view(e = 35) {
-   underside_part(e);
+   underside_part();
    translate([0, 0, 3.5 * e]) lid_part();
-   // Seam screws
-   for (s = [0, 1], o = [2, 7, 12], i = [1, 3]) {
-      x = roundness + end_gap - wall_thickness + (2 * s + 1) * control_gap / 2;
-      p = [x, 40 + 6 + o * 9.8, 7 + i * 9.5];
-      dashed_line(p + [-e, 0, 0], p + [e + 2 * wall_thickness, 0, 0], 0.4);
-   }
    for (i = [0 : 2]) {
-      dx = (i - 1) * e;
-      translate([dx, 0, e]) {
+      translate([0, 0, e])
          pot_part(i > 0, rod_x(i), ear_y(i));
-      }
-      translate([dx, -1.5 * e, 0]) {
+      translate([0, -1.5 * e, 0]) {
          rod_part(i);
          translate([0, 0, 0.6 * e]) clamp_part(i);
       }
    }
    translate([0, 0, 2 * e]) pins_part();
-   translate([-e, 0, 2 * e]) small_pot_holder_part();
-   translate([-e, 0, e]) esp32_part();
-   translate([-e, 0, 2 * e]) color(c_print) cable_cradle_top();
+   translate([0, 0, 2 * e]) small_pot_holder_part();
+   translate([0, 0, e]) esp32_part();
+   translate([0, 0, 2 * e]) color(c_print) cable_cradle_top();
 }
 
 module small_pot_holder_part() {
    color(c_print) small_pot_holder();
 }
 
-box_underside_slice1(); // Make module underside1
-box_underside_slice2(); // Make module underside2
-box_underside_slice3(); // Make module underside3
+box_underside(); // Make module underside
 
 box_lid(); // Make module lid
 
