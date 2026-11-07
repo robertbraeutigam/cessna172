@@ -5,7 +5,8 @@
 // 3 mm aluminium composite (ACM) sheet covers the panel frame; every
 // cockpit component brings its own front face, a hole is cut into the
 // sheet for it and its face is screwed onto the sheet. Heavy or pulled
-// components (the throttle box) also stand on the frame.
+// components (the throttle box) also stand on the frame and are bolted to
+// it.
 //
 // Coordinates, seen from the pilot: x to the right, y away from the pilot
 // (towards the monitor), z up. The origin is the front left corner of the
@@ -61,18 +62,20 @@ radio_body = [275, 76];      // what goes through the sheet
 radio_depth = 55;            // behind the sheet
 
 // --- Throttle box, from throttle/throttle_box.scad ---
-// full_width x (depth + 2 * roundness) x (height + lid)
-throttle_size = [150, 190, 52];
+// The box (full_width x (depth + 2 * roundness) x height, open top) goes
+// through its cut-out and stands on the front rail and the middle
+// crossbar. Its front wall (face_t) is the face; the flange (flange_w, on
+// the top and the two sides, none at the bottom) is screwed onto the sheet
+// with M3 (drill through the box's holes), and two M5 bolts through its
+// floor go into the front rail's top slot.
+throttle_size = [150, 190, 50];
 throttle_rod_xs = [20, 75, 130];  // roundness + end_gap + i * control_gap
 throttle_rod_z = 38;         // wall + stand + pot module + 15 + 7
-throttle_nut_d = 11.2;
-// Clamp pockets at the front: 20 x 20, 35 deep from the front, open at
-// the front, in housings of 20 + 2 * wall
-throttle_pocket = [20, 32, 20];   // x, depth from the front, z
-throttle_pocket_xs = [13, 117];   // pocket left side: roundness + wall, width - 20 - wall + roundness
-throttle_pocket_z = 3;       // floor
-throttle_housing_h = 26;
-throttle_play = 1;           // box to its cut-out
+throttle_face_t = 3;         // face_t
+throttle_flange = 10;        // flange_w
+throttle_play = 1;           // box to its cut-out, sheet_cut_clear
+throttle_bolt_xs = [47.5, 102.5]; // floor_bolt_xs
+throttle_bolt_y = 16;        // floor_bolt_y, from the face front
 
 // --- Switch panel, from switchpanel/ ---
 // The backs of the ignition (77) and the switches (211.6), panel_h high,
@@ -89,7 +92,7 @@ switch_z = rail.y + 5;       // face bottom above the desk
 
 // --- Layout ---
 gap = 25;                    // between two parts; the bay uprights stand in it
-right_w = max(radio_front.x, throttle_size.x + 2 * throttle_play);
+right_w = max(radio_front.x, throttle_size.x + 2 * throttle_flange);
 bay_w = yoke_housing.x + 2 * yoke_play;
 
 x_sw0 = sheet_edge;                          // switch panel
@@ -103,11 +106,13 @@ x_rc = (x_r0 + x_r1) / 2;
 
 upright_xs = [0, x_bay0 - ext, x_bay1, frame_w - ext];   // left sides
 throttle_x0 = x_rc - throttle_size.x / 2;
-throttle_y0 = -sheet_t;                      // box front flush with the sheet front
+throttle_y0 = -sheet_t - throttle_face_t;    // face front, the face on the sheet
 crossbar_xs = concat(upright_xs, [x_rc - ext / 2]);      // the last one carries the throttle box
 
 throttle_cut = [throttle_x0 - throttle_play, rail.y,
                 throttle_x0 + throttle_size.x + throttle_play, rail.y + throttle_size.z + throttle_play];
+throttle_face = [throttle_x0 - throttle_flange, rail.y,
+                 throttle_x0 + throttle_size.x + throttle_flange, rail.y + throttle_size.z + throttle_flange];
 radio_cut = [x_rc - radio_body.x / 2 - 0.5, throttle_cut[3] + sheet_web,
              x_rc + radio_body.x / 2 + 0.5, throttle_cut[3] + sheet_web + radio_body.y + 1];
 radio_front_z0 = radio_cut[1] + 0.5 - (radio_front.y - radio_body.y) / 2;
@@ -123,28 +128,19 @@ upright_len = sheet_h - rail.y - ext;
 brace_rise = upright_len - ext;              // its long edge, from under the top bar to the crossbar
 brace_long = brace_rise * sqrt(2);
 
-// --- Throttle mount (printed, 2x): a tongue in a clamp pocket and a plate
-// in front of the sheet, bolted through the sheet into the front rail ---
-tm_fit = 0.3;
-tm_plate_t = 5;
-tm_plate_w = throttle_pocket.x + 6;
-tm_plate_z = [2, rail.y + throttle_housing_h];       // plate bottom and top
-tm_bolt_dx = 7;                                       // two bolts, +-, into the rail slot
-function tm_cx(i) = throttle_x0 + throttle_pocket_xs[i] + throttle_pocket.x / 2;
-tm_plates = [for (i = [0, 1]) [tm_cx(i) - tm_plate_w / 2, tm_plate_z[0], tm_cx(i) + tm_plate_w / 2, tm_plate_z[1]]];
-
 // --- Sheet screws: M5 through the sheet into T-nuts in the front slots ---
 function spread(a, b, step) = let(n = max(1, ceil((b - a) / step))) [for (i = [0 : n]) a + (b - a) * i / n];
 function clear_of(p, rects, m) =
    len([for (r = rects) if (p.x > r[0] - m && p.x < r[2] + m && p.y > r[1] - m && p.y < r[3] + m) 1]) == 0;
-avoid = concat(cuts, tm_plates);
+avoid = concat(cuts, [throttle_face]);
 sheet_screws = [for (p = concat(
       [for (ux = upright_xs, z = spread(rail.y + 20, sheet_h - ext - 20, screw_step_upright)) [ux + ext / 2, z]],
       [for (x = spread(ext / 2, frame_w - ext / 2, screw_step)) [x, sheet_h - ext / 2]],
       [for (x = spread(ext / 2, x_bay0 - ext / 2, screw_step)) [x, rail.y / 2]],
       [for (x = spread(x_bay1 + ext / 2, frame_w - ext / 2, screw_step)) [x, rail.y / 2]]))
    if (clear_of(p, avoid, screw_edge)) p];
-tm_bolts = [for (i = [0, 1], s = [-1, 1]) [tm_cx(i) + s * tm_bolt_dx, rail.y / 2]];
+// M5 through the throttle box floor into T-nuts in the front rail's top slot, [x, y]
+throttle_bolts = [for (x = throttle_bolt_xs) [throttle_x0 + x, throttle_y0 + throttle_bolt_y]];
 
 // --- Checks ---
 assert(gap >= ext + 3 && sheet_edge >= ext + 3, "No room for the uprights next to the cut-outs");
@@ -153,10 +149,10 @@ assert(throttle_y0 + throttle_size.y <= rear_y, "Throttle box does not fit on th
 assert(yoke_front_y + yoke_housing.y <= rear_y, "Yoke housing runs into the rear rail");
 assert(radio_body.x <= radio_front.x - 6 && radio_body.y <= radio_front.y - 6,
        "Radio front does not cover its cut-out");
-assert(radio_front_z0 >= throttle_cut[3] + 2, "Radio front runs into the throttle box");
+assert(radio_front_z0 >= throttle_face[3] + 2, "Radio front runs into the throttle box face");
 assert(radio_front_z0 + radio_front.y <= sheet_h - ext - sheet_web, "Radio panel too high for the sheet");
 assert(bay_cut[3] <= sheet_h - ext - sheet_web, "Yoke notch too high for the sheet");
 assert(switch_cut[3] <= sheet_h - ext - sheet_web, "Switch panel too high for the sheet");
-assert(tm_plate_z[1] <= rail.y + throttle_rod_z - throttle_nut_d / 2 - 1, "Throttle mount plate runs into the rod nuts");
+assert(abs(throttle_y0 + throttle_bolt_y - rail.x / 4) < 0.01, "Throttle floor bolts miss the front rail slot");
 assert(ext + brace_rise + ext * sqrt(2) <= rear_y, "Braces do not land on the crossbars");
 assert(frame_w <= desk.x && frame_d + frame_overhang <= desk.y, "Frame does not fit on the desk");

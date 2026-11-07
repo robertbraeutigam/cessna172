@@ -82,8 +82,8 @@ Seen from the pilot, left to right:
 The rule for every component: it brings its own front face, a hole is cut
 into the sheet for it and its face is screwed onto the sheet. Heavy or
 pulled components also stand on the frame: the throttle box sits on the
-front rail and a crossbar, held by two printed mounts in its clamp pockets
-that are bolted through the sheet into the rail. The extrusion carries the
+front rail and a crossbar, its face flange is screwed onto the sheet like
+the switch panel's and two M5 bolts through its floor go into the rail. The extrusion carries the
 loads, the sheet only covers the front, so cut-outs do not weaken it.
 Keep at least 25 mm of sheet to the edge and 20 mm between cut-outs, and
 drill the corners of a cut-out before sawing it. Holes for future
@@ -97,7 +97,7 @@ computed from the component sizes, and the build prints the cut list
 | File | Parts |
 |------|-------|
 | `frame.inc.scad` | extrusion and sheet standard, component sizes, layout, checks |
-| `frame.scad` | views, cut list, `throttle_mount` (print 2) |
+| `frame.scad` | views, cut list (no printed parts) |
 
 **MEASURE:** the desk (`desk`), the Saitek yoke housing (`yoke_housing`,
 guessed 283 mm wide like the radio panel; spec sheet: 310 x 185 mm with the
@@ -107,7 +107,9 @@ the panel height the monitor allows (`sheet_h`).
 
 The switch panel's two backs go through one hole, 1 mm larger than the
 backs all round; drill its M3 mount holes through the panel's own holes,
-with the panels in place.
+with the panels in place. The same goes for the throttle box: its cut-out
+is 1 mm larger than the box, open to the rail at the bottom, and its
+flange holes are drilled with the box in place.
 
 ## Hardware
 
@@ -117,7 +119,7 @@ with the panels in place.
 | 14 | 2020 extrusion, 6 mm slot | 5 crossbars, 4 uprights, top bar, 4 braces (45 degree ends) |
 | - | corner brackets, M5 screws, M5 T-nuts | frame joints |
 | 1 | 3 mm ACM sheet | panel, cut to frame_w x sheet_h |
-| 30 | M5 button head screw + T-nut | sheet and throttle mounts |
+| 30 | M5 button head screw + T-nut | sheet, throttle box floor into the front rail |
 | 2-4 | desk clamp | frame onto the desk |
 
 ## Connections (plan)
@@ -148,9 +150,17 @@ slot that takes the pot's slider ear, so pulling the knob moves the slider.
 An ESP32 on a pedestal at the back reads them and connects to the simulator
 over USB.
 
+The box mounts in the [cockpit frame](#cockpit-frame) and has no lid: it
+goes through a cut-out in the panel sheet and stands on the front rail. Its
+front wall is the face, with a 10 mm flange on the top and the two sides
+(none at the bottom, where the box sits on the rail) that is screwed onto
+the sheet with M3 screws, nuts behind the sheet. Two M5 bolts through the
+floor, at the front between the rod supports, go into T-nuts in the front
+rail's top slot, so pulling a knob does not load the sheet alone.
+
 | File | Parts |
 |------|-------|
-| `throttle_box.scad` | the box: underside (printed in one piece), the lid, pot holder, cable cradle |
+| `throttle_box.scad` | the box with its face flange (printed in one piece), pot holder, cable cradle |
 | `carb_heat_knob.scad` | carb heat knob and button |
 | `clamp.scad` | rod clamps for the pot sliders |
 | `pin.scad` | pot hold-down pins |
@@ -163,7 +173,9 @@ over USB.
 | 1 | linear potentiometer, 75 mm | carb heat |
 | 3 | 6 mm rod, with nuts | one per control |
 | 1 | ESP32 board | reads the pots, USB to the PC |
-| - | M3 screws | lid, pot hold-downs, cable cradle |
+| - | M3 screws | pot hold-downs, cable cradle |
+| 5 | M3 x 10 pan head screw + nut | face flange onto the cockpit sheet |
+| 2 | M5 x 10 button head screw + washer + T-nut | floor into the front rail (counted in the frame) |
 
 # Switch panel
 

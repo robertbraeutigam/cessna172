@@ -9,8 +9,11 @@ its own top-level directory; new components should follow the same layout.
 - `throttle/` — throttle quadrant: throttle, mixture and carb heat controls.
   - `throttle_box.scad` — the main box. Linear potentiometers sit on stands
     inside, 6 mm rods (one per control) exit the front, an ESP32 sits on a
-    pedestal at the back, and there are two clamp housings at the front. The underside is
-    printed in one piece, plus a lid.
+    pedestal at the back. It is printed in one piece and has no lid: it goes
+    through a cut-out in the frame's sheet, its front wall is the face with
+    a flange (top and sides, `flange_w`) screwed onto the sheet, and two M5
+    bolts through the floor go into the front rail; `frame/frame.inc.scad`
+    repeats these sizes.
     Its views show the pots, rods with knobs, clamps, pins, ESP32 and wiring
     as view-only parts; the knob, clamp and pin shapes there are copies of
     the other files, keep them in sync.
@@ -51,7 +54,7 @@ its own top-level directory; new components should follow the same layout.
   sizes of the components it carries (copies of the other components'
   values and MEASURE values for the bought Saitek yoke and radio panel,
   keep them in sync), the layout and its checks; `frame.scad` has the
-  views, the cut list (echo) and the printed throttle mount. Every
+  views and the cut list (echo), no printed parts. Every
   component brings its own front face and is screwed onto a cut-out in the
   sheet; heavy or pulled ones also stand on the frame.
 
@@ -120,7 +123,8 @@ box_lid(); // Make module lid
 - `// Ignore module` — never rendered. Used for reference geometry (pots, rods,
   ESP32 board) that is shown with `#` in the preview while designing.
 - Files without any `Make module` marker are rendered whole to
-  `target/<file>.stl`.
+  `target/<file>.stl`, unless they have `Make view` markers: then they
+  only make views (their asserts are still checked), like `frame.scad`.
 
 Marker format is strict: the name is a single word, separated by single
 spaces, and it must be the last thing on the line (trailing spaces are OK).

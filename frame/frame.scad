@@ -2,8 +2,8 @@
 //
 // Aluminium extrusion ladder on the desk, panel frame on its front edge and
 // one ACM sheet over it, with a cut-out for every component. Values,
-// layout and checks are in frame.inc.scad; this file has the views, the
-// cut list (echo) and the printed throttle mount.
+// layout and checks are in frame.inc.scad; this file has the views and the
+// cut list (echo). The frame has no printed parts.
 //
 // Bought parts (lengths: see the echo of the build, or the README):
 // - 2040 extrusion: front rail left, front rail right, rear rail
@@ -13,10 +13,6 @@
 // - 3 mm ACM sheet, frame_w x sheet_h
 // - desk clamps (the ones the throttle used), on the rails
 //
-// Printed:
-// - throttle_mount, 2x: holds the throttle box by its clamp pockets, bolted
-//   through the sheet into the front rail
-//
 // Assembly:
 // 1. Bolt the ladder together: rails, crossbars. Stand the uprights on the
 //    front rail, the top bar on them, the braces from the uprights to the
@@ -25,8 +21,9 @@
 //    drill its screw holes, and screw it onto the front slots with T-nuts.
 // 3. Put the frame on the desk, the yoke into the bay, clamp both.
 // 4. Push the throttle box through its cut-out onto the rail and the middle
-//    crossbar, the throttle mounts into its clamp pockets, and bolt them
-//    through the sheet into the rail.
+//    crossbar until its face is on the sheet, bolt its floor into the rail
+//    (throttle_bolts), drill the sheet through its flange holes and screw
+//    the flange on (M3, nuts behind the sheet).
 
 include <frame.inc.scad>
 
@@ -39,7 +36,6 @@ c_desk = "#c8a77a";
 c_device = "#2b2e33";
 c_display = "#c0392b";
 c_box = "#5b6f8a";
-c_mount = "#e8a33a";
 c_switch = "#3a3d42";
 
 echo(frame = [frame_w, frame_d, sheet_h]);
@@ -47,9 +43,9 @@ echo(rails_2040 = [x_bay0, frame_w - x_bay1, frame_w]);
 echo(crossbars_2020 = len(crossbar_xs), crossbar_len = crossbar_len);
 echo(uprights_2020 = len(upright_xs), upright_len = upright_len, top_bar = frame_w);
 echo(braces_2020 = len(upright_xs), brace_long_edge = brace_long);
-echo(sheet = [frame_w, sheet_h], screws = len(sheet_screws) + len(tm_bolts));
+echo(sheet = [frame_w, sheet_h], screws = len(sheet_screws));
 echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut);
-echo(sheet_screws = sheet_screws, throttle_mount_bolts = tm_bolts);
+echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
 
 // --- Frame ---
 
@@ -94,7 +90,7 @@ module sheet_2d() {
    difference() {
       square([frame_w, sheet_h]);
       for (c = cuts) rect(c);
-      for (p = concat(sheet_screws, tm_bolts))
+      for (p = sheet_screws)
          translate(p) circle(d = m5_d);
    }
 }
@@ -174,11 +170,20 @@ module switch_panel_part() {
 
 module throttle_part() {
    r = 10;
+   f = throttle_flange;
    translate([throttle_x0, throttle_y0, rail.y]) {
-      color(c_box)
-         hull()
-            for (x = [r, throttle_size.x - r], y = [r, throttle_size.y - r])
-               translate([x, y, 0]) cylinder(r = r, h = throttle_size.z);
+      color(c_box) {
+         difference() {
+            hull()
+               for (x = [r, throttle_size.x - r], y = [r, throttle_size.y - r])
+                  translate([x, y, 0]) cylinder(r = r, h = throttle_size.z);
+            translate([3, 3, 3]) cube(throttle_size - [6, 6, 0]);
+         }
+         translate([-f, 0, 0]) cube([throttle_size.x + 2 * f, throttle_face_t, throttle_size.z + f]);
+      }
+      color("#b9c0c8")
+         for (x = throttle_bolt_xs)
+            translate([x, throttle_bolt_y, 3]) cylinder(d = m5_head_d, h = 3);
       for (i = [0 : 2])
          translate([throttle_rod_xs[i], 0, throttle_rod_z]) {
             color("#b9c0c8") rotate([90, 0, 0]) cylinder(d = 6, h = 60);
@@ -188,50 +193,11 @@ module throttle_part() {
    }
 }
 
-// --- Throttle mount, in frame coordinates ---
-
-module throttle_mount_at(i) {
-   cx = tm_cx(i);
-   difference() {
-      union() {
-         translate([cx - tm_plate_w / 2, throttle_y0 - tm_plate_t, tm_plate_z[0]])
-            cube([tm_plate_w, tm_plate_t, tm_plate_z[1] - tm_plate_z[0]]);
-         translate([cx - throttle_pocket.x / 2 + tm_fit, throttle_y0 - 0.01, rail.y + throttle_pocket_z + tm_fit])
-            difference() {
-               cube([throttle_pocket.x - 2 * tm_fit, throttle_pocket.y - 2, throttle_pocket.z - 2 * tm_fit]);
-               // lead-in at the tip
-               translate([-1, throttle_pocket.y - 2, 0])
-                  rotate([45, 0, 0]) cube([throttle_pocket.x, 2, 2], center = true);
-            }
-      }
-      for (s = [-1, 1])
-         translate([cx + s * tm_bolt_dx, throttle_y0 + 1, rail.y / 2])
-            rotate([90, 0, 0]) cylinder(d = m5_d, h = tm_plate_t + 2);
-      // version on top of the tongue
-      translate([cx, throttle_y0 + throttle_pocket.y / 2, rail.y + throttle_pocket_z + throttle_pocket.z - tm_fit - 0.4])
-         linear_extrude(1)
-            rotate(90) text("{{gitrev}}", size = 4, halign = "center", valign = "center",
-                            font = "Liberation Sans:style=Bold");
-   }
-}
-
-module throttle_mount_part(i) {
-   color(c_mount) throttle_mount_at(i);
-}
-
-// Print orientation: plate front on the bed, tongue up
-module throttle_mount() {
-   rotate([90, 0, 0])
-      translate([-tm_cx(0), -(throttle_y0 - tm_plate_t), -(tm_plate_z[0] + tm_plate_z[1]) / 2])
-         throttle_mount_at(0);
-}
-
 module components() {
    yoke_part();
    radio_part();
    switch_panel_part();
    throttle_part();
-   for (i = [0, 1]) throttle_mount_part(i);
 }
 
 module cockpit_view() {
@@ -245,27 +211,22 @@ module cockpit_view() {
 module sheet_view() {
    frame_part();
    sheet_part();
-   color("#e8433a", 0.6)
-      for (p = tm_bolts) translate([p.x, -sheet_t - 0.5, p.y]) rotate([90, 0, 0]) cylinder(d = 12, h = 0.5);
 }
 
-module throttle_mount_view() {
+module throttle_view() {
    intersection() {
       union() {
          frame_part();
          sheet_part();
          throttle_part();
-         for (i = [0, 1]) throttle_mount_part(i);
       }
       translate([throttle_x0 - 40, -100, -1]) cube([throttle_size.x + 80, 400, 120]);
    }
 }
 
-throttle_mount(); // Make module throttle_mount
 //cockpit_view(); // Make view main 62,0,-35
 //cockpit_view(); // Make view front 90,0,0
 //cockpit_view(); // Make view back 55,0,150
 //frame_part(); // Make view frame 55,0,-35
 //sheet_view(); // Make view sheet 90,0,0
-//throttle_mount_view(); // Make view throttle_mount 55,0,-40
-//throttle_mount(); // Make view throttle_mount_print 50,0,30
+//throttle_view(); // Make view throttle 55,0,150

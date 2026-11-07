@@ -52,6 +52,10 @@ target/%: %.scad $(INCLUDE_COPIES)
 			sed "s/\/*\(.*\)Make module $$m *$$/\1/g" <target/$< >target/.model_$*.scad; \
 			$(OPENSCAD) -o $@_$$m.stl target/.model_$*.scad || exit 1; \
 		done; \
+	elif grep "Make view" >/dev/null $<; \
+	then                                  \
+		echo "No models in $<, only views"; \
+		$(OPENSCAD) -o target/.check_$*.echo target/$< || exit 1; \
 	else                                  \
 		echo "Making single module model $<"; \
 		$(OPENSCAD) -o $@.stl target/$< || exit 1; \
