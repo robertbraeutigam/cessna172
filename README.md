@@ -48,6 +48,10 @@ A leading `//` only hides a line from the OpenSCAD preview; the build still
 renders it. `{{gitrev}}` in the source is replaced with the short git hash,
 so the version is embossed into the parts.
 
+Values and modules shared by several files of a component go into a
+`*.inc.scad` file that the others `include`. It is not rendered itself, and
+changing it renders the whole component again.
+
 The printer is an Anycubic Kobra 3 V2 (255 x 255 mm bed). Large parts must
 fit on it, and the files check it. Values that depend on bought parts
 are marked MEASURE in the source; `assert()`s check that the derived
@@ -90,9 +94,14 @@ over USB.
 [`switchpanel/`](switchpanel): the lower left switch panel of the 172N.
 Similar in function to the Saitek Switch Panel, but it should look as close
 to the real panel as possible. Every switch position is a raw input for
-SimVim, active low, like a switch to GND. The ignition key is its own part,
-and the switch row is a separate panel that carries the input multiplexer
-for both.
+SimVim, active low, like a switch to GND.
+
+It is two panels, printed separately and mounted side by side: the ignition
+on the left and the switch row, which also carries the input multiplexer
+for both. Their basics are in `panel.inc.scad`: both are 80 mm high
+(`panel_h`) and 3 mm thick, with the same rim, corner mount holes and
+lettering. The two corners where they meet are square, so together they
+look like the one piece panel of the airplane (about 304 x 80 mm).
 
 ## Ignition switch
 
@@ -124,7 +133,14 @@ closed by a cover:
   open collector and pull low over the magnet, so each one is wired like a
   switch to GND.
 
-Printed parts: housing, rotor, shoe, cover.
+Printed parts: panel, housing, rotor, shoe, cover.
+
+The panel is 92 x 80 mm, printed front side down, with the position labels,
+tick marks and MAGNETOS engraved around the key. The lock body goes through
+a cutout with flats, so it cannot turn, and the housing sits on the back,
+between the rims. The labels are placed for the key pointing at OFF in the
+lock's home position: **MEASURE** where the key really points
+(`key_off_angle`) once the lock is here.
 
 ### Hardware
 
@@ -136,12 +152,14 @@ Printed parts: housing, rotor, shoe, cover.
 | 1 | magnet, 5 x 2 mm | position sensing (`magnet_*`) |
 | 5 | A3144 hall sensor | one per position (OFF is optional) |
 | 4 | M3 screw | cover |
+| 4 | M3 x 10 screw | panel to housing |
 | 1 | M3 x 8 screw | START pin |
-| - | M3 screws | panel mounting |
+| 4 | M3 pan head screw + nut | panel mounting |
 
 ### Assembly
 
-1. Put the lock through the panel and the housing, tighten its nut.
+1. Put the lock through the panel and the housing, screw the panel to the
+   housing, tighten the lock nut.
 2. Mount the rotor with the lock's cam screw.
 3. Insert the ball and its spring, and the shoe and its spring.
 4. Check which magnet face triggers the sensors, then glue in the magnet and
@@ -161,9 +179,10 @@ the labels engraved. Up is ON, like in the airplane. Above the toggles is a
 row of circuit breakers, like on the real panel; they are for show only.
 
 The switch list (`groups` in the source) drives the layout; it follows the
-X-Plane 172 SP. For a 172N remove FUEL PUMP and the panel adapts. The panel
-is 211.6 x 67.8 mm, printed front side down. A rim and bosses on the back
-stiffen it.
+X-Plane 172 SP. For a 172N remove FUEL PUMP and the panel gets shorter. The
+panel is 211.6 x 80 mm, printed front side down; the switches and labels
+need about 68 mm of the height, the rest is split between above and below
+them. A rim and bosses on the back stiffen it.
 
 ### Hardware
 
@@ -241,8 +260,9 @@ nut silver and the rating white, or print the nut and the button in
 different colors.
 
 The list (`breakers` in the source, name and rating) is placed over the
-toggles, one above each, from the left; the panel grows to fit the row and
-the top middle mount screw moves between two breakers. Real breakers
+toggles, one above each, from the left; the build checks that the row
+still fits the panel height, and the top middle mount screw moves between
+two breakers. Real breakers
 (e.g. Klixon push-to-reset) would need a bigger hole and room behind the
 panel, so making them functional later means changing the pockets into
 holes.

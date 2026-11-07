@@ -32,7 +32,12 @@
 // - 6 mm steel ball + spring (detent_spring_*)
 // - spring for the START return (start_spring_*)
 // - magnet (magnet_*), 5x A3144 hall sensors (OFF is optional)
-// - M3 screws: 4x for the cover, 1x M3x8 as the START pin, panel mounting
+// - M3 screws: 4x for the cover, 4x panel to housing, 1x M3x8 as the
+//   START pin, 4x to mount the panel
+//
+// The panel is printed as well. It has the same height, rim, mount holes and
+// lettering as the switch panel (panel.inc.scad) and mounts to its left.
+// The position labels are engraved into its front.
 //
 // Assembly: lock through the panel and the housing, tighten its nut, mount
 // the rotor with the lock's cam screw, insert ball + spring and shoe +
@@ -40,12 +45,19 @@
 
 $fn = 60;
 
+include <panel.inc.scad>
+
 // Preview: shown key position (0=OFF .. 4=START), cover lift
 view_pos = 3;
 explode = 25;
 
-// --- Panel ---
-panel_t = 3;
+// --- Panel (height, thickness, rim, mount holes, font: panel.inc.scad) ---
+label_r = 20;                // position labels around the key
+tick_r = 12;                 // tick marks, from here outwards
+tick_len = 3;
+tick_w = 0.6;
+title = "MAGNETOS";          // above the position labels, "" for none
+title_gap = 2;
 
 // --- Mailbox lock (MEASURE: guesses until the lock arrives) ---
 lock_thread_d = 18;          // threaded body diameter
@@ -59,6 +71,7 @@ lock_spindle_flat = 5;       // cam spindle, width across flats
 lock_spindle_square = false; // true: 4 flats, false: double-D
 lock_spindle_len = 2.5;      // spindle length that drives the cam
 lock_spindle_angle = 0;      // spindle flats vs. body flats at home (OFF)
+key_off_angle = 30;          // where the key points at home (OFF), from +x; the body flats are parallel to y
 lock_screw_d = 4;            // cam screw
 lock_screw_head_d = 8;
 lock_screw_head_h = 3;
@@ -139,6 +152,15 @@ slot_narrow_end = start_pin_angle + arc_deg(start_pin_d / 2 + 0.5, start_pin_r) 
 slot_wide_end = slot_step - arc_deg(start_shoe_len + start_spring_inst, start_pin_r);
 pin_protrusion = start_pin_len - cover_t - gap;
 
+// Panel, centered on the key, as wide as the housing and the mount bosses
+// next to it need. Its pilot's right side (-x) meets the switch panel.
+panel_w = 2 * (half + mount_inset + boss_d / 2 + 0.5);
+mount_holes = panel_corner_holes(-panel_w / 2, panel_w / 2, -panel_h / 2);
+function label_pos(i) = label_r * [cos(key_off_angle + pos_angle(i)), sin(key_off_angle + pos_angle(i))];
+title_y = max([for (i = [0 : 4]) label_pos(i).y]) + label_size / 2 + title_gap;
+
+echo(panel_size = [panel_w, panel_h]);
+
 // --- Sanity checks ---
 assert(z_cam >= front_t + lock_nut_t + 1, "Lock body too short for panel + front plate + nut");
 assert(bore_r > lock_nut_d / 2 + 1, "Lock nut does not fit in the bore");
@@ -157,6 +179,9 @@ assert(rotor_t - start_slot_depth >= 1.2, "START slot floor too thin");
 assert(pin_protrusion >= 1.5 && pin_protrusion <= start_slot_depth - 0.3, "START pin screw length does not fit the slot");
 assert(arc_deg(magnet_d / 2 + 0.5, magnet_r) <= lug_w / 2, "Magnet does not fit in the lug");
 assert(magnet_r * min(pitch, start_pitch) * PI / 180 >= sensor_w + 4, "Hall sensors too close to each other");
+assert(half + 0.5 <= panel_h / 2 - rim_w, "Housing does not fit between the panel rims, make panel_h higher");
+assert(title == "" || title_y + group_label_size <= panel_h / 2 - 3, "Title too close to the top edge");
+assert(tick_r >= lock_flange_d / 2 + 0.5 && tick_r + tick_len <= label_r - label_size, "Ticks run into the lock or the labels");
 
 // --- Helpers ---
 module sector(r_in, r_out, a0, a1, h) {
@@ -291,20 +316,55 @@ module cover() {
       }
 }
 
+// Position labels and ticks, mirrored so they read from the front
+module labels_2d() {
+   for (i = [0 : 4]) {
+      translate(label_pos(i))
+         mirror([1, 0])
+            text(position_names[i], size = label_size, font = font, halign = "center", valign = "center");
+      rotate(key_off_angle + pos_angle(i))
+         translate([tick_r, -tick_w / 2])
+            square([tick_len, tick_w]);
+   }
+   if (title != "")
+      translate([0, title_y])
+         mirror([1, 0])
+            text(title, size = group_label_size, font = font, halign = "center");
+}
+
+// Front at z=-panel_t, the housing on its back at z=0
+module panel() {
+   difference() {
+      // Square corners on the right (-x), where the switch panel is
+      translate([0, 0, -panel_t])
+         panel_blank(-panel_w / 2, panel_w / 2, -panel_h / 2, mount_holes, round0 = false);
+      // Lock body, its flats keep the lock and the housing from turning
+      translate([0, 0, -panel_t - 1])
+         linear_extrude(panel_t + 2)
+            lock_body_profile(0.2);
+      translate([0, 0, -panel_t])
+         corner_holes(clear_d, panel_t);
+      translate([0, 0, -panel_t - 1])
+         linear_extrude(label_depth + 1)
+            labels_2d();
+      // Version on the back, beside the housing
+      translate([-(half + panel_w / 2 - rim_w) / 2, 0, -gitrev_depth])
+         linear_extrude(gitrev_depth + 1)
+            rotate([0, 0, 90])
+               text("{{gitrev}}", size = 3, halign = "center", valign = "center");
+   }
+}
+
 // --- Views (rendered to PNG by "make views") ---
 
-// Display only, the real values come with the lock and the panel design
-key_off_angle = 30;          // direction of the key bow at OFF
+// Display only
 lock_flange_t = 2;
 spring_wire = 0.6;
-label_r = 20;
 
 c_housing = "#3d7bd9";
 c_rotor = "#f5a030";
 c_shoe = "#e8433a";
 c_cover = "#eceff2";
-c_panel = "#35383d";
-c_label = "#f4f4f4";
 c_steel = "#b9c0c8";
 c_chrome = "#e2e6ea";
 c_brass = "#d9b24a";
@@ -420,31 +480,20 @@ module nut_part() {
          }
 }
 
+// Panel with the engraved labels filled in
 module panel_part() {
    color(c_panel)
-      translate([0, 0, -panel_t])
-         difference() {
-            linear_extrude(panel_t)
-               offset(r = corner_r)
-                  square(2 * (half + 8 - corner_r), center = true);
-            translate([0, 0, -1])
-               linear_extrude(panel_t + 2)
-                  lock_body_profile(0.2);
-            corner_holes(clear_d, panel_t);
-         }
-   // Printed labels and ticks, readable from the front
+      panel();
    color(c_label)
-      translate([0, 0, -panel_t - 0.2])
-         linear_extrude(0.2)
-            for (i = [0 : 4]) {
-               a = key_off_angle + pos_angle(i);
-               translate([label_r * cos(a), label_r * sin(a)])
-                  mirror([1, 0])
-                     text(position_names[i], size = 3.2, halign = "center", valign = "center");
-               rotate(a)
-                  translate([lock_flange_d / 2 + 1, -0.3])
-                     square([3, 0.6]);
-            }
+      translate([0, 0, -panel_t + 0.01])
+         linear_extrude(label_depth - 0.02)
+            labels_2d();
+}
+
+module mount_screws() {
+   for (h = mount_holes)
+      translate([h.x, h.y, -panel_t])
+         mount_screw(panel_t + rim_h + 4, c_steel);
 }
 
 module panel_screws() {
@@ -555,7 +604,11 @@ module exploded_view(pos = 0, e = 16) {
 
    translate([0, 0, -4.2 * e]) key_part(theta);
    translate([0, 0, -3 * e]) lock_part(theta);
+   for (h = mount_holes)
+      translate([h.x, h.y, 0])
+         dashed_line(-2 * e, 0, 0.35);
    translate([0, 0, -2 * e]) panel_screws();
+   translate([0, 0, -2 * e]) mount_screws();
    translate([0, 0, -1.2 * e]) panel_part();
    color(c_housing) housing();
    translate([0, 0, 1 * e]) nut_part();
@@ -573,6 +626,7 @@ module assembled_view(pos = 3) {
    theta = pos_angle(pos);
    panel_part();
    panel_screws();
+   mount_screws();
    color(c_housing) housing();
    translate([0, 0, z_cam]) rotate([0, 0, theta]) color(c_rotor) rotor();
    bought_parts(theta);
@@ -602,12 +656,14 @@ module front_view(pos = 0) {
    theta = pos_angle(pos);
    panel_part();
    panel_screws();
+   mount_screws();
    key_part(theta);
    lock_part(theta);
    color(c_housing) housing();
 }
 
 housing(); // Make module housing
+translate([0, 0, -explode]) panel(); // Make module panel
 translate([0, 0, z_cam]) rotate([0, 0, pos_angle(view_pos)]) rotor(); // Make module rotor
 shoe_in_place(pos_angle(view_pos)); // Make module shoe
 translate([0, 0, explode]) cover(); // Make module cover

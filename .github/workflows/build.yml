@@ -43,7 +43,8 @@ jobs:
       # markers. Touch the markers of unchanged files so make skips them, and
       # remove the markers and outputs of changed or deleted files (and of
       # files whose names start with theirs, as the output globs cover them).
-      # A changed Makefile renders the whole component again.
+      # A changed Makefile or *.inc.scad (included by the models) renders the
+      # whole component again.
       - name: Keep unchanged renders
         run: |
           for makefile in */Makefile; do
@@ -52,8 +53,11 @@ jobs:
             (
               cd "$dir"
               [ -d target ] || exit 0
-              if ! awk '$2 == "Makefile"' "$sums" 2>/dev/null | sha256sum -c --status 2>/dev/null; then
-                echo "$dir: Makefile changed, rendering everything"
+              incs=$(awk '$2 ~ /\.inc\.scad$/' "$sums" 2>/dev/null)
+              if ! awk '$2 == "Makefile"' "$sums" 2>/dev/null | sha256sum -c --status 2>/dev/null \
+                || { [ -n "$incs" ] && ! echo "$incs" | sha256sum -c --status 2>/dev/null; } \
+                || [ "$(ls *.inc.scad 2>/dev/null)" != "$(echo "$incs" | awk 'NF { print $2 }')" ]; then
+                echo "$dir: Makefile or an include changed, rendering everything"
                 rm -rf target
                 exit 0
               fi

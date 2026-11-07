@@ -21,8 +21,13 @@ follow the same layout.
   master, light switches, ...). Similar in function to the Saitek Switch Panel,
   but it should look as close to the real 172N panel as possible, and every
   switch position is a raw output wire for SimVim (active low, like a switch
-  to GND).
-  - `ignition.scad` — OFF/R/L/BOTH/START key switch built around a cheap
+  to GND). It is two panels printed separately and mounted side by side,
+  ignition on the left.
+  - `panel.inc.scad` — included by both: panel height (`panel_h`, the same
+    for both), thickness, rim, corner mount holes, lettering, and the
+    `panel_blank` plate (square corners where the panels meet).
+  - `ignition.scad` — its panel (labels engraved) and the
+    OFF/R/L/BOTH/START key switch built around a cheap
     mailbox cam lock (its 90° stop removed). It has a ball detent, end stops
     on a rotor lug, a spring-return START (pin + shoe + spring in an arc slot),
     and one magnet with a digital hall sensor per position. The header comment
@@ -73,6 +78,13 @@ make clean                 # remove target/
 ```
 
 All projects share the same Makefile; keep the copies identical.
+
+`*.inc.scad` files hold values and modules shared by the files of a
+component, which `include <name.inc.scad>` them. They are not rendered, the
+Makefile copies them into `target/` (models are rendered from there) and
+every model depends on them, and the build workflow renders the whole
+component again when one changes. Do not assign a variable again that the
+include already defines: OpenSCAD silently takes the last value.
 
 Output goes to `target/` (not committed). `target/<file>` and
 `target/<file>.views` are empty markers used by make to skip up-to-date files;
