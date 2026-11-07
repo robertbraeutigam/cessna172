@@ -1,4 +1,11 @@
-MODEL_SCADS=$(wildcard *.scad)
+# *.inc.scad files are not models, the models include them. They are copied
+# to target/ (models are rendered from there), and every model of the
+# component depends on them. make removes the copies when it is done
+# (intermediate files), so a target/ restored by the build workflow is up to
+# date as long as its markers are.
+INCLUDE_SCADS=$(wildcard *.inc.scad)
+INCLUDE_COPIES=$(INCLUDE_SCADS:%=target/%)
+MODEL_SCADS=$(filter-out $(INCLUDE_SCADS),$(wildcard *.scad))
 MODEL_MARKS=$(MODEL_SCADS:%.scad=target/%)
 VIEW_MARKS=$(MODEL_SCADS:%.scad=target/%.views)
 GITREV=$(shell git rev-parse --short HEAD)
@@ -29,7 +36,11 @@ models: $(MODEL_MARKS)
 
 views: $(VIEW_MARKS)
 
-target/%: %.scad
+target/%.inc.scad: %.inc.scad
+	@mkdir -p target/
+	@sed $(COMMENT_MARKERS) <$< >$@
+
+target/%: %.scad $(INCLUDE_COPIES)
 	@mkdir -p target/
 	@sed $(COMMENT_MARKERS) <$< >target/$<
 	@if grep "Make module" >/dev/null $<; \
@@ -49,7 +60,7 @@ target/%: %.scad
 
 # Views: "<statement> // Make view <name> <rx>,<ry>,<rz>" renders the
 # statement to target/<file>_<name>.png, seen from that camera rotation
-target/%.views: %.scad
+target/%.views: %.scad $(INCLUDE_COPIES)
 	@mkdir -p target/
 	@sed $(COMMENT_MARKERS) <$< >target/.views_$*.scad
 	@grep -o "Make view .*" <$< | while read make view name rotation rest; \

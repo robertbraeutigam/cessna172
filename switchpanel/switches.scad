@@ -16,7 +16,9 @@
 //   their names engraved above them. They are for show only: printed dummy
 //   push-to-reset buttons (hex nut, button with the rating on it), glued
 //   into hex pockets in the front.
-// - A rim and bosses on the back stiffen the long, thin panel.
+// - A rim and bosses on the back stiffen the long, thin panel. It mounts to
+//   the right of the ignition panel and has the same height, rim and mount
+//   holes (panel.inc.scad); its left corners are square where they meet.
 // - A CD74HC4067 input multiplexer board sits on two standoffs on the back,
 //   in the strip behind the group labels. All switches (and the ignition)
 //   are soldered to it, so only one 7 wire cable runs to the SimVim Mega.
@@ -46,6 +48,8 @@
 // pockets, then mount the panel.
 
 $fn = 48;
+
+include <panel.inc.scad>
 
 // Preview: which switches are shown ON, in label order (missing ones are OFF)
 view_on = [1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1];
@@ -140,28 +144,16 @@ cb_label_gap = 1.5;          // nut to its label
 cb_gap = 2;                  // top of the toggle labels to the nuts
 cb_print_space = 3;          // between the breakers on the print bed
 
-// --- Panel ---
-panel_t = 3;
-corner_r = 4;
+// --- Panel (height, thickness, rim, mount holes, font: panel.inc.scad) ---
 margin_x = 11;               // panel end to the outer switches, room for the group labels
-margin_bottom = 12;          // panel bottom to the rockers
-margin_top = 4;              // panel top to the top label
-rim_w = 2.5;
-rim_h = 8;
-mount_d = 3.3;               // M3
-mount_inset = 6;             // mount hole center to the panel edge
+margin_bottom = 12;          // at least, panel bottom to the rockers
+margin_top = 4;              // at least, panel top to the top label
 mount_center = true;         // also a hole in the middle of the top and bottom edge
-boss_d = 8;                  // overlaps the rim (mount_inset - boss_d / 2 < rim_w)
 
 // --- Labels, engraved into the front ---
-font = "Liberation Sans:style=Bold";
-label_size = 3;
 label_line = 4.2;            // line pitch of two-line labels
 label_gap = 2.5;             // switch to the lowest label line
-label_depth = 0.6;
-group_label_size = 3.2;
 group_line_w = 0.6;          // line under a group label, over its switches
-gitrev_depth = 0.4;
 
 // --- Derived ---
 rk_cutout_c = rk_cutout + 2 * [rk_cutout_clear, rk_cutout_clear];
@@ -209,8 +201,12 @@ function cb_label_w(i) = len(breakers[i][0]) * cb_label_size * 0.75;  // estimat
 
 panel_x0 = -margin_x;
 panel_x1 = group_left(len(groups) - 1) + group_w(len(groups) - 1) + margin_x;
-panel_y0 = -rk_bezel.y / 2 - margin_bottom;
-panel_y1 = max(group_label_y + group_label_size, len(breakers) > 0 ? cb_label_top : 0) + margin_top;
+// The panel is panel_h high, like the ignition panel next to it. The room
+// left over goes half below and half above the switches.
+content_y0 = -rk_bezel.y / 2 - margin_bottom;
+content_y1 = max(group_label_y + group_label_size, len(breakers) > 0 ? cb_label_top : 0) + margin_top;
+panel_y0 = content_y0 - (panel_h - (content_y1 - content_y0)) / 2;
+panel_y1 = panel_y0 + panel_h;
 panel_size = [panel_x1 - panel_x0, panel_y1 - panel_y0];
 panel_cx = (panel_x0 + panel_x1) / 2;
 
@@ -218,7 +214,7 @@ panel_cx = (panel_x0 + panel_x1) / 2;
 function closest(v, x) = [for (a = v) if (abs(a - x) == min([for (b = v) abs(b - x)])) a][0];
 mount_top_cx = len(breakers) > 1 ? closest([for (i = [1 : len(cb_xs) - 1]) (cb_xs[i - 1] + cb_xs[i]) / 2], panel_cx) : panel_cx;
 mount_holes = concat(
-   [for (x = [panel_x0 + mount_inset, panel_x1 - mount_inset], y = [panel_y0 + mount_inset, panel_y1 - mount_inset]) [x, y]],
+   panel_corner_holes(panel_x0, panel_x1, panel_y0),
    mount_center ? [[panel_cx, panel_y0 + mount_inset], [mount_top_cx, panel_y1 - mount_inset]] : []);
 mount_count = len(mount_holes);
 
@@ -247,6 +243,7 @@ echo(panel_size = panel_size, switches = switch_count, mux_inputs = switch_count
 
 // --- Sanity checks ---
 assert(panel_size.x <= bed.x && panel_size.y <= bed.y, "Panel does not fit the printer bed");
+assert(content_y1 - content_y0 <= panel_h, "Switches and labels do not fit panel_h, make it higher or the margins smaller");
 assert([for (g = groups) if (g[1] == "rocker2" && len(g[2]) != 2) g] == [], "A rocker2 group needs exactly two switches");
 assert(panel_t - rk_grip >= 1, "Rocker pockets too shallow, make panel_t thicker or rk_grip thinner");
 assert(rk_grip >= 0.8, "Panel too thin around the rockers");
@@ -259,7 +256,6 @@ assert(min_front_gap >= 1, "Switches too close to each other, increase tg_pitch 
 assert(min_web >= 1.2, "Too thin a wall between two pockets, increase tg_pitch or group_space");
 assert(min_boss_dist >= 0.5, "A mount boss runs into a switch pocket, increase the margins");
 assert(panel_y0 + rim_w + 0.5 <= -max(rk_pocket.y, tg_pocket.y) / 2, "Rim runs into a switch pocket, increase margin_bottom");
-assert(mount_inset - boss_d / 2 <= rim_w - 0.3, "Mount bosses must overlap the rim");
 assert(len(view_on) <= switch_count, "view_on has more entries than there are switches");
 assert(switch_count + ignition_inputs <= mux_channels, "More switches than mux inputs");
 assert(mux_y - mux_board.y / 2 >= mux_switch_y + mux_clear, "Mux board runs into the switches, increase margin_top");
@@ -280,11 +276,6 @@ assert(cb_rating_size * 1.4 <= cb_button_d - 2 * cb_button_chamfer, "Breaker rat
 module rrect(size, r) {
    offset(r = r)
       square(size - 2 * [r, r], center = true);
-}
-
-module panel_outline() {
-   translate([panel_cx, (panel_y0 + panel_y1) / 2])
-      rrect(panel_size, corner_r);
 }
 
 module labels_2d() {
@@ -319,19 +310,9 @@ module cb_rating_2d(amps) {
 module panel() {
    difference() {
       union() {
-         translate([0, 0, -panel_t])
-            linear_extrude(panel_t)
-               panel_outline();
-         translate([0, 0, -panel_t - rim_h])
-            linear_extrude(rim_h + 0.01)
-               difference() {
-                  panel_outline();
-                  offset(delta = -rim_w)
-                     panel_outline();
-               }
-         for (h = mount_holes)
-            translate([h.x, h.y, -panel_t - rim_h])
-               cylinder(d = boss_d, h = rim_h + 0.01);
+         // Square corners on the left, where the ignition panel is
+         mirror([0, 0, 1])
+            panel_blank(panel_x0, panel_x1, panel_y0, mount_holes, round0 = false);
          for (h = mux_holes)
             translate([mux_x + h.x, mux_y + h.y, mux_z])
                cylinder(d = mux_standoff_d, h = mux_standoff_h + 0.01);
@@ -358,9 +339,6 @@ module panel() {
                   linear_extrude(tg_pocket_depth + 1)
                      square(tg_pocket, center = true);
             }
-      for (h = mount_holes)
-         translate([h.x, h.y, -panel_t - rim_h - 1])
-            cylinder(d = mount_d, h = panel_t + rim_h + 2);
       translate([0, 0, -label_depth])
          linear_extrude(label_depth + 1)
             labels_2d();
@@ -407,9 +385,7 @@ module breakers_plate() {
 
 // --- Views (rendered to PNG by "make views") ---
 
-c_panel = "#4a4f57";
 c_cut = "#3d7bd9";           // panel in the section views
-c_label = "#f4f4f4";
 c_body = "#2a2b2e";
 c_bezel = "#1b1c1e";
 c_tab = "#d9b24a";
@@ -615,27 +591,11 @@ module panel_part() {
             labels_2d();
 }
 
-module pan_head_screw(len) {
-   color(c_steel) {
-      difference() {
-         scale([1, 1, 0.45])
-            sphere(d = 5.6, $fn = 32);
-         translate([0, 0, -5])
-            cylinder(d = 10, h = 5);
-         translate([-1.6, -0.3, 0.6])
-            cube([3.2, 0.6, 3]);
-         translate([-0.3, -1.6, 0.6])
-            cube([0.6, 3.2, 3]);
-      }
-      translate([0, 0, -len])
-         cylinder(d = 3, h = len);
-   }
-}
-
 module mount_screws() {
    for (h = mount_holes)
       translate([h.x, h.y, 0])
-         pan_head_screw(panel_t + rim_h + 4);
+         mirror([0, 0, 1])
+            mount_screw(panel_t + rim_h + 4, c_steel);
 }
 
 // Wire through a list of points
