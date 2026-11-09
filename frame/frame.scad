@@ -4,16 +4,16 @@
 // one ACM sheet over it, with a cut-out for every component; below the
 // desk top the clamp hangers, the apron under the throttle and the bay bar
 // with the parking brake. Values, layout and checks are in frame.inc.scad;
-// this file has the views and the cut list (echo). The only printed parts
-// are the clamp feet (clamp_foot.scad).
+// this file has the views and the cut list (echo). It has no printed parts.
 //
 // Bought parts (lengths: see the echo of the build, or the README):
 // - 2040 extrusion: front rail left, front rail right, rear rail
 // - 2020 extrusion: 5 crossbars, 4 uprights, top bar, 4 braces (45 degree
-//   ends), 4 hangers (2 short), lower bar, bay bar
+//   ends), 4 hangers (2 short), 4 clamp arms, lower bar, bay bar
 // - corner brackets, M5 screws and T-nuts (6 mm slot)
 // - 3 mm ACM sheet, frame_w x sheet_h, and the apron sheet
-// - 4 M6 x 40 thumb screws + M6 nuts, for the clamp feet
+// - 4 M5 x 40 knurled thumb screws (DIN 464) and 4 self-adhesive rubber
+//   bumpers (20 mm), for the clamps
 //
 // Assembly:
 // 1. Bolt the ladder together: rails, crossbars. Stand the uprights on the
@@ -21,16 +21,25 @@
 //    crossbars.
 // 2. Cut the sheet (cuts, sheet_screws in the echo, the "sheet" view),
 //    drill its screw holes, and screw it onto the front slots with T-nuts.
-// 3. Hang the hangers under the front rail, a corner bracket on each side in
-//    the rail's front bottom slot; the lower bar between the two long ones,
-//    the apron sheet on their front slots. Screw the bay bar under the two
-//    rail ends (bay_bar_bolts: drill through the bar, T-nut in the rail's
-//    front bottom slot). Screw a clamp foot (M6 nut in its pocket) onto each
-//    hanger's side slot, below the brackets.
-// 4. Put the frame on the desk, the hangers just in front of the desk edge,
-//    and tighten the thumb screws in the feet up against the desk
-//    underside. Put the yoke into the bay and clamp it with its own clamps.
-// 5. Push the throttle box through its cut-out onto the rail and the middle
+// 3. Clamps: tap the top end of each hanger and the front end of each arm
+//    M5. Drill an access hole (5 mm) down through the front rail over each
+//    hanger, its centre over the rail's front bottom slot. Screw an M5 x 12
+//    button head into the hanger's end, slide its head into the slot and
+//    tighten it through the access hole, then add a corner bracket on each
+//    side of the hanger. Drill through each hanger (front to back) at
+//    arm_bolt_z and bolt the arm to its back face (M5 x 30 from the front),
+//    a corner bracket under the arm. Drill the arm through at arm_screw_y,
+//    put a T-nut in its bottom slot there and screw the thumb screw in
+//    from below. Glue a felt pad on each hanger's back, at the desk edge.
+// 4. The lower bar between the two long hangers, the apron sheet on their
+//    front slots (its holes: apron_screws, apron_head_holes for the arm bolt
+//    heads). Screw the bay bar under the two rail ends (bay_bar_bolts:
+//    drill through the bar, T-nut in the rail's front bottom slot).
+// 5. Stick a rubber bumper on the desk underside over each thumb screw. Put
+//    the frame on the desk, the hangers against the desk edge, and tighten
+//    the thumb screws by hand up against the bumpers. Put the yoke into the
+//    bay and clamp it with its own clamps.
+// 6. Push the throttle box through its cut-out onto the rail and the middle
 //    crossbar until its face is on the sheet, bolt its floor into the rail
 //    (throttle_bolts), drill the sheet through its flange holes and screw
 //    the flange on (M3, nuts behind the sheet). The pedestal goes in the
@@ -58,11 +67,14 @@ echo(braces_2020 = len(upright_xs), brace_long_edge = brace_long);
 echo(sheet = [frame_w, sheet_h], screws = len(sheet_screws));
 echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut);
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
-echo(hangers_2020 = [for (h = hangers) h[2]], lower_bar = apron_bar[1] - apron_bar[0],
+echo(hangers_2020 = [for (h = hangers) h[1]], clamp_arms_2020 = [len(hangers), arm_len],
+     arm_bolt_z = arm_bolt_z, arm_screw_y = arm_screw_y, lower_bar = apron_bar[1] - apron_bar[0],
      bay_bar = bay_bar[1] - bay_bar[0]);
-echo(apron_sheet = [apron[1] - apron[0], apron_h], apron_screws = len(apron_screws));
+echo(apron_sheet = [apron[1] - apron[0], apron_h], apron_screws = len(apron_screws),
+     apron_head_holes = apron_head_holes, apron_head_d = apron_head_d);
 echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts, bay_bar_bolts = bay_bar_bolts);
-echo(m5 = len(sheet_screws) + len(apron_screws) + 2 * len(hangers) + 2 + 2 + 2 + 2);
+echo(m5 = len(sheet_screws) + len(apron_screws) + 2 * len(hangers) + 2 + 2 + 2 + 2,
+     corner_brackets = 3 * len(hangers));
 
 // --- Frame ---
 
@@ -96,21 +108,41 @@ module frame_part() {
    }
    bar([0, 0, sheet_h - ext], [frame_w, ext, ext]);
    // below the desk top
-   for (h = hangers)
-      bar([h[0], 0, -h[2]], [ext, ext, h[2]]);
+   for (h = hangers) {
+      bar([h[0], 0, -h[1]], [ext, ext, h[1]]);
+      bar([h[0], ext, arm_z0], [ext, arm_len, ext]);
+   }
    bar([apron_bar[0], 0, -apron_h], [apron_bar[1] - apron_bar[0], ext, ext]);
    bar([bay_bar[0], 0, -ext], [bay_bar[1] - bay_bar[0], ext, ext]);
 }
 
-module feet_part() {
-   for (h = hangers) {
-      color("#e08a2c") translate([foot_x(h), 0, 0]) clamp_foot();
-      // thumb screw from below, its tip on the desk underside
-      color("#b9c0c8") translate([foot_x(h) + foot_t / 2, foot_screw_y, foot_z0 - 12]) {
-         cylinder(d = 6, h = 12 + foot_h + foot_gap);
-         cylinder(d = 20, h = 4);
+// Corner bracket: its corner at the origin, legs along +x and -z, ext wide in y
+module corner_bracket() {
+   translate([0, ext, 0]) rotate([90, 0, 0]) linear_extrude(ext)
+      polygon([[0, 0], [bracket_leg, 0], [bracket_leg, -bracket_t], [bracket_t, -bracket_leg], [0, -bracket_leg]]);
+}
+
+// Clamp hardware, view only: brackets, the arm bolt head, the thumb screw
+// (its tip on the rubber pad) and the pad
+module clamp_hw_part(h) {
+   x = h[0] + ext / 2;
+   color("#9aa0a8") {
+      translate([h[0], 0, 0]) mirror([1, 0, 0]) corner_bracket();
+      translate([h[0] + ext, 0, 0]) corner_bracket();
+      translate([h[0] + ext, ext, arm_z0]) rotate([0, 0, 90]) corner_bracket();
+   }
+   color("#6f757d") {
+      translate([x, 0, arm_bolt_z]) rotate([90, 0, 0]) cylinder(d = m5_head_d, h = 2.75);
+      translate([x, arm_screw_y, thumb_z]) {
+         cylinder(d = 5, h = thumb_len);
+         translate([0, 0, -thumb_head[1]]) cylinder(d = thumb_head[0], h = thumb_head[1], $fn = 24);
       }
    }
+   color("#222") translate([x, arm_screw_y, -desk.z - desk_skirt - pad_t]) cylinder(d = pad_d, h = pad_t);
+}
+
+module clamps_part() {
+   for (h = hangers) clamp_hw_part(h);
 }
 
 // --- Sheet, x / z on the sheet ---
@@ -135,6 +167,8 @@ module apron_2d() {
       rect(pedestal_cut);
       for (p = apron_screws)
          translate(p) circle(d = m5_d);
+      for (p = apron_head_holes)
+         translate(p) circle(d = apron_head_d);
    }
 }
 
@@ -299,7 +333,7 @@ module components() {
    throttle_part();
    pedestal_part();
    park_part();
-   feet_part();
+   clamps_part();
 }
 
 module cockpit_view() {
@@ -324,11 +358,25 @@ module under_view() {
          sheet_part();
          pedestal_part();
          park_part(set = true);
-         feet_part();
+         clamps_part();
          throttle_part();
       }
       translate([-110, -200, -apron_h - 1]) cube([frame_w + 220, 600, apron_h + 120]);
    }
+}
+
+// Close-up of the left clamp, the desk and the frame around it cut off
+module clamp_view() {
+   h = hangers[0];
+   x0 = h[0] - 45;
+   x1 = h[0] + ext + 45;
+   color(c_desk) translate([x0, frame_overhang, -desk.z]) cube([x1 - x0, arm_len + 40, desk.z]);
+   color(c_alu) {
+      translate([x0, 0, 0]) cube([x1 - x0, rail.x, rail.y]);
+      translate([h[0], 0, -h[1]]) cube([ext, ext, h[1]]);
+      translate([h[0], ext, arm_z0]) cube([ext, arm_len, ext]);
+   }
+   clamp_hw_part(h);
 }
 
 module throttle_view() {
@@ -349,3 +397,4 @@ module throttle_view() {
 //sheet_view(); // Make view sheet 90,0,0
 //throttle_view(); // Make view throttle 55,0,150
 //under_view(); // Make view under 80,0,-20
+//clamp_view(); // Make view clamp 75,0,-50
