@@ -45,20 +45,22 @@ its own top-level directory; new components should follow the same layout.
     is a row of printed dummy circuit breakers (`breakers`, for show only,
     glued into hex pockets). A CD74HC4067
     input mux on standoffs on the back collects all switches and the
-    ignition, so one Cat5 cable runs to hub port 1. The switch list
+    ignition, so one Cat5 cable runs to hub port 3. The switch list
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
 
 - `hub/` — `hub.scad`: the box (and lid) with the SimVim Arduino Mega, the
   servo Nano (upside down on its own pedestal, pins up), a prototype
-  board with the bus (female header strips for 5 V, GND and mux S0..S3)
-  and room for extra circuits, and one RJ45 breakout board per port, wired with jumper
-  wires, nothing soldered on the Arduinos. Every SimVim component connects
-  to its own numbered port with a straight Cat5 cable; the port pinout
-  (same on every port: S0..S3, 5 V, GND, SIG, AUX) is in the README's
-  Connections section, keep components and README in sync with it. The
-  `rj_*`, `proto_*` and `nano_*` values are guesses until the parts
-  are measured.
+  board (bus header, room for extra circuits) and 12 RJ45 breakout
+  boards in two rows of six (the top row on brass standoffs on the
+  bottom one). Pins 1-6 of all RJ45 boards are soldered together (the
+  bus); only SIG and AUX of each port and the bus header go to the
+  Arduinos with jumper wires, nothing is soldered on the Arduinos. Every
+  SimVim component connects to its own numbered port with a straight
+  Cat5 cable; the port pinout (same on every port: S0..S3, 5 V, GND, SIG,
+  AUX) and the port list are in the README's Connections section, keep
+  components and README in sync with them. The `rj_*`, `proto_*` and
+  `nano_*` values are guesses until the parts are measured.
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheet over it. `frame.inc.scad` holds the extrusion/sheet standard, the
