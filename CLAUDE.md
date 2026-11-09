@@ -45,9 +45,18 @@ its own top-level directory; new components should follow the same layout.
     is a row of printed dummy circuit breakers (`breakers`, for show only,
     glued into hex pockets). A CD74HC4067
     input mux on standoffs on the back collects all switches and the
-    ignition, so one cable runs to the SimVim Mega. The switch list
+    ignition, so one Cat5 cable runs to hub port 1. The switch list
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
+
+- `hub/` — `hub.scad`: the box (and lid) with the SimVim Arduino Mega, a
+  half size breadboard with the servo Nano on it (the bus for 5 V, GND and
+  mux S0..S3) and one RJ45 breakout board per port, wired with jumper
+  wires, nothing soldered. Every SimVim component connects to its own
+  numbered port with a straight Cat5 cable; the port pinout (same on every
+  port: S0..S3, 5 V, GND, SIG, AUX) is in the README's Connections
+  section, keep components and README in sync with it. The `rj_*` and
+  `bb` values are guesses until the parts are measured.
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheet over it. `frame.inc.scad` holds the extrusion/sheet standard, the
