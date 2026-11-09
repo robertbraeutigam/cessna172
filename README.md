@@ -246,41 +246,56 @@ the bus in its right wall.
 [![Hub](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)
 
 `hub.scad` prints the box (`hub_box.stl`, floor down) and the lid
-(`hub_lid.stl`, top down). The box is 249 x 135.5 x 57 mm with the lid (6 ports,
-`ports`); the build checks that it fits the printer bed.
+(`hub_lid.stl`, top down). The box is 249 x 214 x 57 mm with the lid
+(6 ports, `ports`); the build checks that it fits the printer bed.
+
+From the front wall to the back:
 
 - **Ports**: 6 RJ45 breakout boards on standoffs along the front wall,
   their jacks behind cut-outs in it, numbered 1-6 from the left. Their
-  angled 8 pin headers point into the box.
-- **Mega**: on 6 standoffs at the back left, its USB jack through the left
-  wall (flush with the outside, so any USB-B plug fits), with a cut-out in
+  angled 8 pin headers point into the box. Behind them is a 35 mm strip
+  for the jumpers.
+- **Breadboard** (left): a half size (400 points) breadboard in a pocket,
+  stuck down with its adhesive back. It is the bus that all ports share
+  (below), so it sits closest to them.
+- **Prototype board** (right): a 50 x 70 mm board on four standoffs, for
+  small extra circuits if they are needed (pull-up resistors, a servo
+  capacitor, later the power bus distribution). The hole for the power
+  bus is in the right wall beside it.
+- **Mega** (back left): on 6 standoffs, its USB jack through the left wall
+  (flush with the outside, so any USB-B plug fits), with a cut-out in
   front of the power jack for later.
-- **Breadboard**: a half size (400 points) breadboard in a pocket at the
-  back right, stuck down with its adhesive back. The Nano is plugged into
-  it, and it is the bus that all ports share (below).
-- Between the port row and the boards is a 35 mm strip for the jumpers,
-  and about 40 mm between the Mega and the breadboard; the build checks the
-  room for a plugged jumper (30 mm) above the boards.
+- **Nano** (back right): on its own pedestal, upside down with its pins up,
+  so the jumpers plug in from above like on the Mega. Four corner posts
+  carry the PCB by its corners only (clear of the pin solder joints, the
+  ICSP pins and the USB jack under it) and their lips locate it; a drop of
+  hot glue on two posts keeps it there. Its USB jack is at a cut-out in the
+  right wall, so the SimVim firmware can be loaded with the lid on.
+- The rows are 25 mm apart, the boards in a row at least 20 mm; the build
+  checks these and the room for a plugged jumper (30 mm) above every board.
 - The lid has a locating lip and is screwed onto four corner posts. Four
   ears on the floor (5.3 mm holes) screw the box onto the frame (M5 + T-nut)
   or under the desk.
 
-Nothing is soldered: the Mega and the Nano keep their pins free and can
-be reused, and a port is rewired by moving jumpers.
+Nothing on the Mega or the Nano is soldered: they keep their pins free and
+can be reused, and a port is rewired by moving jumpers.
 
 ### Hardware
 
 | Qty | Part | Use |
 |-----|------|-----|
 | 1 | Arduino Mega 2560 | SimVim main board |
-| 1 | Arduino Nano | SimVim servo controller |
-| 1 | half size breadboard, 400 points | bus and the Nano |
+| 1 | Arduino Nano, headers soldered | SimVim servo controller |
+| 1 | half size breadboard, 400 points | bus |
+| 1 | prototype board, 50 x 70 mm | extra circuits, if needed |
 | 6 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
-| 18 | M2 x 6 screw | RJ45 boards |
+| 22 | M2 x 6 screw | RJ45 boards, prototype board |
 | 6 | M3 x 6 self tapping screw | Mega |
 | 4 | M3 x 10 self tapping screw | lid |
-| ~50 | male-female jumper wire, 20 cm | RJ45 pins to the breadboard and the Mega |
-| ~10 | male-male jumper wire, 10 cm | breadboard to the Mega, Nano to the Mega |
+| - | hot glue | Nano onto its pedestal |
+| ~50 | male-female jumper wire, 20 cm | RJ45 pins to the breadboard, the Mega and the Nano |
+| ~10 | male-male jumper wire, 10 cm | breadboard to the Mega |
+| ~4 | female-female jumper wire, 20 cm | RJ45 AUX pins to Nano servo outputs |
 
 Per component: one more RJ45 breakout board and a straight Cat5 patch
 cable.
@@ -289,43 +304,51 @@ cable.
 and its position on the board, the header position and the mounting holes
 (guessed from the listing picture; if they do not match the standoffs, the
 build still works, but fix `rj_holes` before printing). The breadboard
-(`bb`), whose size varies by maker. The Mega values are from the Arduino
-drawing.
+(`bb`), whose size varies by maker. The prototype board's hole positions
+(`proto_*`; if its holes are smaller than M2, use M1.6 screws). The Nano
+(`nano_*`): its size, the first and last pin, and how far the USB jack, the
+pin solder joints and the ICSP pins (if soldered) reach under the PCB
+(`nano_under`, 9 mm). The Mega values are from the Arduino drawing.
 
 ### Wiring
 
 **Breadboard bus**: both + rails are 5 V, both - rails GND (join the top
-and bottom rails with a short wire at one end). Right of the Nano, one
-column each for S0, S1, S2 and S3, both halves joined across the middle
-channel with a short wire: that leaves 8 holes per signal, one for each
-port and one to the Mega.
+and bottom rails with a short wire at one end). One column each for S0,
+S1, S2 and S3, both halves joined across the middle channel with a short
+wire: that leaves 8 holes per signal, one for each port and one to the
+Mega.
 
 | From | To | Jumper |
 |------|----|--------|
 | each port pin 1, 2, 3, 6 (S0, S1, S2, S3) | its breadboard column | male-female |
 | each port pin 4, 5 (5 V, GND) | + rail, - rail | male-female |
 | each port pin 7 (SIG) | its Mega pin (table above) | male-female |
-| each port pin 8 (AUX) | its Mega analog pin, or the breadboard row of a Nano servo output | male-female |
+| each port pin 8 (AUX) | its Mega analog pin | male-female |
+| | or a Nano servo output | female-female |
 | S0-S3 columns | Mega pins 22-25 | male-male |
 | + rail, - rail | Mega 5 V, GND | male-male |
-| Nano 5 V, GND rows | + rail, - rail | male-male |
-| Nano TX | Mega RX2 (pin 17) | male-male |
-| Nano RX | Mega TX2 (pin 16) | male-male |
+| Nano 5 V, GND | + rail, - rail | male-female |
+| Nano TX | Mega RX2 (pin 17) | male-female |
+| Nano RX | Mega TX2 (pin 16) | male-female |
+
+The Nano lies upside down, so its pin labels are underneath: check them
+before plugging (many clones print them on both sides).
 
 Port 2's AUX goes to the Nano output that SimVim assigns to the trim
 indicator servo (see SimVim's
 [servo controllers](https://simvim.com/gau_servo_ctrl.html) page). The
-Nano gets its firmware from the SimVim plugin over USB: take the lid off,
-unplug its TX and RX jumpers and plug it into the PC for that.
+Nano gets its firmware from the SimVim plugin over USB: unplug its TX and
+RX jumpers and plug a USB cable in through the right wall.
 
 ### Assembly
 
 1. Screw the RJ45 boards onto their standoffs, jacks into the cut-outs.
-2. Screw the Mega onto its standoffs.
-3. Stick the breadboard into its pocket and plug the Nano into it, across
-   the middle channel, its USB end to the left.
-4. Wire the bus and the ports as above, label the SIG and AUX jumpers.
-5. Screw the lid on.
+2. Screw the prototype board and the Mega onto their standoffs.
+3. Stick the breadboard into its pocket.
+4. Put the Nano upside down onto its pedestal, USB jack to the right wall,
+   and fix it with a drop of hot glue on two posts.
+5. Wire the bus and the ports as above, label the SIG and AUX jumpers.
+6. Screw the lid on.
 
 # Throttle quadrant
 
