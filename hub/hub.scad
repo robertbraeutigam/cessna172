@@ -8,19 +8,19 @@
 // - The RJ45 boards stand on low standoffs in a row along the front wall,
 //   their jacks behind cut-outs in it, numbered 1.. from the left. Their 8
 //   pin angled headers point into the box.
-// - Behind them is a free strip for the jumper wires, then a row with a
-//   half size breadboard (left) and a prototype board on standoffs (right),
-//   and behind that the Mega (left, its USB and power jacks through the
-//   left wall) and the Nano (right, its USB jack at a cut-out in the right
-//   wall, so its firmware can be loaded with the lid on).
-// - The breadboard is the bus: its rails carry 5 V and GND, four of its
-//   columns S0..S3, so every port plugs into it with plain jumper wires. The
-//   prototype board is for small extra circuits (pull-ups, a servo
-//   capacitor, the later power bus), soldered as needed.
+// - Behind them is a free strip for the jumper wires, then one row: the
+//   Mega (left, its USB and power jacks through the left wall), a
+//   prototype board on standoffs (middle) and the Nano (right, its USB
+//   jack at a cut-out in the right wall, so its firmware can be loaded with
+//   the lid on).
+// - The prototype board is the bus: female header strips soldered onto it,
+//   one per shared line (5 V, GND, S0..S3), take a jumper from every port
+//   and one to the Mega. Its free part is for small extra circuits
+//   (pull-ups, a servo capacitor, the later power bus).
 // - The Nano lies upside down, pins up, on a pedestal of four corner posts
 //   with lips that locate it; a drop of hot glue keeps it there.
 // - Nothing on the Mega or the Nano is soldered: jumper wires go from the
-//   RJ45 pins to the Mega, the Nano and the breadboard.
+//   RJ45 pins to the Mega, the Nano and the bus.
 // - A lid with a locating lip is screwed onto four corner posts. Four ears
 //   on the floor screw the box onto the frame or under the desk.
 //
@@ -29,16 +29,15 @@
 // The box is printed floor down, the lid top down.
 //
 // Parts to buy (details in the README):
-// - Arduino Mega 2560, Arduino Nano (headers soldered), half size
-//   breadboard (400 points), 50 x 70 mm prototype board
+// - Arduino Mega 2560, Arduino Nano (headers soldered), 50 x 70 mm
+//   prototype board, 6 female header strips (the bus)
 // - ports x RJ45 breakout board (34 x 28 mm, 8 pin angled header)
 // - 6 x M3 x 6 self tapping screws (Mega), 4 x M3 x 10 (lid),
 //   3 x ports + 4 M2 x 6 screws (RJ45 boards, prototype board)
 // - male-female, male-male and a few female-female jumper wires
 //
-// Assembly: screw the RJ45 boards, the prototype board and the Mega onto
-// their standoffs, stick the breadboard into its pocket, glue the Nano onto
-// its pedestal, wire it as in the README, screw the lid on.
+// Assembly: solder the bus onto the prototype board, screw it, the RJ45
+// boards and the Mega onto their standoffs, glue the Nano onto its pedestal, wire it as in the README, screw the lid on.
 
 $fn = 48;
 
@@ -48,7 +47,7 @@ bed = [255, 255];            // Kobra 3 V2
 // --- Box ---
 wall = 2.5;
 floor_t = 2.5;
-inner_h = 52;                // floor top to the lid
+inner_h = 50;                // floor top to the lid
 post = 8;                    // lid screw posts in the corners, square
 post_hole = 2.8;             // M3 self tapping into plastic
 lid_t = 2.5;
@@ -84,9 +83,8 @@ font = "Liberation Sans:style=Bold";
 
 // --- Jumper wires and spacing ---
 dupont = 30;                 // a plugged jumper: housing + bent wire, above its pin
-cable_gap = 35;              // free strip behind the RJ45 boards
-row_gap = 25;                // between the board rows
-board_gap = 20;              // at least, between two boards in a row
+cable_gap = 30;              // free strip behind the RJ45 boards
+board_gap = 15;              // at least, between two boards in the row
 
 // --- Arduino Mega 2560 (from the Arduino drawing) ---
 mega = [101.6, 53.34];
@@ -101,17 +99,14 @@ mega_usb = [31.75, 43.75, 10.9, 6.2];
 mega_power = [3.3, 12.2, 11, 1.8];
 jack_cut_clear = 0.6;
 
-// --- Half size breadboard (MEASURE) ---
-bb = [82.5, 54.5, 8.5];
-bb_clear = 0.5;
-bb_rim = [1.5, 3];           // pocket rim, width x height
-
 // --- Prototype board, 50 x 70 mm (MEASURE) ---
-proto = [70, 50, 1.6];
+proto = [50, 70, 1.6];       // along the wall x depth
 proto_holes_inset = 2.5;     // hole centers from the edges
 proto_screw_hole = 2.1;      // M2 pilot hole
 proto_standoff = [5.5, 6];   // room for the solder side under it
-proto_parts_h = 12;          // tallest part soldered on it
+proto_parts_h = 9;           // tallest part soldered on it (female headers 8.5)
+bus_lines = 6;               // 5 V, GND, S0, S1, S2, S3
+bus_len = 10;                // header positions per line: ports + Mega + spare
 
 // --- Arduino Nano, upside down on its pedestal (MEASURE) ---
 nano = [43.2, 17.8, 1.6];    // x from the far end to the USB end
@@ -128,29 +123,23 @@ nano_wall_gap = 1.5;         // USB end of the PCB to the right wall
 nano_usb_cut = [14, 10];     // cut-out for the USB plug overmold, y x z
 
 // --- Power bus (later) ---
-power_hole_d = 9;            // through the right wall, beside the prototype board
+power_hole_d = 9;            // through the back wall, behind the prototype board
 
 // --- Derived ---
 port_x0 = post + port_margin;
 port_x = function(i) port_x0 + i * (rj.x + port_gap);
 inner_x = 2 * port_x0 + ports * rj.x + (ports - 1) * port_gap;
-// Row 1: breadboard (left) and prototype board (right)
-row1_y = rj.y + cable_gap;
-bb_pocket = [bb.x + 2 * (bb_clear + bb_rim[0]), bb.y + 2 * (bb_clear + bb_rim[0])];
-bb_x = port_x0 + bb_clear + bb_rim[0];
-bb_y = row1_y + bb_clear + bb_rim[0];
-proto_x = inner_x - port_x0 - proto.x;
-proto_y = row1_y;
-row1_d = max(bb_pocket.y, proto.y);
-// Row 2: Mega (left) and Nano (right)
-row2_y = row1_y + row1_d + row_gap;
+// The board row: Mega (left), prototype board (middle), Nano (right)
+row_y = rj.y + cable_gap;
 mega_x = mega_usb[3] - wall;  // the USB jack ends flush with the outside
 mega_z = mega_standoff[1];
 nano_x = inner_x - nano_wall_gap - nano.x;
-nano_y = row2_y + (mega.y - nano.y) / 2;
+nano_y = row_y + (mega.y - nano.y) / 2;
 nano_z = nano_under;          // the PCB's component side, lying on the posts
-back_gap = post + 1;
-inner_y = row2_y + mega.y + back_gap;
+nano_left = nano_x - nano_post_out - nano_lip[0];  // the pedestal's left side
+proto_x = (mega_x + mega.x + nano_left - proto.x) / 2;
+proto_y = row_y;
+inner_y = max(row_y + mega.y + post + 1, proto_y + proto.y + 2);
 outer = [inner_x + 2 * wall, inner_y + 2 * wall, floor_t + inner_h];
 rj_z = rj_standoff[1];
 ear_xs = [0, inner_x - ear.x];
@@ -168,18 +157,18 @@ for (h = rj_holes)
    assert(h.x - rj_standoff[0] / 2 >= 0 && h.x + rj_standoff[0] / 2 <= rj.x
           && h.y - rj_standoff[0] / 2 >= 0 && h.y + rj_standoff[0] / 2 <= rj.y,
           "RJ45 standoff sticks out of its board");
-assert(rj_pin_y + rj_pin_reach + 15 <= row1_y,
+assert(rj_pin_y + rj_pin_reach + 15 <= row_y,
        "No room for the jumpers behind the RJ45 boards");
-assert(bb_x + bb.x + bb_clear + bb_rim[0] + board_gap <= proto_x,
-       "Breadboard and prototype board are too close for the wiring");
-assert(mega_x + mega.x + board_gap <= nano_x - nano_post_out - nano_lip[0],
-       "Mega and Nano are too close for the wiring");
+assert(mega_x + mega.x + board_gap <= proto_x && proto_x + proto.x + board_gap <= nano_left,
+       "Mega, prototype board and Nano are too close for the wiring");
+assert(bus_lines * 5.08 <= proto.x - 10 && bus_len * 2.54 <= proto.y - 10,
+       "Bus headers do not fit the prototype board");
+assert(bus_len >= ports + 1, "Bus too short for all ports and the Mega");
 assert(nano_y + nano.y + nano_post_out + nano_lip[0] <= inner_y - post,
        "Nano pedestal runs into the back post");
-assert(row2_y + mega.y <= inner_y - post, "Mega runs into the back posts");
+assert(row_y + mega.y <= inner_y - post, "Mega runs into the back posts");
 assert(mega_z + mega_pcb_t + mega_header_h + dupont <= inner_h,
        "No room for the jumpers above the Mega");
-assert(bb.z + dupont <= inner_h, "No room for the jumpers above the breadboard");
 assert(nano_z + nano.z + nano_pin_h + dupont <= inner_h,
        "No room for the jumpers above the Nano");
 assert(proto_standoff[1] + proto.z + proto_parts_h + dupont <= inner_h,
@@ -195,7 +184,7 @@ assert(rj_z + rj_pcb_t + rj_jack.z + jack_clear + label_size + 2 <= inner_h,
        "No room for the port numbers above the jacks");
 assert(mega_z + mega_pcb_t + mega_usb[2] + jack_cut_clear < inner_h - lip_h,
        "USB cut-out runs into the lid lip");
-assert(power_hole_d / 2 < proto.y / 2, "Power bus hole does not fit beside the prototype board");
+assert(power_hole_d < proto.x, "Power bus hole does not fit behind the prototype board");
 
 // --- Box ---
 
@@ -233,15 +222,15 @@ module box() {
       }
       // Mega USB and power jacks in the left wall
       for (j = [mega_usb, mega_power])
-         translate([-wall - 1, row2_y + j[0] - jack_cut_clear, mega_z + mega_pcb_t - jack_cut_clear])
+         translate([-wall - 1, row_y + j[0] - jack_cut_clear, mega_z + mega_pcb_t - jack_cut_clear])
             cube([wall + 2, j[1] - j[0] + 2 * jack_cut_clear, j[2] + 2 * jack_cut_clear]);
       // Nano USB plug in the right wall
       translate([inner_x - 1, nano_y + nano.y / 2 - nano_usb_cut[0] / 2,
                  nano_z - nano_usb[1] / 2 - nano_usb_cut[1] / 2])
          cube([wall + 2, nano_usb_cut[0], nano_usb_cut[1]]);
-      // Power bus, later: through the right wall beside the prototype board
-      translate([inner_x - 1, proto_y + proto.y / 2, inner_h / 2])
-         rotate([0, 90, 0]) cylinder(d = power_hole_d, h = wall + 2);
+      // Power bus, later: through the back wall behind the prototype board
+      translate([proto_x + proto.x / 2, inner_y - 1, inner_h / 2])
+         rotate([-90, 0, 0]) cylinder(d = power_hole_d, h = wall + 2);
    }
    // Corner posts for the lid screws
    for (x = [0, inner_x - post], y = [0, inner_y - post])
@@ -256,19 +245,12 @@ module box() {
          standoff(rj_standoff, rj_screw_hole);
    // Mega standoffs
    for (h = mega_holes)
-      translate([mega_x + h.x, row2_y + h.y, 0])
+      translate([mega_x + h.x, row_y + h.y, 0])
          standoff(mega_standoff, mega_screw_hole);
    // Prototype board standoffs
    for (h = proto_hole_pos)
       translate([proto_x + h.x, proto_y + h.y, 0])
          standoff(proto_standoff, proto_screw_hole);
-   // Breadboard pocket rim
-   translate([bb_x - bb_clear, bb_y - bb_clear, 0])
-      linear_extrude(bb_rim[1])
-         difference() {
-            offset(delta = bb_rim[0]) square([bb.x + 2 * bb_clear, bb.y + 2 * bb_clear]);
-            square([bb.x + 2 * bb_clear, bb.y + 2 * bb_clear]);
-         }
    translate([nano_x, nano_y, 0]) nano_pedestal();
 }
 
@@ -379,14 +361,6 @@ module mega_part() {
    }
 }
 
-module bb_part() {
-   color("#f2f2ee") cube(bb);
-   color("#d6d6d0") translate([0, bb.y / 2 - 1.5, bb.z - 0.5]) cube([bb.x, 3, 1]);
-   // Power rails
-   color("#d84040") for (y = [3.5, bb.y - 6.5]) translate([2, y, bb.z]) cube([bb.x - 4, 0.6, 0.05]);
-   color("#3060c0") for (y = [6.5, bb.y - 3.5]) translate([2, y, bb.z]) cube([bb.x - 4, 0.6, 0.05]);
-}
-
 module proto_part() {
    color(c_pcb_green)
       difference() {
@@ -396,6 +370,10 @@ module proto_part() {
    color(c_pin)
       for (x = [6 : 2.54 : proto.x - 5], y = [6 : 2.54 : proto.y - 5])
          translate([x, y, proto.z]) cylinder(d = 1.2, h = 0.05, $fn = 8);
+   // The bus: one female header strip per line, at the front
+   color(c_black)
+      for (i = [0 : bus_lines - 1])
+         translate([5 + i * 5.08, 5, proto.z]) cube([2.54, bus_len * 2.54, 8.5]);
 }
 
 // Upside down: the component side (USB jack) down, the pins up
@@ -422,8 +400,7 @@ module lid_part() { color(c_lid) lid(); }
 module inside_parts() {
    for (i = [0 : ports - 1])
       translate([port_x(i), 0, rj_z]) rj_part();
-   translate([mega_x, row2_y, mega_z]) mega_part();
-   translate([bb_x, bb_y, 0]) bb_part();
+   translate([mega_x, row_y, mega_z]) mega_part();
    translate([proto_x, proto_y, proto_standoff[1]]) proto_part();
    translate([nano_x, nano_y, nano_z]) nano_part();
 }

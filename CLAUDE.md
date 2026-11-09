@@ -50,14 +50,14 @@ its own top-level directory; new components should follow the same layout.
     listing; `tg_*` are guesses until the switches are measured.
 
 - `hub/` — `hub.scad`: the box (and lid) with the SimVim Arduino Mega, the
-  servo Nano (upside down on its own pedestal, pins up), a half size
-  breadboard (the bus for 5 V, GND and mux S0..S3), a prototype board for
-  extra circuits and one RJ45 breakout board per port, wired with jumper
+  servo Nano (upside down on its own pedestal, pins up), a prototype
+  board with the bus (female header strips for 5 V, GND and mux S0..S3)
+  and room for extra circuits, and one RJ45 breakout board per port, wired with jumper
   wires, nothing soldered on the Arduinos. Every SimVim component connects
   to its own numbered port with a straight Cat5 cable; the port pinout
   (same on every port: S0..S3, 5 V, GND, SIG, AUX) is in the README's
   Connections section, keep components and README in sync with it. The
-  `rj_*`, `bb`, `proto_*` and `nano_*` values are guesses until the parts
+  `rj_*`, `proto_*` and `nano_*` values are guesses until the parts
   are measured.
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
