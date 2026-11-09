@@ -23,7 +23,7 @@
 //   are square and without a flange where they meet.
 // - A CD74HC4067 input multiplexer board sits on two standoffs on the back,
 //   in the strip behind the group labels. All switches (and the ignition)
-//   are soldered to it, so only one 7 wire cable runs to the SimVim Mega.
+//   are soldered to it, so only one Cat5 cable runs to the hub (port 1).
 //
 // Wiring: every switch closes one contact: one side to a common GND wire,
 // the other to a mux input (active low, like any switch to GND). ALT and

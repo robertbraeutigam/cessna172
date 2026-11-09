@@ -12,6 +12,7 @@ Each cockpit component has its own directory:
 | [`throttle/`](throttle) | throttle quadrant: throttle, mixture and carb heat |
 | [`switchpanel/`](switchpanel) | the 172N lower left switch panel: ignition key, master, lights, avionics |
 | [`frame/`](frame) | the aluminium frame and panel sheet that everything mounts on |
+| [`hub/`](hub) | the box with the SimVim Mega, the servo Nano and the Cat5 ports |
 
 The pictures below are rendered from the current `master` by the
 [Build](.github/workflows/build.yml) workflow and published, together with
@@ -174,19 +175,178 @@ flange holes are drilled with the box in place.
 | 2 | screw clamp with rubber jaws, 50 mm opening | rail ends onto the desk |
 | 2 | felt pad | on the apron hangers' backs, against the desk edge |
 
-## Connections (plan)
+## Connections
 
-- One hub box under the frame: the SimVim Arduino Mega and a powered USB
-  hub, so one USB cable runs to the PC (Mega, throttle ESP32, Saitek yoke,
-  Saitek radio panel, later the FFB yoke).
-- SimVim modules connect with Cat5 patch cables (RJ45): 5 V, GND, mux
-  S0-S3 (shared by all ports), mux SIG (one Mega pin per port) and one
-  analog line. Each module has one mux and one jack. The switch panel's
-  7 wire mux cable is port 1; the under-desk controls (trim wheel, fuel
-  selector, parking brake) share port 2.
-- Power: USB only for now. With lighting, gauges or the FFB yoke comes one
-  24 V PSU with fused branches, buck converters for 5 V, a separate cut-off
-  switch on the FFB motor power and one star ground at the PSU.
+- The **hub** (see [Hub](#hub)) holds the SimVim Arduino Mega, the Nano
+  that drives the servos and one RJ45 jack per port. A powered USB hub
+  next to it takes the USB cables (Mega, throttle ESP32, Saitek yoke,
+  Saitek radio panel, later the FFB yoke), so one USB cable runs to the PC.
+- Every SimVim component connects to a hub port with a straight Cat5 patch
+  cable. Each component has one CD74HC4067 mux (if it has inputs) and one
+  RJ45 breakout board; everything inside a component is soldered, the
+  plug is the only separation point.
+- Port 1 is the switch panel, port 2 the under-desk pedestal (trim wheel,
+  trim indicator, fuel selector, parking brake). Ports 3-6 are free.
+
+### Port pinout
+
+The same on every port, at both ends of the cable (a straight patch cable
+keeps the pin numbers):
+
+| Pin | T568B color | Signal | At the hub |
+|-----|-------------|--------|------------|
+| 1 | white-orange | S0 | bus, Mega pin 22 |
+| 2 | orange | S1 | bus, Mega pin 23 |
+| 3 | white-green | S2 | bus, Mega pin 24 |
+| 4 | blue | 5 V | bus, Mega 5 V |
+| 5 | white-blue | GND | bus, Mega GND |
+| 6 | green | S3 | bus, Mega pin 25 |
+| 7 | white-brown | SIG | the port's own Mega pin (the mux output) |
+| 8 | brown | AUX | the port's own line: a Mega analog pin, or a Nano servo output |
+
+5 V and GND are one twisted pair. S0-S3 are fixed by SimVim and shared by
+every mux. SIG and AUX are wired per port at the hub, so a component must
+go into its own port (they are numbered); swapping two cables only
+mixes up the inputs in the sim until they are swapped back, it does not
+damage anything.
+
+| Port | Component | SIG | AUX |
+|------|-----------|-----|-----|
+| 1 | switch panel | D26 | A0 (free) |
+| 2 | pedestal | D27 | Nano servo output: trim indicator |
+| 3-6 | free | D28-D31 | A2-A5 |
+
+The SIG pins are suggestions: any free digital pin works, select it in the
+SimVim configurator. AUX carries one analog input (a pot) or one servo
+signal; a component that needs more (several gauge servos) gets a second
+port or its own feed.
+
+**Logic only** goes over the Cat5: the muxes, encoders and hall sensors
+draw a few mA. One small (9 g) servo may take its 5 V from pin 4 too (about
+0.2-0.3 V drop on 2 m of one 24 AWG wire at its current peaks); put a 470 uF
+capacitor across its supply at the servo. GND has to stay in the cable with
+the signals, and the mux 5 V has to come from the Mega, so it is never
+powered while its inputs are not (or the other way round).
+
+### Power (later)
+
+USB only for now. With lighting, gauges or the FFB yoke comes one 24 V PSU
+with fused branches, buck converters for 5 V, a separate cut-off switch on
+the FFB motor power and one star ground at the PSU. Loads (servos,
+backlighting) then get their current from a separate 2 wire 5 V bus with a
+2 pin plug per component (e.g. JST-VH or a 5.08 mm screw terminal), not
+from the Cat5; its GND is tied to the Mega GND at one point in the hub.
+Leave room for that plug in components with loads; the hub has a hole for
+the bus in its right wall.
+
+# Hub
+
+[`hub/`](hub): the box with the Mega, the servo Nano and the Cat5 ports.
+
+[![Hub](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)
+
+`hub.scad` prints the box (`hub_box.stl`, floor down) and the lid
+(`hub_lid.stl`, top down). The box is 249 x 135 x 55 mm with the lid
+(6 ports, `ports`); the build checks that it fits the printer bed.
+
+From the front wall to the back:
+
+- **Ports**: 6 RJ45 breakout boards on standoffs along the front wall,
+  their jacks behind cut-outs in it, numbered 1-6 from the left. Their
+  angled 8 pin headers point into the box. Behind them is a 30 mm strip
+  for the jumpers, then one row of boards:
+- **Mega** (left): on 6 standoffs, its USB jack through the left wall
+  (flush with the outside, so any USB-B plug fits), with a cut-out in
+  front of the power jack for later.
+- **Prototype board** (middle): a 50 x 70 mm board on four standoffs. It
+  carries the bus that all ports share (below), and its free part is for
+  small extra circuits if they are needed (pull-up resistors, a servo
+  capacitor, later the power bus distribution). The hole for the power bus
+  is in the back wall behind it.
+- **Nano** (right): on its own pedestal, upside down with its pins up,
+  so the jumpers plug in from above like on the Mega. Four corner posts
+  carry the PCB by its corners only (clear of the pin solder joints, the
+  ICSP pins and the USB jack under it) and their lips locate it; a drop of
+  hot glue on two posts keeps it there. Its USB jack is at a cut-out in the
+  right wall, so the SimVim firmware can be loaded with the lid on.
+- The boards are about 20 mm apart (at least `board_gap`, 15 mm); the
+  build checks this and the room for a plugged jumper (30 mm) above every
+  board.
+- The lid has a locating lip and is screwed onto four corner posts. Four
+  ears on the floor (5.3 mm holes) screw the box onto the frame (M5 + T-nut)
+  or under the desk.
+
+Nothing on the Mega or the Nano is soldered: they keep their pins free and
+can be reused, and a port is rewired by moving jumpers.
+
+### Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 1 | Arduino Mega 2560 | SimVim main board |
+| 1 | Arduino Nano, headers soldered | SimVim servo controller |
+| 1 | prototype board, 50 x 70 mm | the bus, extra circuits if needed |
+| 6 | female header strip, 10 pin, 2.54 mm | the bus lines |
+| 6 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
+| 22 | M2 x 6 screw | RJ45 boards, prototype board |
+| 6 | M3 x 6 self tapping screw | Mega |
+| 4 | M3 x 10 self tapping screw | lid |
+| - | hot glue | Nano onto its pedestal |
+| ~50 | male-female jumper wire, 20 cm | RJ45 pins to the bus, the Mega and the Nano |
+| ~10 | male-male jumper wire, 10 cm | bus to the Mega |
+| ~4 | female-female jumper wire, 20 cm | RJ45 AUX pins to Nano servo outputs |
+
+Per component: one more RJ45 breakout board and a straight Cat5 patch
+cable.
+
+**MEASURE when they arrive**: the RJ45 boards (`rj_*`): the jack's height
+and its position on the board, the header position and the mounting holes
+(guessed from the listing picture; if they do not match the standoffs, the
+build still works, but fix `rj_holes` before printing). The prototype board's hole positions
+(`proto_*`; if its holes are smaller than M2, use M1.6 screws). The Nano
+(`nano_*`): its size, the first and last pin, and how far the USB jack, the
+pin solder joints and the ICSP pins (if soldered) reach under the PCB
+(`nano_under`, 9 mm). The Mega values are from the Arduino drawing.
+
+### Wiring
+
+**Bus**: six 10 pin female header strips soldered side by side at the
+front edge of the prototype board, one per shared line: 5 V, GND, S0, S1,
+S2, S3. Bridge the 10 pins of each strip on the solder side with a bare
+wire. That is a socket for each port and one for the Mega, plus 3 spare,
+for male jumper pins, like a breadboard. Mark the strips on the board.
+
+| From | To | Jumper |
+|------|----|--------|
+| each port pin 1, 2, 3, 6 (S0, S1, S2, S3) | its bus strip | male-female |
+| each port pin 4, 5 (5 V, GND) | 5 V, GND strip | male-female |
+| each port pin 7 (SIG) | its Mega pin (table above) | male-female |
+| each port pin 8 (AUX) | its Mega analog pin | male-female |
+| | or a Nano servo output | female-female |
+| S0-S3 strips | Mega pins 22-25 | male-male |
+| 5 V, GND strips | Mega 5 V, GND | male-male |
+| Nano 5 V, GND | 5 V, GND strips | male-female |
+| Nano TX | Mega RX2 (pin 17) | male-female |
+| Nano RX | Mega TX2 (pin 16) | male-female |
+
+The Nano lies upside down, so its pin labels are underneath: check them
+before plugging (many clones print them on both sides).
+
+Port 2's AUX goes to the Nano output that SimVim assigns to the trim
+indicator servo (see SimVim's
+[servo controllers](https://simvim.com/gau_servo_ctrl.html) page). The
+Nano gets its firmware from the SimVim plugin over USB: unplug its TX and
+RX jumpers and plug a USB cable in through the right wall.
+
+### Assembly
+
+1. Solder the bus onto the prototype board.
+2. Screw the RJ45 boards onto their standoffs, jacks into the cut-outs.
+3. Screw the prototype board and the Mega onto their standoffs.
+4. Put the Nano upside down onto its pedestal, USB jack to the right wall,
+   and fix it with a drop of hot glue on two posts.
+5. Wire the bus and the ports as above, label the SIG and AUX jumpers.
+6. Screw the lid on.
 
 # Throttle quadrant
 
@@ -341,7 +501,8 @@ it.
 | 1 | CD74HC4067 16 channel mux breakout board | all inputs, see [Multiplexer](#multiplexer) |
 | 2 | M2 x 6 screw | mux onto its standoffs |
 | 7 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
-| 1 | 8 pin straight header + Dupont housing | cable to the Mega |
+| 1 | 8 pin straight header + Dupont housing | mux control pins, to the port board |
+| 1 | RJ45 breakout board (as in the [hub](#hub)) + Cat5 patch cable | hub port 1 |
 | - | wire, heat shrink | see [Wiring](#wiring) |
 
 ### Double rocker switches
@@ -418,7 +579,7 @@ holes.
 All switches and the ignition go to one CD74HC4067 breakout board on the
 back of the switch panel. It is SimVim's standard input extension: 16
 inputs, read through one Mega pin. So everything is soldered on the panels,
-and only one 7 wire cable runs to the Mega.
+and only one Cat5 cable runs to the hub (port 1).
 
 (A SimVim "slave" board does not work here: the only slave for inputs is
 the key matrix board, and it takes momentary buttons only, no toggle
@@ -455,20 +616,24 @@ switch (M, one input per position). In the SimVim configurator assign the
 toggles and rockers as toggle switches (S). Without FUEL PUMP (172N) or the
 OFF hall sensor, one input stays free.
 
-#### Cable to the Mega
+#### Cable to the hub
 
-| Mux pin | Mega |
-|---------|------|
-| S0, S1, S2, S3 | pins 22, 23, 24, 25 (fixed by SimVim, shared by all muxes) |
-| SIG | any free digital pin, select it in the SimVim configurator |
-| VCC | 5 V |
-| GND | GND |
-| EN | not to the Mega: bridge it to GND on the board (enable is active low) |
+The mux goes to hub port 1 (see [Port pinout](#port-pinout)) through an
+RJ45 breakout board behind the switch panel:
 
-Solder the header into the control row (short pin ends towards the panel)
-and plug an 8 pin Dupont housing onto it, with the EN position left empty. A
-second mux elsewhere in the cockpit shares S0..S3; it only needs its own SIG
-pin.
+| Mux pin | RJ45 pin | Mega (at the hub) |
+|---------|----------|-------------------|
+| S0, S1, S2, S3 | 1, 2, 3, 6 | pins 22, 23, 24, 25 (fixed by SimVim, shared by all muxes) |
+| VCC | 4 | 5 V |
+| GND | 5 | GND |
+| SIG | 7 | D26, select it in the SimVim configurator |
+| EN | - | not to the hub: bridge it to GND on the board (enable is active low) |
+
+RJ45 pin 8 (AUX) stays free. Solder the header into the control row (short
+pin ends towards the panel) and plug an 8 pin Dupont housing onto it, with
+the EN position left empty; from there short wires (or female-female
+jumpers) go to the RJ45 board's pins. The RJ45 board has no place on the
+panel yet: tie it to the frame behind the panel for now.
 
 The switches and the hall sensors have no pull-up resistors: this assumes
 SimVim turns on the Mega's internal pull-up on the SIG pin, which its docs
