@@ -78,24 +78,35 @@ Seen from the pilot, left to right:
   A future force feedback yoke bolts to a crossbar in the bay instead.
 - **Saitek radio panel**, with the **throttle box** under it.
 
-The frame overhangs the desk edge by 25 mm (`frame_overhang`: a 2020 and
-5 mm play), so the sheet is 25 mm in front of the desk edge and extrusion
-can go down there; the front rail still lies 15 mm on the desk and the
-yoke housing sits 25 mm behind the sheet. Below the desk top:
+The frame overhangs the desk edge by 22 mm (`frame_overhang`: a 2020 and
+a 2 mm felt pad), so the sheet is 22 mm in front of the desk edge and
+extrusion can go down there; the front rail still lies 18 mm on the desk
+and the yoke housing sits 22 mm behind the sheet.
 
-- **Clamps**: four 2020 hangers under the front rail (a corner bracket on
-  each side, in the rail's front bottom slot), two short ones (52 mm) on
-  the left and the two apron hangers on the right. A printed clamp foot
-  (`clamp_foot.scad`) is screwed onto the side of each hanger with two M5
-  and reaches 45 mm back under the desk top; an M6 thumb screw through a
-  nut in the foot presses up against the desk underside. So the frame
-  clamps itself onto the desk edge, the rail on top, the feet below, and
-  no separate desk clamps are needed.
-- **Apron**, under the throttle: the two right hangers go 199 mm down, a
-  2020 lower bar joins them and a small ACM sheet covers them, flush under
-  the main sheet. It carries the **pedestal** with the trim wheel and the
-  fuel selector, which stands on the lower bar like the throttle box on
-  the rail.
+**Desk clamps**: the 2040 front rail runs 50 mm past the sheet at each
+end (`ear_len`). There a bought screw clamp with rubber jaws clamps each
+rail end onto the desk (the `clamp` view): the fixed jaw on the rail, the
+spine in front of it beside the sheet, the screw jaw on the desk
+underside, both jaws where the rail lies on the desk (`clamp_y`, 31 mm
+from the rail front). The rail is 20 mm and the desk 28 mm, so a clamp
+with a 50 mm opening and at least 33 mm reach fits; the build checks
+`clamp_open`, `clamp_reach` and the jaw size. No printed part is in the
+load path (printed parts creep under constant load), and two clamps about
+1 m apart give well over 2 kN of grip, against 50-100 N of pulling on the
+controls.
+
+Below the desk top:
+
+- **Apron**, under the throttle: two 2020 hangers under the front rail go
+  202 mm down, a 2020 lower bar joins them and a small ACM sheet covers
+  them, flush under the main sheet. Each hanger hangs from the rail by a
+  blind joint: an M5 button head in its tapped top end, the head in the
+  rail's front bottom slot, tightened through a 5 mm access hole drilled
+  down through the rail, and a corner bracket on each side. A felt pad on
+  each hanger's back rests against the desk edge, so pushing the frame
+  away hits a stop. The apron carries the **pedestal** with the trim wheel
+  and the fuel selector, which stands on the lower bar like the throttle
+  box on the rail.
 - **Bay bar**: a 2020 under the yoke bay, screwed under the two front
   rail ends (it also ties them together). The **parking brake** hangs under
   it, directly below the yoke: a thin body (22 mm) under the desk top, two
@@ -125,18 +136,19 @@ components are cut when they arrive.
 
 All values are in `frame.inc.scad`; the layout (cut-outs, screw holes) is
 computed from the component sizes, and the build prints the cut list
-(`echo`). With the current guesses the frame is 985 x 365 mm, the sheet
-985 x 260 mm, the apron sheet 250 x 199 mm.
+(`echo`). With the current guesses the frame is 985 x 362 mm, the sheet
+985 x 260 mm, the apron sheet 250 x 202 mm. With the ears the frame takes
+1085 mm of the desk width.
 
 | File | Parts |
 |------|-------|
 | `frame.inc.scad` | extrusion and sheet standard, component sizes, layout, checks |
 | `frame.scad` | views, cut list |
-| `clamp_foot.scad` | clamp foot (print 4, on its side) |
 
 **MEASURE:** the desk (`desk`, and `desk_skirt` if it has a frame or
 drawer under the top at the front edge), the leg room the pilot needs
-(`knee_w`), the free width between the yoke's own desk clamps
+(`knee_w`), the desk clamps (`clamp_open`, `clamp_reach`, `clamp_w`,
+`clamp_pad_d`), the free width between the yoke's own desk clamps
 (`yoke_clamp_gap`), the Saitek yoke housing (`yoke_housing`,
 guessed 283 mm wide like the radio panel; spec sheet: 310 x 185 mm with the
 wheel), the radio panel body that goes through the sheet (`radio_body`,
@@ -154,11 +166,13 @@ flange holes are drilled with the box in place.
 | Qty | Part | Use |
 |-----|------|-----|
 | 3 | 2040 extrusion, 6 mm slot | front rail left and right, rear rail |
-| 20 | 2020 extrusion, 6 mm slot | 5 crossbars, 4 uprights, top bar, 4 braces (45 degree ends), 4 hangers (2 short), lower bar, bay bar |
-| - | corner brackets, M5 screws, M5 T-nuts | frame joints (2 per hanger at the rail) |
+| 18 | 2020 extrusion, 6 mm slot | 5 crossbars, 4 uprights, top bar, 4 braces (45 degree ends), 2 apron hangers (top end tapped M5), lower bar, bay bar |
+| - | corner brackets, M5 screws, M5 T-nuts | frame joints (2 per apron hanger at the rail) |
 | 2 | 3 mm ACM sheet | panel, cut to frame_w x sheet_h; the apron sheet |
-| 53 | M5 button head screw + T-nut | sheets, clamp feet, bay bar into the rail ends, throttle box, pedestal and parking brake |
-| 4 | M6 x 40 thumb screw + M6 nut | clamp feet against the desk underside |
+| 45 | M5 button head screw + T-nut | sheets, bay bar into the rail ends, throttle box, pedestal and parking brake |
+| 2 | M5 x 12 button head screw | apron hangers' blind joints into the front rail |
+| 2 | screw clamp with rubber jaws, 50 mm opening | rail ends onto the desk |
+| 2 | felt pad | on the apron hangers' backs, against the desk edge |
 
 ## Connections (plan)
 

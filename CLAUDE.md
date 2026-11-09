@@ -56,10 +56,11 @@ its own top-level directory; new components should follow the same layout.
   keep them in sync), the layout and its checks; `frame.scad` has the
   views and the cut list (echo), no printed parts. Every
   component brings its own front face and is screwed onto a cut-out in the
-  sheet; heavy or pulled ones also stand on the frame. Below the desk top,
-  in front of the desk edge: four hangers with printed clamp feet
-  (`clamp_foot.scad`, the clamp foot shape is in `frame.inc.scad`) that
-  clamp the frame onto the desk, an apron under the throttle for the trim
+  sheet; heavy or pulled ones also stand on the frame. The front rail runs
+  past the sheet at both ends (`ear_len`), where two bought screw clamps
+  clamp it onto the desk (no printed parts in the load path: they creep
+  under constant load). Below the desk top, in front of the desk edge: an
+  apron under the throttle for the trim
   wheel / fuel selector pedestal, and a bay bar under the yoke with the
   thin parking brake; `knee_w` around the yoke stays open for the legs.
 
