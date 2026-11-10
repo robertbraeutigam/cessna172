@@ -19,7 +19,7 @@
 //   wide part, and the spring pushes the key back to BOTH.
 // - Sensing: one magnet in the rotor lug, one unipolar (NOT latching)
 //   digital hall sensor per position in the cover, e.g. A3144. The output is
-//   open collector and pulls low over the magnet, so it wires to a SimVim
+//   open collector and pulls low over the magnet, so it wires to a MobiFlight
 //   input like a switch to GND (needs 5V and GND too). Check which magnet
 //   face triggers the sensor before gluing the magnet in.
 //

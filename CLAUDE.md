@@ -22,7 +22,7 @@ its own top-level directory; new components should follow the same layout.
 - `switchpanel/` — the Cessna 172N lower-left switch panel (ignition key,
   master, light switches, ...). Similar in function to the Saitek Switch Panel,
   but it should look as close to the real 172N panel as possible, and every
-  switch position is a raw output wire for SimVim (active low, like a switch
+  switch position is a raw output wire for MobiFlight (active low, like a switch
   to GND). It is two panels printed separately and mounted side by side,
   ignition on the left.
   - `panel.inc.scad` — included by both: back height (`panel_h`, the same
@@ -49,18 +49,19 @@ its own top-level directory; new components should follow the same layout.
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
 
-- `hub/` — `hub.scad`: the box (and lid) with the SimVim Arduino Mega, the
-  servo Nano (upside down on its own pedestal, pins up), a prototype
-  board (bus header, room for extra circuits) and 12 RJ45 breakout
+- `hub/` — `hub.scad`: the box (and lid) with the Arduino Mega running
+  MobiFlight (the Connector on the Windows PC talks to X-Plane; servos and
+  encoders go straight to Mega pins, encoders never through a mux), a
+  prototype board (bus header, room for extra circuits) and 12 RJ45 breakout
   boards in two rows of six (the top row on brass standoffs on the
   bottom one). Pins 1-6 of all RJ45 boards are soldered together (the
   bus); only SIG and AUX of each port and the bus header go to the
-  Arduinos with jumper wires, nothing is soldered on the Arduinos. Every
-  SimVim component connects to its own numbered port with a straight
+  Mega with jumper wires, nothing is soldered on the Mega. Every
+  MobiFlight component connects to its own numbered port with a straight
   Cat5 cable; the port pinout (same on every port: S0..S3, 5 V, GND, SIG,
   AUX) and the port list are in the README's Connections section, keep
-  components and README in sync with them. The `rj_*`, `proto_*` and
-  `nano_*` values are guesses until the parts are measured.
+  components and README in sync with them. The `rj_*` and `proto_*`
+  values are guesses until the parts are measured.
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheet over it. `frame.inc.scad` holds the extrusion/sheet standard, the
