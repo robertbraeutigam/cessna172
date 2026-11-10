@@ -65,7 +65,7 @@ echo(sheet = [frame_w, sheet_h + ext], screws = len(sheet_screws));
 echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut);
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
 echo(apron_sheet = [apron[1] - apron[0], apron_h - ext], apron_screws = len(apron_screws));
-echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts);
+echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts, flaps_cut = flaps_cut);
 echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2, desk_clamps = len(clamp_xs), clamp_y = clamp_y);
 
 // --- Frame ---
@@ -168,6 +168,7 @@ module apron_2d() {
    difference() {
       translate([apron[0], -apron_h]) square([apron[1] - apron[0], apron_h - ext]);
       rect(pedestal_cut);
+      rect(flaps_cut);
       for (p = apron_screws)
          translate(p) circle(d = m5_d);
    }
@@ -293,16 +294,27 @@ module under_box(x, size) {
 
 module pedestal_part() {
    under_box(pedestal_x, pedestal_size);
-   // trim wheel rim out of a slot in the face, fuel selector below it
+   // trim wheel rim out of a slot in the face, trim indicator slot below it
    z = apron_bar_z + pedestal_size.z;
-   color("#222") {
+   color("#222")
       translate([pedestal_x - 6, under_y0 + 40, z - 55])
          rotate([0, 90, 0]) cylinder(d = 100, h = 12);
-      translate([pedestal_x, under_y0, apron_bar_z + 35]) {
-         rotate([90, 0, 0]) cylinder(d = 50, h = 6);
-         translate([0, -10, 0]) cube([12, 10, 50], center = true);
-      }
+   color("#ddd")
+      translate([pedestal_x - 4, under_y0 - 0.5, apron_bar_z + 12]) cube([8, 1, 28]);
+}
+
+// Bought flaps panel: front plate on the apron sheet, body behind it,
+// lever and indicator on the plate
+module flaps_part() {
+   y = -sheet_t;
+   color(c_device) {
+      translate([flaps_face[0], y - 3, flaps_face[1]])
+         cube([flaps_plate.x, 3, flaps_plate.y]);
+      translate([flaps_x - flaps_body.x / 2, 0, flaps_z - flaps_body.y / 2])
+         cube([flaps_body.x, flaps_body.z - sheet_t, flaps_body.y]);
    }
+   color("#ddd") translate([flaps_x - 18, y - 3.5, flaps_z - 20]) cube([2, 1, 40]);
+   color("#eee") translate([flaps_x + 4, y - 15, flaps_z + 8]) cube([16, 12, 6]);
 }
 
 // Parking brake: body under the desk top behind the bottom bar, a tab up to
@@ -333,6 +345,7 @@ module components() {
    switch_panel_part();
    throttle_part();
    pedestal_part();
+   flaps_part();
    park_part();
    clamps_part();
 }
@@ -358,6 +371,7 @@ module under_view() {
          frame_part();
          sheet_part();
          pedestal_part();
+         flaps_part();
          park_part(set = true);
          clamps_part();
          throttle_part();
