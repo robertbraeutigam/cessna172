@@ -297,7 +297,7 @@ patch cable to length, or in half for two components:
 
 | Port | Component | SIG | AUX |
 |------|-----------|-----|-----|
-| 1 | pedestal: fuel selector (mux), trim indicator (servo) | D26 | D2 (servo) |
+| 1 | pedestal: mux (parking brake, more later), trim indicator (servo) | D26 | D2 (servo) |
 | 2 | throttle quadrant (open, see below) | D27 | A1 |
 | 3 | switch panel | D28 | A2 (free) |
 | 4 | yoke handle: PTT, trim switch, more buttons (FFB yoke, later) | D29 | A3 |
