@@ -27,11 +27,13 @@ its own top-level directory; new components should follow the same layout.
   ignition on the left.
   - `panel.inc.scad` — included by both: back height (`panel_h`, the same
     for both), thickness, rim, face flange (`flange_w`) with the mount
-    holes, lettering, and the `panel_blank` plate (square corners and no
+    holes, lettering, the separate front face (`face_t`, printed front
+    side up, labels standing out of it for a paint pen) and the
+    `panel_blank` plate (square corners and no
     flange where the panels meet). The back goes through a hole in the
     frame's sheet, the flange is screwed onto it; `frame/frame.inc.scad`
     repeats these sizes.
-  - `ignition.scad` — its panel (labels engraved) and the
+  - `ignition.scad` — its panel and face and the
     OFF/R/L/BOTH/START key switch built around a cheap
     mailbox cam lock (its 90° stop removed). It has a ball detent, end stops
     on a rotor lug, a spring-return START (pin + shoe + spring in an arc slot),
@@ -41,9 +43,9 @@ its own top-level directory; new components should follow the same layout.
   - `switches.scad` — a separate panel with the switch row: a red double
     rocker for MASTER (ALT, BAT), M12 toggles in the middle (lights,
     pitot heat, fuel pump) and a black double rocker for
-    AVIONICS (BUS 1, BUS 2), with the labels engraved. Above the toggles
-    is a row of printed dummy circuit breakers (`breakers`, for show only,
-    glued into hex pockets). A CD74HC4067
+    AVIONICS (BUS 1, BUS 2), with the labels on its face. Above the
+    toggles is a row of printed dummy circuit breakers (`breakers`, for
+    show only, glued into hex holes in the face). A CD74HC4067
     input mux on standoffs on the back collects all switches and the
     ignition, so one Cat5 cable runs to hub port 3 (soldered to the mux,
     tied onto `tie_block` next to it). The switch list

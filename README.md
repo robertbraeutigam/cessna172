@@ -546,14 +546,18 @@ The positions (30° apart) should be verified against the real switch.
 
 `switches.scad`: the switch row. The red split MASTER (ALT, BAT) on the
 left, toggle switches in the middle (FUEL PUMP, BEACON, LAND, TAXI, NAV,
-STROBE, PITOT HEAT) and the split AVIONICS (BUS 1, BUS 2) on the right, with
-the labels engraved. Up is ON, like in the airplane. Above the toggles is a
+STROBE, PITOT HEAT) and the split AVIONICS (BUS 1, BUS 2) on the right.
+Up is ON, like in the airplane. Above the toggles is a
 row of circuit breakers, like on the real panel; they are for show only.
 
 The switch list (`groups` in the source) drives the layout; it follows the
 X-Plane 172 SP. For a 172N remove FUEL PUMP and the panel gets shorter. The
-panel is 221.6 x 100 mm (the back 211.6 x 80 mm), printed front side
-down; the switches and labels need about 68 mm of the back's height, the
+panel is 221.6 x 100 mm (the back 211.6 x 80 mm). Like the ignition, its
+front is a separate 1 mm face with the labels standing 0.8 mm out of it,
+for a white paint pen; the face is printed front side up
+(`switches_face.stl`), the panel front side down, so neither needs
+supports, and together they are 3 mm thick. The toggle nuts, the rocker
+lips and the mount screws clamp the face on. The switches and labels need about 68 mm of the back's height, the
 rest is split between above and below them. The rim on the back stiffens
 it.
 
@@ -580,7 +584,8 @@ in red for MASTER and black for AVIONICS. Two independent rockers side by
 side in one housing, tall and narrow like the real split switches.
 
 They snap into a cutout from the front: ramps on their top and bottom end
-catch behind the panel, which is thinned there by a pocket in the back.
+catch behind the face and the panel, which is thinned there by a pocket
+in the back, to 0.5 mm behind the 1 mm face.
 Dimensions from the listing (`rk_*`):
 
 - panel cutout 22 x 28.5 mm (width x height)
@@ -628,8 +633,8 @@ The real 172N has a row of push-to-reset circuit breakers above the
 switches, each with its name on the panel above it and its rating (A) on
 the button. Here they are non-functional dummies: a hex nut with a button
 on top and the rating engraved into the button, all printed as one part
-(`switches_breakers.stl`, nut side down). They are glued into 1 mm deep hex
-pockets in the front of the panel, which locate them and keep them
+(`switches_breakers.stl`, nut side down). They are glued into hex holes in
+the 1 mm face, onto the panel behind it, which locate them and keep them
 straight; nothing goes through the panel. Print them in black and paint the
 nut silver and the rating white, or print the nut and the button in
 different colors.
@@ -639,8 +644,8 @@ toggles, one above each, from the left; the build checks that the row
 still fits the panel height, and the top middle mount screw moves between
 two breakers. Real breakers
 (e.g. Klixon push-to-reset) would need a bigger hole and room behind the
-panel, so making them functional later means changing the pockets into
-holes.
+panel, so making them functional later means a hole through the panel
+as well.
 
 ### Multiplexer
 
@@ -732,7 +737,8 @@ solder and heat shrink.
 
 1. Solder the wires to the switches first; the rockers are hard to get out
    again once snapped in.
-2. Put the toggles in from the back and tighten their nuts.
+2. Lay the face on the front, put the toggles in from the back and
+   tighten their nuts.
 3. Snap the rockers in from the front.
 4. Solder the other wire ends to the mux and screw it onto its standoffs.
 5. Solder the Cat5 cable to the mux control row and tie it onto its

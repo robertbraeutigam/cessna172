@@ -64,8 +64,6 @@ tick_len = 3;
 tick_w = 0.6;
 title = "MAGNETOS";          // above the position labels, "" for none
 title_gap = 2;
-face_t = 1;                  // separate front face, the panel's plate is panel_t - face_t
-label_raise = 0.8;           // labels and ticks stand out of the face, for a paint pen
 panel_screw_head_d = 5.5;    // M3 socket head, the face has holes around them
 
 // --- Mailbox lock (MEASURE: guesses until the lock arrives) ---
@@ -194,7 +192,6 @@ assert(magnet_r + magnet_w / 2 + 0.1 + 1 <= lug_r, "Magnet pocket breaks through
 assert(rotor_t - magnet_h - 0.2 >= 1.2, "Magnet pocket floor too thin");
 assert(magnet_r * min(pitch, start_pitch) * PI / 180 >= sensor_w + 4, "Hall sensors too close to each other");
 assert(half + 0.5 <= panel_h / 2 - rim_w, "Housing does not fit between the panel rims, make panel_h higher");
-assert(face_t >= 0.8 && panel_t - face_t >= 1.6, "Face or panel plate too thin");
 assert(title == "" || title_y + group_label_size <= panel_h / 2 - 3, "Title too close to the top edge");
 assert(tick_r >= lock_flange_d / 2 + 0.5 && tick_r + tick_len <= label_r - label_size, "Ticks run into the lock or the labels");
 
