@@ -178,7 +178,7 @@ flange holes are drilled with the box in place.
 ## Connections
 
 - The **hub** (see [Hub](#hub)) holds the Arduino Mega with the MobiFlight
-  firmware and 12 RJ45 ports. A powered USB hub next to it takes the USB
+  firmware and 6 RJ45 ports. A powered USB hub next to it takes the USB
   cables (Mega, throttle ESP32, Saitek yoke, Saitek radio panel, later the
   FFB yoke), so one USB cable runs to the PC.
 - Every MobiFlight component connects to a hub port with a straight Cat5
@@ -264,12 +264,18 @@ patch cable to length, or in half for two components:
 | 3 | switch panel | D28 | A2 (free) |
 | 4 | yoke handle: PTT, trim switch, more buttons (FFB yoke, later) | D29 | A3 |
 | 5 | pedestal: trim wheel encoder | D30 (encoder A) | D38 (encoder B) |
-| 6-12 | free | D31-D37 | A5-A11 |
+| 6 | free | D31 | A5 |
 
 The pins are suggestions: any free pin works, select it in the MobiFlight
 Connector. AUX carries one analog input (a pot, on an analog pin), one servo
 signal or one encoder line (on a digital pin); a component that needs more
 (an encoder, several gauge servos) gets a second port.
+
+A Mega takes at most 6 multiplexers in MobiFlight (`MaxInputMultiplexer`
+in its board file), so one hub has 6 ports. If the cockpit needs more
+ports, it gets a second hub with its own Mega and its own bus, on its own
+USB cable to the powered USB hub; the Connector shows it as a second
+board. Two Megas can not drive the same S0-S3 bus.
 
 - **Parking brake**: one switch, on the mux of the pedestal or of the yoke
   port, whichever cable runs closer (it hangs under the yoke).
@@ -313,19 +319,16 @@ the bus in its back wall.
 
 `hub.scad` prints the box (`hub_box.stl`, floor down) and the lid
 (`hub_lid.stl`, top down). The box is 249 x 135 x 55 mm with the lid
-(2 rows of 6 ports, `port_rows`, `port_cols`); the build checks that it
-fits the printer bed.
+(one row of 6 ports, `port_cols`); the build checks that it fits the
+printer bed.
 
 From the front wall to the back:
 
-- **Ports**: 12 RJ45 breakout boards in two rows along the front wall,
-  their jacks behind cut-outs in it, numbered 1-6 (bottom row) and 7-12
-  (top row) from the left, the numbers beside the jacks. The bottom
-  boards are screwed onto bosses on the floor with M2 screws from below
-  (their heads in counterbores). The top boards stand on 20 mm M2 brass
-  standoffs screwed onto those screws, in the same holes, so nothing has to
-  be reached under the top row. Their angled 8 pin headers point into the
-  box. Behind them is a 30 mm strip for the jumpers, then one row of
+- **Ports**: 6 RJ45 breakout boards in a row along the front wall,
+  their jacks behind cut-outs in it, numbered 1-6 from the left, the
+  numbers beside the jacks. The boards are screwed onto bosses on the
+  floor with M2 self tapping screws from above. Their angled 8 pin headers
+  point into the box. Behind them is a 30 mm strip for the jumpers, then one row of
   boards:
 - **Mega** (left): on 6 standoffs, its USB jack through the left wall
   (flush with the outside, so any USB-B plug fits), with a cut-out in
@@ -354,15 +357,13 @@ lid on.
 | 1 | Arduino Mega 2560 | MobiFlight board |
 | 1 | prototype board, 50 x 70 mm | bus header, extra circuits if needed |
 | 1 | female header strip, 8 pin, 2.54 mm | bus header |
-| 12 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
-| 18 | M2 x 20 female-female brass standoff | top row on the bottom row |
-| 18 | M2 x 12 screw | bottom row, from below through the floor |
-| 18 | M2 x 5 screw | top row |
+| 6 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
+| 18 | M2 x 6 self tapping screw | RJ45 boards |
 | 4 | M2 x 6 screw | prototype board |
 | 6 | M3 x 6 self tapping screw | Mega |
 | 4 | M3 x 10 self tapping screw | lid |
 | - | insulated wire, about 0.25 mm2, 6 colors | the bus |
-| ~25 | male-female jumper wire, 20 cm | RJ45 SIG and AUX pins to the Mega |
+| ~12 | male-female jumper wire, 20 cm | RJ45 SIG and AUX pins to the Mega |
 | ~6 | male-male jumper wire, 10 cm | bus header to the Mega |
 
 Per port used: a stranded copper Cat5 patch cable, soldered at the
@@ -371,22 +372,18 @@ component end (see [Cables](#cables)).
 **MEASURE when they arrive**: the RJ45 boards (`rj_*`): the jack's height
 and its position on the board, the header position and the mounting holes
 (guessed from the listing picture; fix `rj_holes` before printing, the
-build checks that the brass standoffs clear the jack and the header). If
-the jack is taller than 13.5 mm, take longer standoffs (`rj_stack`). The
+build checks that the bosses stay on the board). The
 prototype board's hole positions (`proto_*`; if its holes are smaller than
 M2, use M1.6 screws). The Mega values are from the Arduino drawing.
 
 ### Wiring
 
-**Bus**: pins 1-6 of all 12 boards are soldered together, one insulated
+**Bus**: pins 1-6 of all 6 boards are soldered together, one insulated
 wire per line (S0, S1, S2, 5 V, GND, S3; one color each):
 
-- Along each row: one wire per pin number, from port 1 to port 6 (and 7 to
-  12). Strip a short piece of insulation where it passes each pin and
+- Along the row: one wire per pin number, from port 1 to port 6. Strip a short piece of insulation where it passes each pin and
   solder it there, at the pin's base by the header, so it does not touch
   the other pins it crosses.
-- Between the rows: a short wire from each of port 1's pins 1-6 up to the
-  same pin of port 7.
 - To the prototype board: six wires from port 1's pins 1-6 to an 8 pin
   female header on it: S0, S1, S2, S3, 5 V, GND, 5 V, GND.
 
@@ -404,15 +401,12 @@ device on that pin in the Connector.
 
 ### Assembly
 
-1. Screw the bottom row in: the M2 x 12 screws from below through the
-   floor and the board, the brass standoffs onto them from above.
-2. Solder the bottom row's bus wires.
-3. Screw the top row onto the standoffs (M2 x 5), solder its bus wires and
-   the links between the rows.
-4. Solder the bus header onto the prototype board and wire it to port 1.
-5. Screw the prototype board and the Mega onto their standoffs.
-6. Plug the jumpers as above, label the SIG and AUX jumpers.
-7. Screw the lid on.
+1. Screw the RJ45 boards onto their bosses (M2 x 6).
+2. Solder the bus wires along the row.
+3. Solder the bus header onto the prototype board and wire it to port 1.
+4. Screw the prototype board and the Mega onto their standoffs.
+5. Plug the jumpers as above, label the SIG and AUX jumpers.
+6. Screw the lid on.
 
 # Throttle quadrant
 

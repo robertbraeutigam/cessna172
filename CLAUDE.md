@@ -53,9 +53,9 @@ its own top-level directory; new components should follow the same layout.
 - `hub/` — `hub.scad`: the box (and lid) with the Arduino Mega running
   MobiFlight (the Connector on the Windows PC talks to X-Plane; servos and
   encoders go straight to Mega pins, encoders never through a mux), a
-  prototype board (bus header, room for extra circuits) and 12 RJ45 breakout
-  boards in two rows of six (the top row on brass standoffs on the
-  bottom one). Pins 1-6 of all RJ45 boards are soldered together (the
+  prototype board (bus header, room for extra circuits) and 6 RJ45 breakout
+  boards in one row (MobiFlight takes at most 6 muxes per Mega; more
+  ports means a second hub with its own Mega). Pins 1-6 of all RJ45 boards are soldered together (the
   bus); only SIG and AUX of each port and the bus header go to the
   Mega with jumper wires, nothing is soldered on the Mega. Every
   MobiFlight component connects to its own numbered port with a Cat5
