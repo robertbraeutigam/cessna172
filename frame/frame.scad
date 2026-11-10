@@ -9,10 +9,11 @@
 // no printed parts.
 //
 // Bought parts (lengths: see the echo of the build, or the README):
-// - 2020 extrusion, front part: top bar, bottom bar, 4 uprights, throttle
-//   bar, 2 apron hangers, lower bar
+// - 2020 extrusion, front part: top bar, bottom bar, 4 uprights,
+//   2 apron hangers, lower bar
 // - 2020 extrusion, desk part: front rail left, front rail right, rear
-//   rail, 5 crossbars, 4 braces (45 degree ends)
+//   rail, 5 crossbars, 4 braces (cut square)
+// - 8 45 degree connectors for 2020, one at each brace end
 // - corner brackets, M5 screws and T-nuts (6 mm slot)
 // - 3 mm ACM sheet, frame_w x (sheet_h + ext), and the apron sheet
 // - 2 screw clamps with rubber jaws, at least ext + desk.z opening
@@ -21,8 +22,7 @@
 //
 // Assembly:
 // 1. Front part, flat on the floor: the bottom bar, the uprights on it,
-//    the top bar on them, the throttle bar between the right two uprights
-//    on the bottom bar, the two hangers under the bottom bar and the lower
+//    the top bar on them, the two hangers under the bottom bar and the lower
 //    bar between their ends, all with corner brackets.
 // 2. Cut the sheets (cuts, sheet_screws, apron_screws in the echo, the
 //    "sheet" view), drill their screw holes, and screw them onto the front
@@ -31,13 +31,13 @@
 // 4. Put the desk part on the desk, stand the front part in front of the
 //    desk edge, its bottom bar against the edge (felt pads), and bolt it
 //    on: a corner bracket from each upright's back to the front rail, the
-//    throttle bar to the front rail, the braces from the uprights to the
-//    crossbars. Clamp each rail end (ear) onto the desk with a screw
-//    clamp. Put the yoke into the bay, its front on the bottom bar, and
+//    braces from the uprights to the crossbars with a 45 degree connector
+//    on each end, in the obtuse angle. Clamp each rail end (ear) onto
+//    the desk with a screw clamp. Put the yoke into the bay, its front on the bottom bar, and
 //    clamp it with its own clamps.
-// 5. Push the throttle box through its cut-out onto the throttle bar, the
-//    rail and the middle crossbar until its face is on the sheet, bolt its
-//    floor into the throttle bar (throttle_bolts), drill the sheet through
+// 5. Push the throttle box through its cut-out onto the rail and the
+//    middle crossbar until its face is on the sheet, bolt its floor into
+//    the rail (throttle_bolts), drill the sheet through
 //    its flange holes and screw the flange on (M3, nuts behind the sheet).
 //    The pedestal goes in the same way onto the lower bar, the parking
 //    brake under the bottom bar, when they exist.
@@ -57,10 +57,10 @@ c_switch = "#3a3d42";
 
 echo(frame = [frame_w, frame_d, sheet_h]);
 echo(front_part_2020 = [["top bar", frame_w], ["bottom bar", frame_w], ["4 uprights", upright_len],
-                        ["throttle bar", throttle_bar[1] - throttle_bar[0]], ["2 hangers", hanger_len],
+                        ["2 hangers", hanger_len],
                         ["lower bar", apron_bar_len]]);
 echo(desk_part_2020 = [["front rail left", rails[0][1] - rails[0][0]], ["front rail right", rails[1][1] - rails[1][0]],
-                       ["rear rail", frame_w], ["5 crossbars", crossbar_len], ["4 braces, long edge", brace_long]]);
+                       ["rear rail", frame_w], ["5 crossbars", crossbar_len], ["4 braces, cut square", brace_len]]);
 echo(sheet = [frame_w, sheet_h + ext], screws = len(sheet_screws));
 echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut);
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
@@ -74,19 +74,23 @@ module bar(p0, size) {
    color(c_alu) translate(p0) cube(size);
 }
 
-// 45 degree brace behind the upright at x: its long edge from the
-// upright's back under the top bar down to the crossbar, ends cut flush to
-// them
+// 45 degree brace behind the upright at x, cut square: its inner edge
+// from the upright's back at brace_top down to the crossbar top, and a 45
+// degree connector in the obtuse angle at each end (drawn on its +x side)
 module brace(x) {
    a = [ext, brace_top];
    d = [1, -1] / sqrt(2);       // along the brace (y, z)
-   n = [-1, -1] / sqrt(2);      // towards the corner
-   color(c_alu)
-      intersection() {
-         translate([x - 1, ext, ext]) cube([ext + 2, frame_d, sheet_h]);
-         multmatrix([[1, 0, 0, x], [0, d.x, n.x, a.x], [0, d.y, n.y, a.y], [0, 0, 0, 1]])
-            translate([0, -ext * 2, 0]) cube([ext, brace_long + ext * 4, ext]);
-      }
+   o = [1, 1] / sqrt(2);        // away from the corner
+   multmatrix([[1, 0, 0, x], [0, d.x, o.x, a.x], [0, d.y, o.y, a.y], [0, 0, 0, 1]])
+      color(c_alu) cube([ext, brace_len, ext]);
+   // connectors (view only): one leg on the brace, one on the upright / crossbar
+   color("#5a6068") translate([x + ext, 0, 0]) rotate([0, 90, 0]) linear_extrude(3)
+      for (e = [[a, [0, 1], d], [a + brace_len * d, [1, 0], -d]])
+         hull() {
+            translate([-(e[0].y + 2), e[0].x + 2]) square(1);
+            translate([-(e[0].y + 2 + 30 * e[1].y), e[0].x + 2 + 30 * e[1].x]) square(1);
+            translate([-(e[0].y + 2 + 30 * e[2].y), e[0].x + 2 + 30 * e[2].x]) square(1);
+         }
 }
 
 module front_part() {
@@ -94,7 +98,6 @@ module front_part() {
    bar([0, 0, -ext], [frame_w, ext, ext]);
    for (x = upright_xs)
       bar([x, 0, 0], [ext, ext, upright_len]);
-   bar([throttle_bar[0], 0, 0], [throttle_bar[1] - throttle_bar[0], ext, ext]);
    // apron
    for (x = hangers)
       bar([x, 0, -ext - hanger_len], [ext, ext, hanger_len]);

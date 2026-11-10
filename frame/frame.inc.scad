@@ -18,8 +18,7 @@
 //
 // - Front part, vertical, in front of the desk edge: a rectangle (top bar,
 //   bottom bar, an upright at each end) with an upright on each side of the
-//   yoke bay, and the throttle bar between the right two uprights, on the
-//   bottom bar, that the throttle box stands on. The bottom bar lies just
+//   yoke bay. The bottom bar lies just
 //   under the desk top (its top at desk height), its back against the desk
 //   edge (a felt pad); the yoke's front sits on it, the yoke's own clamps go
 //   around it and the desk. Under the throttle a smaller rectangle hangs
@@ -29,7 +28,9 @@
 // - Desk part, flat on the desk behind it: a ladder (front rail, rear rail,
 //   crossbars) with the front rail cut at the yoke bay. The front part is
 //   bolted to its front rail, and a 45 degree brace from each upright down
-//   to a crossbar stops it from rocking.
+//   to a crossbar stops it from rocking: a stock length, cut square, held
+//   by a bought 45 degree connector at each end. The throttle box stands on the
+//   front rail and the crossbar under its middle.
 //
 // The front rail runs past the sheet at both ends (ear_len): there a
 // bought screw clamp (rubber jaws) on each end clamps the rail onto the
@@ -37,22 +38,24 @@
 // knee_w around the yoke stays open for the legs; only the bottom bar and
 // the thin parking brake are there, just under the desk top.
 //
-// Lengths are rounded up (round_w, round_d, round_h), so most bars are
-// round stock lengths.
+// Lengths are rounded to stock lengths (multiples of round_d), except the
+// apron's lower bar. The height is the lowest that the parts on the sheet
+// allow, with stock length uprights.
 
 // --- Extrusion: 2020 only, 6 mm slot, M5 T-nuts everywhere ---
 ext = 20;
 round_w = 100;               // frame width rounded up to this
-round_d = 50;                // crossbars
-round_h = 10;                // apron hangers and lower bar
+round_d = 50;                // the other bars rounded to this (stock lengths)
+round_cut = 10;              // the apron's lower bar: between the leg room and the pedestal, no stock length fits
+brace_len = 200;             // a stock length, cut square
 slot_w = 6;
 m5_d = 5.3;                  // M5 clearance, sheet and printed parts
 m5_head_d = 9.5;             // button head
 
 // --- Sheet ---
 sheet_t = 3;                 // ACM, the same as the printed panel_t
-sheet_h = 260;               // panel height above the desk; limited by the monitor
-                             // (the sheet also covers the bottom bar, ext more)
+sheet_h_max = 260;           // panel height above the desk at most; limited by the monitor
+                             // (sheet_h is computed from the parts on it)
 sheet_edge = 25;             // sheet edge to a cut-out, at least
 sheet_web = 20;              // sheet between two cut-outs, at least
 screw_edge = 6;              // screw hole center to a cut-out, at least
@@ -67,13 +70,14 @@ edge_play = 2;               // front part back to the desk edge: a felt pad, th
 frame_overhang = ext + edge_play;     // frame front in front of the desk edge
 
 // --- Saitek Pro Flight Yoke, MEASURE ---
-// Spec sheet: 310 mm wide (the wheel), 185 mm high, 380-464 mm deep with the
-// shaft in / out. The housing is about as wide as the radio panel that sat
-// on it (from memory).
-yoke_housing = [283, 280, 185];   // housing body: width, depth, height
+// Spec sheet: 310 mm wide (the wheel), 380-464 mm deep with the shaft in /
+// out. The housing is about 100 mm high and about as wide as the radio
+// panel that sat on it (from memory).
+yoke_housing = [283, 280, 100];   // housing body: width, depth, height
+ffb_h = 130;                 // the future force feedback yoke's height, the notch is made for it
 yoke_front_y = 0;            // housing front, on the bottom bar; its clamps go around the bar and the desk
 yoke_play = 5;               // housing to the bay sides and the notch top
-yoke_shaft_z = 120;          // shaft center above the desk (view only)
+yoke_shaft_z = 65;           // shaft center above the desk (view only)
 yoke_wheel_w = 310;          // view only
 
 // --- Saitek Pro Flight Radio Panel, MEASURE ---
@@ -87,11 +91,12 @@ radio_depth = 55;            // behind the sheet
 
 // --- Throttle box, from throttle/throttle_box.scad ---
 // The box (full_width x (depth + 2 * roundness) x height, open top) goes
-// through its cut-out and stands on the throttle bar, the front rail and
-// the middle crossbar. Its front wall (face_t) is the face; the flange
-// (flange_w, on the top and the two sides, none at the bottom) is screwed
-// onto the sheet with M3 (drill through the box's holes), and two M5 bolts
-// through its floor go into the throttle bar's top slot.
+// through its cut-out and stands on the front rail and the middle
+// crossbar, its front overhanging the front part. Its front wall (face_t)
+// is the face; the flange (flange_w, on the top and the two sides, none at
+// the bottom) is screwed onto the sheet with M3 (drill through the box's
+// holes), and two M5 bolts through its floor go into the front rail's top
+// slot.
 throttle_size = [150, 190, 50];
 throttle_rod_xs = [20, 75, 130];  // roundness + end_gap + i * control_gap
 throttle_rod_z = 38;         // wall + stand + pot module + 15 + 7
@@ -99,7 +104,7 @@ throttle_face_t = 3;         // face_t
 throttle_flange = 10;        // flange_w
 throttle_play = 1;           // box to its cut-out, sheet_cut_clear
 throttle_bolt_xs = [47.5, 102.5]; // floor_bolt_xs
-throttle_bolt_y = 16;        // floor_bolt_y, from the face front
+throttle_bolt_y = 36;        // floor_bolt_y, from the face front
 
 // --- Switch panel, from switchpanel/ ---
 // The backs of the ignition (77) and the switches (211.6), panel_h high,
@@ -168,8 +173,6 @@ x_rc = (x_r0 + x_r1) / 2;
 
 // front part
 upright_xs = [0, x_bay0 - ext, x_bay1, frame_w - ext];   // left sides
-upright_len = sheet_h - ext;                 // on the bottom bar, under the top bar
-throttle_bar = [x_bay1 + ext, frame_w - ext];            // [x0, x1], on the bottom bar
 throttle_x0 = x_rc - throttle_size.x / 2;
 throttle_y0 = -sheet_t - throttle_face_t;    // face front, the face on the sheet
 
@@ -182,8 +185,13 @@ radio_cut = [x_rc - radio_body.x / 2 - 0.5, throttle_cut[3] + sheet_web,
 radio_front_z0 = radio_cut[1] + 0.5 - (radio_front.y - radio_body.y) / 2;
 switch_cut = [x_sw0 + switch_flange - switch_cut_clear, switch_z + switch_flange - switch_cut_clear,
               x_sw1 - switch_flange + switch_cut_clear, switch_z + switch_flange + switch_back.y + switch_cut_clear];
-bay_cut = [x_bay0, 0, x_bay1, yoke_housing.z + yoke_play];
+bay_cut = [x_bay0, 0, x_bay1, max(yoke_housing.z, ffb_h) + yoke_play];
 cuts = [switch_cut, bay_cut, throttle_cut, radio_cut];   // [x0, z0, x1, z1] on the sheet
+
+// Height: sheet_web over the highest cut-out (or the radio front), then the
+// top bar; the uprights (on the bottom bar, under the top bar) a stock length
+upright_len = ceil((max(radio_front_z0 + radio_front.y, bay_cut[3], switch_cut[3]) + sheet_web) / round_d) * round_d;
+sheet_h = upright_len + ext;                 // panel height above the desk (the sheet also covers the bottom bar, ext more)
 
 // desk part: the front rail behind the front part, cut at the bay
 crossbar_xs = concat(upright_xs, [x_rc - ext / 2]);      // the last one carries the throttle box
@@ -191,12 +199,16 @@ crossbar_len = ceil((max(yoke_front_y + yoke_housing.y, throttle_y0 + throttle_s
 rear_y = 2 * ext + crossbar_len;
 frame_d = rear_y + ext;
 // front rail left and right, [x0, x1]: at least ear_len past the sheet, rounded up
-rails = [[x_bay0 - ceil((x_bay0 + ear_len) / round_h) * round_h, x_bay0],
-         [x_bay1, x_bay1 + ceil((frame_w - x_bay1 + ear_len) / round_h) * round_h]];
+rails = [[x_bay0 - ceil((x_bay0 + ear_len) / round_d) * round_d, x_bay0],
+         [x_bay1, x_bay1 + ceil((frame_w - x_bay1 + ear_len) / round_d) * round_d]];
 clamp_xs = [rails[0][0] + ear_len / 2, rails[1][1] - ear_len / 2];   // desk clamps, on the rail ends
-brace_top = sheet_h - 2 * ext;               // its long edge on the upright's back, under the top bar
-brace_rise = brace_top - ext;                // down to the crossbar top
-brace_long = brace_rise * sqrt(2);
+brace_room = 30;             // upright above the brace, for the connector's leg
+// Brace: its inner edge (towards the corner) from the upright's back at
+// brace_top down to the crossbar top, brace_rise lower and further back;
+// a 45 degree connector in the obtuse angle at each end, so at the top the
+// upright needs brace_room above it
+brace_rise = brace_len / sqrt(2);
+brace_top = ext + brace_rise;
 
 // --- Below the desk top (z < 0) ---
 yoke_c = (x_bay0 + x_bay1) / 2;
@@ -204,10 +216,10 @@ legs = [yoke_c - knee_w / 2, yoke_c + knee_w / 2];       // open for the legs
 under_z = desk.z + desk_skirt + desk_clear;              // desk top to the top of the bodies
 // Apron: two hangers under the bottom bar (corner brackets), the right one
 // under the end upright, and the lower bar between their ends
-hanger_len = ceil((under_z + pedestal_size.z + under_play - ext) / round_h) * round_h;
+hanger_len = ceil((under_z + pedestal_size.z + under_play - ext) / round_d) * round_d;
 apron_bar_z = -ext - hanger_len;                         // top of the lower bar
 apron_h = -apron_bar_z + ext;                            // desk top to the apron bottom
-apron_bar_len = floor((frame_w - 2 * ext - legs[1]) / round_h) * round_h;
+apron_bar_len = floor((frame_w - 2 * ext - legs[1]) / round_cut) * round_cut;
 hangers = [frame_w - 2 * ext - apron_bar_len, frame_w - ext];   // left sides
 apron_bar = [hangers[0] + ext, hangers[1]];
 apron = [hangers[0], frame_w];                           // [x0, x1] of the apron sheet, z -apron_h .. -ext
@@ -238,7 +250,7 @@ apron_screws = [for (p = concat(
       [for (h = hangers, z = spread(-apron_h + ext / 2, -ext - ext / 2, screw_step_upright)) [h + ext / 2, z]],
       [for (x = spread(apron_bar[0] + ext / 2, apron_bar[1] - ext / 2, screw_step)) [x, -apron_h + ext / 2]]))
    if (clear_of(p, [pedestal_cut, pedestal_face], screw_edge)) p];
-// M5 through the throttle box floor into T-nuts in the throttle bar's top slot, [x, y]
+// M5 through the throttle box floor into T-nuts in the front rail's top slot, [x, y]
 throttle_bolts = [for (x = throttle_bolt_xs) [throttle_x0 + x, throttle_y0 + throttle_bolt_y]];
 // M5 through the pedestal floor into T-nuts in the lower bar's top slot, [x, y]
 pedestal_bolts = [for (s = [-1, 1]) [pedestal_x + s * pedestal_size.x / 4, under_y0 + under_bolt_y]];
@@ -247,23 +259,25 @@ pedestal_bolts = [for (s = [-1, 1]) [pedestal_x + s * pedestal_size.x / 4, under
 assert(gap >= ext + 3 && margin >= ext + 3, "No room for the uprights next to the cut-outs");
 assert(margin >= sheet_edge, "Cut-outs too close to the sheet edge");
 assert(switch_cut[1] >= ext, "Switch panel cut-out runs into the bottom of the sheet");
-assert(throttle_bar[1] - throttle_bar[0] >= throttle_size.x, "Throttle bar shorter than the throttle box");
+assert(throttle_x0 >= rails[1][0] && throttle_x0 + throttle_size.x <= frame_w, "Throttle box not on the front rail");
 assert(throttle_y0 + throttle_size.y <= rear_y, "Throttle box does not fit on the frame");
 assert(yoke_front_y + yoke_housing.y <= rear_y, "Yoke housing runs into the rear rail");
 assert(radio_body.x <= radio_front.x - 6 && radio_body.y <= radio_front.y - 6,
        "Radio front does not cover its cut-out");
 assert(radio_front_z0 >= throttle_face[3] + 2, "Radio front runs into the throttle box face");
+assert(sheet_h <= sheet_h_max, "Panel too high for the monitor");
 assert(radio_front_z0 + radio_front.y <= sheet_h - ext - sheet_web, "Radio panel too high for the sheet");
 assert(bay_cut[3] <= sheet_h - ext - sheet_web, "Yoke notch too high for the sheet");
 assert(switch_cut[3] <= sheet_h - ext - sheet_web, "Switch panel too high for the sheet");
-assert(abs(throttle_y0 + throttle_bolt_y - ext / 2) < 0.01, "Throttle floor bolts miss the throttle bar slot");
-assert(ext + brace_rise + ext * sqrt(2) <= rear_y, "Braces do not land on the crossbars");
-assert(brace_top + ext * sqrt(2) <= sheet_h, "Braces stick out over the top bar");
+assert(abs(throttle_y0 + throttle_bolt_y - ext * 3 / 2) < 0.01, "Throttle floor bolts miss the front rail slot");
+assert(ext + brace_rise + ext / sqrt(2) <= rear_y, "Braces do not land on the crossbars");
+assert(brace_top + brace_room <= sheet_h - ext, "Braces too long: no room for the connector on the upright");
+assert(brace_top + ext / sqrt(2) <= sheet_h, "Braces stick out over the top bar");
 assert(rails[1][1] - rails[0][0] <= desk.x && frame_d <= frame_overhang + desk.y, "Frame does not fit on the desk");
 assert(2 * ext - frame_overhang >= 10, "Front rail barely on the desk");
 assert(legs[0] <= x_bay0 && legs[1] >= x_bay1, "Leg room narrower than the yoke bay");
 assert(hangers[0] >= legs[1], "Apron hanger in the leg room");
-assert(hangers[0] >= throttle_bar[0], "Apron hanger not under the throttle side");
+assert(hangers[0] >= x_bay1 + ext, "Apron hanger not under the throttle side");
 assert(abs(under_y0 + under_bolt_y - ext / 2) < 0.01, "Pedestal floor bolts miss the lower bar slot");
 assert(pedestal_face[0] >= apron_bar[0] && pedestal_face[2] <= apron_bar[1],
        "Pedestal does not fit between its hangers");

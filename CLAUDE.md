@@ -12,7 +12,7 @@ its own top-level directory; new components should follow the same layout.
     pedestal at the back. It is printed in one piece and has no lid: it goes
     through a cut-out in the frame's sheet, its front wall is the face with
     a flange (top and sides, `flange_w`) screwed onto the sheet, and two M5
-    bolts through the floor go into the frame's throttle bar; `frame/frame.inc.scad`
+    bolts through the floor go into the frame's front rail; `frame/frame.inc.scad`
     repeats these sizes.
     Its views show the pots, rods with knobs, clamps, pins, ESP32 and wiring
     as view-only parts; the knob, clamp and pin shapes there are copies of
@@ -78,11 +78,12 @@ its own top-level directory; new components should follow the same layout.
   sheet; heavy or pulled ones also stand on the frame. The frame is two
   parts bolted together: the vertical front part in front of the desk
   edge (a rectangle with the uprights, its bottom bar just under the desk
-  top, the throttle bar under the throttle box, and the apron hanging
-  under it for the trim wheel / fuel selector pedestal; the thin parking
+  top, and the apron hanging under the throttle for the trim wheel /
+  fuel selector pedestal; the thin parking
   brake hangs under the bottom bar below the yoke), and the desk part (a
   ladder on the desk, its front rail cut at the yoke), with 45 degree
-  braces between them. Lengths are rounded up (`round_*`). The front rail
+  braces between them (stock bars cut square, bought 45 degree
+  connectors). Lengths are rounded to stock lengths (`round_*`). The front rail
   runs past the sheet at both ends (`ear_len`), where two bought screw
   clamps clamp it onto the desk (no printed parts in the load path: they
   creep under constant load). `knee_w` around the yoke stays open for the
