@@ -11,8 +11,8 @@ its own top-level directory; new components should follow the same layout.
     inside, 6 mm rods (one per control) exit the front, an ESP32 sits on a
     pedestal at the back. It is printed in one piece and has no lid: it goes
     through a cut-out in the frame's sheet, its front wall is the face with
-    a flange (top and sides, `flange_w`) screwed onto the sheet, and two M5
-    bolts through the floor go into the frame's front rail; `frame/frame.inc.scad`
+    a flange (top and sides, `flange_w`) screwed onto the sheet, and its floor
+    only rests on the frame's front rail (not bolted); `frame/frame.inc.scad`
     repeats these sizes.
     Its views show the pots, rods with knobs, clamps, pins, ESP32 and wiring
     as view-only parts; the knob, clamp and pin shapes there are copies of

@@ -36,9 +36,8 @@
 //    the desk with a screw clamp. Put the yoke into the bay, its front on the bottom bar, and
 //    clamp it with its own clamps.
 // 5. Push the throttle box through its cut-out onto the rail and the
-//    middle crossbar until its face is on the sheet, bolt its floor into
-//    the rail (throttle_bolts), drill the sheet through
-//    its flange holes and screw the flange on (M3, nuts behind the sheet).
+//    middle crossbar until its face is on the sheet, drill the sheet
+//    through its flange holes and screw the flange on (M3, nuts behind the sheet).
 //    The pedestal goes in the same way onto the lower bar, the parking
 //    brake under the bottom bar, when they exist.
 
@@ -63,10 +62,10 @@ echo(desk_part_2020 = [["front rail left", rails[0][1] - rails[0][0]], ["front r
                        ["rear rail", frame_w], ["5 crossbars", crossbar_len], ["4 braces, cut square", brace_len]]);
 echo(sheet = [frame_w, sheet_h + ext], screws = len(sheet_screws));
 echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut);
-echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
+echo(sheet_screws = sheet_screws);
 echo(apron_sheet = [apron[1] - apron[0], apron_h - ext], apron_screws = len(apron_screws));
 echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts);
-echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2, desk_clamps = len(clamp_xs), clamp_y = clamp_y);
+echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2, desk_clamps = len(clamp_xs), clamp_y = clamp_y);
 
 // --- Frame ---
 
@@ -262,9 +261,6 @@ module throttle_part() {
          }
          translate([-f, 0, 0]) cube([throttle_size.x + 2 * f, throttle_face_t, throttle_size.z + f]);
       }
-      color("#b9c0c8")
-         for (x = throttle_bolt_xs)
-            translate([x, throttle_bolt_y, 3]) cylinder(d = m5_head_d, h = 3);
       for (i = [0 : 2])
          translate([throttle_rod_xs[i], 0, throttle_rod_z]) {
             color("#b9c0c8") rotate([90, 0, 0]) cylinder(d = 6, h = 60);

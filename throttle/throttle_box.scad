@@ -4,9 +4,9 @@
 // the panel sheet and stands on the front rail. Its front wall is the face,
 // with a flange on the top and the two sides that is screwed onto the sheet
 // (M3, nuts behind the sheet; drill the sheet through the flange's holes
-// with the box in place). Two M5 bolts through the floor go into T-nuts in
-// the front rail's top slot. The box is behind the sheet, so it needs no
-// lid; its top stays open.
+// with the box in place); the floor only rests on the front rail, the
+// loads from the knobs are small. The box is behind the sheet, so it needs
+// no lid; its top stays open.
 
 $fn = 30;
 
@@ -31,13 +31,9 @@ mount_nut_r = 3.2;           // M3 nut, across the corners / 2, behind the sheet
 mount_low_z = 8;             // the lower holes in the side flanges
 sheet_cut_clear = 1;         // sheet cut-out beyond the box (frame/ throttle_play)
 
-// Floor bolts into the front rail (frame/): M5, the rail (a 2020 behind
-// the frame's front part) has its top slot 30 mm behind the sheet, and the
-// sheet and face_t are in front of y = 6
+// The cockpit sheet (frame/), behind face_t; the front rail (a 2020 behind
+// the frame's front part) starts 20 mm behind it
 sheet_t = 3;
-rail_slot_y = 30;
-m5_d = 5.3;
-floor_bolt_y = face_t + sheet_t + rail_slot_y;
 
 // Calculated
 width = 2 * control_gap + 2 * end_gap;
@@ -103,10 +99,6 @@ module box_underside() {
          translate([h.x, -1, h.y])
             rotate([-90, 0, 0])
                cylinder(d=mount_d, h=face_t+2);
-      // Floor bolts into the front rail
-      for (x = floor_bolt_xs)
-         translate([x, floor_bolt_y, -1])
-            cylinder(d=m5_d, h=wall_thickness+2);
       // Rod & rod nut holes
       throttle_rods();
       translate([roundness+end_gap+control_gap, wall_thickness*2, wall_thickness+big_pot_stand_height+big_pot_module_height+15+7])
@@ -136,10 +128,6 @@ mount_holes = [
    [full_width + flange_w - mount_inset, face_h - mount_inset],
    [-flange_w + mount_inset, mount_low_z],
    [full_width + flange_w - mount_inset, mount_low_z]];
-
-// Floor bolts between the rod support walls, clear of the rods above
-floor_bolt_xs = [(rod_support_x(0) + rod_support_x(1)) / 2 + wall_thickness / 2,
-                 (rod_support_x(2) + rod_support_x(3)) / 2 + wall_thickness / 2];
 
 // The front wall widened to the face, top corners rounded
 module face() {
@@ -652,13 +640,10 @@ module sheet_part() {
                }
    color("#c3c9d0")
       translate([-flange_w - m, face_t + sheet_t + 20, -20]) cube([face_w + 2 * m, 20, 20]);
-   // Mount screws and floor bolts
-   color(c_steel) {
+   // Mount screws
+   color(c_steel)
       for (h = mount_holes)
          translate([h.x, 0, h.y]) rotate([90, 0, 0]) cylinder(d = 5.5, h = 2);
-      for (x = floor_bolt_xs)
-         translate([x, floor_bolt_y, wall_thickness]) cylinder(d = 9.5, h = 3);
-   }
 }
 
 module inside_parts() {

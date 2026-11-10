@@ -149,8 +149,8 @@ into the sheet for it and its face is screwed onto the sheet. Heavy or
 pulled components also stand on the frame: the throttle box sits on the
 front rail and the crossbar under its middle (its front overhangs the
 front part), its face flange is screwed onto the sheet like the switch
-panel's and two M5 bolts through its floor go into the front rail.
-The pedestal does the same on the apron's lower bar.
+panel's; it only rests on the rail, the knobs pull very little.
+The pedestal stands on the apron's lower bar and is bolted to it.
 The extrusion carries the
 loads, the sheet only covers the front, so cut-outs do not weaken it.
 Keep at least 25 mm of sheet to the edge and 20 mm between cut-outs, and
@@ -202,7 +202,7 @@ flange holes are drilled with the box in place.
 | 8 | 45 degree connector for 2020 | brace ends |
 | - | corner brackets, M5 screws, M5 T-nuts | frame joints, and the front part onto the front rail |
 | 2 | 3 mm ACM sheet | panel, cut to frame_w x (sheet_h + 20); the apron sheet |
-| 43 | M5 button head screw + T-nut | sheets, throttle box, pedestal and parking brake |
+| 41 | M5 button head screw + T-nut | sheets, pedestal and parking brake |
 | 2 | screw clamp with rubber jaws, 50 mm opening | rail ends onto the desk |
 | 3 | felt pad | on the bottom bar's back, against the desk edge |
 
@@ -457,9 +457,10 @@ The box mounts in the [cockpit frame](#cockpit-frame) and has no lid: it
 goes through a cut-out in the panel sheet and stands on the frame's front rail. Its
 front wall is the face, with a 10 mm flange on the top and the two sides
 (none at the bottom, where the box sits on the rail) that is screwed onto
-the sheet with M3 screws, nuts behind the sheet. Two M5 bolts through the
-floor, at the front between the rod supports, go into T-nuts in the
-front rail's top slot, so pulling a knob does not load the sheet alone.
+the sheet with M3 screws, nuts behind the sheet. The floor only rests on
+the rail, it is not bolted: the knobs need little force, and the second
+wall with the cross braces behind the face (the rods' second bearing)
+stiffens the face against it.
 
 | File | Parts |
 |------|-------|
@@ -478,7 +479,6 @@ front rail's top slot, so pulling a knob does not load the sheet alone.
 | 1 | ESP32 board | reads the pots, USB to the PC |
 | - | M3 screws | pot hold-downs, cable cradle |
 | 5 | M3 x 10 pan head screw + nut | face flange onto the cockpit sheet |
-| 2 | M5 x 10 button head screw + washer + T-nut | floor into the front rail (counted in the frame) |
 
 # Switch panel
 

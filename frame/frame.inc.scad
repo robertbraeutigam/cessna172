@@ -4,8 +4,7 @@
 // bolted together. 3 mm aluminium composite (ACM) sheet covers the front;
 // every cockpit component brings its own front face, a hole is cut into
 // the sheet for it and its face is screwed onto the sheet. Heavy or pulled
-// components (the throttle box) also stand on the frame and are bolted to
-// it.
+// components also stand on the frame (the throttle box only rests on it).
 //
 // Coordinates, seen from the pilot: x to the right, y away from the pilot
 // (towards the monitor), z up. The origin is the front left corner of the
@@ -95,16 +94,13 @@ radio_depth = 55;            // behind the sheet
 // crossbar, its front overhanging the front part. Its front wall (face_t)
 // is the face; the flange (flange_w, on the top and the two sides, none at
 // the bottom) is screwed onto the sheet with M3 (drill through the box's
-// holes), and two M5 bolts through its floor go into the front rail's top
-// slot.
+// holes); its floor only rests on the rail.
 throttle_size = [150, 190, 50];
 throttle_rod_xs = [20, 75, 130];  // roundness + end_gap + i * control_gap
 throttle_rod_z = 38;         // wall + stand + pot module + 15 + 7
 throttle_face_t = 3;         // face_t
 throttle_flange = 10;        // flange_w
 throttle_play = 1;           // box to its cut-out, sheet_cut_clear
-throttle_bolt_xs = [47.5, 102.5]; // floor_bolt_xs
-throttle_bolt_y = 36;        // floor_bolt_y, from the face front
 
 // --- Switch panel, from switchpanel/ ---
 // The backs of the ignition (77) and the switches (211.6), panel_h high,
@@ -250,8 +246,6 @@ apron_screws = [for (p = concat(
       [for (h = hangers, z = spread(-apron_h + ext / 2, -ext - ext / 2, screw_step_upright)) [h + ext / 2, z]],
       [for (x = spread(apron_bar[0] + ext / 2, apron_bar[1] - ext / 2, screw_step)) [x, -apron_h + ext / 2]]))
    if (clear_of(p, [pedestal_cut, pedestal_face], screw_edge)) p];
-// M5 through the throttle box floor into T-nuts in the front rail's top slot, [x, y]
-throttle_bolts = [for (x = throttle_bolt_xs) [throttle_x0 + x, throttle_y0 + throttle_bolt_y]];
 // M5 through the pedestal floor into T-nuts in the lower bar's top slot, [x, y]
 pedestal_bolts = [for (s = [-1, 1]) [pedestal_x + s * pedestal_size.x / 4, under_y0 + under_bolt_y]];
 
@@ -269,7 +263,6 @@ assert(sheet_h <= sheet_h_max, "Panel too high for the monitor");
 assert(radio_front_z0 + radio_front.y <= sheet_h - ext - sheet_web, "Radio panel too high for the sheet");
 assert(bay_cut[3] <= sheet_h - ext - sheet_web, "Yoke notch too high for the sheet");
 assert(switch_cut[3] <= sheet_h - ext - sheet_web, "Switch panel too high for the sheet");
-assert(abs(throttle_y0 + throttle_bolt_y - ext * 3 / 2) < 0.01, "Throttle floor bolts miss the front rail slot");
 assert(ext + brace_rise + ext / sqrt(2) <= rear_y, "Braces do not land on the crossbars");
 assert(brace_top + brace_room <= sheet_h - ext, "Braces too long: no room for the connector on the upright");
 assert(brace_top + ext / sqrt(2) <= sheet_h, "Braces stick out over the top bar");
