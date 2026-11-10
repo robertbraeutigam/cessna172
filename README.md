@@ -514,7 +514,7 @@ lock's home position: **MEASURE** where the key really points
 | 1 | mailbox / cabinet cam lock | key and spindle (**MEASURE** it and update the `lock_*` values, they are guesses) |
 | 1 | 6 mm steel ball + spring | detent (`detent_spring_*`, spring OD below 6 mm) |
 | 1 | spring, 5 mm OD, 15 mm | START return (`start_spring_*`) |
-| 1 | magnet, 5 x 2 mm | position sensing (`magnet_*`) |
+| 1 | cube magnet, 5 x 5 x 5 mm | position sensing (`magnet_*`) |
 | 5 | A3144 hall sensor | one per position (OFF is optional) |
 | 4 | M3 screw | cover |
 | 4 | M3 x 10 screw | panel to housing |
