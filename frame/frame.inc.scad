@@ -28,7 +28,8 @@
 // - Desk part, flat on the desk behind it: a ladder (front rail, rear rail,
 //   crossbars) with the front rail cut at the yoke bay. The front part is
 //   bolted to its front rail, and a 45 degree brace from each upright down
-//   to a crossbar stops it from rocking. The throttle box stands on the
+//   to a crossbar stops it from rocking: a stock length, cut square, held
+//   by a bought 45 degree connector at each end. The throttle box stands on the
 //   front rail and the crossbar under its middle.
 //
 // The front rail runs past the sheet at both ends (ear_len): there a
@@ -37,14 +38,15 @@
 // knee_w around the yoke stays open for the legs; only the bottom bar and
 // the thin parking brake are there, just under the desk top.
 //
-// Lengths are rounded up (round_w, round_d, round_h), so most bars are
-// round stock lengths.
+// Lengths are rounded to stock lengths (multiples of round_d), except the
+// uprights, which the sheet height sets, and the apron's lower bar.
 
 // --- Extrusion: 2020 only, 6 mm slot, M5 T-nuts everywhere ---
 ext = 20;
 round_w = 100;               // frame width rounded up to this
-round_d = 50;                // crossbars
-round_h = 10;                // apron hangers and lower bar
+round_d = 50;                // the other bars rounded to this (stock lengths)
+round_cut = 10;              // the apron's lower bar: between the leg room and the pedestal, no stock length fits
+brace_len = 250;             // a stock length, cut square
 slot_w = 6;
 m5_d = 5.3;                  // M5 clearance, sheet and printed parts
 m5_head_d = 9.5;             // button head
@@ -191,12 +193,16 @@ crossbar_len = ceil((max(yoke_front_y + yoke_housing.y, throttle_y0 + throttle_s
 rear_y = 2 * ext + crossbar_len;
 frame_d = rear_y + ext;
 // front rail left and right, [x0, x1]: at least ear_len past the sheet, rounded up
-rails = [[x_bay0 - ceil((x_bay0 + ear_len) / round_h) * round_h, x_bay0],
-         [x_bay1, x_bay1 + ceil((frame_w - x_bay1 + ear_len) / round_h) * round_h]];
+rails = [[x_bay0 - ceil((x_bay0 + ear_len) / round_d) * round_d, x_bay0],
+         [x_bay1, x_bay1 + ceil((frame_w - x_bay1 + ear_len) / round_d) * round_d]];
 clamp_xs = [rails[0][0] + ear_len / 2, rails[1][1] - ear_len / 2];   // desk clamps, on the rail ends
-brace_top = sheet_h - 2 * ext;               // its long edge on the upright's back, under the top bar
-brace_rise = brace_top - ext;                // down to the crossbar top
-brace_long = brace_rise * sqrt(2);
+brace_room = 30;             // upright above the brace, for the connector's leg
+// Brace: its inner edge (towards the corner) from the upright's back at
+// brace_top down to the crossbar top, brace_rise lower and further back;
+// a 45 degree connector in the obtuse angle at each end, so at the top the
+// upright needs brace_room above it
+brace_rise = brace_len / sqrt(2);
+brace_top = ext + brace_rise;
 
 // --- Below the desk top (z < 0) ---
 yoke_c = (x_bay0 + x_bay1) / 2;
@@ -204,10 +210,10 @@ legs = [yoke_c - knee_w / 2, yoke_c + knee_w / 2];       // open for the legs
 under_z = desk.z + desk_skirt + desk_clear;              // desk top to the top of the bodies
 // Apron: two hangers under the bottom bar (corner brackets), the right one
 // under the end upright, and the lower bar between their ends
-hanger_len = ceil((under_z + pedestal_size.z + under_play - ext) / round_h) * round_h;
+hanger_len = ceil((under_z + pedestal_size.z + under_play - ext) / round_d) * round_d;
 apron_bar_z = -ext - hanger_len;                         // top of the lower bar
 apron_h = -apron_bar_z + ext;                            // desk top to the apron bottom
-apron_bar_len = floor((frame_w - 2 * ext - legs[1]) / round_h) * round_h;
+apron_bar_len = floor((frame_w - 2 * ext - legs[1]) / round_cut) * round_cut;
 hangers = [frame_w - 2 * ext - apron_bar_len, frame_w - ext];   // left sides
 apron_bar = [hangers[0] + ext, hangers[1]];
 apron = [hangers[0], frame_w];                           // [x0, x1] of the apron sheet, z -apron_h .. -ext
@@ -257,8 +263,9 @@ assert(radio_front_z0 + radio_front.y <= sheet_h - ext - sheet_web, "Radio panel
 assert(bay_cut[3] <= sheet_h - ext - sheet_web, "Yoke notch too high for the sheet");
 assert(switch_cut[3] <= sheet_h - ext - sheet_web, "Switch panel too high for the sheet");
 assert(abs(throttle_y0 + throttle_bolt_y - ext * 3 / 2) < 0.01, "Throttle floor bolts miss the front rail slot");
-assert(ext + brace_rise + ext * sqrt(2) <= rear_y, "Braces do not land on the crossbars");
-assert(brace_top + ext * sqrt(2) <= sheet_h, "Braces stick out over the top bar");
+assert(ext + brace_rise + ext / sqrt(2) <= rear_y, "Braces do not land on the crossbars");
+assert(brace_top + brace_room <= sheet_h - ext, "Braces too long: no room for the connector on the upright");
+assert(brace_top + ext / sqrt(2) <= sheet_h, "Braces stick out over the top bar");
 assert(rails[1][1] - rails[0][0] <= desk.x && frame_d <= frame_overhang + desk.y, "Frame does not fit on the desk");
 assert(2 * ext - frame_overhang >= 10, "Front rail barely on the desk");
 assert(legs[0] <= x_bay0 && legs[1] >= x_bay1, "Leg room narrower than the yoke bay");

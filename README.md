@@ -80,6 +80,10 @@ parts, each built on its own and then bolted together:
   rear rail and five crossbars. The front rail is cut at the yoke bay. The
   front part is bolted to the front rail with corner brackets, and a 45
   degree brace from each upright down to a crossbar stops it from rocking.
+  The braces are 250 mm stock bars cut square, held by a bought 45 degree
+  connector for 2020 at each end, in the obtuse angle (at the top the
+  upright has 43 mm above the brace for it; a 300 mm brace would leave
+  only 8 mm).
 
 Seen from the pilot, left to right:
 
@@ -96,7 +100,7 @@ a 2 mm felt pad), so the sheet is 22 mm in front of the desk edge; the
 front rail lies 18 mm on the desk.
 
 **Desk clamps**: the front rail runs at least 50 mm past the sheet at each
-end (`ear_len`, rounded so the rail halves are 420 and 400 mm). There a
+end (`ear_len`, rounded so the rail halves are 450 and 400 mm). There a
 bought screw clamp with rubber jaws clamps each
 rail end onto the desk (the `clamp` view): the fixed jaw on the rail, the
 spine in front of it beside the sheet, the screw jaw on the desk
@@ -145,16 +149,18 @@ components are cut when they arrive.
 
 All values are in `frame.inc.scad`; the layout (cut-outs, screw holes) is
 computed from the component sizes, and the build prints the cut list
-(`echo`). Lengths are rounded up: the width to 100 mm (`round_w`), the
-crossbars to 50 mm, the rail halves and the apron to 10 mm. With the
-current guesses the frame is 1000 x 360 mm and 260 mm high above the desk,
-the sheet 1000 x 280 mm (it also covers the bottom bar), the apron sheet
-250 x 190 mm. With the ears the frame takes 1120 mm of the desk width.
+(`echo`). Lengths are rounded to stock lengths: the width to 100 mm
+(`round_w`), the other bars to 50 mm (`round_d`). Only the uprights (the
+sheet height sets them) and the apron's lower bar (between the leg room
+and the pedestal, `round_cut`) are cut to an odd length. With the current
+guesses the frame is 1000 x 360 mm and 260 mm high above the desk, the
+sheet 1000 x 280 mm (it also covers the bottom bar), the apron sheet
+250 x 220 mm. With the ears the frame takes 1143 mm of the desk width.
 
 | Part | 2020 bars |
 |------|-----------|
-| front part | top bar 1000, bottom bar 1000, 4 uprights 240, 2 apron hangers 170, lower bar 210 |
-| desk part | front rail left 420, front rail right 400, rear rail 1000, 5 crossbars 300, 4 braces (45 degree ends, long edge 283) |
+| front part | top bar 1000, bottom bar 1000, 4 uprights 240, 2 apron hangers 200, lower bar 210 |
+| desk part | front rail left 450, front rail right 400, rear rail 1000, 5 crossbars 300, 4 braces 250 (cut square) |
 
 | File | Parts |
 |------|-------|
@@ -181,7 +187,8 @@ flange holes are drilled with the box in place.
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 22 | 2020 extrusion, 6 mm slot | front part: top bar, bottom bar, 4 uprights, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 5 crossbars, 4 braces (45 degree ends) |
+| 22 | 2020 extrusion, 6 mm slot | front part: top bar, bottom bar, 4 uprights, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 5 crossbars, 4 braces (cut square) |
+| 8 | 45 degree connector for 2020 | brace ends |
 | - | corner brackets, M5 screws, M5 T-nuts | frame joints, and the front part onto the front rail |
 | 2 | 3 mm ACM sheet | panel, cut to frame_w x (sheet_h + 20); the apron sheet |
 | 43 | M5 button head screw + T-nut | sheets, throttle box, pedestal and parking brake |

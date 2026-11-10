@@ -82,7 +82,8 @@ its own top-level directory; new components should follow the same layout.
   fuel selector pedestal; the thin parking
   brake hangs under the bottom bar below the yoke), and the desk part (a
   ladder on the desk, its front rail cut at the yoke), with 45 degree
-  braces between them. Lengths are rounded up (`round_*`). The front rail
+  braces between them (stock bars cut square, bought 45 degree
+  connectors). Lengths are rounded to stock lengths (`round_*`). The front rail
   runs past the sheet at both ends (`ear_len`), where two bought screw
   clamps clamp it onto the desk (no printed parts in the load path: they
   creep under constant load). `knee_w` around the yoke stays open for the
