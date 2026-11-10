@@ -45,7 +45,8 @@ its own top-level directory; new components should follow the same layout.
     is a row of printed dummy circuit breakers (`breakers`, for show only,
     glued into hex pockets). A CD74HC4067
     input mux on standoffs on the back collects all switches and the
-    ignition, so one Cat5 cable runs to hub port 3. The switch list
+    ignition, so one Cat5 cable runs to hub port 3 (soldered to the mux,
+    tied onto `tie_block` next to it). The switch list
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
 
@@ -57,8 +58,9 @@ its own top-level directory; new components should follow the same layout.
   bottom one). Pins 1-6 of all RJ45 boards are soldered together (the
   bus); only SIG and AUX of each port and the bus header go to the
   Mega with jumper wires, nothing is soldered on the Mega. Every
-  MobiFlight component connects to its own numbered port with a straight
-  Cat5 cable; the port pinout (same on every port: S0..S3, 5 V, GND, SIG,
+  MobiFlight component connects to its own numbered port with a Cat5
+  cable, RJ45 plug at the hub and soldered straight to the mux at the
+  component (no connector there); the port pinout (same on every port: S0..S3, 5 V, GND, SIG,
   AUX) and the port list are in the README's Connections section, keep
   components and README in sync with them. The `rj_*` and `proto_*`
   values are guesses until the parts are measured.

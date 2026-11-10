@@ -24,6 +24,9 @@
 // - A CD74HC4067 input multiplexer board sits on two standoffs on the back,
 //   in the strip behind the group labels. All switches (and the ignition)
 //   are soldered to it, so only one Cat5 cable runs to the hub (port 3).
+//   The cable is soldered straight to the mux (no connector, the plug at
+//   the hub end is the only one) and a cable tie holds it on a block next
+//   to the mux, so pulling the cable does not pull the solder joints.
 //
 // Wiring: every switch closes one contact: one side to a common GND wire,
 // the other to a mux input (active low, like any switch to GND). ALT and
@@ -40,13 +43,15 @@
 // - 7 toggle switches, M12 neck (2 pin ON-OFF or 6 pin ON-ON)
 // - mount_count x M3 screws to mount the panel
 // - CD74HC4067 16 channel mux breakout board, 2 x M2 x 6 screws
+// - a stranded copper Cat5 patch cable (cut off at one end), a cable tie
 // - glue for the printed dummy breakers
 // - wire: one GND wire daisy chained over all switches, one wire per switch
 //
 // Assembly: solder the wires to the switches first (the rockers are hard to
 // get out again), put the toggles in from the back and tighten their nuts,
 // snap the rockers in from the front, solder the other wire ends to the mux
-// and screw it onto its standoffs, glue the dummy breakers into their
+// and screw it onto its standoffs, solder the Cat5 cable to the mux control
+// row and tie it onto its block, glue the dummy breakers into their
 // pockets, then mount the panel.
 
 $fn = 48;
@@ -104,7 +109,7 @@ mux_board_t = 1.6;
 mux_holes = [[-17.5, 0], [17.5, 0]];  // MEASURE: guess, from the board center
 mux_hole_d = 2.2;            // in the board, for the view
 mux_pin_inset = 1.3;         // pin row to the board edge
-mux_pin_stub = 3;            // pin ends (header pins) below the board
+mux_pin_stub = 3;            // wire ends and solder below the board
 mux_channels = 16;
 mux_ctl_names = ["SIG", "S3", "S2", "S1", "S0", "EN", "VCC", "GND"];  // MEASURE: order on the board
 ignition_inputs = 5;         // OFF, R, L, BOTH, START, after the switches
@@ -113,6 +118,14 @@ mux_standoff_d = 6;
 mux_standoff_h = 5;          // panel back to the board
 mux_screw_hole = 2.1;        // M2 pilot hole
 mux_clear = 0.3;
+
+// --- Cable to the hub: soldered to the mux, tied down next to it ---
+cable_d = 6;                 // Cat5 patch cable (MEASURE)
+tie = [3.6, 1.3];            // cable tie, width x thickness
+tie_clear = 0.6;             // added to the tie's width and thickness in the slot
+tie_block = [10, 13, 6];     // along the cable (x) x across x height off the panel back
+tie_groove = 1.5;            // cable groove in the block top
+tie_gap = 12;                // mux board edge to the block, the wires fan out there
 
 // --- Layout ---
 // Groups from left to right: label above the group, type ("rocker2" or
@@ -228,6 +241,10 @@ mux_switch_y = max(rk_cutout_c.y, tg_pocket.y) / 2;  // the switches reach up to
 function mux_ch_pin(i) = [mux_x + (i - 7.5) * 2.54, mux_y - mux_board.y / 2 + mux_pin_inset];
 function mux_ctl_pin(name) = [mux_x + (search([name], mux_ctl_names)[0] - 3.5) * 2.54,
                               mux_y + mux_board.y / 2 - mux_pin_inset];
+// Cable tie block, right of the mux; the cable runs along x on its top
+tie_x = mux_x + mux_board.x / 2 + tie_gap + tie_block.x / 2;
+tie_y = mux_y;
+tie_slot = tie + [tie_clear, tie_clear];
 
 // Distance from a point to a centered box
 function box_dist(p, c, size) = norm([max(0, abs(p.x - c.x) - size.x / 2), max(0, abs(p.y - c.y) - size.y / 2)]);
@@ -264,6 +281,12 @@ assert(mux_x - mux_board.x / 2 >= panel_x0 + rim_w + mux_clear && mux_x + mux_bo
        "Mux board does not fit inside the rim, move mux_x");
 assert(mux_standoff_h >= mux_pin_stub + 1, "Mux standoffs too short for the pin ends");
 assert(mux_standoff_d >= mux_screw_hole + 3, "Mux standoff wall too thin");
+assert(tie_x + tie_block.x / 2 <= panel_x1 - rim_w - 1, "Cable tie block does not fit inside the rim, move mux_x");
+assert(tie_y - tie_block.y / 2 >= mux_switch_y + mux_clear && tie_y + tie_block.y / 2 <= panel_y1 - rim_w,
+       "Cable tie block runs into the switches or the rim");
+assert(tie_block.y >= cable_d + 2 * tie_slot.y + 2, "Cable tie block too narrow for the cable");
+assert(tie_block.z - tie_groove - tie_slot.y >= 2, "Cable tie block too thin above the slot");
+assert(tie_block.x >= tie_slot.x + 4, "Cable tie block too short for the slot");
 assert(len(breakers) <= len(groups[cb_group][2]), "More breakers than toggles below them");
 assert(tg_pitch >= 2 * cb_r + 1.5 && tg_pitch >= max([for (i = [0 : len(breakers) - 1]) cb_label_w(i)]) + 1, "Breakers too close to each other, increase tg_pitch");
 assert(cb_pocket_depth <= panel_t - 1.5, "Breaker pockets too deep");
@@ -315,6 +338,7 @@ module panel() {
          for (h = mux_holes)
             translate([mux_x + h.x, mux_y + h.y, mux_z])
                cylinder(d = mux_standoff_d, h = mux_standoff_h + 0.01);
+         tie_block();
       }
       // Mux screw holes, not through the front
       for (h = mux_holes)
@@ -395,6 +419,10 @@ c_gnd = "#1d1f22";
 c_pcb = "#5a3d8a";
 wire_colors = ["#e8433a", "#f5a030", "#f2d03b", "#4caf50", "#3d7bd9", "#8e5bd6", "#9aa3ad", "#eceff2"];
 wire_d = 1.2;
+c_cable = "#8fa3b8";
+// Cat5 pairs on the mux control pins (T568B, README Port pinout)
+cat5_names = ["S0", "S1", "S2", "VCC", "GND", "S3", "SIG"];
+cat5_colors = ["#f8d2a8", "#f5a030", "#c4e6bf", "#3d7bd9", "#c3d6f5", "#4caf50", "#e3d2c0"];
 
 function rocker_color(name) = name == "red" ? "#d33a2c" : name == "white" ? "#eeeeea" : "#26282b";
 function is_on(i) = i < len(view_on) && view_on[i] == 1;
@@ -511,6 +539,21 @@ module toggle_nut_part(cut = false) {
          }
 }
 
+// Block for the cable tie on the panel back: the tie goes through a slot
+// along y at the panel, around the cable lying in the groove on top
+module tie_block() {
+   translate([tie_x, tie_y, -panel_t])
+      mirror([0, 0, 1])
+         difference() {
+            translate([-tie_block.x / 2, -tie_block.y / 2, -0.01])
+               cube(tie_block + [0, 0, 0.01]);
+            translate([-tie_slot.x / 2, -tie_block.y / 2 - 1, -1])
+               cube([tie_slot.x, tie_block.y + 2, tie_slot.y + 1]);
+            translate([-tie_block.x / 2 - 1, 0, tie_block.z + cable_d / 2 - tie_groove])
+               rotate([0, 90, 0]) cylinder(d = cable_d, h = tie_block.x + 2);
+         }
+}
+
 // Mux board with its pin holes, panel side at mux_z
 module mux_part() {
    pins = concat([for (i = [0 : mux_channels - 1]) mux_ch_pin(i)],
@@ -531,11 +574,6 @@ module mux_part() {
    color(c_body)
       translate([mux_x, mux_y, mux_z - mux_board_t - 0.75])
          cube([10, 5.3, 1.5], center = true);
-   // Header pins on the control row
-   color(c_tab)
-      for (n = mux_ctl_names)
-         translate([mux_ctl_pin(n).x, mux_ctl_pin(n).y, mux_z - mux_board_t - 6])
-            cube([0.64, 0.64, 6 + mux_pin_stub], center = false);
 }
 
 module mux_screws() {
@@ -617,8 +655,9 @@ function wire_tabs() = [for (u = units)
          : [[u[0] + p.x, 0, tg_body_z - tg_body_depth - tg_tab.z], [u[0] + p.x, -tg_pin_pitch.y, tg_body_z - tg_body_depth - tg_tab.z]]];
 
 // GND daisy chained over the switches to the mux GND, a signal wire from
-// every switch to its mux input, and the cable to the Mega leaving upwards.
-// The ignition cable (C11..C15, VCC, GND) is not shown.
+// every switch to its mux input, and the Cat5 cable to the hub, soldered to
+// the control row and tied onto its block. The ignition cable (C11..C15,
+// VCC, GND) is not shown.
 module wires_part() {
    t = wire_tabs();
    z = min([for (w = t) w[0].z]) - 2;
@@ -639,14 +678,44 @@ module wires_part() {
    // EN to GND: the mux is always enabled
    en = mux_ctl_pin("EN");
    wire([[en.x, en.y, zb], [en.x, en.y - 1.5, zb - 1], [gnd.x, gnd.y - 1.5, zb - 1], [gnd.x, gnd.y, zb]], c_gnd);
-   // Cable to the Mega, plugged onto the header
-   zc = mux_z - mux_board_t - 6;
+   // Cat5 cable to the hub: its pairs soldered to the control row (T568B
+   // colors), the jacket tied onto the block, then over the top rim
+   zt = -panel_t - tie_block.z + tie_groove - cable_d / 2;  // cable axis
+   x_end = tie_x - tie_block.x / 2 - 2;                     // jacket end
    for (j = [0 : len(mux_ctl_names) - 1])
       if (mux_ctl_names[j] != "EN") {
          p = mux_ctl_pin(mux_ctl_names[j]);
-         wire([[p.x, p.y, zc], [p.x, p.y, zc - 4], [p.x, panel_y1 + 15, zc - 4]],
-              mux_ctl_names[j] == "GND" ? c_gnd : wire_colors[j % len(wire_colors)]);
+         wire([[p.x, p.y, zb], [p.x, p.y, zb - 2 - j * 0.3], [x_end - 3, tie_y + (j - 3.5) * 0.6, zt],
+               [x_end + 0.5, tie_y + (j - 3.5) * 0.6, zt]],
+              cat5_colors[search([mux_ctl_names[j]], cat5_names)[0]]);
       }
+   // Past the block it bends away from the panel and over the top rim
+   x_bend = tie_x + tie_block.x / 2 + cable_d;
+   z_over = -panel_t - rim_h - cable_d / 2 - 1;
+   path = [[x_end, tie_y, zt], [x_bend, tie_y, zt], [x_bend + 4, tie_y, z_over],
+           [x_bend + 4, panel_y1 + 20, z_over]];
+   color(c_cable)
+      for (i = [1 : len(path) - 1])
+         hull() {
+            translate(path[i - 1]) sphere(d = cable_d, $fn = 16);
+            translate(path[i]) sphere(d = cable_d, $fn = 16);
+         }
+   // The tie around the cable and through the block
+   color(c_gnd)
+      translate([tie_x, tie_y, zt])
+         rotate([0, 90, 0])
+            difference() {
+               hull() {
+                  cylinder(d = cable_d + 2 * tie.y, h = tie.x, center = true);
+                  translate([zt + panel_t + tie_slot.y / 2, 0, 0])
+                     cube([tie.y, tie_block.y - 2, tie.x], center = true);
+               }
+               hull() {
+                  cylinder(d = cable_d, h = tie.x + 1, center = true);
+                  translate([zt + panel_t + tie_slot.y / 2, 0, 0])
+                     cube([0.01, tie_block.y - 2 - 2 * tie.y, tie.x + 1], center = true);
+               }
+            }
 }
 
 module dashed_line(from_z, to_z, d = 0.5) {
