@@ -31,7 +31,7 @@
 // - mailbox lock (MEASURE it and update the lock_* parameters)
 // - 6 mm steel ball + spring (detent_spring_*)
 // - spring for the START return (start_spring_*)
-// - magnet (magnet_*), 5x A3144 hall sensors (OFF is optional)
+// - 5x5x5 mm cube magnet (magnet_*), 5x A3144 hall sensors (OFF is optional)
 // - M3 screws: 4x for the cover, 4x panel to housing, 1x M3x8 as the
 //   START pin, 4x to mount the panel
 //
@@ -118,8 +118,8 @@ start_shoe_len = 3;
 start_slot_depth = 5;
 
 // --- Sensing ---
-magnet_d = 5;
-magnet_h = 2;
+magnet_w = 5;                // cube magnet, side
+magnet_h = 5;                // height (along the key axis)
 magnet_r = rotor_r + 1;
 sensor_w = 4.0;              // A3144 TO-92S body
 sensor_h = 3.0;
@@ -179,7 +179,10 @@ assert(start_pin_r + slot_wide_w / 2 + 1 <= rotor_r - notch_depth, "START slot r
 assert(start_pin_r - slot_wide_w / 2 - 1 >= lock_screw_head_d / 2 + 0.3, "START slot runs into the cam screw head");
 assert(rotor_t - start_slot_depth >= 1.2, "START slot floor too thin");
 assert(pin_protrusion >= 1.5 && pin_protrusion <= start_slot_depth - 0.3, "START pin screw length does not fit the slot");
-assert(arc_deg(magnet_d / 2 + 0.5, magnet_r) <= lug_w / 2, "Magnet does not fit in the lug");
+// The lug sides start at the rotor rim, so the pocket must be inside them from there out
+assert(atan((magnet_w / 2 + 0.1 + 0.5) / rotor_r) <= lug_w / 2, "Magnet does not fit in the lug");
+assert(magnet_r + magnet_w / 2 + 0.1 + 1 <= lug_r, "Magnet pocket breaks through the lug rim");
+assert(rotor_t - magnet_h - 0.2 >= 1.2, "Magnet pocket floor too thin");
 assert(magnet_r * min(pitch, start_pitch) * PI / 180 >= sensor_w + 4, "Hall sensors too close to each other");
 assert(half + 0.5 <= panel_h / 2 - rim_w, "Housing does not fit between the panel rims, make panel_h higher");
 assert(title == "" || title_y + group_label_size <= panel_h / 2 - 3, "Title too close to the top edge");
@@ -271,8 +274,8 @@ module rotor() {
       }
       // Magnet
       rotate([0, 0, lug_angle])
-         translate([magnet_r, 0, rotor_t - magnet_h - 0.2])
-            cylinder(d = magnet_d + 0.2, h = rotor_t);
+         translate([magnet_r - magnet_w / 2 - 0.1, -magnet_w / 2 - 0.1, rotor_t - magnet_h - 0.2])
+            cube([magnet_w + 0.2, magnet_w + 0.2, rotor_t]);
    }
 }
 
@@ -531,12 +534,12 @@ module start_parts(theta) {
 
 module magnet_part(theta) {
    rotate([0, 0, lug_angle + theta])
-      translate([magnet_r, 0, z_cam + rotor_t - magnet_h - 0.2]) {
+      translate([magnet_r - magnet_w / 2, -magnet_w / 2, z_cam + rotor_t - magnet_h - 0.2]) {
          color("#d64541")
-            cylinder(d = magnet_d, h = magnet_h / 2);
+            cube([magnet_w, magnet_w, magnet_h / 2]);
          color("#3f6fd6")
             translate([0, 0, magnet_h / 2])
-               cylinder(d = magnet_d, h = magnet_h / 2);
+               cube([magnet_w, magnet_w, magnet_h / 2]);
       }
 }
 
