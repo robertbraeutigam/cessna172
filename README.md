@@ -182,9 +182,10 @@ flange holes are drilled with the box in place.
   cables (Mega, throttle ESP32, Saitek yoke, Saitek radio panel, later the
   FFB yoke), so one USB cable runs to the PC.
 - Every MobiFlight component connects to a hub port with a straight Cat5
-  patch cable. Each component has one CD74HC4067 mux (if it has inputs) and
-  one RJ45 breakout board; everything inside a component is soldered, the
-  plug is the only separation point.
+  patch cable. Each component has one CD74HC4067 mux (if it has inputs),
+  and the cable is soldered straight to it (see [Cables](#cables)):
+  everything inside a component is soldered, the plug at the hub is the
+  only separation point.
 
 ### MobiFlight
 
@@ -207,8 +208,8 @@ drives servos straight from Mega pins, without a second board.
 
 ### Port pinout
 
-The same on every port, at both ends of the cable (a straight patch cable
-keeps the pin numbers):
+The same on every port. At the hub it is the RJ45 pin, at the component
+the wire color (the cable is soldered there):
 
 | Pin | T568B color | Signal | At the hub |
 |-----|-------------|--------|------------|
@@ -221,7 +222,7 @@ keeps the pin numbers):
 | 7 | white-brown | SIG | the port's own Mega pin (the mux output) |
 | 8 | brown | AUX | the port's own line: a Mega analog pin, or a digital pin (servo, encoder) |
 
-5 V and GND are one twisted pair. S0-S3 are shared by every mux (MobiFlight
+5 V and GND are one twisted pair (blue). S0-S3 are shared by every mux (MobiFlight
 takes them once per board); at the hub pins 1-6 of all ports are soldered together (the
 bus). SIG and AUX are wired per port with jumpers, so a component must go
 into its own port (they are numbered); swapping two cables only mixes up
@@ -232,6 +233,27 @@ Every mux gets a pull-up resistor from SIG to 5 V. MobiFlight turns on the
 Mega's internal pull-up, but that is weak (20-50 kOhm), and its docs
 recommend an extra one for long wires: solder a 4.7 kOhm between the SIG and
 VCC pins on each mux board, in the component.
+
+### Cables
+
+At the hub every cable has its RJ45 plug; at the component it is soldered
+straight to the mux (and the port's other pins), without a connector. Cut a
+patch cable to length, or in half for two components:
+
+- **Stranded** patch cable, not solid installation cable: solid wire breaks
+  next to a solder joint after a few bends.
+- **Pure copper** ("CU"), not CCA (copper clad aluminium, common in cheap
+  cables): CCA hardly takes solder and breaks easily.
+- **Check the colors** against the [Port pinout](#port-pinout) before
+  soldering, with a multimeter or a cable tester: most patch cables are
+  T568B, a few are T568A (orange and green pairs swapped).
+- **Strain relief**: tie the jacket down on the component right before the
+  wires fan out (the switch panel has a block for a cable tie next to the
+  mux), so pulling the cable never pulls a solder joint. Tin the strands
+  first and put heat shrink over every joint; cut unused wires short and
+  insulate them.
+- Measure the run to the hub and leave some slack: the length is fixed
+  once it is soldered.
 
 ### Ports
 
@@ -252,8 +274,7 @@ signal or one encoder line (on a digital pin); a component that needs more
 - **Parking brake**: one switch, on the mux of the pedestal or of the yoke
   port, whichever cable runs closer (it hangs under the yoke).
 - **Trim wheel encoder** (EC11 type, 20 detents): MobiFlight does not read
-  encoders through a mux, so the pedestal has a second RJ45 board and cable
-  to port 5: encoder A on its SIG, B on its AUX, both straight to Mega pins,
+  encoders through a mux, so the pedestal has a second cable to port 5: encoder A on its SIG, B on its AUX, both straight to Mega pins,
   the common on its GND. Set the encoder type in the Connector to match the
   encoder (steps per detent) and test that a fast spin does not lose steps.
 - **Throttle quadrant**: open. It is an ESP32 on USB today; on a port its
@@ -344,8 +365,8 @@ lid on.
 | ~25 | male-female jumper wire, 20 cm | RJ45 SIG and AUX pins to the Mega |
 | ~6 | male-male jumper wire, 10 cm | bus header to the Mega |
 
-Per component: one more RJ45 breakout board and a straight Cat5 patch
-cable.
+Per port used: a stranded copper Cat5 patch cable, soldered at the
+component end (see [Cables](#cables)).
 
 **MEASURE when they arrive**: the RJ45 boards (`rj_*`): the jack's height
 and its position on the board, the header position and the mounting holes
@@ -546,9 +567,9 @@ it.
 | 1 | CD74HC4067 16 channel mux breakout board | all inputs, see [Multiplexer](#multiplexer) |
 | 2 | M2 x 6 screw | mux onto its standoffs |
 | 7 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
-| 1 | 8 pin straight header + Dupont housing | mux control pins, to the port board |
 | 1 | 4.7 kOhm resistor | SIG pull-up on the mux |
-| 1 | RJ45 breakout board (as in the [hub](#hub)) + Cat5 patch cable | hub port 3 |
+| 1 | Cat5 patch cable, stranded copper (see [Cables](#cables)) | to hub port 3, soldered to the mux |
+| 1 | cable tie, up to 3.6 mm wide | the cable onto its block (`tie`) |
 | - | wire, heat shrink | see [Wiring](#wiring) |
 
 ### Double rocker switches
@@ -661,22 +682,23 @@ the OFF hall sensor, one input stays free.
 
 #### Cable to the hub
 
-The mux goes to hub port 3 (see [Port pinout](#port-pinout)) through an
-RJ45 breakout board behind the switch panel:
+The mux goes to hub port 3 (see [Port pinout](#port-pinout)) with a Cat5
+cable soldered straight into its control row (see [Cables](#cables)):
 
-| Mux pin | RJ45 pin | Mega (at the hub) |
-|---------|----------|-------------------|
-| S0, S1, S2, S3 | 1, 2, 3, 6 | pins 22, 23, 24, 25 (shared by all muxes) |
-| VCC | 4 | 5 V |
-| GND | 5 | GND |
-| SIG | 7 | D28, the mux's data pin in the MobiFlight Connector |
+| Mux pin | Wire (T568B) | Mega (at the hub) |
+|---------|--------------|-------------------|
+| S0, S1, S2, S3 | white-orange, orange, white-green, green | pins 22, 23, 24, 25 (shared by all muxes) |
+| VCC | blue | 5 V |
+| GND | white-blue | GND |
+| SIG | white-brown | D28, the mux's data pin in the MobiFlight Connector |
 | EN | - | not to the hub: bridge it to GND on the board (enable is active low) |
 
-RJ45 pin 8 (AUX) stays free. Solder the header into the control row (short
-pin ends towards the panel) and plug an 8 pin Dupont housing onto it, with
-the EN position left empty; from there short wires (or female-female
-jumpers) go to the RJ45 board's pins. The RJ45 board has no place on the
-panel yet: tie it to the frame behind the panel for now.
+The brown wire (AUX) is not used: cut it short and insulate it. The cable
+comes in over the top rim and is tied down with a cable tie on the block
+right of the mux (`tie_block`: the tie goes through the slot at the panel
+and around the cable in the groove on top), so the wires fan out from
+there to the pins without any pull on them. **MEASURE** the cable
+(`cable_d`, 6 mm) and the tie (`tie`, 3.6 x 1.3 mm).
 
 The switches and the hall sensors have no pull-up resistors of their own:
 one 4.7 kOhm resistor from SIG to VCC on the mux board pulls whichever
@@ -702,7 +724,7 @@ the mux GND, and one signal wire from each switch to its C pin, soldered
 straight into the board. The ignition cable (5 signals, 5 V, GND) is best
 plugged in with a 7 pin Dupont or JST connector, so the two panels can be
 separated. GND and VCC get several wires (switch chain, EN bridge,
-ignition, Mega cable): join the extra wires into one before the pin, with
+ignition, Cat5 cable): join the extra wires into one before the pin, with
 solder and heat shrink.
 
 ### Assembly
@@ -712,8 +734,10 @@ solder and heat shrink.
 2. Put the toggles in from the back and tighten their nuts.
 3. Snap the rockers in from the front.
 4. Solder the other wire ends to the mux and screw it onto its standoffs.
-5. Glue the dummy breakers into their pockets.
-6. Mount the panel.
+5. Solder the Cat5 cable to the mux control row and tie it onto its
+   block.
+6. Glue the dummy breakers into their pockets.
+7. Mount the panel.
 
 ### Notes
 

@@ -2,8 +2,9 @@
 //
 // The box under the cockpit that holds the Arduino Mega with the MobiFlight
 // firmware and one RJ45 breakout board per port. Every
-// component (switch panel, pedestal, ...) plugs into a port with a straight
-// Cat5 patch cable; all ports have the same pinout (README, Connections).
+// component (switch panel, pedestal, ...) plugs into a port with a Cat5
+// cable, soldered straight to the component at its other end; all ports
+// have the same pinout (README, Connections).
 //
 // - The RJ45 boards sit in two rows of six along the front wall, their
 //   jacks behind cut-outs in it, numbered 1-6 (bottom) and 7-12 (top) from
