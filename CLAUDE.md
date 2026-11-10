@@ -12,7 +12,7 @@ its own top-level directory; new components should follow the same layout.
     pedestal at the back. It is printed in one piece and has no lid: it goes
     through a cut-out in the frame's sheet, its front wall is the face with
     a flange (top and sides, `flange_w`) screwed onto the sheet, and two M5
-    bolts through the floor go into the front rail; `frame/frame.inc.scad`
+    bolts through the floor go into the frame's throttle bar; `frame/frame.inc.scad`
     repeats these sizes.
     Its views show the pots, rods with knobs, clamps, pins, ESP32 and wiring
     as view-only parts; the knob, clamp and pin shapes there are copies of
@@ -68,19 +68,25 @@ its own top-level directory; new components should follow the same layout.
   values are guesses until the parts are measured.
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
-  sheet over it. `frame.inc.scad` holds the extrusion/sheet standard, the
+  sheet over it, all 2020 profile. `frame.inc.scad` holds the
+  extrusion/sheet standard, the
   sizes of the components it carries (copies of the other components'
   values and MEASURE values for the bought Saitek yoke and radio panel,
   keep them in sync), the layout and its checks; `frame.scad` has the
   views and the cut list (echo), no printed parts. Every
   component brings its own front face and is screwed onto a cut-out in the
-  sheet; heavy or pulled ones also stand on the frame. The front rail runs
-  past the sheet at both ends (`ear_len`), where two bought screw clamps
-  clamp it onto the desk (no printed parts in the load path: they creep
-  under constant load). Below the desk top, in front of the desk edge: an
-  apron under the throttle for the trim
-  wheel / fuel selector pedestal, and a bay bar under the yoke with the
-  thin parking brake; `knee_w` around the yoke stays open for the legs.
+  sheet; heavy or pulled ones also stand on the frame. The frame is two
+  parts bolted together: the vertical front part in front of the desk
+  edge (a rectangle with the uprights, its bottom bar just under the desk
+  top, the throttle bar under the throttle box, and the apron hanging
+  under it for the trim wheel / fuel selector pedestal; the thin parking
+  brake hangs under the bottom bar below the yoke), and the desk part (a
+  ladder on the desk, its front rail cut at the yoke), with 45 degree
+  braces between them. Lengths are rounded up (`round_*`). The front rail
+  runs past the sheet at both ends (`ear_len`), where two bought screw
+  clamps clamp it onto the desk (no printed parts in the load path: they
+  creep under constant load). `knee_w` around the yoke stays open for the
+  legs.
 
 ## Documentation
 

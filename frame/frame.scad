@@ -1,45 +1,46 @@
 // Cockpit frame
 //
-// Aluminium extrusion ladder on the desk, panel frame on its front edge and
-// one ACM sheet over it, with a cut-out for every component; below the
-// desk top the apron under the throttle and the bay bar
-// with the parking brake. Values, layout and checks are in frame.inc.scad;
-// this file has the views and the cut list (echo). It has no printed parts.
+// Two parts of 2020 extrusion: the front part (a vertical rectangle with
+// the uprights, in front of the desk edge, and the apron hanging under the
+// throttle) and the desk part (a ladder on the desk, cut at the yoke),
+// bolted together and braced at 45 degrees; one ACM sheet over the front
+// with a cut-out for every component. Values, layout and checks are in
+// frame.inc.scad; this file has the views and the cut list (echo). It has
+// no printed parts.
 //
 // Bought parts (lengths: see the echo of the build, or the README):
-// - 2040 extrusion: front rail left, front rail right, rear rail
-// - 2020 extrusion: 5 crossbars, 4 uprights, top bar, 4 braces (45 degree
-//   ends), 2 apron hangers, lower bar, bay bar
+// - 2020 extrusion, front part: top bar, bottom bar, 4 uprights, throttle
+//   bar, 2 apron hangers, lower bar
+// - 2020 extrusion, desk part: front rail left, front rail right, rear
+//   rail, 5 crossbars, 4 braces (45 degree ends)
 // - corner brackets, M5 screws and T-nuts (6 mm slot)
-// - 3 mm ACM sheet, frame_w x sheet_h, and the apron sheet
-// - 2 screw clamps with rubber jaws, at least rail.y + desk.z opening
+// - 3 mm ACM sheet, frame_w x (sheet_h + ext), and the apron sheet
+// - 2 screw clamps with rubber jaws, at least ext + desk.z opening
 //   (clamp_open, clamp_reach), to clamp the rail ends onto the desk
+// - felt pads on the bottom bar's back, against the desk edge
 //
 // Assembly:
-// 1. Bolt the ladder together: rails, crossbars. Stand the uprights on the
-//    front rail, the top bar on them, the braces from the uprights to the
-//    crossbars.
-// 2. Cut the sheet (cuts, sheet_screws in the echo, the "sheet" view),
-//    drill its screw holes, and screw it onto the front slots with T-nuts.
-// 3. Hang the two apron hangers under the front rail: tap each top end M5,
-//    drill a 5 mm access hole down through the rail over it (over the
-//    rail's front bottom slot), screw an M5 x 12 button head into the
-//    hanger's end, slide its head into the slot and tighten it through the
-//    access hole; a corner bracket on each side. The lower bar between
-//    their ends, the apron sheet on their front slots, a felt pad on each
-//    hanger's back at the desk edge. Screw the bay bar under the two rail
-//    ends (bay_bar_bolts: drill through the bar, T-nut in the rail's front
-//    bottom slot).
-// 4. Put the frame on the desk, the apron hangers against the desk edge,
-//    and clamp each rail end (ear) onto the desk with a screw clamp, its
-//    jaws where the rail lies on the desk. Put the yoke into the bay and
+// 1. Front part, flat on the floor: the bottom bar, the uprights on it,
+//    the top bar on them, the throttle bar between the right two uprights
+//    on the bottom bar, the two hangers under the bottom bar and the lower
+//    bar between their ends, all with corner brackets.
+// 2. Cut the sheets (cuts, sheet_screws, apron_screws in the echo, the
+//    "sheet" view), drill their screw holes, and screw them onto the front
+//    slots with T-nuts.
+// 3. Desk part: the front rail halves, the rear rail and the crossbars.
+// 4. Put the desk part on the desk, stand the front part in front of the
+//    desk edge, its bottom bar against the edge (felt pads), and bolt it
+//    on: a corner bracket from each upright's back to the front rail, the
+//    throttle bar to the front rail, the braces from the uprights to the
+//    crossbars. Clamp each rail end (ear) onto the desk with a screw
+//    clamp. Put the yoke into the bay, its front on the bottom bar, and
 //    clamp it with its own clamps.
-// 5. Push the throttle box through its cut-out onto the rail and the middle
-//    crossbar until its face is on the sheet, bolt its floor into the rail
-//    (throttle_bolts), drill the sheet through its flange holes and screw
-//    the flange on (M3, nuts behind the sheet). The pedestal goes in the
-//    same way onto the lower bar, the parking brake under the bay bar, when
-//    they exist.
+// 5. Push the throttle box through its cut-out onto the throttle bar, the
+//    rail and the middle crossbar until its face is on the sheet, bolt its
+//    floor into the throttle bar (throttle_bolts), drill the sheet through
+//    its flange holes and screw the flange on (M3, nuts behind the sheet).
+//    The pedestal goes in the same way onto the lower bar, the parking
+//    brake under the bottom bar, when they exist.
 
 include <frame.inc.scad>
 
@@ -55,19 +56,17 @@ c_box = "#5b6f8a";
 c_switch = "#3a3d42";
 
 echo(frame = [frame_w, frame_d, sheet_h]);
-echo(rails_2040 = [x_bay0 + ear_len, frame_w - x_bay1 + ear_len, frame_w]);
-echo(crossbars_2020 = len(crossbar_xs), crossbar_len = crossbar_len);
-echo(uprights_2020 = len(upright_xs), upright_len = upright_len, top_bar = frame_w);
-echo(braces_2020 = len(upright_xs), brace_long_edge = brace_long);
-echo(sheet = [frame_w, sheet_h], screws = len(sheet_screws));
+echo(front_part_2020 = [["top bar", frame_w], ["bottom bar", frame_w], ["4 uprights", upright_len],
+                        ["throttle bar", throttle_bar[1] - throttle_bar[0]], ["2 hangers", hanger_len],
+                        ["lower bar", apron_bar_len]]);
+echo(desk_part_2020 = [["front rail left", rails[0][1] - rails[0][0]], ["front rail right", rails[1][1] - rails[1][0]],
+                       ["rear rail", frame_w], ["5 crossbars", crossbar_len], ["4 braces, long edge", brace_long]]);
+echo(sheet = [frame_w, sheet_h + ext], screws = len(sheet_screws));
 echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut);
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
-echo(hangers_2020 = [for (h = hangers) h[1]], lower_bar = apron_bar[1] - apron_bar[0],
-     bay_bar = bay_bar[1] - bay_bar[0]);
-echo(apron_sheet = [apron[1] - apron[0], apron_h], apron_screws = len(apron_screws));
-echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts, bay_bar_bolts = bay_bar_bolts);
-echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2 + 2, hanger_m5x12 = len(hangers),
-     desk_clamps = len(clamp_xs), clamp_y = clamp_y);
+echo(apron_sheet = [apron[1] - apron[0], apron_h - ext], apron_screws = len(apron_screws));
+echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts);
+echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2, desk_clamps = len(clamp_xs), clamp_y = clamp_y);
 
 // --- Frame ---
 
@@ -75,36 +74,46 @@ module bar(p0, size) {
    color(c_alu) translate(p0) cube(size);
 }
 
-// 45 degree brace behind the upright at x: its long edge from under the top
-// bar on the upright down to the crossbar, ends cut flush to them
+// 45 degree brace behind the upright at x: its long edge from the
+// upright's back under the top bar down to the crossbar, ends cut flush to
+// them
 module brace(x) {
-   a = [ext, rail.y + brace_rise];
+   a = [ext, brace_top];
    d = [1, -1] / sqrt(2);       // along the brace (y, z)
    n = [-1, -1] / sqrt(2);      // towards the corner
    color(c_alu)
       intersection() {
-         translate([x - 1, ext, rail.y]) cube([ext + 2, frame_d, sheet_h]);
+         translate([x - 1, ext, ext]) cube([ext + 2, frame_d, sheet_h]);
          multmatrix([[1, 0, 0, x], [0, d.x, n.x, a.x], [0, d.y, n.y, a.y], [0, 0, 0, 1]])
             translate([0, -ext * 2, 0]) cube([ext, brace_long + ext * 4, ext]);
       }
 }
 
-module frame_part() {
-   bar([-ear_len, 0, 0], [x_bay0 + ear_len, rail.x, rail.y]);
-   bar([x_bay1, 0, 0], [frame_w - x_bay1 + ear_len, rail.x, rail.y]);
-   bar([0, rear_y, 0], [frame_w, rail.x, rail.y]);
-   for (x = crossbar_xs)
-      bar([x, rail.x, 0], [ext, crossbar_len, ext]);
-   for (x = upright_xs) {
-      bar([x, 0, rail.y], [ext, ext, upright_len]);
-      brace(x);
-   }
+module front_part() {
    bar([0, 0, sheet_h - ext], [frame_w, ext, ext]);
-   // below the desk top
-   for (h = hangers)
-      bar([h[0], 0, -h[1]], [ext, ext, h[1]]);
-   bar([apron_bar[0], 0, -apron_h], [apron_bar[1] - apron_bar[0], ext, ext]);
-   bar([bay_bar[0], 0, -ext], [bay_bar[1] - bay_bar[0], ext, ext]);
+   bar([0, 0, -ext], [frame_w, ext, ext]);
+   for (x = upright_xs)
+      bar([x, 0, 0], [ext, ext, upright_len]);
+   bar([throttle_bar[0], 0, 0], [throttle_bar[1] - throttle_bar[0], ext, ext]);
+   // apron
+   for (x = hangers)
+      bar([x, 0, -ext - hanger_len], [ext, ext, hanger_len]);
+   bar([apron_bar[0], 0, -apron_h], [apron_bar_len, ext, ext]);
+}
+
+module desk_frame_part() {
+   for (r = rails)
+      bar([r[0], ext, 0], [r[1] - r[0], ext, ext]);
+   bar([0, rear_y, 0], [frame_w, ext, ext]);
+   for (x = crossbar_xs)
+      bar([x, 2 * ext, 0], [ext, crossbar_len, ext]);
+   for (x = upright_xs)
+      brace(x);
+}
+
+module frame_part() {
+   front_part();
+   desk_frame_part();
 }
 
 // Bought screw clamp, view only: the fixed jaw on the rail end, the spine
@@ -112,8 +121,8 @@ module frame_part() {
 module desk_clamp_part(x) {
    bar_w = 12;                                // the clamp's bars, across (x) and thick
    spine_y = clamp_y - clamp_reach;           // spine inner face
-   top = rail.y + 3;                          // over the rubber jaw
-   low = rail.y + 3 - clamp_open - 12;        // bottom bar top, the opening left as screw travel
+   top = ext + 3;                             // over the rubber jaw
+   low = ext + 3 - clamp_open - 12;        // bottom bar top, the opening left as screw travel
    translate([x, 0, 0]) {
       color("#5a6068") {
          translate([-bar_w / 2, spine_y - bar_w, low - bar_w]) cube([bar_w, bar_w, top + bar_w - low + bar_w]);
@@ -126,7 +135,7 @@ module desk_clamp_part(x) {
          translate([0, 0, -desk.z - 6 - (low - bar_w - 25)]) cylinder(d = clamp_pad_d, h = 3);
       }
       color("#222") translate([0, clamp_y, 0]) {
-         translate([0, 0, rail.y]) cylinder(d = clamp_pad_d, h = 3);
+         translate([0, 0, ext]) cylinder(d = clamp_pad_d, h = 3);
          translate([0, 0, -desk.z - 3]) cylinder(d = clamp_pad_d, h = 3);
       }
    }
@@ -144,7 +153,7 @@ module rect(r) {
 
 module sheet_2d() {
    difference() {
-      square([frame_w, sheet_h]);
+      translate([0, -ext]) square([frame_w, sheet_h + ext]);
       for (c = cuts) rect(c);
       for (p = sheet_screws)
          translate(p) circle(d = m5_d);
@@ -154,7 +163,7 @@ module sheet_2d() {
 // apron sheet, x / z on the sheet (z < 0)
 module apron_2d() {
    difference() {
-      translate([apron[0], -apron_h]) square([apron[1] - apron[0], apron_h]);
+      translate([apron[0], -apron_h]) square([apron[1] - apron[0], apron_h - ext]);
       rect(pedestal_cut);
       for (p = apron_screws)
          translate(p) circle(d = m5_d);
@@ -240,7 +249,7 @@ module switch_panel_part() {
 module throttle_part() {
    r = 10;
    f = throttle_flange;
-   translate([throttle_x0, throttle_y0, rail.y]) {
+   translate([throttle_x0, throttle_y0, ext]) {
       color(c_box) {
          difference() {
             hull()
@@ -293,7 +302,7 @@ module pedestal_part() {
    }
 }
 
-// Parking brake: body under the desk top behind the bay bar, a tab up to
+// Parking brake: body under the desk top behind the bottom bar, a tab up to
 // the bar's bottom slot; the T-handle released (sideways, almost flush) or
 // set (pulled out, pointing down)
 module park_part(set = false) {
@@ -338,7 +347,7 @@ module sheet_view() {
    sheet_part();
 }
 
-// Below the desk top: aprons, under-desk components and the leg room
+// Below the desk top: the apron, under-desk components and the leg room
 module under_view() {
    intersection() {
       union() {
@@ -356,15 +365,16 @@ module under_view() {
 
 // Close-up of the left desk clamp, the desk and the frame around it cut off
 module clamp_view() {
-   x0 = -ear_len - 40;
+   x0 = rails[0][0] - 40;
    x1 = 60;
    color(c_desk) translate([x0, frame_overhang, -desk.z]) cube([x1 - x0, 110, desk.z]);
    color(c_alu) {
-      translate([-ear_len, 0, 0]) cube([x1 + ear_len, rail.x, rail.y]);
-      translate([0, 0, rail.y]) cube([ext, ext, 70]);
-      translate([0, rail.x, 0]) cube([ext, 90, ext]);
+      translate([rails[0][0], ext, 0]) cube([x1 - rails[0][0], ext, ext]);
+      translate([0, 0, -ext]) cube([x1, ext, ext]);
+      translate([0, 0, 0]) cube([ext, ext, 70]);
+      translate([0, 2 * ext, 0]) cube([ext, 90, ext]);
    }
-   color(c_sheet) translate([0, -sheet_t, 0]) cube([x1, sheet_t, rail.y + 70]);
+   color(c_sheet) translate([0, -sheet_t, -ext]) cube([x1, sheet_t, ext + 70]);
    desk_clamp_part(clamp_xs[0]);
 }
 
