@@ -2,8 +2,8 @@
 
 A home cockpit of the Cessna 172 for the X-Plane flight simulator. The parts
 are designed in [OpenSCAD](https://openscad.org/) and 3D printed, and the
-controls are read by [SimVim](https://simvim.com/) on an Arduino Mega (the
-throttle quadrant uses its own ESP32).
+controls are read by [MobiFlight](https://www.mobiflight.com/) on an
+Arduino Mega (the throttle quadrant uses its own ESP32).
 
 Each cockpit component has its own directory:
 
@@ -12,7 +12,7 @@ Each cockpit component has its own directory:
 | [`throttle/`](throttle) | throttle quadrant: throttle, mixture and carb heat |
 | [`switchpanel/`](switchpanel) | the 172N lower left switch panel: ignition key, master, lights, avionics |
 | [`frame/`](frame) | the aluminium frame and panel sheet that everything mounts on |
-| [`hub/`](hub) | the box with the SimVim Mega, the servo Nano and the Cat5 ports |
+| [`hub/`](hub) | the box with the MobiFlight Mega and the Cat5 ports |
 
 The pictures below are rendered from the current `master` by the
 [Build](.github/workflows/build.yml) workflow and published, together with
@@ -177,14 +177,33 @@ flange holes are drilled with the box in place.
 
 ## Connections
 
-- The **hub** (see [Hub](#hub)) holds the SimVim Arduino Mega, the Nano
-  that drives the servos and 12 RJ45 ports. A powered USB hub next to it
-  takes the USB cables (Mega, throttle ESP32, Saitek yoke, Saitek radio
-  panel, later the FFB yoke), so one USB cable runs to the PC.
-- Every SimVim component connects to a hub port with a straight Cat5 patch
-  cable. Each component has one CD74HC4067 mux (if it has inputs) and one
-  RJ45 breakout board; everything inside a component is soldered, the
+- The **hub** (see [Hub](#hub)) holds the Arduino Mega with the MobiFlight
+  firmware and 12 RJ45 ports. A powered USB hub next to it takes the USB
+  cables (Mega, throttle ESP32, Saitek yoke, Saitek radio panel, later the
+  FFB yoke), so one USB cable runs to the PC.
+- Every MobiFlight component connects to a hub port with a straight Cat5
+  patch cable. Each component has one CD74HC4067 mux (if it has inputs) and
+  one RJ45 breakout board; everything inside a component is soldered, the
   plug is the only separation point.
+
+### MobiFlight
+
+[MobiFlight](https://www.mobiflight.com/) is free and open source (MIT,
+[GitHub](https://github.com/MobiFlight/MobiFlight-Connector)). The
+MobiFlight Connector runs on the PC (**Windows only**) and talks to X-Plane
+11/12 directly through its datarefs and commands (X-Plane's UDP interface,
+no plugin). It also flashes the MobiFlight firmware onto the Mega over USB.
+
+In the Connector, the Mega gets one device per thing on a port: a
+*Multiplexer* per mux (its SIG pin as the data pin; S0-S3 are set once, on
+the first mux, and shared by all), a *Servo*, an *Encoder* or an *Analog
+input* on the port's other pins. Each input (a mux channel is a button) then
+sets a dataref or sends a command on press and on release, each output
+(servo) follows a dataref. The configuration is a file: keep it with the
+cockpit.
+
+MobiFlight reads encoders only on their own pins, not through a mux, and
+drives servos straight from Mega pins, without a second board.
 
 ### Port pinout
 
@@ -200,50 +219,52 @@ keeps the pin numbers):
 | 5 | white-blue | GND | bus, Mega GND |
 | 6 | green | S3 | bus, Mega pin 25 |
 | 7 | white-brown | SIG | the port's own Mega pin (the mux output) |
-| 8 | brown | AUX | the port's own line: a Mega analog pin, or a Nano servo output |
+| 8 | brown | AUX | the port's own line: a Mega analog pin, or a digital pin (servo, encoder) |
 
-5 V and GND are one twisted pair. S0-S3 are fixed by SimVim and shared by
-every mux; at the hub pins 1-6 of all ports are soldered together (the
+5 V and GND are one twisted pair. S0-S3 are shared by every mux (MobiFlight
+takes them once per board); at the hub pins 1-6 of all ports are soldered together (the
 bus). SIG and AUX are wired per port with jumpers, so a component must go
 into its own port (they are numbered); swapping two cables only mixes up
 the inputs in the sim until they are swapped back, it does not damage
 anything.
 
-Every mux needs a pull-up resistor from SIG to 5 V (SimVim recommends
-1-5 kOhm, the open mux output picks up noise otherwise): solder a 4.7 kOhm
-between the SIG and VCC pins on each mux board, in the component.
+Every mux gets a pull-up resistor from SIG to 5 V. MobiFlight turns on the
+Mega's internal pull-up, but that is weak (20-50 kOhm), and its docs
+recommend an extra one for long wires: solder a 4.7 kOhm between the SIG and
+VCC pins on each mux board, in the component.
 
 ### Ports
 
 | Port | Component | SIG | AUX |
 |------|-----------|-----|-----|
-| 1 | pedestal: trim wheel encoder, fuel selector (mux), trim indicator (servo) | D26 | Nano servo output |
+| 1 | pedestal: fuel selector (mux), trim indicator (servo) | D26 | D2 (servo) |
 | 2 | throttle quadrant (open, see below) | D27 | A1 |
 | 3 | switch panel | D28 | A2 (free) |
 | 4 | yoke handle: PTT, trim switch, more buttons (FFB yoke, later) | D29 | A3 |
-| 5-12 | free | D30-D37 | A4-A11 |
+| 5 | pedestal: trim wheel encoder | D30 (encoder A) | D38 (encoder B) |
+| 6-12 | free | D31-D37 | A5-A11 |
 
-The SIG pins are suggestions: any free digital pin works, select it in the
-SimVim configurator. AUX carries one analog input (a pot) or one servo
-signal; a component that needs more (several gauge servos) gets a second
-port.
+The pins are suggestions: any free pin works, select it in the MobiFlight
+Connector. AUX carries one analog input (a pot, on an analog pin), one servo
+signal or one encoder line (on a digital pin); a component that needs more
+(an encoder, several gauge servos) gets a second port.
 
 - **Parking brake**: one switch, on the mux of the pedestal or of the yoke
   port, whichever cable runs closer (it hangs under the yoke).
-- **Trim wheel encoder** (EC11 type, 20 detents): SimVim reads encoders
-  through the mux (A and B on two mux inputs, common to GND). Test on the
-  bench that a fast spin does not lose steps. If it does, it gets a second
-  port (e.g. 5): encoder A on its SIG, B on its AUX, both straight to Mega
-  pins.
+- **Trim wheel encoder** (EC11 type, 20 detents): MobiFlight does not read
+  encoders through a mux, so the pedestal has a second RJ45 board and cable
+  to port 5: encoder A on its SIG, B on its AUX, both straight to Mega pins,
+  the common on its GND. Set the encoder type in the Connector to match the
+  encoder (steps per detent) and test that a fast spin does not lose steps.
 - **Throttle quadrant**: open. It is an ESP32 on USB today; on a port its
   three pots would need three analog lines (a port has AUX, and SIG if it
   goes to an analog Mega pin, but no mux), or carb heat becomes a switch.
 - **Likely later**: flaps lever and indicator (mux + servo on AUX), panel
-  light dimmers (pots on AUX), steam gauges (servos, or a SimVim stepper
-  board in the hub). Outputs (annunciator lights, avionics displays) do
-  not fit this pinout: SimVim drives them through 74HC595 shift registers,
-  which need their own lines; decide that before the first output
-  component.
+  light dimmers (pots on AUX), steam gauges (servos, or steppers with a
+  driver board in the hub). Outputs (annunciator lights, avionics displays)
+  do not fit this pinout: MobiFlight drives them through 74HC595 shift
+  registers or MAX7219 drivers, which need three lines of their own; decide
+  that before the first output component.
 
 **Logic only** goes over the Cat5: the muxes, encoders and hall sensors
 draw a few mA. One small (9 g) servo may take its 5 V from pin 4 too (about
@@ -265,7 +286,7 @@ the bus in its back wall.
 
 # Hub
 
-[`hub/`](hub): the box with the Mega, the servo Nano and the Cat5 ports.
+[`hub/`](hub): the box with the MobiFlight Mega and the Cat5 ports.
 
 [![Hub](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)
 
@@ -288,32 +309,28 @@ From the front wall to the back:
 - **Mega** (left): on 6 standoffs, its USB jack through the left wall
   (flush with the outside, so any USB-B plug fits), with a cut-out in
   front of the power jack for later.
-- **Prototype board** (middle): a 50 x 70 mm board on four standoffs,
-  with the bus header (below) and room for small extra circuits if they
-  are needed (a servo capacitor, later the power bus distribution). The
-  hole for the power bus is in the back wall behind it.
-- **Nano** (right): on its own pedestal, upside down with its pins up,
-  so the jumpers plug in from above like on the Mega. Four corner posts
-  carry the PCB by its corners only (clear of the pin solder joints, the
-  ICSP pins and the USB jack under it) and their lips locate it; a drop of
-  hot glue on two posts keeps it there. Its USB jack is at a cut-out in the
-  right wall, so the SimVim firmware can be loaded with the lid on.
-- The boards are about 20 mm apart (at least `board_gap`, 15 mm); the
-  build checks this and the room for a plugged jumper (30 mm) above every
+- **Prototype board** (next to the Mega, 20 mm away): a 50 x 70 mm board
+  on four standoffs, with the bus header (below) and room for small extra
+  circuits if they are needed (a servo capacitor, later the power bus
+  distribution). The hole for the power bus is in the back wall behind it.
+  The rest of the row, on the right, stays free (a stepper driver board,
+  later).
+- The build checks the room for a plugged jumper (30 mm) above every
   board.
 - The lid has a locating lip and is screwed onto four corner posts. Four
   ears on the floor (5.3 mm holes) screw the box onto the frame (M5 + T-nut)
   or under the desk.
 
-Nothing on the Mega or the Nano is soldered: they keep their pins free and
-can be reused, and a port is rewired by moving jumpers.
+Nothing on the Mega is soldered: it keeps its pins free and can be reused,
+and a port is rewired by moving jumpers. The MobiFlight firmware is flashed
+from the Connector through the Mega's USB jack in the left wall, with the
+lid on.
 
 ### Hardware
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 1 | Arduino Mega 2560 | SimVim main board |
-| 1 | Arduino Nano, headers soldered | SimVim servo controller |
+| 1 | Arduino Mega 2560 | MobiFlight board |
 | 1 | prototype board, 50 x 70 mm | bus header, extra circuits if needed |
 | 1 | female header strip, 8 pin, 2.54 mm | bus header |
 | 12 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
@@ -324,10 +341,8 @@ can be reused, and a port is rewired by moving jumpers.
 | 6 | M3 x 6 self tapping screw | Mega |
 | 4 | M3 x 10 self tapping screw | lid |
 | - | insulated wire, about 0.25 mm2, 6 colors | the bus |
-| - | hot glue | Nano onto its pedestal |
-| ~30 | male-female jumper wire, 20 cm | RJ45 SIG and AUX pins to the Mega, Nano to the bus and the Mega |
+| ~25 | male-female jumper wire, 20 cm | RJ45 SIG and AUX pins to the Mega |
 | ~6 | male-male jumper wire, 10 cm | bus header to the Mega |
-| ~4 | female-female jumper wire, 20 cm | RJ45 AUX pins to Nano servo outputs |
 
 Per component: one more RJ45 breakout board and a straight Cat5 patch
 cable.
@@ -338,10 +353,7 @@ and its position on the board, the header position and the mounting holes
 build checks that the brass standoffs clear the jack and the header). If
 the jack is taller than 13.5 mm, take longer standoffs (`rj_stack`). The
 prototype board's hole positions (`proto_*`; if its holes are smaller than
-M2, use M1.6 screws). The Nano (`nano_*`): its size, the first and last
-pin, and how far the USB jack, the pin solder joints and the ICSP pins (if
-soldered) reach under the PCB (`nano_under`, 9 mm). The Mega values are
-from the Arduino drawing.
+M2, use M1.6 screws). The Mega values are from the Arduino drawing.
 
 ### Wiring
 
@@ -362,22 +374,12 @@ Pins 7 and 8 stay free for the jumpers.
 | From | To | Jumper |
 |------|----|--------|
 | each port pin 7 (SIG) | its Mega pin (table above) | male-female |
-| each port pin 8 (AUX) | its Mega analog pin | male-female |
-| | or a Nano servo output | female-female |
+| each port pin 8 (AUX) | its Mega pin (table above) | male-female |
 | bus header S0-S3 | Mega pins 22-25 | male-male |
 | bus header 5 V, GND | Mega 5 V, GND | male-male |
-| Nano 5 V, GND | bus header 5 V, GND | male-female |
-| Nano TX | Mega RX2 (pin 17) | male-female |
-| Nano RX | Mega TX2 (pin 16) | male-female |
 
-The Nano lies upside down, so its pin labels are underneath: check them
-before plugging (many clones print them on both sides).
-
-Port 1's AUX goes to the Nano output that SimVim assigns to the trim
-indicator servo (see SimVim's
-[servo controllers](https://simvim.com/gau_servo_ctrl.html) page). The
-Nano gets its firmware from the SimVim plugin over USB: unplug its TX and
-RX jumpers and plug a USB cable in through the right wall.
+Port 1's AUX goes to D2, the trim indicator servo's signal; add a Servo
+device on that pin in the Connector.
 
 ### Assembly
 
@@ -388,10 +390,8 @@ RX jumpers and plug a USB cable in through the right wall.
    the links between the rows.
 4. Solder the bus header onto the prototype board and wire it to port 1.
 5. Screw the prototype board and the Mega onto their standoffs.
-6. Put the Nano upside down onto its pedestal, USB jack to the right wall,
-   and fix it with a drop of hot glue on two posts.
-7. Plug the jumpers as above, label the SIG and AUX jumpers.
-8. Screw the lid on.
+6. Plug the jumpers as above, label the SIG and AUX jumpers.
+7. Screw the lid on.
 
 # Throttle quadrant
 
@@ -439,7 +439,7 @@ rail's top slot, so pulling a knob does not load the sheet alone.
 [`switchpanel/`](switchpanel): the lower left switch panel of the 172N.
 Similar in function to the Saitek Switch Panel, but it should look as close
 to the real panel as possible. Every switch position is a raw input for
-SimVim, active low, like a switch to GND.
+MobiFlight, active low, like a switch to GND.
 
 It is two panels, printed separately and mounted side by side: the ignition
 on the left and the switch row, which also carries the input multiplexer
@@ -623,13 +623,9 @@ holes.
 ### Multiplexer
 
 All switches and the ignition go to one CD74HC4067 breakout board on the
-back of the switch panel. It is SimVim's standard input extension: 16
-inputs, read through one Mega pin. So everything is soldered on the panels,
-and only one Cat5 cable runs to the hub (port 3).
-
-(A SimVim "slave" board does not work here: the only slave for inputs is
-the key matrix board, and it takes momentary buttons only, no toggle
-switches.)
+back of the switch panel. MobiFlight reads it as a Multiplexer device: 16
+inputs through one Mega pin. So everything is soldered on the panels, and
+only one Cat5 cable runs to the hub (port 3).
 
 The board sits on two standoffs in the strip behind the group labels, on
 the left (pilot side) half, where the ignition cable comes in. Mount it with
@@ -657,10 +653,11 @@ the standoffs.
 | C7 | STROBE | C15 | ignition START |
 
 That is all 16. The switches are in label order (the `groups` order), and
-the ignition positions are consecutive, which suits a SimVim multi-position
-switch (M, one input per position). In the SimVim configurator assign the
-toggles and rockers as toggle switches (S). Without FUEL PUMP (172N) or the
-OFF hall sensor, one input stays free.
+the ignition positions are consecutive. In the MobiFlight Connector every
+channel is a button: a toggle or rocker sets its dataref to 1 on press and
+to 0 on release, an ignition position sets the key position on press, and
+START holds the starter while it is pressed. Without FUEL PUMP (172N) or
+the OFF hall sensor, one input stays free.
 
 #### Cable to the hub
 
@@ -669,10 +666,10 @@ RJ45 breakout board behind the switch panel:
 
 | Mux pin | RJ45 pin | Mega (at the hub) |
 |---------|----------|-------------------|
-| S0, S1, S2, S3 | 1, 2, 3, 6 | pins 22, 23, 24, 25 (fixed by SimVim, shared by all muxes) |
+| S0, S1, S2, S3 | 1, 2, 3, 6 | pins 22, 23, 24, 25 (shared by all muxes) |
 | VCC | 4 | 5 V |
 | GND | 5 | GND |
-| SIG | 7 | D28, select it in the SimVim configurator |
+| SIG | 7 | D28, the mux's data pin in the MobiFlight Connector |
 | EN | - | not to the hub: bridge it to GND on the board (enable is active low) |
 
 RJ45 pin 8 (AUX) stays free. Solder the header into the control row (short
@@ -683,12 +680,12 @@ panel yet: tie it to the frame behind the panel for now.
 
 The switches and the hall sensors have no pull-up resistors of their own:
 one 4.7 kOhm resistor from SIG to VCC on the mux board pulls whichever
-input is selected up (SimVim recommends 1-5 kOhm on every mux). Test it on
+input is selected up (see [Port pinout](#port-pinout)). Test it on
 the bench with one switch on the mux before soldering all of them.
 
 ### Wiring
 
-Every input is wired like a switch to GND (active low, as SimVim expects):
+Every input is wired like a switch to GND (active low, as MobiFlight expects):
 
 - **Toggle, 2 pin:** one lug to GND, the other to its mux input. Mount it so
   it is ON with the lever up.
