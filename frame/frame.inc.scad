@@ -23,7 +23,7 @@
 //   edge (a felt pad); the yoke's front sits on it, the yoke's own clamps go
 //   around it and the desk. Under the throttle a smaller rectangle hangs
 //   from the bottom bar: the apron, two hangers and a lower bar, for the
-//   trim wheel / fuel selector pedestal. The parking brake hangs under the
+//   trim wheel pedestal and the flaps panel. The parking brake hangs under the
 //   bottom bar in the bay, directly below the yoke.
 // - Desk part, flat on the desk behind it: a ladder (front rail, rear rail,
 //   crossbars) with the front rail cut at the yoke bay. The front part is
@@ -119,8 +119,9 @@ switch_panel = switch_back + 2 * [switch_flange, switch_flange];   // the face
 switch_depth = 40;           // switches behind the sheet (view only)
 switch_z = ext + 5;          // face bottom above the desk
 
-// --- Under-desk controls, future components (guesses until designed) ---
-// Pedestal (trim wheel, fuel selector), same rule as the throttle box: the
+// --- Under-desk controls ---
+// Pedestal (trim wheel and trim indicator), a future component, same rule
+// as the throttle box: the
 // body (width x depth x height) goes through its cut-out in the apron sheet
 // and stands on the lower bar, the face flange (top and sides) is screwed
 // onto the sheet with M3, and two M5 bolts through the floor go into the
@@ -129,8 +130,15 @@ under_face_t = 3;
 under_flange = 10;
 under_play = 1;              // body to its cut-out
 under_bolt_y = 16;           // floor bolts from the face front, over the lower bar's slot
-pedestal_size = [90, 120, 150];
+pedestal_size = [75, 120, 150];   // 75 x 150 front (MEASURE), the depth a guess
 desk_clear = 3;              // a body to the desk underside, at least
+// Flaps panel, bought (lever and indicator), MEASURE: its front plate is
+// screwed onto the apron sheet (drill through the plate's own holes), its
+// body goes through the cut-out. Right of the pedestal, as high as the
+// desk allows.
+flaps_plate = [50, 63];      // front plate, width x height
+flaps_body = [44, 57, 64];   // through the sheet (a guess: 3 mm smaller than the plate all round), depth behind it
+flaps_play = 0.5;            // body to its cut-out
 // Parking brake: no face. A thin body (width x depth x height) under the
 // desk top, behind the bottom bar, hangs from the bottom bar's bottom slot (two
 // M5). Its T-handle is in front of the bar: released, it is almost flush
@@ -246,10 +254,17 @@ sheet_screws = [for (p = concat(
       [for (x = spread(ext / 2, frame_w - ext / 2, screw_step)) [x, -ext / 2]]))
    if (clear_of(p, avoid, screw_edge)) p];
 // apron sheet: its hangers and the lower bar, [x, z]
+// flaps panel, centered between the pedestal face and the right hanger
+flaps_x = (pedestal_face[2] + hangers[1]) / 2;
+flaps_cut = [flaps_x - flaps_body.x / 2 - flaps_play, -under_z - flaps_body.y - flaps_play,
+             flaps_x + flaps_body.x / 2 + flaps_play, -under_z];
+flaps_z = (flaps_cut[1] + flaps_cut[3]) / 2;           // center
+flaps_face = [flaps_x - flaps_plate.x / 2, flaps_z - flaps_plate.y / 2,
+              flaps_x + flaps_plate.x / 2, flaps_z + flaps_plate.y / 2];
 apron_screws = [for (p = concat(
       [for (h = hangers, z = spread(-apron_h + ext / 2, -ext - ext / 2, screw_step_upright)) [h + ext / 2, z]],
       [for (x = spread(apron_bar[0] + ext / 2, apron_bar[1] - ext / 2, screw_step)) [x, -apron_h + ext / 2]]))
-   if (clear_of(p, [pedestal_cut, pedestal_face], screw_edge)) p];
+   if (clear_of(p, [pedestal_cut, pedestal_face, flaps_cut, flaps_face], screw_edge)) p];
 // M5 through the throttle box floor into T-nuts in the front rail's top slot, [x, y]
 throttle_bolts = [for (x = throttle_bolt_xs) [throttle_x0 + x, throttle_y0 + throttle_bolt_y]];
 // M5 through the pedestal floor into T-nuts in the lower bar's top slot, [x, y]
@@ -283,6 +298,11 @@ assert(pedestal_face[0] >= apron_bar[0] && pedestal_face[2] <= apron_bar[1],
        "Pedestal does not fit between its hangers");
 assert(pedestal_cut[3] <= -under_z + under_play, "Pedestal runs into the desk");
 assert(pedestal_face[3] <= -ext - screw_edge, "Pedestal face runs off its apron sheet");
+assert(flaps_body.x <= flaps_plate.x - 4 && flaps_body.y <= flaps_plate.y - 4, "Flaps plate does not cover its cut-out");
+assert(flaps_face[0] >= pedestal_face[2] + sheet_web / 2, "Flaps panel runs into the pedestal face");
+assert(flaps_face[2] <= hangers[1] - screw_edge && flaps_face[3] <= -ext - screw_edge,
+       "Flaps panel runs off its apron sheet");
+assert(flaps_cut[1] >= apron_bar_z + ext, "Flaps panel runs into the lower bar");
 assert(clamp_open >= ext + desk.z + 1, "Desk clamps do not open far enough for the rail and the desk");
 assert(clamp_reach >= clamp_y + 2, "Desk clamps do not reach over the rail to the desk");
 assert(clamp_y - clamp_pad_d / 2 >= frame_overhang - 3, "Desk clamp jaw not under the desk");

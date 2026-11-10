@@ -128,8 +128,14 @@ Below the desk top:
   bar, two 2020 hangers (corner brackets; the right one under the end
   upright) and a lower bar between their ends, covered by a small ACM
   sheet flush under the main sheet. It carries the **pedestal** with the
-  trim wheel and the fuel selector, which stands on the lower bar like the
-  throttle box on the front rail.
+  trim wheel and the trim indicator (75 x 150 mm front), centered under
+  the throttle, which stands on the lower bar like the throttle box on the
+  front rail, and to its right the bought **flaps panel** (lever and
+  indicator, 50 x 63 mm front plate, 64 mm deep), as high as the desk
+  allows: its body goes through a cut-out in the apron sheet and its plate
+  is screwed onto the sheet (drill through the plate's own holes). The
+  cut-out (`flaps_body`) is a guess, 3 mm smaller than the plate all
+  round, until the panel is measured.
 - **Parking brake**, under the bottom bar in the yoke bay, directly below
   the yoke: a thin body (22 mm) under the desk top, two M5 into the bar's
   bottom slot, and the T-handle just in front of the bar. Released, it is
@@ -140,8 +146,9 @@ Below the desk top:
 Apart from the bottom bar and the thin parking brake, `knee_w` (460 mm)
 around the yoke stays open for the legs. The pedestal and the parking
 brake are future components; their sizes (`pedestal_size`, `park_size`)
-are guesses that reserve the space (the pedestal sets the apron height),
-and the pedestal's hole is cut when it exists. Their bodies must stay
+reserve the space (the pedestal sets the apron height; its depth and the
+parking brake are guesses), and the pedestal's hole is cut when it
+exists. Their bodies must stay
 below the desk underside.
 
 The rule for every component: it brings its own front face, a hole is cut
