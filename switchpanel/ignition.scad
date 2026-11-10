@@ -37,7 +37,10 @@
 //
 // The panel is printed as well. It has the same height, rim, mount holes and
 // lettering as the switch panel (panel.inc.scad) and mounts to its left.
-// The position labels are engraved into its front.
+// The position labels are engraved into its front. The labels module is
+// the inlay that fills them: load panel and labels into the slicer as one
+// object with two parts (same coordinates) and print the labels in white
+// with a second filament, they are its first label_depth of layers.
 //
 // Assembly: lock through the panel and the housing, tighten its nut, mount
 // the rotor with the lock's cam screw, insert ball + spring and shoe +
@@ -360,6 +363,14 @@ module panel() {
    }
 }
 
+// Inlay that fills the engraved labels, printed in a second color together
+// with the panel (same position, front side down)
+module labels() {
+   translate([0, 0, -panel_t])
+      linear_extrude(label_depth)
+         labels_2d();
+}
+
 // --- Views (rendered to PNG by "make views") ---
 
 // Display only
@@ -669,6 +680,7 @@ module front_view(pos = 0) {
 
 housing(); // Make module housing
 translate([0, 0, -explode]) panel(); // Make module panel
+translate([0, 0, -explode]) labels(); // Make module labels
 translate([0, 0, z_cam]) rotate([0, 0, pos_angle(view_pos)]) rotor(); // Make module rotor
 shoe_in_place(pos_angle(view_pos)); // Make module shoe
 translate([0, 0, explode]) cover(); // Make module cover
