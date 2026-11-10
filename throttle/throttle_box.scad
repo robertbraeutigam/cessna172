@@ -1,11 +1,11 @@
 // Throttle box with carb heat, throttle, mixture
 //
 // Mounted in the cockpit frame (frame/): the box goes through a cut-out in
-// the panel sheet and stands on the throttle bar. Its front wall is the face,
+// the panel sheet and stands on the front rail. Its front wall is the face,
 // with a flange on the top and the two sides that is screwed onto the sheet
 // (M3, nuts behind the sheet; drill the sheet through the flange's holes
 // with the box in place). Two M5 bolts through the floor go into T-nuts in
-// the throttle bar's top slot. The box is behind the sheet, so it needs no
+// the front rail's top slot. The box is behind the sheet, so it needs no
 // lid; its top stays open.
 
 $fn = 30;
@@ -23,7 +23,7 @@ bed = [255, 255];
 
 // Face flange, the same as the switch panels (switchpanel/panel.inc.scad)
 face_t = wall_thickness;     // the front wall, in front of the sheet
-flange_w = 10;               // face beyond the box: top and sides, none at the bottom (bar)
+flange_w = 10;               // face beyond the box: top and sides, none at the bottom (rail)
 face_corner_r = 4;
 mount_d = 3.3;               // M3
 mount_inset = 4.5;           // mount hole center to the face edge
@@ -31,10 +31,11 @@ mount_nut_r = 3.2;           // M3 nut, across the corners / 2, behind the sheet
 mount_low_z = 8;             // the lower holes in the side flanges
 sheet_cut_clear = 1;         // sheet cut-out beyond the box (frame/ throttle_play)
 
-// Floor bolts into the throttle bar (frame/): M5, the bar's top slot is
-// 10 mm behind the sheet, and the sheet and face_t are in front of y = 6
+// Floor bolts into the front rail (frame/): M5, the rail (a 2020 behind
+// the frame's front part) has its top slot 30 mm behind the sheet, and the
+// sheet and face_t are in front of y = 6
 sheet_t = 3;
-rail_slot_y = 10;
+rail_slot_y = 30;
 m5_d = 5.3;
 floor_bolt_y = face_t + sheet_t + rail_slot_y;
 
@@ -102,7 +103,7 @@ module box_underside() {
          translate([h.x, -1, h.y])
             rotate([-90, 0, 0])
                cylinder(d=mount_d, h=face_t+2);
-      // Floor bolts into the throttle bar
+      // Floor bolts into the front rail
       for (x = floor_bolt_xs)
          translate([x, floor_bolt_y, -1])
             cylinder(d=m5_d, h=wall_thickness+2);
@@ -637,7 +638,7 @@ module underside_part() {
 }
 
 // A piece of the cockpit sheet with the box's cut-out, behind the face,
-// the throttle bar and the front rail under it (frame/)
+// the frame's front part and the front rail under it (frame/)
 module sheet_part() {
    m = 40;
    c = sheet_cut_clear;
@@ -650,7 +651,7 @@ module sheet_part() {
                   translate([-c, -1]) square([full_width + 2 * c, height + c + 1]);
                }
    color("#c3c9d0")
-      translate([-flange_w - m, face_t + sheet_t, -20]) cube([face_w + 2 * m, 40, 20]);
+      translate([-flange_w - m, face_t + sheet_t + 20, -20]) cube([face_w + 2 * m, 20, 20]);
    // Mount screws and floor bolts
    color(c_steel) {
       for (h = mount_holes)
@@ -669,7 +670,7 @@ module inside_parts() {
    wires_part();
 }
 
-// Mounted on the cockpit sheet and the throttle bar
+// Mounted on the cockpit sheet and the front rail
 module mounted_view() {
    underside_part();
    sheet_part();

@@ -18,8 +18,7 @@
 //
 // - Front part, vertical, in front of the desk edge: a rectangle (top bar,
 //   bottom bar, an upright at each end) with an upright on each side of the
-//   yoke bay, and the throttle bar between the right two uprights, on the
-//   bottom bar, that the throttle box stands on. The bottom bar lies just
+//   yoke bay. The bottom bar lies just
 //   under the desk top (its top at desk height), its back against the desk
 //   edge (a felt pad); the yoke's front sits on it, the yoke's own clamps go
 //   around it and the desk. Under the throttle a smaller rectangle hangs
@@ -29,7 +28,8 @@
 // - Desk part, flat on the desk behind it: a ladder (front rail, rear rail,
 //   crossbars) with the front rail cut at the yoke bay. The front part is
 //   bolted to its front rail, and a 45 degree brace from each upright down
-//   to a crossbar stops it from rocking.
+//   to a crossbar stops it from rocking. The throttle box stands on the
+//   front rail and the crossbar under its middle.
 //
 // The front rail runs past the sheet at both ends (ear_len): there a
 // bought screw clamp (rubber jaws) on each end clamps the rail onto the
@@ -87,11 +87,12 @@ radio_depth = 55;            // behind the sheet
 
 // --- Throttle box, from throttle/throttle_box.scad ---
 // The box (full_width x (depth + 2 * roundness) x height, open top) goes
-// through its cut-out and stands on the throttle bar, the front rail and
-// the middle crossbar. Its front wall (face_t) is the face; the flange
-// (flange_w, on the top and the two sides, none at the bottom) is screwed
-// onto the sheet with M3 (drill through the box's holes), and two M5 bolts
-// through its floor go into the throttle bar's top slot.
+// through its cut-out and stands on the front rail and the middle
+// crossbar, its front overhanging the front part. Its front wall (face_t)
+// is the face; the flange (flange_w, on the top and the two sides, none at
+// the bottom) is screwed onto the sheet with M3 (drill through the box's
+// holes), and two M5 bolts through its floor go into the front rail's top
+// slot.
 throttle_size = [150, 190, 50];
 throttle_rod_xs = [20, 75, 130];  // roundness + end_gap + i * control_gap
 throttle_rod_z = 38;         // wall + stand + pot module + 15 + 7
@@ -99,7 +100,7 @@ throttle_face_t = 3;         // face_t
 throttle_flange = 10;        // flange_w
 throttle_play = 1;           // box to its cut-out, sheet_cut_clear
 throttle_bolt_xs = [47.5, 102.5]; // floor_bolt_xs
-throttle_bolt_y = 16;        // floor_bolt_y, from the face front
+throttle_bolt_y = 36;        // floor_bolt_y, from the face front
 
 // --- Switch panel, from switchpanel/ ---
 // The backs of the ignition (77) and the switches (211.6), panel_h high,
@@ -169,7 +170,6 @@ x_rc = (x_r0 + x_r1) / 2;
 // front part
 upright_xs = [0, x_bay0 - ext, x_bay1, frame_w - ext];   // left sides
 upright_len = sheet_h - ext;                 // on the bottom bar, under the top bar
-throttle_bar = [x_bay1 + ext, frame_w - ext];            // [x0, x1], on the bottom bar
 throttle_x0 = x_rc - throttle_size.x / 2;
 throttle_y0 = -sheet_t - throttle_face_t;    // face front, the face on the sheet
 
@@ -238,7 +238,7 @@ apron_screws = [for (p = concat(
       [for (h = hangers, z = spread(-apron_h + ext / 2, -ext - ext / 2, screw_step_upright)) [h + ext / 2, z]],
       [for (x = spread(apron_bar[0] + ext / 2, apron_bar[1] - ext / 2, screw_step)) [x, -apron_h + ext / 2]]))
    if (clear_of(p, [pedestal_cut, pedestal_face], screw_edge)) p];
-// M5 through the throttle box floor into T-nuts in the throttle bar's top slot, [x, y]
+// M5 through the throttle box floor into T-nuts in the front rail's top slot, [x, y]
 throttle_bolts = [for (x = throttle_bolt_xs) [throttle_x0 + x, throttle_y0 + throttle_bolt_y]];
 // M5 through the pedestal floor into T-nuts in the lower bar's top slot, [x, y]
 pedestal_bolts = [for (s = [-1, 1]) [pedestal_x + s * pedestal_size.x / 4, under_y0 + under_bolt_y]];
@@ -247,7 +247,7 @@ pedestal_bolts = [for (s = [-1, 1]) [pedestal_x + s * pedestal_size.x / 4, under
 assert(gap >= ext + 3 && margin >= ext + 3, "No room for the uprights next to the cut-outs");
 assert(margin >= sheet_edge, "Cut-outs too close to the sheet edge");
 assert(switch_cut[1] >= ext, "Switch panel cut-out runs into the bottom of the sheet");
-assert(throttle_bar[1] - throttle_bar[0] >= throttle_size.x, "Throttle bar shorter than the throttle box");
+assert(throttle_x0 >= rails[1][0] && throttle_x0 + throttle_size.x <= frame_w, "Throttle box not on the front rail");
 assert(throttle_y0 + throttle_size.y <= rear_y, "Throttle box does not fit on the frame");
 assert(yoke_front_y + yoke_housing.y <= rear_y, "Yoke housing runs into the rear rail");
 assert(radio_body.x <= radio_front.x - 6 && radio_body.y <= radio_front.y - 6,
@@ -256,14 +256,14 @@ assert(radio_front_z0 >= throttle_face[3] + 2, "Radio front runs into the thrott
 assert(radio_front_z0 + radio_front.y <= sheet_h - ext - sheet_web, "Radio panel too high for the sheet");
 assert(bay_cut[3] <= sheet_h - ext - sheet_web, "Yoke notch too high for the sheet");
 assert(switch_cut[3] <= sheet_h - ext - sheet_web, "Switch panel too high for the sheet");
-assert(abs(throttle_y0 + throttle_bolt_y - ext / 2) < 0.01, "Throttle floor bolts miss the throttle bar slot");
+assert(abs(throttle_y0 + throttle_bolt_y - ext * 3 / 2) < 0.01, "Throttle floor bolts miss the front rail slot");
 assert(ext + brace_rise + ext * sqrt(2) <= rear_y, "Braces do not land on the crossbars");
 assert(brace_top + ext * sqrt(2) <= sheet_h, "Braces stick out over the top bar");
 assert(rails[1][1] - rails[0][0] <= desk.x && frame_d <= frame_overhang + desk.y, "Frame does not fit on the desk");
 assert(2 * ext - frame_overhang >= 10, "Front rail barely on the desk");
 assert(legs[0] <= x_bay0 && legs[1] >= x_bay1, "Leg room narrower than the yoke bay");
 assert(hangers[0] >= legs[1], "Apron hanger in the leg room");
-assert(hangers[0] >= throttle_bar[0], "Apron hanger not under the throttle side");
+assert(hangers[0] >= x_bay1 + ext, "Apron hanger not under the throttle side");
 assert(abs(under_y0 + under_bolt_y - ext / 2) < 0.01, "Pedestal floor bolts miss the lower bar slot");
 assert(pedestal_face[0] >= apron_bar[0] && pedestal_face[2] <= apron_bar[1],
        "Pedestal does not fit between its hangers");

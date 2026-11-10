@@ -9,8 +9,8 @@
 // no printed parts.
 //
 // Bought parts (lengths: see the echo of the build, or the README):
-// - 2020 extrusion, front part: top bar, bottom bar, 4 uprights, throttle
-//   bar, 2 apron hangers, lower bar
+// - 2020 extrusion, front part: top bar, bottom bar, 4 uprights,
+//   2 apron hangers, lower bar
 // - 2020 extrusion, desk part: front rail left, front rail right, rear
 //   rail, 5 crossbars, 4 braces (45 degree ends)
 // - corner brackets, M5 screws and T-nuts (6 mm slot)
@@ -21,8 +21,7 @@
 //
 // Assembly:
 // 1. Front part, flat on the floor: the bottom bar, the uprights on it,
-//    the top bar on them, the throttle bar between the right two uprights
-//    on the bottom bar, the two hangers under the bottom bar and the lower
+//    the top bar on them, the two hangers under the bottom bar and the lower
 //    bar between their ends, all with corner brackets.
 // 2. Cut the sheets (cuts, sheet_screws, apron_screws in the echo, the
 //    "sheet" view), drill their screw holes, and screw them onto the front
@@ -31,13 +30,13 @@
 // 4. Put the desk part on the desk, stand the front part in front of the
 //    desk edge, its bottom bar against the edge (felt pads), and bolt it
 //    on: a corner bracket from each upright's back to the front rail, the
-//    throttle bar to the front rail, the braces from the uprights to the
+//    braces from the uprights to the
 //    crossbars. Clamp each rail end (ear) onto the desk with a screw
 //    clamp. Put the yoke into the bay, its front on the bottom bar, and
 //    clamp it with its own clamps.
-// 5. Push the throttle box through its cut-out onto the throttle bar, the
-//    rail and the middle crossbar until its face is on the sheet, bolt its
-//    floor into the throttle bar (throttle_bolts), drill the sheet through
+// 5. Push the throttle box through its cut-out onto the rail and the
+//    middle crossbar until its face is on the sheet, bolt its floor into
+//    the rail (throttle_bolts), drill the sheet through
 //    its flange holes and screw the flange on (M3, nuts behind the sheet).
 //    The pedestal goes in the same way onto the lower bar, the parking
 //    brake under the bottom bar, when they exist.
@@ -57,7 +56,7 @@ c_switch = "#3a3d42";
 
 echo(frame = [frame_w, frame_d, sheet_h]);
 echo(front_part_2020 = [["top bar", frame_w], ["bottom bar", frame_w], ["4 uprights", upright_len],
-                        ["throttle bar", throttle_bar[1] - throttle_bar[0]], ["2 hangers", hanger_len],
+                        ["2 hangers", hanger_len],
                         ["lower bar", apron_bar_len]]);
 echo(desk_part_2020 = [["front rail left", rails[0][1] - rails[0][0]], ["front rail right", rails[1][1] - rails[1][0]],
                        ["rear rail", frame_w], ["5 crossbars", crossbar_len], ["4 braces, long edge", brace_long]]);
@@ -94,7 +93,6 @@ module front_part() {
    bar([0, 0, -ext], [frame_w, ext, ext]);
    for (x = upright_xs)
       bar([x, 0, 0], [ext, ext, upright_len]);
-   bar([throttle_bar[0], 0, 0], [throttle_bar[1] - throttle_bar[0], ext, ext]);
    // apron
    for (x = hangers)
       bar([x, 0, -ext - hanger_len], [ext, ext, hanger_len]);

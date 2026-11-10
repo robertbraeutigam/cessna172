@@ -74,8 +74,7 @@ parts, each built on its own and then bolted together:
   bar, bottom bar, an upright at each end) with an upright on each side of
   the yoke bay. The bottom bar lies just under the desk top, its top at
   desk height and its back against the desk edge (felt pads), so pushing
-  the frame away hits a stop. Between the right two uprights, on the
-  bottom bar, is the throttle bar that the throttle box stands on. One
+  the frame away hits a stop. One
   3 mm aluminium composite (ACM) sheet is screwed onto its front slots.
 - **Desk part**, flat on the desk behind it: a ladder of a front rail, a
   rear rail and five crossbars. The front rail is cut at the yoke bay. The
@@ -116,7 +115,7 @@ Below the desk top:
   upright) and a lower bar between their ends, covered by a small ACM
   sheet flush under the main sheet. It carries the **pedestal** with the
   trim wheel and the fuel selector, which stands on the lower bar like the
-  throttle box on the throttle bar.
+  throttle box on the front rail.
 - **Parking brake**, under the bottom bar in the yoke bay, directly below
   the yoke: a thin body (22 mm) under the desk top, two M5 into the bar's
   bottom slot, and the T-handle just in front of the bar. Released, it is
@@ -134,9 +133,9 @@ below the desk underside.
 The rule for every component: it brings its own front face, a hole is cut
 into the sheet for it and its face is screwed onto the sheet. Heavy or
 pulled components also stand on the frame: the throttle box sits on the
-throttle bar, the front rail and a crossbar, its face flange is screwed
-onto the sheet like the switch panel's and two M5 bolts through its floor
-go into the throttle bar.
+front rail and the crossbar under its middle (its front overhangs the
+front part), its face flange is screwed onto the sheet like the switch
+panel's and two M5 bolts through its floor go into the front rail.
 The pedestal does the same on the apron's lower bar.
 The extrusion carries the
 loads, the sheet only covers the front, so cut-outs do not weaken it.
@@ -154,7 +153,7 @@ the sheet 1000 x 280 mm (it also covers the bottom bar), the apron sheet
 
 | Part | 2020 bars |
 |------|-----------|
-| front part | top bar 1000, bottom bar 1000, 4 uprights 240, throttle bar 301, 2 apron hangers 170, lower bar 210 |
+| front part | top bar 1000, bottom bar 1000, 4 uprights 240, 2 apron hangers 170, lower bar 210 |
 | desk part | front rail left 420, front rail right 400, rear rail 1000, 5 crossbars 300, 4 braces (45 degree ends, long edge 283) |
 
 | File | Parts |
@@ -175,14 +174,14 @@ the panel height the monitor allows (`sheet_h`).
 The switch panel's two backs go through one hole, 1 mm larger than the
 backs all round; drill its M3 mount holes through the panel's own holes,
 with the panels in place. The same goes for the throttle box: its cut-out
-is 1 mm larger than the box, open to the throttle bar at the bottom, and its
+is 1 mm larger than the box, open at the bottom, and its
 flange holes are drilled with the box in place.
 
 ## Hardware
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 23 | 2020 extrusion, 6 mm slot | front part: top bar, bottom bar, 4 uprights, throttle bar, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 5 crossbars, 4 braces (45 degree ends) |
+| 22 | 2020 extrusion, 6 mm slot | front part: top bar, bottom bar, 4 uprights, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 5 crossbars, 4 braces (45 degree ends) |
 | - | corner brackets, M5 screws, M5 T-nuts | frame joints, and the front part onto the front rail |
 | 2 | 3 mm ACM sheet | panel, cut to frame_w x (sheet_h + 20); the apron sheet |
 | 43 | M5 button head screw + T-nut | sheets, throttle box, pedestal and parking brake |
@@ -437,12 +436,12 @@ An ESP32 on a pedestal at the back reads them and connects to the simulator
 over USB.
 
 The box mounts in the [cockpit frame](#cockpit-frame) and has no lid: it
-goes through a cut-out in the panel sheet and stands on the frame's throttle bar. Its
+goes through a cut-out in the panel sheet and stands on the frame's front rail. Its
 front wall is the face, with a 10 mm flange on the top and the two sides
-(none at the bottom, where the box sits on the bar) that is screwed onto
+(none at the bottom, where the box sits on the rail) that is screwed onto
 the sheet with M3 screws, nuts behind the sheet. Two M5 bolts through the
 floor, at the front between the rod supports, go into T-nuts in the
-throttle bar's top slot, so pulling a knob does not load the sheet alone.
+front rail's top slot, so pulling a knob does not load the sheet alone.
 
 | File | Parts |
 |------|-------|
@@ -461,7 +460,7 @@ throttle bar's top slot, so pulling a knob does not load the sheet alone.
 | 1 | ESP32 board | reads the pots, USB to the PC |
 | - | M3 screws | pot hold-downs, cable cradle |
 | 5 | M3 x 10 pan head screw + nut | face flange onto the cockpit sheet |
-| 2 | M5 x 10 button head screw + washer + T-nut | floor into the throttle bar (counted in the frame) |
+| 2 | M5 x 10 button head screw + washer + T-nut | floor into the front rail (counted in the frame) |
 
 # Switch panel
 
