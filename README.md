@@ -498,10 +498,17 @@ closed by a cover:
   open collector and pull low over the magnet, so each one is wired like a
   switch to GND.
 
-Printed parts: panel, housing, rotor, shoe, cover.
+Printed parts: face, panel, housing, rotor, shoe, cover.
 
-The panel is 87 x 100 mm (the back 77 x 80 mm), printed front side down, with the position labels,
-tick marks and MAGNETOS engraved around the key. The lock body goes through
+The panel is 87 x 100 mm (the back 77 x 80 mm). Its front is a separate
+1 mm face with the position labels, tick marks and MAGNETOS standing 0.8 mm
+out of it around the key, to be painted with a white acrylic paint pen.
+The face is printed front side up (the STL is already flipped), the panel
+front side down, so neither needs supports; together they are 3 mm thick,
+like the switch panel. The mount screws clamp the face onto the panel,
+and so does the lock flange (glue or double sided tape it on
+as well if it bows); it has holes around the heads of the panel screws.
+The lock body goes through
 a cutout with flats, so it cannot turn, and the housing sits on the back,
 between the rims. The labels are placed for the key pointing at OFF in the
 lock's home position: **MEASURE** where the key really points
