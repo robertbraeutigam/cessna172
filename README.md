@@ -80,10 +80,20 @@ parts, each built on its own and then bolted together:
   rear rail and five crossbars. The front rail is cut at the yoke bay. The
   front part is bolted to the front rail with corner brackets, and a 45
   degree brace from each upright down to a crossbar stops it from rocking.
-  The braces are 250 mm stock bars cut square, held by a bought 45 degree
+  The braces are 200 mm stock bars cut square, held by a bought 45 degree
   connector for 2020 at each end, in the obtuse angle (at the top the
-  upright has 43 mm above the brace for it; a 300 mm brace would leave
-  only 8 mm).
+  upright has 39 mm above the brace for it; a 250 mm brace would leave
+  only 3 mm).
+
+The panel is as low as the parts on it allow: the right stack sets it.
+The throttle box face reaches 80 mm above the desk (it stands on the
+20 mm rail, 50 mm box and a 10 mm flange), then 20 mm of sheet, the radio
+panel's 84 mm front (to 172 mm), 20 mm of sheet and the top bar. The yoke
+notch is 135 mm high, for a future 130 mm force feedback yoke (`ffb_h`;
+the Saitek yoke is about 100 mm), and the switch panel needs 136 mm. The
+build computes the height from these and rounds the uprights up to a
+stock length (200 mm), so the panel top is 220 mm above the desk; it
+checks that it stays under `sheet_h_max` (260 mm, the monitor).
 
 Seen from the pilot, left to right:
 
@@ -150,17 +160,17 @@ components are cut when they arrive.
 All values are in `frame.inc.scad`; the layout (cut-outs, screw holes) is
 computed from the component sizes, and the build prints the cut list
 (`echo`). Lengths are rounded to stock lengths: the width to 100 mm
-(`round_w`), the other bars to 50 mm (`round_d`). Only the uprights (the
-sheet height sets them) and the apron's lower bar (between the leg room
-and the pedestal, `round_cut`) are cut to an odd length. With the current
-guesses the frame is 1000 x 360 mm and 260 mm high above the desk, the
-sheet 1000 x 280 mm (it also covers the bottom bar), the apron sheet
+(`round_w`), the other bars to 50 mm (`round_d`). Only the apron's lower
+bar (between the leg room and the pedestal, `round_cut`) is cut to an odd
+length. With the current guesses the frame is 1000 x 360 mm and 220 mm
+high above the desk, the sheet 1000 x 240 mm (it also covers the bottom
+bar), the apron sheet
 250 x 220 mm. With the ears the frame takes 1143 mm of the desk width.
 
 | Part | 2020 bars |
 |------|-----------|
-| front part | top bar 1000, bottom bar 1000, 4 uprights 240, 2 apron hangers 200, lower bar 210 |
-| desk part | front rail left 450, front rail right 400, rear rail 1000, 5 crossbars 300, 4 braces 250 (cut square) |
+| front part | top bar 1000, bottom bar 1000, 4 uprights 200, 2 apron hangers 200, lower bar 210 |
+| desk part | front rail left 450, front rail right 400, rear rail 1000, 5 crossbars 300, 4 braces 200 (cut square) |
 
 | File | Parts |
 |------|-------|
@@ -172,10 +182,11 @@ drawer under the top at the front edge), the leg room the pilot needs
 (`knee_w`), the desk clamps (`clamp_open`, `clamp_reach`, `clamp_w`,
 `clamp_pad_d`), the free width between the yoke's own desk clamps
 (`yoke_clamp_gap`), the Saitek yoke housing (`yoke_housing`,
-guessed 283 mm wide like the radio panel; spec sheet: 310 x 185 mm with the
-wheel), the radio panel body that goes through the sheet (`radio_body`,
+guessed 283 mm wide like the radio panel and about 100 mm high; spec
+sheet: 310 mm wide with the wheel), the force feedback yoke's height
+(`ffb_h`), the radio panel body that goes through the sheet (`radio_body`,
 from Logitech's "Construction dimensions for Flight Panels" drawing) and
-the panel height the monitor allows (`sheet_h`).
+the panel height the monitor allows (`sheet_h_max`).
 
 The switch panel's two backs go through one hole, 1 mm larger than the
 backs all round; drill its M3 mount holes through the panel's own holes,

@@ -39,22 +39,23 @@
 // the thin parking brake are there, just under the desk top.
 //
 // Lengths are rounded to stock lengths (multiples of round_d), except the
-// uprights, which the sheet height sets, and the apron's lower bar.
+// apron's lower bar. The height is the lowest that the parts on the sheet
+// allow, with stock length uprights.
 
 // --- Extrusion: 2020 only, 6 mm slot, M5 T-nuts everywhere ---
 ext = 20;
 round_w = 100;               // frame width rounded up to this
 round_d = 50;                // the other bars rounded to this (stock lengths)
 round_cut = 10;              // the apron's lower bar: between the leg room and the pedestal, no stock length fits
-brace_len = 250;             // a stock length, cut square
+brace_len = 200;             // a stock length, cut square
 slot_w = 6;
 m5_d = 5.3;                  // M5 clearance, sheet and printed parts
 m5_head_d = 9.5;             // button head
 
 // --- Sheet ---
 sheet_t = 3;                 // ACM, the same as the printed panel_t
-sheet_h = 260;               // panel height above the desk; limited by the monitor
-                             // (the sheet also covers the bottom bar, ext more)
+sheet_h_max = 260;           // panel height above the desk at most; limited by the monitor
+                             // (sheet_h is computed from the parts on it)
 sheet_edge = 25;             // sheet edge to a cut-out, at least
 sheet_web = 20;              // sheet between two cut-outs, at least
 screw_edge = 6;              // screw hole center to a cut-out, at least
@@ -69,13 +70,14 @@ edge_play = 2;               // front part back to the desk edge: a felt pad, th
 frame_overhang = ext + edge_play;     // frame front in front of the desk edge
 
 // --- Saitek Pro Flight Yoke, MEASURE ---
-// Spec sheet: 310 mm wide (the wheel), 185 mm high, 380-464 mm deep with the
-// shaft in / out. The housing is about as wide as the radio panel that sat
-// on it (from memory).
-yoke_housing = [283, 280, 185];   // housing body: width, depth, height
+// Spec sheet: 310 mm wide (the wheel), 380-464 mm deep with the shaft in /
+// out. The housing is about 100 mm high and about as wide as the radio
+// panel that sat on it (from memory).
+yoke_housing = [283, 280, 100];   // housing body: width, depth, height
+ffb_h = 130;                 // the future force feedback yoke's height, the notch is made for it
 yoke_front_y = 0;            // housing front, on the bottom bar; its clamps go around the bar and the desk
 yoke_play = 5;               // housing to the bay sides and the notch top
-yoke_shaft_z = 120;          // shaft center above the desk (view only)
+yoke_shaft_z = 65;           // shaft center above the desk (view only)
 yoke_wheel_w = 310;          // view only
 
 // --- Saitek Pro Flight Radio Panel, MEASURE ---
@@ -171,7 +173,6 @@ x_rc = (x_r0 + x_r1) / 2;
 
 // front part
 upright_xs = [0, x_bay0 - ext, x_bay1, frame_w - ext];   // left sides
-upright_len = sheet_h - ext;                 // on the bottom bar, under the top bar
 throttle_x0 = x_rc - throttle_size.x / 2;
 throttle_y0 = -sheet_t - throttle_face_t;    // face front, the face on the sheet
 
@@ -184,8 +185,13 @@ radio_cut = [x_rc - radio_body.x / 2 - 0.5, throttle_cut[3] + sheet_web,
 radio_front_z0 = radio_cut[1] + 0.5 - (radio_front.y - radio_body.y) / 2;
 switch_cut = [x_sw0 + switch_flange - switch_cut_clear, switch_z + switch_flange - switch_cut_clear,
               x_sw1 - switch_flange + switch_cut_clear, switch_z + switch_flange + switch_back.y + switch_cut_clear];
-bay_cut = [x_bay0, 0, x_bay1, yoke_housing.z + yoke_play];
+bay_cut = [x_bay0, 0, x_bay1, max(yoke_housing.z, ffb_h) + yoke_play];
 cuts = [switch_cut, bay_cut, throttle_cut, radio_cut];   // [x0, z0, x1, z1] on the sheet
+
+// Height: sheet_web over the highest cut-out (or the radio front), then the
+// top bar; the uprights (on the bottom bar, under the top bar) a stock length
+upright_len = ceil((max(radio_front_z0 + radio_front.y, bay_cut[3], switch_cut[3]) + sheet_web) / round_d) * round_d;
+sheet_h = upright_len + ext;                 // panel height above the desk (the sheet also covers the bottom bar, ext more)
 
 // desk part: the front rail behind the front part, cut at the bay
 crossbar_xs = concat(upright_xs, [x_rc - ext / 2]);      // the last one carries the throttle box
@@ -259,6 +265,7 @@ assert(yoke_front_y + yoke_housing.y <= rear_y, "Yoke housing runs into the rear
 assert(radio_body.x <= radio_front.x - 6 && radio_body.y <= radio_front.y - 6,
        "Radio front does not cover its cut-out");
 assert(radio_front_z0 >= throttle_face[3] + 2, "Radio front runs into the throttle box face");
+assert(sheet_h <= sheet_h_max, "Panel too high for the monitor");
 assert(radio_front_z0 + radio_front.y <= sheet_h - ext - sheet_web, "Radio panel too high for the sheet");
 assert(bay_cut[3] <= sheet_h - ext - sheet_web, "Yoke notch too high for the sheet");
 assert(switch_cut[3] <= sheet_h - ext - sheet_web, "Switch panel too high for the sheet");
