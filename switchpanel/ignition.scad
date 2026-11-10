@@ -26,7 +26,7 @@
 // Coordinates: z is the key axis, z=0 is the back of the panel, +z points
 // backwards. Positive rotation is clockwise seen from the front. All parts
 // are modeled in their print orientation (front side down), except the
-// panel, which is printed front side up (see below).
+// face, which is printed front side up (see below).
 //
 // Parts to buy:
 // - mailbox lock (MEASURE it and update the lock_* parameters)
@@ -38,9 +38,12 @@
 //
 // The panel is printed as well. It has the same height, rim, mount holes and
 // lettering as the switch panel (panel.inc.scad) and mounts to its left.
-// The position labels stand out of its front (label_raise), to be painted
-// with a white paint pen, so it is printed front side up, with supports
-// under the back (inside the rim and under the flange).
+// Its front is a separate thin face (face_t) with the position labels
+// standing out of it (label_raise), to be painted with a white paint pen.
+// The face is printed front side up and the panel front side down, so
+// neither needs supports. Together they are panel_t thick, like the switch
+// panel. The face is clamped by the mount screws and the lock flange (glue
+// or double sided tape it on as well if it bows).
 //
 // Assembly: lock through the panel and the housing, tighten its nut, mount
 // the rotor with the lock's cam screw, insert ball + spring and shoe +
@@ -61,7 +64,9 @@ tick_len = 3;
 tick_w = 0.6;
 title = "MAGNETOS";          // above the position labels, "" for none
 title_gap = 2;
-label_raise = 0.8;           // labels and ticks stand out of the front, for a paint pen
+face_t = 1;                  // separate front face, the panel's plate is panel_t - face_t
+label_raise = 0.8;           // labels and ticks stand out of the face, for a paint pen
+panel_screw_head_d = 5.5;    // M3 socket head, the face has holes around them
 
 // --- Mailbox lock (MEASURE: guesses until the lock arrives) ---
 lock_thread_d = 18;          // threaded body diameter
@@ -189,6 +194,7 @@ assert(magnet_r + magnet_w / 2 + 0.1 + 1 <= lug_r, "Magnet pocket breaks through
 assert(rotor_t - magnet_h - 0.2 >= 1.2, "Magnet pocket floor too thin");
 assert(magnet_r * min(pitch, start_pitch) * PI / 180 >= sensor_w + 4, "Hall sensors too close to each other");
 assert(half + 0.5 <= panel_h / 2 - rim_w, "Housing does not fit between the panel rims, make panel_h higher");
+assert(face_t >= 0.8 && panel_t - face_t >= 1.6, "Face or panel plate too thin");
 assert(title == "" || title_y + group_label_size <= panel_h / 2 - 3, "Title too close to the top edge");
 assert(tick_r >= lock_flange_d / 2 + 0.5 && tick_r + tick_len <= label_r - label_size, "Ticks run into the lock or the labels");
 
@@ -341,12 +347,9 @@ module labels_2d() {
             text(title, size = group_label_size, font = font, halign = "center");
 }
 
-// Front at z=-panel_t, the housing on its back at z=0, the labels stand
-// out in front of it
+// Front at z=-panel_t + face_t (the face is in front of it), the housing
+// on its back at z=0
 module panel() {
-   translate([0, 0, -panel_t - label_raise])
-      linear_extrude(label_raise + 0.01)
-         labels_2d();
    difference() {
       // Square corners on the right (-x), where the switch panel is
       translate([0, 0, -panel_t])
@@ -357,12 +360,37 @@ module panel() {
             lock_body_profile(0.2);
       translate([0, 0, -panel_t])
          corner_holes(clear_d, panel_t);
+      // Room for the face
+      translate([0, 0, -panel_t - 1])
+         linear_extrude(face_t + 1)
+            offset(delta = 1)
+               panel_face_2d(-panel_w / 2, panel_w / 2, -panel_h / 2, round0 = false);
       // Version on the back of the flange
       translate([panel_w / 2 + flange_w / 2, 0, -gitrev_depth])
          linear_extrude(gitrev_depth + 1)
             rotate([0, 0, 90])
                text("{{gitrev}}", size = 3, halign = "center", valign = "center");
    }
+}
+
+// Front face from z=-panel_t to the panel, with the labels standing out in
+// front of it
+module face() {
+   translate([0, 0, -panel_t - label_raise])
+      linear_extrude(label_raise + 0.01)
+         labels_2d();
+   translate([0, 0, -panel_t])
+      linear_extrude(face_t)
+         difference() {
+            panel_face_2d(-panel_w / 2, panel_w / 2, -panel_h / 2, round0 = false);
+            lock_body_profile(0.2);
+            for (h = mount_holes)
+               translate(h)
+                  circle(d = mount_d);
+            for (x = [-1, 1], y = [-1, 1])
+               translate([x * screw_xy, y * screw_xy])
+                  circle(d = panel_screw_head_d + 0.7);
+         }
 }
 
 // --- Views (rendered to PNG by "make views") ---
@@ -490,10 +518,17 @@ module nut_part() {
          }
 }
 
-// Panel with the raised labels painted
+// Panel and face
 module panel_part() {
    color(c_panel)
       panel();
+   face_part();
+}
+
+// Face with the raised labels painted
+module face_part() {
+   color(c_panel)
+      face();
    color(c_label)
       translate([0, 0, -panel_t - label_raise - 0.01])
          linear_extrude(0.02)
@@ -508,7 +543,7 @@ module mount_screws() {
 
 module panel_screws() {
    for (x = [-1, 1], y = [-1, 1])
-      translate([x * screw_xy, y * screw_xy, -panel_t])
+      translate([x * screw_xy, y * screw_xy, -panel_t + face_t])
          rotate([180, 0, 0])
             m3_screw(10);
 }
@@ -619,7 +654,8 @@ module exploded_view(pos = 0, e = 16) {
          dashed_line(-2 * e, 0, 0.35);
    translate([0, 0, -2 * e]) panel_screws();
    translate([0, 0, -2 * e]) mount_screws();
-   translate([0, 0, -1.2 * e]) panel_part();
+   translate([0, 0, -1.6 * e]) face_part();
+   translate([0, 0, -1.2 * e]) color(c_panel) panel();
    color(c_housing) housing();
    translate([0, 0, 1 * e]) nut_part();
    translate([0, 0, 1 * e]) detent_parts(theta);
@@ -673,7 +709,8 @@ module front_view(pos = 0) {
 }
 
 housing(); // Make module housing
-translate([0, 0, -explode]) rotate([0, 180, 0]) panel(); // Make module panel
+translate([0, 0, -explode]) panel(); // Make module panel
+translate([0, 0, -2 * explode]) rotate([0, 180, 0]) face(); // Make module face
 translate([0, 0, z_cam]) rotate([0, 0, pos_angle(view_pos)]) rotor(); // Make module rotor
 shoe_in_place(pos_angle(view_pos)); // Make module shoe
 translate([0, 0, explode]) cover(); // Make module cover
