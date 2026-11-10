@@ -13,9 +13,14 @@
 //   a nut on the front clamps them. Their body sits in a shallow pocket in
 //   the back so they cannot turn.
 // - Above the toggles is a row of circuit breakers, like in the 172N, with
-//   their names engraved above them. They are for show only: printed dummy
+//   their names above them. They are for show only: printed dummy
 //   push-to-reset buttons (hex nut, button with the rating on it), glued
-//   into hex pockets in the front.
+//   into hex holes in the face.
+// - The front is a separate thin face (face_t, panel.inc.scad) with the
+//   labels standing out of it, to be painted with a white paint pen. It is
+//   printed front side up, the panel behind it front side down, so neither
+//   needs supports. The toggle nuts, the rocker lips and the mount screws
+//   clamp it on.
 // - A rim on the back stiffens the long, thin panel; it goes through the
 //   hole in the cockpit sheet and the face flange around it is screwed onto
 //   the sheet. It mounts to the right of the ignition panel and has the same
@@ -36,7 +41,7 @@
 //
 // Coordinates: the front of the panel is at z=0, +z points towards the
 // pilot, x to the pilot's right, y up. The panel starts at x=-margin_x, the
-// switch centers are at y=0. The panel is printed front side down.
+// switch centers are at y=0. The face is in front of z=-face_t.
 //
 // Parts to buy (details in the README):
 // - 1 red and 1 black double rocker switch, 6 pin
@@ -52,7 +57,8 @@
 // snap the rockers in from the front, solder the other wire ends to the mux
 // and screw it onto its standoffs, solder the Cat5 cable to the mux control
 // row and tie it onto its block, glue the dummy breakers into their
-// pockets, then mount the panel.
+// pockets, then mount the panel. The face goes on before the toggle nuts
+// and the rockers.
 
 $fn = 48;
 
@@ -147,7 +153,7 @@ breakers = [
 ];
 cb_nut_af = 11;              // hex nut across flats
 cb_nut_t = 2.5;              // of which cb_pocket_depth sits in the panel
-cb_pocket_depth = 1;         // hex pocket in the front, locates the breaker for gluing
+cb_pocket_depth = face_t;    // hex hole in the face, locates the breaker for gluing
 cb_pocket_clear = 0.15;      // added on every side of the pocket
 cb_button_d = 6.5;
 cb_button_h = 4;             // above the nut
@@ -165,7 +171,7 @@ margin_bottom = 12;          // at least, panel bottom to the rockers
 margin_top = 4;              // at least, panel top to the top label
 mount_center = true;         // also a hole in the middle of the top and bottom edge
 
-// --- Labels, engraved into the front ---
+// --- Labels, standing out of the face ---
 label_line = 4.2;            // line pitch of two-line labels
 label_gap = 2.5;             // switch to the lowest label line
 group_line_w = 0.6;          // line under a group label, over its switches
@@ -265,11 +271,11 @@ assert(face_size.x <= bed.x && face_size.y <= bed.y, "Panel does not fit the pri
 assert(content_y1 - content_y0 <= panel_h, "Switches and labels do not fit panel_h, make it higher or the margins smaller");
 assert([for (g = groups) if (g[1] == "rocker2" && len(g[2]) != 2) g] == [], "A rocker2 group needs exactly two switches");
 assert(panel_t - rk_grip >= 1, "Rocker pockets too shallow, make panel_t thicker or rk_grip thinner");
-assert(rk_grip >= 0.8, "Panel too thin around the rockers");
+assert(rk_grip - face_t >= 0.4, "Panel ledge behind the face too thin around the rockers");
 assert(rk_cutout.x >= rk_body.x && rk_cutout.y >= rk_body.y, "Rocker body does not fit the cutout");
 assert(rk_bezel.x >= rk_cutout_c.x + 1.5 && rk_bezel.y >= rk_cutout_c.y + 1.5, "Rocker lip does not cover the cutout");
 assert(tg_thread_len + tg_body_z >= tg_washer_t + tg_nut_t + 1, "Toggle thread too short for the panel");
-assert(tg_pocket_depth < panel_t - 1, "Toggle body pocket too deep");
+assert(tg_pocket_depth <= panel_t - face_t - 0.8, "Toggle body pocket too deep");
 assert(norm(tg_body) >= tg_pocket.x + 1, "Toggle body could turn in its square pocket");
 assert(min_front_gap >= 1, "Switches too close to each other, increase tg_pitch or group_space");
 assert(min_web >= 1.2, "Too thin a wall between two pockets, increase tg_pitch or group_space");
@@ -289,7 +295,6 @@ assert(tie_block.z - tie_groove - tie_slot.y >= 2, "Cable tie block too thin abo
 assert(tie_block.x >= tie_slot.x + 4, "Cable tie block too short for the slot");
 assert(len(breakers) <= len(groups[cb_group][2]), "More breakers than toggles below them");
 assert(tg_pitch >= 2 * cb_r + 1.5 && tg_pitch >= max([for (i = [0 : len(breakers) - 1]) cb_label_w(i)]) + 1, "Breakers too close to each other, increase tg_pitch");
-assert(cb_pocket_depth <= panel_t - 1.5, "Breaker pockets too deep");
 assert(cb_pocket_depth < cb_nut_t, "Breaker nut sunk completely into the panel");
 assert(min_cb_mount_dist >= 0.5, "A mount screw runs into a breaker or its label");
 assert(cb_rating_size * 1.4 <= cb_button_d - 2 * cb_button_chamfer, "Breaker rating too big for the button");
@@ -362,19 +367,42 @@ module panel() {
                   linear_extrude(tg_pocket_depth + 1)
                      square(tg_pocket, center = true);
             }
-      translate([0, 0, -label_depth])
-         linear_extrude(label_depth + 1)
-            labels_2d();
-      // Breaker pockets
-      for (x = cb_xs)
-         translate([x, cb_y, -cb_pocket_depth])
-            cylinder(r = cb_r + cb_pocket_clear / cos(30), h = cb_pocket_depth + 1, $fn = 6);
+      // Room for the face
+      translate([0, 0, -face_t])
+         linear_extrude(face_t + 1)
+            offset(delta = 1)
+               panel_face_2d(panel_x0, panel_x1, panel_y0, round0 = false);
       // Version on the back, mirrored so it reads from behind
       translate([panel_x1 - 30, panel_y1 + flange_w / 2, -panel_t - 1])
          linear_extrude(gitrev_depth + 1)
             mirror([1, 0])
                text("{{gitrev}}", size = 3, halign = "center", valign = "center");
    }
+}
+
+// Front face from z=-face_t to 0, the labels stand out in front of it
+module face() {
+   translate([0, 0, -0.01])
+      linear_extrude(label_raise + 0.01)
+         labels_2d();
+   translate([0, 0, -face_t])
+      linear_extrude(face_t)
+         difference() {
+            panel_face_2d(panel_x0, panel_x1, panel_y0, round0 = false);
+            for (u = units)
+               translate([u[0], 0])
+                  if (is_rocker(u))
+                     square(rk_cutout_c, center = true);
+                  else
+                     circle(d = tg_hole);
+            // Breaker pockets
+            for (x = cb_xs)
+               translate([x, cb_y])
+                  circle(r = cb_r + cb_pocket_clear / cos(30), $fn = 6);
+            for (h = mount_holes)
+               translate(h)
+                  circle(d = mount_d);
+         }
 }
 
 // Breaker button with the rating engraved, on z=0
@@ -618,13 +646,20 @@ module breakers_part() {
       }
 }
 
-// Panel with the engraved labels filled in
+// Panel and face
 module panel_part() {
    color(c_panel)
       panel();
+   face_part();
+}
+
+// Face with the raised labels painted
+module face_part() {
+   color(c_panel)
+      face();
    color(c_label)
-      translate([0, 0, -label_depth + 0.01])
-         linear_extrude(label_depth - 0.02)
+      translate([0, 0, label_raise - 0.01])
+         linear_extrude(0.02)
             labels_2d();
 }
 
@@ -746,7 +781,10 @@ module back_view() {
 
 // Rockers come in from the front, toggles from the back
 module exploded_view(e = 30) {
-   panel_part();
+   color(c_panel)
+      panel();
+   translate([0, 0, 0.5 * e])
+      face_part();
    for (u = units)
       translate([u[0], 0, 0])
          if (is_rocker(u)) {
@@ -781,12 +819,15 @@ module exploded_view(e = 30) {
       mount_screws();
 }
 
-// Panel and switch cut vertically through the middle of unit u
+// Panel, face and switch cut vertically through the middle of unit u
 module section_view(u, w = 40) {
    color(c_cut)
       render()
          intersection() {
-            panel();
+            union() {
+               panel();
+               face();
+            }
             translate([u[0] - w, panel_y0 - 1, -50])
                cube([w, panel_size.y + 2, 100]);
          }
@@ -794,6 +835,7 @@ module section_view(u, w = 40) {
 }
 
 rotate([0, 180, 0]) panel(); // Make module panel
+translate([0, 0, -30]) face(); // Make module face
 breakers_plate(); // Make module breakers
 
 //switches_part(); // Ignore module

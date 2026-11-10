@@ -28,10 +28,15 @@ mount_inset = 4.5;           // mount hole center to the face edge
 mount_nut_r = 3.2;           // M3 nut, across the corners / 2, behind the sheet
 sheet_cut_clear = 1;         // sheet hole beyond the back, all round (frame/)
 
-// --- Lettering, engraved into the front and filled in ---
+// --- Front face and lettering ---
+// The front of both panels is a separate thin face, printed front side up,
+// with the lettering standing out of it, to be painted with a white paint
+// pen. The printed panel behind it is panel_t - face_t thick at the front
+// and printed front side down, so neither needs supports.
+face_t = 1;
+label_raise = 0.8;           // lettering in front of the face
 font = "Liberation Sans:style=Bold";
 label_size = 3;
-label_depth = 0.6;
 group_label_size = 3.2;
 gitrev_depth = 0.4;          // version on the back
 
@@ -41,6 +46,7 @@ c_label = "#f4f4f4";
 
 assert(mount_inset + mount_nut_r + 0.3 <= flange_w - sheet_cut_clear,
        "Mount nuts do not sit on the sheet, make flange_w wider");
+assert(face_t >= 0.8 && panel_t - face_t >= 1.6, "Face or panel plate too thin");
 assert(mount_d / 2 + 1.2 <= mount_inset, "Mount holes too close to the face edge");
 
 // Mount holes in the flange: top and bottom row
