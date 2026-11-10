@@ -498,14 +498,13 @@ closed by a cover:
   open collector and pull low over the magnet, so each one is wired like a
   switch to GND.
 
-Printed parts: panel, labels, housing, rotor, shoe, cover.
+Printed parts: panel, housing, rotor, shoe, cover.
 
-The panel is 87 x 100 mm (the back 77 x 80 mm), printed front side down, with the position labels,
-tick marks and MAGNETOS engraved around the key. `labels` is the inlay
-that fills the engraving: load `ignition_panel.stl` and
-`ignition_labels.stl` into the slicer as one object with two parts (they
-keep their positions) and give the labels white filament, so the lettering
-is printed in color in the first 0.6 mm instead of painted in. The lock body goes through
+The panel is 87 x 100 mm (the back 77 x 80 mm), with the position labels,
+tick marks and MAGNETOS standing 0.8 mm out of the front around the key, to
+be painted with a white acrylic paint pen. So it is printed front side up
+(the STL is already flipped), with supports under the back: inside the rim
+and under the flange. The lock body goes through
 a cutout with flats, so it cannot turn, and the housing sits on the back,
 between the rims. The labels are placed for the key pointing at OFF in the
 lock's home position: **MEASURE** where the key really points

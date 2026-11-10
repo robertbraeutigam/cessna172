@@ -25,7 +25,8 @@
 //
 // Coordinates: z is the key axis, z=0 is the back of the panel, +z points
 // backwards. Positive rotation is clockwise seen from the front. All parts
-// are modeled in their print orientation (front side down).
+// are modeled in their print orientation (front side down), except the
+// panel, which is printed front side up (see below).
 //
 // Parts to buy:
 // - mailbox lock (MEASURE it and update the lock_* parameters)
@@ -37,10 +38,9 @@
 //
 // The panel is printed as well. It has the same height, rim, mount holes and
 // lettering as the switch panel (panel.inc.scad) and mounts to its left.
-// The position labels are engraved into its front. The labels module is
-// the inlay that fills them: load panel and labels into the slicer as one
-// object with two parts (same coordinates) and print the labels in white
-// with a second filament, they are its first label_depth of layers.
+// The position labels stand out of its front (label_raise), to be painted
+// with a white paint pen, so it is printed front side up, with supports
+// under the back (inside the rim and under the flange).
 //
 // Assembly: lock through the panel and the housing, tighten its nut, mount
 // the rotor with the lock's cam screw, insert ball + spring and shoe +
@@ -61,6 +61,7 @@ tick_len = 3;
 tick_w = 0.6;
 title = "MAGNETOS";          // above the position labels, "" for none
 title_gap = 2;
+label_raise = 0.8;           // labels and ticks stand out of the front, for a paint pen
 
 // --- Mailbox lock (MEASURE: guesses until the lock arrives) ---
 lock_thread_d = 18;          // threaded body diameter
@@ -340,8 +341,12 @@ module labels_2d() {
             text(title, size = group_label_size, font = font, halign = "center");
 }
 
-// Front at z=-panel_t, the housing on its back at z=0
+// Front at z=-panel_t, the housing on its back at z=0, the labels stand
+// out in front of it
 module panel() {
+   translate([0, 0, -panel_t - label_raise])
+      linear_extrude(label_raise + 0.01)
+         labels_2d();
    difference() {
       // Square corners on the right (-x), where the switch panel is
       translate([0, 0, -panel_t])
@@ -352,23 +357,12 @@ module panel() {
             lock_body_profile(0.2);
       translate([0, 0, -panel_t])
          corner_holes(clear_d, panel_t);
-      translate([0, 0, -panel_t - 1])
-         linear_extrude(label_depth + 1)
-            labels_2d();
       // Version on the back of the flange
       translate([panel_w / 2 + flange_w / 2, 0, -gitrev_depth])
          linear_extrude(gitrev_depth + 1)
             rotate([0, 0, 90])
                text("{{gitrev}}", size = 3, halign = "center", valign = "center");
    }
-}
-
-// Inlay that fills the engraved labels, printed in a second color together
-// with the panel (same position, front side down)
-module labels() {
-   translate([0, 0, -panel_t])
-      linear_extrude(label_depth)
-         labels_2d();
 }
 
 // --- Views (rendered to PNG by "make views") ---
@@ -496,13 +490,13 @@ module nut_part() {
          }
 }
 
-// Panel with the engraved labels filled in
+// Panel with the raised labels painted
 module panel_part() {
    color(c_panel)
       panel();
    color(c_label)
-      translate([0, 0, -panel_t + 0.01])
-         linear_extrude(label_depth - 0.02)
+      translate([0, 0, -panel_t - label_raise - 0.01])
+         linear_extrude(0.02)
             labels_2d();
 }
 
@@ -679,8 +673,7 @@ module front_view(pos = 0) {
 }
 
 housing(); // Make module housing
-translate([0, 0, -explode]) panel(); // Make module panel
-translate([0, 0, -explode]) labels(); // Make module labels
+translate([0, 0, -explode]) rotate([0, 180, 0]) panel(); // Make module panel
 translate([0, 0, z_cam]) rotate([0, 0, pos_angle(view_pos)]) rotor(); // Make module rotor
 shoe_in_place(pos_angle(view_pos)); // Make module shoe
 translate([0, 0, explode]) cover(); // Make module cover
