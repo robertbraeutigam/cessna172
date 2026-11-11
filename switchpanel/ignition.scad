@@ -3,11 +3,13 @@
 // The key turns clockwise (seen from the front of the panel). OFF, R, L and
 // BOTH are detents, START is spring loaded and returns to BOTH on release.
 //
-// Built around a cheap mailbox / cabinet cam lock. Its cam AND stop washer
-// are removed: these locks usually turn only 90 degrees, so this assembly
-// provides its own end stops for the whole OFF..START sweep. The key can
-// only be pulled at the lock's home position, which has to be OFF (see
-// lock_spindle_angle).
+// Built around a cheap mailbox / cabinet cam lock. It turns only 90
+// degrees: a small tab on the plug just behind the face stops in the
+// housing grooves. Take off the cam and its washer, pull the plug (key in,
+// the detent ball is not needed) and file the tab flush; this assembly
+// provides its own end stops for the whole OFF..START sweep and the rotor
+// holds the plug in. The key can be pulled at the lock's home position,
+// which has to be OFF (see lock_spindle_angle).
 //
 // Mechanisms (inside the housing, closed by the cover):
 // - Detents: a steel ball pushed by a spring (radial channel in the
@@ -29,7 +31,7 @@
 // face, which is printed front side up (see below).
 //
 // Parts to buy:
-// - mailbox lock (MEASURE it and update the lock_* parameters)
+// - mailbox lock (file off its stop tab, see above; lock_* parameters)
 // - 6 mm steel ball + spring (detent_spring_*)
 // - spring for the START return (start_spring_*)
 // - 5x5x5 mm cube magnet (magnet_*), 5x A3144 hall sensors (OFF is optional)
@@ -66,21 +68,21 @@ title = "MAGNETOS";          // above the position labels, "" for none
 title_gap = 2;
 panel_screw_head_d = 5.5;    // M3 socket head, the face has holes around them
 
-// --- Mailbox lock (MEASURE: guesses until the lock arrives) ---
+// --- Mailbox lock (MEASURE: thread, nut and screw size still guesses) ---
 lock_thread_d = 18;          // threaded body diameter
 lock_flat_w = 16;            // body width across the two flats
-lock_body_len = 16;          // flange underside to the cam seat
+lock_body_len = 17;          // flange underside to the cam seat
 lock_flange_d = 22;          // preview only
 lock_nut_d = 25;             // nut across corners
 lock_nut_t = 3;
-lock_spindle_d = 7;          // cam spindle, round diameter
-lock_spindle_flat = 5;       // cam spindle, width across flats
-lock_spindle_square = false; // true: 4 flats, false: double-D
-lock_spindle_len = 2.5;      // spindle length that drives the cam
+lock_spindle_d = 9.9;        // cam spindle, round diameter (square: across corners)
+lock_spindle_flat = 7;       // cam spindle, width across flats
+lock_spindle_square = true;  // true: 4 flats, false: double-D
+lock_spindle_len = 2;        // spindle length that drives the cam
 lock_spindle_angle = 0;      // spindle flats vs. body flats at home (OFF)
 key_off_angle = 30;          // where the key points at home (OFF), from +x; the body flats are parallel to y
 lock_screw_d = 4;            // cam screw
-lock_screw_head_d = 8;
+lock_screw_head_d = 12;
 lock_screw_head_h = 3;
 
 // --- Positions (VERIFY against the real switch) ---

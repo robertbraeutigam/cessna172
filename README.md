@@ -610,10 +610,15 @@ returns to BOTH.
 
 ### How it works
 
-It is built around a cheap mailbox (cabinet) cam lock. The lock's cam and
-its stop washer are removed: these locks usually turn only 90°, so the
-assembly has its own end stops for the whole OFF..START sweep. The key can
-only be pulled at the lock's home position, which is OFF.
+It is built around a cheap mailbox (cabinet) cam lock. These locks turn
+only 90°, so the lock is made to turn freely and the assembly has its own
+end stops for the whole OFF..START sweep. On the lock used here the stop is
+a small tab (about 1 mm) on the plug just behind the face, which runs into
+two of the four grooves in the housing: take the cam, its washer and the
+cam screw off, pull the plug out with the key in (the small detent ball
+falls out, it is not needed), file the tab flush with the plug and put it
+back; the printed rotor on the spindle then holds the plug in. The key can
+be pulled where the wafers meet a groove (home = OFF, maybe every 90°).
 
 A printed rotor on the lock's spindle sits in a housing behind the panel,
 closed by a cover:
@@ -650,7 +655,7 @@ lock's home position: **MEASURE** where the key really points
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 1 | mailbox / cabinet cam lock | key and spindle (**MEASURE** it and update the `lock_*` values, they are guesses) |
+| 1 | mailbox / cabinet cam lock | key and spindle (`lock_*`: body 17 mm, 7 mm square spindle, 12 mm cam screw head; thread, nut and screw size still guesses) |
 | 1 | 6 mm steel ball + spring | detent (`detent_spring_*`, spring OD below 6 mm) |
 | 1 | spring, 5 mm OD, 15 mm | START return (`start_spring_*`) |
 | 1 | cube magnet, 5 x 5 x 5 mm | position sensing (`magnet_*`) |
