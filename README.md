@@ -130,12 +130,12 @@ Below the desk top:
   sheet flush under the main sheet. It carries the **pedestal** with the
   trim wheel and the trim indicator (75 x 150 mm front), centered under
   the throttle, which stands on the lower bar like the throttle box on the
-  front rail, and to its right the bought **flaps panel** (lever and
-  indicator, 50 x 63 mm front plate, 64 mm deep), as high as the desk
-  allows: its body goes through a cut-out in the apron sheet and its plate
-  is screwed onto the sheet (drill through the plate's own holes). The
-  cut-out (`flaps_body`) is a guess, 3 mm smaller than the plate all
-  round, until the panel is measured.
+  front rail, and to its right the DIY **flaps panel** (lever pot and
+  indicator servo, on hub port 5; not designed yet, so its 50 x 63 mm front
+  plate and 64 mm depth are placeholders), as high as the desk allows: its
+  body goes through a cut-out in the apron sheet and its plate is screwed
+  onto the sheet. The cut-out (`flaps_body`, 3 mm smaller than the plate
+  all round) follows the panel once it is designed.
 - **Parking brake**, under the bottom bar in the yoke bay, directly below
   the yoke: a thin body (22 mm) under the desk top, two M5 into the bar's
   bottom slot, and the T-handle just in front of the bar. Released, it is
@@ -219,11 +219,16 @@ flange holes are drilled with the box in place.
   firmware and 6 RJ45 ports. A powered USB hub next to it takes the USB
   cables (Mega, throttle ESP32, Saitek yoke, Saitek radio panel, later the
   FFB yoke), so one USB cable runs to the PC.
-- Every MobiFlight component connects to a hub port with a straight Cat5
-  patch cable. Each component has one CD74HC4067 mux (if it has inputs),
-  and the cable is soldered straight to it (see [Cables](#cables)):
-  everything inside a component is soldered, the plug at the hub is the
-  only separation point.
+- Every MobiFlight component connects to its own hub port with one
+  straight Cat5 patch cable, soldered straight to the component (see
+  [Cables](#cables)): everything inside a component is soldered, the plug
+  at the hub is the only separation point.
+- There are two kinds of port (see [Port pinout](#port-pinout)): a **mux
+  port** for a component with many switches (one CD74HC4067 mux), and a
+  **direct port**, whose six signal wires each go to their own Mega pin,
+  for servos, encoders, pots and a few switches. Only 5 V and GND are the
+  same on both, so one cable carries everything a component like the
+  pedestal or the flaps needs.
 
 ### MobiFlight
 
@@ -235,48 +240,83 @@ no plugin). It also flashes the MobiFlight firmware onto the Mega over USB.
 
 In the Connector, the Mega gets one device per thing on a port: a
 *Multiplexer* per mux (its SIG pin as the data pin; S0-S3 are set once, on
-the first mux, and shared by all), a *Servo*, an *Encoder* or an *Analog
-input* on the port's other pins. Each input (a mux channel is a button) then
-sets a dataref or sends a command on press and on release, each output
+the first mux, and shared by all), and a *Servo*, an *Encoder*, an *Analog
+input* or a *Button* on a Mega pin. Each input (a mux channel is a button)
+then sets a dataref or sends a command on press and on release, each output
 (servo) follows a dataref. The configuration is a file: keep it with the
 cockpit.
 
 MobiFlight reads encoders only on their own pins, not through a mux, and
-drives servos straight from Mega pins, without a second board.
+drives servos straight from Mega pins, without a second board: that is
+what the direct ports are for.
 
 ### Port pinout
 
-The same on every port. At the hub it is the RJ45 pin, at the component
-the wire color (the cable is soldered there):
+At the hub it is the RJ45 pin, at the component the wire color (the cable
+is soldered there). Pins 4 and 5 (the blue pair) are 5 V and GND on every
+port; at the hub they are soldered together across all 6 ports.
+
+**Mux ports (1-3):**
 
 | Pin | T568B color | Signal | At the hub |
 |-----|-------------|--------|------------|
-| 1 | white-orange | S0 | bus, Mega pin 22 |
-| 2 | orange | S1 | bus, Mega pin 23 |
-| 3 | white-green | S2 | bus, Mega pin 24 |
-| 4 | blue | 5 V | bus, Mega 5 V |
-| 5 | white-blue | GND | bus, Mega GND |
-| 6 | green | S3 | bus, Mega pin 25 |
+| 1 | white-orange | S0 | mux bus, Mega pin 22 |
+| 2 | orange | S1 | mux bus, Mega pin 23 |
+| 3 | white-green | S2 | mux bus, Mega pin 24 |
+| 4 | blue | 5 V | all ports, Mega 5 V |
+| 5 | white-blue | GND | all ports, Mega GND |
+| 6 | green | S3 | mux bus, Mega pin 25 |
 | 7 | white-brown | SIG | the port's own Mega pin (the mux output) |
-| 8 | brown | AUX | the port's own line: a Mega analog pin, or a digital pin (servo, encoder) |
+| 8 | brown | AUX | the port's own Mega pin: one analog input, a button or a servo |
 
-5 V and GND are one twisted pair (blue). S0-S3 are shared by every mux (MobiFlight
-takes them once per board); at the hub pins 1-6 of all ports are soldered together (the
-bus). SIG and AUX are wired per port with jumpers, so a component must go
-into its own port (they are numbered); swapping two cables only mixes up
-the inputs in the sim until they are swapped back, it does not damage
-anything.
+S0-S3 are shared by every mux (MobiFlight takes them once per board); at
+the hub pins 1, 2, 3 and 6 of ports 1-3 are soldered together (the mux
+bus). Every mux gets a pull-up resistor from SIG to 5 V. MobiFlight turns
+on the Mega's internal pull-up, but that is weak (20-50 kOhm), and its
+docs recommend an extra one for long wires: solder a 4.7 kOhm between the
+SIG and VCC pins on each mux board, in the component.
 
-Every mux gets a pull-up resistor from SIG to 5 V. MobiFlight turns on the
-Mega's internal pull-up, but that is weak (20-50 kOhm), and its docs
-recommend an extra one for long wires: solder a 4.7 kOhm between the SIG and
-VCC pins on each mux board, in the component.
+**Direct ports (4-6):**
+
+| Pin | T568B color | Signal | At the hub |
+|-----|-------------|--------|------------|
+| 1 | white-orange | servo 5 V, or line E | servo header 5 V, or its own Mega pin |
+| 2 | orange | servo GND, or line F | servo header GND, or its own Mega pin |
+| 3 | white-green | line A | its own Mega pin |
+| 4 | blue | 5 V | all ports, Mega 5 V |
+| 5 | white-blue | GND | all ports, Mega GND |
+| 6 | green | line B | its own Mega pin |
+| 7 | white-brown | line C | its own Mega pin, or the servo header (servo signal) |
+| 8 | brown | line D | its own Mega pin |
+
+Each line is whatever the component needs: a pot wiper (analog Mega
+pin), an encoder contact, a switch (any digital pin) or a servo signal.
+The rules:
+
+- **A servo** takes its power on the orange pair (pin 1 5 V, pin 2 GND) and
+  its signal on pin 7. At the hub they go to the servo header on the
+  prototype board (see [Hub wiring](#wiring)), not to the blue pair: the
+  servo's current peaks then do not move the GND and 5 V that the pots
+  and the logic on the same cable use. Without a servo, pins 1 and 2 are
+  two more lines.
+- **Pots** go between 5 V and GND of the blue pair, the wiper on a line.
+- **Switches and encoders** go to GND (pin 5) like on a mux, active low,
+  with a 4.7 kOhm pull-up to 5 V at the component on each line (the same
+  reason as the mux SIG pull-up).
+
+**A wrong port does not damage anything**, it only mixes up the inputs in
+the sim until the cable is in its own port again (they are numbered). Every
+Mega output that goes into a cable has a 330 Ohm resistor in series at the
+hub (S0-S3 and each servo signal, on the prototype board), so a component
+in the wrong kind of port can not short a Mega output against a switch to
+GND or a pot at its end stop. Still, mark the direct ports at the hub (a
+paint pen dot next to their numbers).
 
 ### Cables
 
 At the hub every cable has its RJ45 plug; at the component it is soldered
-straight to the mux (and the port's other pins), without a connector. Cut a
-patch cable to length, or in half for two components:
+straight to the mux or to the parts, without a connector. Cut a patch
+cable to length, or in half for two components:
 
 - **Stranded** patch cable, not solid installation cable: solid wire breaks
   next to a solder joint after a few bends.
@@ -295,59 +335,98 @@ patch cable to length, or in half for two components:
 
 ### Ports
 
+**Mux ports**:
+
 | Port | Component | SIG | AUX |
 |------|-----------|-----|-----|
-| 1 | pedestal: mux (parking brake, more later), trim indicator (servo) | D26 | D2 (servo) |
-| 2 | throttle quadrant (open, see below) | D27 | A1 |
-| 3 | switch panel | D28 | A2 (free) |
-| 4 | yoke handle: PTT, trim switch, more buttons (FFB yoke, later) | D29 | A3 |
-| 5 | pedestal: trim wheel encoder | D30 (encoder A) | D38 (encoder B) |
-| 6 | free | D31 | A5 |
+| 1 | yoke handle: PTT, trim switch, more buttons (FFB yoke, later) | D26 | A1 |
+| 2 | free | D27 | A2 |
+| 3 | switch panel | D28 | A3 (free) |
 
-The pins are suggestions: any free pin works, select it in the MobiFlight
-Connector. AUX carries one analog input (a pot, on an analog pin), one servo
-signal or one encoder line (on a digital pin); a component that needs more
-(an encoder, several gauge servos) gets a second port.
+**Direct ports** (pin 4 5 V and pin 5 GND on all of them):
 
-A Mega takes at most 6 multiplexers in MobiFlight (`MaxInputMultiplexer`
-in its board file), so one hub has 6 ports. If the cockpit needs more
-ports, it gets a second hub with its own Mega and its own bus, on its own
-USB cable to the powered USB hub; the Connector shows it as a second
-board. Two Megas can not drive the same S0-S3 bus.
+| Port | Component | Pin 3 (A) | Pin 6 (B) | Pin 7 (C) | Pin 8 (D) | Pins 1, 2 |
+|------|-----------|-----------|-----------|-----------|-----------|-----------|
+| 4 | pedestal: trim wheel, trim indicator, parking brake | D30, encoder A | D31, encoder B | D2, trim servo | D32, parking brake | servo power |
+| 5 | flaps: lever and indicator | A4, lever pot | D33 (free) | D3, flaps servo | D34 (free) | servo power |
+| 6 | throttle quadrant (if it moves to the hub, see below) | A5, throttle | A6, mixture | A7, carb heat | A8 (free) | A9, A10 (free) |
 
-- **Parking brake**: one switch, on the mux of the pedestal or of the yoke
-  port, whichever cable runs closer (it hangs under the yoke).
-- **Trim wheel encoder** (EC11 type, 20 detents): MobiFlight does not read
-  encoders through a mux, so the pedestal has a second cable to port 5: encoder A on its SIG, B on its AUX, both straight to Mega pins,
-  the common on its GND. Set the encoder type in the Connector to match the
-  encoder (steps per detent) and test that a fast spin does not lose steps.
-- **Throttle quadrant**: open. It is an ESP32 on USB today; on a port its
-  three pots would need three analog lines (a port has AUX, and SIG if it
-  goes to an analog Mega pin, but no mux), or carb heat becomes a switch.
-- **Likely later**: flaps lever and indicator (mux + servo on AUX), panel
-  light dimmers (pots on AUX), steam gauges (servos, or steppers with a
-  driver board in the hub). Outputs (annunciator lights, avionics displays)
-  do not fit this pinout: MobiFlight drives them through 74HC595 shift
-  registers or MAX7219 drivers, which need three lines of their own; decide
-  that before the first output component.
+The pins are suggestions: any free pin works (pots on analog pins), select
+it in the MobiFlight Connector. A component that needs more than a port
+gives gets a second port of the kind it needs.
 
-**Logic only** goes over the Cat5: the muxes, encoders and hall sensors
-draw a few mA. One small (9 g) servo may take its 5 V from pin 4 too (about
-0.2-0.3 V drop on 2 m of one 24 AWG wire at its current peaks); put a 470 uF
-capacitor across its supply at the servo. GND has to stay in the cable with
-the signals, and the mux 5 V has to come from the Mega, so it is never
-powered while its inputs are not (or the other way round).
+The direct ports leave room: a Mega has 16 analog and 54 digital pins, and
+MobiFlight takes at most 6 multiplexers on one (`MaxInputMultiplexer` in its
+board file), of which this hub uses 3. More components than the 6 ports get
+a second hub with its own Mega, on its own USB cable to the powered USB
+hub; the Connector shows it as a second board. Two Megas can not drive the
+same S0-S3 bus.
+
+- **Pedestal**: one cable for everything on it. The trim wheel encoder
+  (EC11 type, 20 detents) on lines A and B, its common on GND; set the
+  encoder type in the Connector to match the encoder (steps per detent) and
+  test that a fast spin does not lose steps. The trim indicator servo (9 g)
+  on pin 7 and the orange pair.
+- **Parking brake**: one switch, on line D of the pedestal port: two wires
+  from the pedestal along the bottom bar to the brake under the yoke. A
+  *Button* on D32 in the Connector.
+- **Flaps** (DIY, on the apron next to the pedestal): the lever pot on
+  line A, the indicator servo (9 g) on pin 7 and the orange pair. Two lines
+  are left (e.g. a switch at the flap detents, if the lever gets one).
+- **Throttle quadrant**: open. It is an ESP32 on USB today; on port 6 its
+  three pots go on lines A-C, with no mux and no ESP32.
+- **Likely later**: panel light dimmers (pots, on free lines), steam gauges
+  (servos on a direct port, or steppers with a driver board in the hub),
+  outputs (annunciator lights, avionics displays): MobiFlight drives them
+  through 74HC595 shift registers or MAX7219 drivers with three lines each
+  (data, clock, latch), which fit a direct port.
+
+**Logic only** on the blue pair: the muxes, pots, encoders and hall
+sensors draw a few mA. The servos take their current on their own orange
+pair from the servo header in the hub, which is fed from the Mega 5 V for
+now (see [Power](#power-later)); put a 470 uF capacitor across the supply
+at each servo. A 9 g servo draws about 0.15-0.3 A when it moves and up to
+0.7 A stalled, about 0.2 V drop on 2 m of the 24 AWG pair. Two of them on
+the Mega's USB 5 V is the limit: if the Mega resets when both move at
+once, feed the servo header from a 5 V supply. GND has to stay in the cable
+with the signals, and the logic 5 V has to come from the Mega, so a
+component is never powered while its inputs are not (or the other way
+round).
+
+### Why not a serial bus
+
+A serial bus (I2C, UART, RS485, CAN) would need 2 signal wires instead of
+the mux's 5 lines, but it does not save a cable: every component gets one
+Cat5 cable either way, with 8 wires, and the S0-S3 lines are shared, so
+each extra mux costs only one Mega pin. The options:
+
+- **74HC165 input shift registers**: MobiFlight reads them (*Input Shift
+  Register*, 8 inputs per chip, chained). Three lines (data, clock, latch)
+  instead of the mux's five, but they also have to go to every component,
+  and 8 pull-up resistors per chip: no gain over the mux.
+- **I2C port expanders** (MCP23017, PCF8574): not in the standard
+  MobiFlight firmware for inputs (it uses I2C only for LCD displays), and
+  I2C is made for a circuit board, not for 2 m cables.
+- **UART, RS485, CAN**: these need a microcontroller in every component
+  and our own firmware at both ends; MobiFlight does not speak them. The
+  MobiFlight way to do that is a small board per component that runs
+  MobiFlight itself (e.g. an Arduino Pro Micro, on its own USB cable to the
+  powered USB hub), like the throttle's ESP32: fine for one or two
+  components, but each is one more board to flash and one more USB device.
 
 ### Power (later)
 
 USB only for now. With lighting, gauges or the FFB yoke comes one 24 V PSU
 with fused branches, buck converters for 5 V, a separate cut-off switch on
-the FFB motor power and one star ground at the PSU. Loads (servos,
-backlighting) then get their current from a separate 2 wire 5 V bus with a
-2 pin plug per component (e.g. JST-VH or a 5.08 mm screw terminal), not
-from the Cat5; its GND is tied to the Mega GND at one point in the hub.
-Leave room for that plug in components with loads; the hub has a hole for
-the bus in its back wall.
+the FFB motor power and one star ground at the PSU. The servo header in
+the hub is then fed from a 5 V converter instead of the Mega 5 V (remove
+its link, see [Hub wiring](#wiring)), so the servos keep their orange pair
+in the Cat5. Bigger loads (backlighting, more servos in one component) get
+their current from a separate 2 wire 5 V bus with a 2 pin plug per
+component (e.g. JST-VH or a 5.08 mm screw terminal), not from the Cat5;
+its GND is tied to the Mega GND at one point in the hub. Leave room for
+that plug in components with loads; the hub has a hole for the bus in its
+back wall.
 
 # Hub
 
@@ -364,7 +443,8 @@ From the front wall to the back:
 
 - **Ports**: 6 RJ45 breakout boards in a row along the front wall,
   their jacks behind cut-outs in it, numbered 1-6 from the left, the
-  numbers beside the jacks. The boards are screwed onto bosses on the
+  numbers beside the jacks: 1-3 are the mux ports, 4-6 the direct ports
+  (see [Port pinout](#port-pinout); mark them). The boards are screwed onto bosses on the
   floor with M2 self tapping screws from above. Their angled 8 pin headers
   point into the box. Behind them is a 30 mm strip for the jumpers, then one row of
   boards:
@@ -372,8 +452,8 @@ From the front wall to the back:
   (flush with the outside, so any USB-B plug fits), with a cut-out in
   front of the power jack for later.
 - **Prototype board** (next to the Mega, 20 mm away): a 50 x 70 mm board
-  on four standoffs, with the bus header (below) and room for small extra
-  circuits if they are needed (a servo capacitor, later the power bus
+  on four standoffs, with the bus header, the servo header (below) and
+  room for small extra circuits if they are needed (later the power bus
   distribution). The hole for the power bus is in the back wall behind it.
   The rest of the row, on the right, stays free (a stepper driver board,
   later).
@@ -393,16 +473,17 @@ lid on.
 | Qty | Part | Use |
 |-----|------|-----|
 | 1 | Arduino Mega 2560 | MobiFlight board |
-| 1 | prototype board, 50 x 70 mm | bus header, extra circuits if needed |
-| 1 | female header strip, 8 pin, 2.54 mm | bus header |
+| 1 | prototype board, 50 x 70 mm | bus header, servo header, extra circuits if needed |
+| 2 | female header strip, 8 pin, 2.54 mm | bus header, servo header |
+| 6 | 330 Ohm resistor | in series with S0-S3 and the 2 servo signals |
 | 6 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
 | 18 | M2 x 6 self tapping screw | RJ45 boards |
 | 4 | M2 x 6 screw | prototype board |
 | 6 | M3 x 6 self tapping screw | Mega |
 | 4 | M3 x 10 self tapping screw | lid |
 | - | insulated wire, about 0.25 mm2, 6 colors | the bus |
-| ~12 | male-female jumper wire, 20 cm | RJ45 SIG and AUX pins to the Mega |
-| ~6 | male-male jumper wire, 10 cm | bus header to the Mega |
+| ~20 | male-female jumper wire, 20 cm | RJ45 pins to the Mega and to the servo header |
+| ~10 | male-male jumper wire, 10 cm | bus and servo header to the Mega |
 
 Per port used: a stranded copper Cat5 patch cable, soldered at the
 component end (see [Cables](#cables)).
@@ -416,34 +497,47 @@ M2, use M1.6 screws). The Mega values are from the Arduino drawing.
 
 ### Wiring
 
-**Bus**: pins 1-6 of all 6 boards are soldered together, one insulated
-wire per line (S0, S1, S2, 5 V, GND, S3; one color each):
+**Bus**: one insulated wire per line, one color each, soldered along the
+row of boards. Strip a short piece of insulation where it passes a pin and
+solder it there, at the pin's base by the header, so it does not touch the
+other pins it crosses:
 
-- Along the row: one wire per pin number, from port 1 to port 6. Strip a short piece of insulation where it passes each pin and
-  solder it there, at the pin's base by the header, so it does not touch
-  the other pins it crosses.
+- 5 V and GND (pins 4 and 5): across all 6 ports.
+- S0, S1, S2, S3 (pins 1, 2, 3 and 6): across the mux ports 1-3 only.
+  Ports 4-6 keep these pins for their own lines.
 - To the prototype board: six wires from port 1's pins 1-6 to an 8 pin
-  female header on it: S0, S1, S2, S3, 5 V, GND, 5 V, GND.
+  female header on it (the bus header): S0, S1, S2, S3, 5 V, GND, 5 V,
+  GND. S0-S3 go through a 330 Ohm resistor each, soldered between the
+  wire and the header pin.
 
-Pins 7 and 8 stay free for the jumpers.
+**Servo header**: a second 8 pin female header on the prototype board,
+for the servos of ports 4 and 5: 5 V, GND, signal in, signal out, twice.
+Each signal in goes through a 330 Ohm resistor to its signal out. Its 5 V
+pins are joined to the bus header 5 V by one wire link (the one to remove
+when a 5 V supply feeds the servos, see [Power](#power-later)), its GND
+pins to the bus header GND for good.
+
+Everything else is a jumper:
 
 | From | To | Jumper |
 |------|----|--------|
-| each port pin 7 (SIG) | its Mega pin (table above) | male-female |
-| each port pin 8 (AUX) | its Mega pin (table above) | male-female |
+| ports 1-3 pin 7 (SIG) and pin 8 (AUX) | their Mega pins (see [Ports](#ports)) | male-female |
+| ports 4-6, each pin with a line | its Mega pin | male-female |
+| ports 4 and 5 pins 1, 2, 7 (servo 5 V, GND, signal) | servo header 5 V, GND, signal in | male-female |
+| servo header signal out | Mega D2 (port 4), D3 (port 5) | male-male |
 | bus header S0-S3 | Mega pins 22-25 | male-male |
 | bus header 5 V, GND | Mega 5 V, GND | male-male |
 
-Port 1's AUX goes to D2, the trim indicator servo's signal; add a Servo
-device on that pin in the Connector.
+Add a Servo device on D2 and D3 in the Connector.
 
 ### Assembly
 
 1. Screw the RJ45 boards onto their bosses (M2 x 6).
-2. Solder the bus wires along the row.
-3. Solder the bus header onto the prototype board and wire it to port 1.
+2. Solder the bus wires along the row (S0-S3 only across ports 1-3).
+3. Solder the bus header, the servo header and the resistors onto the
+   prototype board and wire the bus header to port 1.
 4. Screw the prototype board and the Mega onto their standoffs.
-5. Plug the jumpers as above, label the SIG and AUX jumpers.
+5. Plug the jumpers as above and label them.
 6. Screw the lid on.
 
 # Throttle quadrant
