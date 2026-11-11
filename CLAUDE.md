@@ -57,13 +57,17 @@ its own top-level directory; new components should follow the same layout.
   encoders go straight to Mega pins, encoders never through a mux), a
   prototype board (bus header, room for extra circuits) and 6 RJ45 breakout
   boards in one row (MobiFlight takes at most 6 muxes per Mega; more
-  ports means a second hub with its own Mega). Pins 1-6 of all RJ45 boards are soldered together (the
-  bus); only SIG and AUX of each port and the bus header go to the
-  Mega with jumper wires, nothing is soldered on the Mega. Every
-  MobiFlight component connects to its own numbered port with a Cat5
-  cable, RJ45 plug at the hub and soldered straight to the mux at the
-  component (no connector there); the port pinout (same on every port: S0..S3, 5 V, GND, SIG,
-  AUX) and the port list are in the README's Connections section, keep
+  ports means a second hub with its own Mega). Ports 1-3 are mux ports
+  (S0..S3, 5 V, GND, SIG, AUX), ports 4-6 direct ports (5 V and GND on
+  the same pins 4 and 5, the other six wires are lines to their own Mega
+  pins, a servo takes its power on the orange pair), for components
+  without a mux (servos, encoders, pots). The bus wires join pins 4 and 5
+  of all boards and S0..S3 of the mux ports; everything else goes to the
+  Mega or to the servo header on the prototype board with jumper wires,
+  nothing is soldered on the Mega. Every MobiFlight component connects to
+  its own numbered port with one Cat5 cable, RJ45 plug at the hub and
+  soldered straight to the component (no connector there); the port
+  pinouts and the port list are in the README's Connections section, keep
   components and README in sync with them. The `rj_*` and `proto_*`
   values are guesses until the parts are measured.
 

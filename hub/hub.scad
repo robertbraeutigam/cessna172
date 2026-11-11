@@ -3,8 +3,10 @@
 // The box under the cockpit that holds the Arduino Mega with the MobiFlight
 // firmware and one RJ45 breakout board per port. Every
 // component (switch panel, pedestal, ...) plugs into a port with a Cat5
-// cable, soldered straight to the component at its other end; all ports
-// have the same pinout (README, Connections).
+// cable, soldered straight to the component at its other end. Ports 1-3
+// are mux ports (S0-S3, SIG, AUX), ports 4-6 direct ports (six lines
+// to their own Mega pins, servo power on the orange pair); 5 V and GND are
+// pins 4 and 5 on all of them (README, Connections).
 //
 // - The RJ45 boards sit in one row of six along the front wall, their
 //   jacks behind cut-outs in it, numbered 1-6 from the left, the numbers
@@ -12,10 +14,11 @@
 //   tapping, from above). Their 8 pin angled headers point into the box.
 //   More components than ports (or than the 6 muxes MobiFlight takes on a
 //   Mega) get a second hub with its own Mega, not more ports here.
-// - The bus: pins 1-6 (S0, S1, S2, 5 V, GND, S3) of all boards are soldered
-//   together, an insulated wire per line along the row, so only pins 7 and
-//   8 (SIG, AUX) of each port get a jumper. Six wires take the bus from port 1 to a header on the
-//   prototype board, where the Mega plugs in.
+// - The bus: an insulated wire per line along the row, soldered to pins
+//   4 and 5 (5 V, GND) of all boards and to pins 1, 2, 3, 6 (S0-S3) of the
+//   mux ports. The other pins get jumpers. Six wires take the bus from port
+//   1 to a header on the prototype board (S0-S3 through 330 Ohm), where the
+//   Mega plugs in; a servo header there feeds the direct ports' servos.
 // - Behind them is a free strip for the jumper wires, then one row: the
 //   Mega (left, its USB and power jacks through the left wall) and the
 //   prototype board on standoffs (right, the bus header and room for small
@@ -31,14 +34,15 @@
 // The box is printed floor down, the lid top down.
 //
 // Parts to buy (details in the README):
-// - Arduino Mega 2560, 50 x 70 mm prototype board, an 8 pin female header (the bus header)
+// - Arduino Mega 2560, 50 x 70 mm prototype board, two 8 pin female
+//   headers (bus and servo header), 6 x 330 Ohm resistors
 // - 6 RJ45 breakout boards (34 x 28 mm, 8 pin angled header)
 // - 18 M2 x 6 self tapping screws (RJ45 boards), 4 x M2 x 6 (prototype
 //   board), 6 x M3 x 6 self tapping screws (Mega), 4 x M3 x 10 (lid)
 // - insulated wire for the bus, male-female and male-male jumper wires
 //
-// Assembly: screw the RJ45 boards on, solder their bus, wire it to the
-// prototype board, screw it and the Mega on, plug the jumpers as in the
+// Assembly: screw the RJ45 boards on, solder their bus, solder the headers
+// and resistors on the prototype board and wire the bus to it, screw it and the Mega on, plug the jumpers as in the
 // README, screw the lid on.
 
 $fn = 48;
