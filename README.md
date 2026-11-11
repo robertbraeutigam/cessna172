@@ -246,6 +246,13 @@ then sets a dataref or sends a command on press and on release, each output
 (servo) follows a dataref. The configuration is a file: keep it with the
 cockpit.
 
+MobiFlight sends an X-Plane command only once; it cannot hold one while a
+button is pressed (still open:
+[MobiFlight-Connector#2405](https://github.com/MobiFlight/MobiFlight-Connector/issues/2405)).
+Where a command has to be held, like the ignition START, a small
+FlyWithLua (NG) plugin
+script in X-Plane does it (see [In X-Plane](#in-x-plane)).
+
 MobiFlight reads encoders only on their own pins, not through a mux, and
 drives servos straight from Mega pins, without a second board: that is
 what the direct ports are for.
@@ -679,6 +686,30 @@ between the rims. The cutout is turned so the key points at OFF
 
 The positions (30° apart) should be verified against the real switch.
 
+### In X-Plane
+
+X-Plane's key is spring loaded: writing START (4) to
+`sim/cockpit2/engine/actuators/ignition_key` jumps back to BOTH in the next
+frame, and MobiFlight cannot hold the starter command. So START goes
+through `switchpanel/ignition.lua`, a FlyWithLua script: it creates the
+dataref `cessna172/ignition/start` and holds `sim/starters/engage_starter_1`
+while it is 1. Copy it to `X-Plane/Resources/plugins/FlyWithLua/Scripts/`.
+
+In the MobiFlight Connector (inputs C11..C15 of the mux):
+
+| Input | On press | On release |
+|-------|----------|------------|
+| OFF, R, L, BOTH | `sim/cockpit2/engine/actuators/ignition_key[0]` = the position | nothing |
+| START | `cessna172/ignition/start` = 1 | `cessna172/ignition/start` = 0 |
+
+Releasing START springs the key back to BOTH, whose sensor sets the key
+position again. **VERIFY** the key values (0 is OFF, 3 is BOTH; check
+which of 1 and 2 is L) with DataRefTool while turning the key in the
+virtual cockpit. Start X-Plane (or reload the Lua scripts) before
+connecting MobiFlight, the START dataref only exists once the script has
+run. If MobiFlight disconnects in START, the starter keeps cranking until
+the key is turned in the cockpit or the scripts are reloaded.
+
 ## Switches
 
 [![Switch panel](https://robertbraeutigam.github.io/cessna172/switchpanel/switches_montage.png)](https://robertbraeutigam.github.io/cessna172/switchpanel/switches_montage.png)
@@ -822,7 +853,8 @@ That is all 16. The switches are in label order (the `groups` order), and
 the ignition positions are consecutive. In the MobiFlight Connector every
 channel is a button: a toggle or rocker sets its dataref to 1 on press and
 to 0 on release, an ignition position sets the key position on press, and
-START holds the starter while it is pressed. Without FUEL PUMP (172N) or
+START holds the starter while it is pressed through a FlyWithLua script
+(see [In X-Plane](#in-x-plane)). Without FUEL PUMP (172N) or
 the OFF hall sensor, one input stays free.
 
 #### Cable to the hub
