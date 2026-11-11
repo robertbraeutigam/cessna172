@@ -9,7 +9,7 @@
 // the detent ball is not needed) and file the tab flush; this assembly
 // provides its own end stops for the whole OFF..START sweep and the rotor
 // holds the plug in. The key can be pulled at the lock's home position,
-// which has to be OFF (see lock_spindle_angle).
+// which has to be OFF (see lock_key_home).
 //
 // Mechanisms (inside the housing, closed by the cover):
 // - Detents: a steel ball pushed by a spring (radial channel in the
@@ -31,7 +31,7 @@
 // face, which is printed front side up (see below).
 //
 // Parts to buy:
-// - mailbox lock (file off its stop tab, see above; lock_* parameters)
+// - mailbox lock (file off its stop tab, see above), its M4 cam screw
 // - 6 mm steel ball + spring (detent_spring_*)
 // - spring for the START return (start_spring_*)
 // - 5x5x5 mm cube magnet (magnet_*), 5x A3144 hall sensors (OFF is optional)
@@ -68,22 +68,25 @@ title = "MAGNETOS";          // above the position labels, "" for none
 title_gap = 2;
 panel_screw_head_d = 5.5;    // M3 socket head, the face has holes around them
 
-// --- Mailbox lock (MEASURE: thread, nut and screw size still guesses) ---
+// --- Mailbox lock (measured) ---
 lock_thread_d = 18;          // threaded body diameter
 lock_flat_w = 16;            // body width across the two flats
 lock_body_len = 17;          // flange underside to the cam seat
 lock_flange_d = 22;          // preview only
 lock_nut_d = 25;             // nut across corners
-lock_nut_t = 3;
+lock_nut_t = 4;
 lock_spindle_d = 9.9;        // cam spindle, round diameter (square: across corners)
 lock_spindle_flat = 7;       // cam spindle, width across flats
 lock_spindle_square = true;  // true: 4 flats, false: double-D
 lock_spindle_len = 2;        // spindle length that drives the cam
 lock_spindle_angle = 0;      // spindle flats vs. body flats at home (OFF)
-key_off_angle = 30;          // where the key points at home (OFF), from +x; the body flats are parallel to y
-lock_screw_d = 4;            // cam screw
+lock_key_home = 90;          // key vs. body flats at home (key out): 0 parallel, 90 perpendicular
+key_off_angle = 30;          // where the key points at OFF (home), from +x; the lock body is turned to match
+lock_screw_d = 4;            // cam screw, M4
+lock_screw_len = 5;          // thread length
 lock_screw_head_d = 12;
-lock_screw_head_h = 3;
+lock_screw_head_h = 2;
+rotor_clamp_t = 2.5;         // rotor between spindle end and screw head, the rest of the screw goes into the spindle
 
 // --- Positions (VERIFY against the real switch) ---
 pitch = 30;                  // OFF->R, R->L, L->BOTH
@@ -139,6 +142,10 @@ cover_t = 3;
 function arc_deg(len, r) = len / r * 180 / PI;
 
 z_cam = lock_body_len - panel_t;
+// The flats of the lock body (cutouts in panel, face and housing) are
+// turned so the key points at OFF where it comes out
+body_angle = key_off_angle - lock_key_home - 90;
+screw_seat = lock_spindle_len + rotor_clamp_t;  // head underside, in the rotor
 z_back = z_cam + rotor_t + gap;
 bore_r = rotor_r + 0.4;
 
@@ -175,7 +182,9 @@ echo(panel_size = [panel_w, panel_h], face_size = [face_w, face_h]);
 // --- Sanity checks ---
 assert(z_cam >= front_t + lock_nut_t + 1, "Lock body too short for panel + front plate + nut");
 assert(bore_r > lock_nut_d / 2 + 1, "Lock nut does not fit in the bore");
-assert(rotor_t - lock_spindle_len - lock_screw_head_h >= 1.5, "Too little material under the cam screw head");
+assert(rotor_clamp_t - 0.2 >= 1.5, "Too little material under the cam screw head");
+assert(screw_seat + lock_screw_head_h <= rotor_t, "Cam screw head sticks out of the rotor");
+assert(lock_screw_len - rotor_clamp_t >= 2, "Cam screw too short to reach into the spindle");
 assert(lug_angle - lug_w / 2 > arc_deg(ball_d, rotor_r)
        && lug_angle + lug_w / 2 < 360 - sweep - arc_deg(ball_d, rotor_r),
        "Rotor lug runs into the detent notches");
@@ -211,7 +220,7 @@ module outline() {
 }
 
 module lock_body_profile(clearance) {
-   intersection() {
+   rotate(body_angle) intersection() {
       circle(d = lock_thread_d + 2 * clearance);
       square([lock_flat_w + 2 * clearance, lock_thread_d + 2], center = true);
    }
@@ -263,13 +272,13 @@ module rotor() {
       }
       // Lock spindle
       translate([0, 0, -1])
-         rotate([0, 0, lock_spindle_angle])
+         rotate([0, 0, body_angle + lock_spindle_angle])
             linear_extrude(lock_spindle_len + 1.2)
                spindle_profile(0.1);
       // Cam screw and its head
       translate([0, 0, -1])
          cylinder(d = lock_screw_d + 0.4, h = rotor_t + 2);
-      translate([0, 0, rotor_t - lock_screw_head_h - 0.2])
+      translate([0, 0, screw_seat])
          cylinder(d = lock_screw_head_d + 0.6, h = rotor_t);
       // Detent notches for OFF, R, L, BOTH (the ball is at world angle 0)
       for (i = [0 : 3])
@@ -480,7 +489,7 @@ module lock_part(theta) {
             lock_body_profile(0);
    color(c_steel)
       translate([0, 0, z_cam])
-         rotate([0, 0, theta + lock_spindle_angle])
+         rotate([0, 0, theta + body_angle + lock_spindle_angle])
             linear_extrude(lock_spindle_len)
                spindle_profile(0);
 }
@@ -583,8 +592,8 @@ module magnet_part(theta) {
 }
 
 module cam_screw_part() {
-   translate([0, 0, z_cam + rotor_t - 0.2])
-      screw(lock_screw_d, 8, lock_screw_head_d, lock_screw_head_h);
+   translate([0, 0, z_cam + screw_seat])
+      screw(lock_screw_d, lock_screw_len, lock_screw_head_d, lock_screw_head_h);
 }
 
 module sensor_parts() {

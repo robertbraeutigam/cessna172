@@ -618,7 +618,10 @@ two of the four grooves in the housing: take the cam, its washer and the
 cam screw off, pull the plug out with the key in (the small detent ball
 falls out, it is not needed), file the tab flush with the plug and put it
 back; the printed rotor on the spindle then holds the plug in. The key can
-be pulled where the wafers meet a groove (home = OFF, maybe every 90°).
+be pulled only with the key perpendicular to the body flats
+(`lock_key_home`), so the flats of the cutouts in the face, panel and
+housing are turned to put that position at OFF. It also comes out 90°
+further, near BOTH.
 
 A printed rotor on the lock's spindle sits in a housing behind the panel,
 closed by a cover:
@@ -647,15 +650,14 @@ and so does the lock flange (glue or double sided tape it on
 as well if it bows); it has holes around the heads of the panel screws.
 The lock body goes through
 a cutout with flats, so it cannot turn, and the housing sits on the back,
-between the rims. The labels are placed for the key pointing at OFF in the
-lock's home position: **MEASURE** where the key really points
-(`key_off_angle`) once the lock is here.
+between the rims. The cutout is turned so the key points at OFF
+(`key_off_angle`) where it comes out of the lock.
 
 ### Hardware
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 1 | mailbox / cabinet cam lock | key and spindle (`lock_*`: body 17 mm, 7 mm square spindle, 12 mm cam screw head; thread, nut and screw size still guesses) |
+| 1 | mailbox / cabinet cam lock | key and spindle (`lock_*`: 18 mm thread, 17 mm body, 25 x 4 mm nut, 7 mm square spindle, its M4 x 5 cam screw with a 12 mm head holds the rotor) |
 | 1 | 6 mm steel ball + spring | detent (`detent_spring_*`, spring OD below 6 mm) |
 | 1 | spring, 5 mm OD, 15 mm | START return (`start_spring_*`) |
 | 1 | cube magnet, 5 x 5 x 5 mm | position sensing (`magnet_*`) |
