@@ -618,10 +618,10 @@ two of the four grooves in the housing: take the cam, its washer and the
 cam screw off, pull the plug out with the key in (the small detent ball
 falls out, it is not needed), file the tab flush with the plug and put it
 back; the printed rotor on the spindle then holds the plug in. The key can
-be pulled only with the key perpendicular to the body flats
-(`lock_key_home`), so the flats of the cutouts in the face, panel and
-housing are turned to put that position at OFF. It also comes out 90°
-further, near BOTH.
+be pulled every 90°, with the key parallel or perpendicular to the body
+flats (`lock_key_home`), so the flats of the cutouts in the face, panel
+and housing are turned to put one of these positions at OFF. It also
+comes out 90° further, at BOTH.
 
 A printed rotor on the lock's spindle sits in a housing behind the panel,
 closed by a cover:

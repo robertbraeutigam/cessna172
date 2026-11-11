@@ -8,8 +8,8 @@
 // housing grooves. Take off the cam and its washer, pull the plug (key in,
 // the detent ball is not needed) and file the tab flush; this assembly
 // provides its own end stops for the whole OFF..START sweep and the rotor
-// holds the plug in. The key can be pulled at the lock's home position,
-// which has to be OFF (see lock_key_home).
+// holds the plug in. The key can be pulled every 90 degrees, one of these
+// has to be OFF (see lock_key_home), so it also comes out at BOTH.
 //
 // Mechanisms (inside the housing, closed by the cover):
 // - Detents: a steel ball pushed by a spring (radial channel in the
@@ -80,7 +80,7 @@ lock_spindle_flat = 7;       // cam spindle, width across flats
 lock_spindle_square = true;  // true: 4 flats, false: double-D
 lock_spindle_len = 2;        // spindle length that drives the cam
 lock_spindle_angle = 0;      // spindle flats vs. body flats at home (OFF)
-lock_key_home = 90;          // key vs. body flats at home (key out): 0 parallel, 90 perpendicular
+lock_key_home = 90;          // key vs. body flats where it comes out (every 90 degrees: 0 or 90)
 key_off_angle = 30;          // where the key points at OFF (home), from +x; the lock body is turned to match
 lock_screw_d = 4;            // cam screw, M4
 lock_screw_len = 5;          // thread length
