@@ -38,8 +38,8 @@ its own top-level directory; new components should follow the same layout.
     mailbox cam lock (its 90° stop removed). It has a ball detent, end stops
     on a rotor lug, a spring-return START (pin + shoe + spring in an arc slot),
     and one magnet with a digital hall sensor per position. The header comment
-    has the parts list and assembly order. The `lock_*` values are guesses
-    until the real lock is measured.
+    has the parts list and assembly order. The `lock_*` values are measured
+    (the lock's stop tab is filed off, so it turns past 90°).
   - `ignition.lua` — FlyWithLua script for X-Plane that holds the starter
     while START is pressed (MobiFlight writes its dataref; it cannot hold
     a command itself).

@@ -250,7 +250,7 @@ MobiFlight sends an X-Plane command only once; it cannot hold one while a
 button is pressed (still open:
 [MobiFlight-Connector#2405](https://github.com/MobiFlight/MobiFlight-Connector/issues/2405)).
 Where a command has to be held, like the ignition START, a small
-[FlyWithLua](https://forums.x-plane.org/files/file/38445-flywithlua-ng-next-generation-plus-edition-for-x-plane-12-win-lin-mac/)
+FlyWithLua (NG) plugin
 script in X-Plane does it (see [In X-Plane](#in-x-plane)).
 
 MobiFlight reads encoders only on their own pins, not through a mux, and
