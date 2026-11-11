@@ -132,9 +132,9 @@ under_play = 1;              // body to its cut-out
 under_bolt_y = 16;           // floor bolts from the face front, over the lower bar's slot
 pedestal_size = [75, 120, 150];   // 75 x 150 front (MEASURE), the depth a guess
 desk_clear = 3;              // a body to the desk underside, at least
-// Flaps panel, bought (lever and indicator), MEASURE: its front plate is
-// screwed onto the apron sheet (drill through the plate's own holes), its
-// body goes through the cut-out. Right of the pedestal, as high as the
+// Flaps panel, DIY (lever pot and indicator servo, not designed yet; these
+// sizes are placeholders until it is): its front plate is screwed onto the
+// apron sheet, its body goes through the cut-out. Right of the pedestal, as high as the
 // desk allows.
 flaps_plate = [50, 63];      // front plate, width x height
 flaps_body = [44, 57, 64];   // through the sheet (a guess: 3 mm smaller than the plate all round), depth behind it

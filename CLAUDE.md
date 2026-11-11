@@ -83,7 +83,7 @@ its own top-level directory; new components should follow the same layout.
   parts bolted together: the vertical front part in front of the desk
   edge (a rectangle with the uprights, its bottom bar just under the desk
   top, and the apron hanging under the throttle for the trim wheel
-  pedestal and the bought flaps panel; the thin parking
+  pedestal and the DIY flaps panel (not designed yet); the thin parking
   brake hangs under the bottom bar below the yoke), and the desk part (a
   ladder on the desk, its front rail cut at the yoke), with 45 degree
   braces between them (stock bars cut square, bought 45 degree

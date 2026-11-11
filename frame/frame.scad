@@ -303,7 +303,7 @@ module pedestal_part() {
       translate([pedestal_x - 4, under_y0 - 0.5, apron_bar_z + 12]) cube([8, 1, 28]);
 }
 
-// Bought flaps panel: front plate on the apron sheet, body behind it,
+// DIY flaps panel (placeholder): front plate on the apron sheet, body behind it,
 // lever and indicator on the plate
 module flaps_part() {
    y = -sheet_t;
