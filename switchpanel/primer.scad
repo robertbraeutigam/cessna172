@@ -4,7 +4,8 @@
 // ignition side), with its own cut-out in the cockpit sheet (frame/). It
 // does not touch the ignition panel. The knob pulls out (stroke), pushes
 // back in and, only when it is fully in, turns a quarter turn clockwise
-// (seen from the front) to lock, like the real one.
+// (seen from the front) to lock, like the real one. Turned back, a spring
+// pops it part way out (pop).
 //
 // Mechanism, the same idea as the throttle quadrant (throttle/):
 // - The knob's stem slides in a tube on the back of the panel (the front
@@ -21,6 +22,9 @@
 //   A carrier on the rod has a slot over the ear; two rod collars (the
 //   throttle's plain clamp) hold it on the rod. The rod turns in the carrier
 //   (twist lock), the carrier itself is guided between the bracket's ribs.
+// - Pop out: a compression spring on the rod between the rear collar and
+//   the rear wall. The collar reaches it only in the last pop mm, so it
+//   pushes the knob out that far when unlocked and leaves it free after.
 // - The pot goes to the switch panel's mux board: 5 V, GND, and the
 //   wiper on the Cat5 cable's spare AUX wire (hub port 3, Mega A3).
 //
@@ -35,12 +39,13 @@
 // - M3 screws: 4x M3x12 bracket onto the tube, 4x M3x10 pot straps, 1x
 //   M3x6 knob set screw, 4x M3x10 + nuts to mount the panel
 // - 2x throttle/clamp.scad "plain" (clamp_plain.stl) as rod collars
+// - compression spring over the 6 mm rod (pop_spring_*)
 //
 // Assembly: panel and face through the sheet, screw the flange on. From
 // behind: knob stem into the tube (lug in the keyway), bracket onto the
 // tube (hex key through the holes in the rear wall), pot onto its stands
 // with the straps. Push the rod in from the back, through the rear
-// wall, a collar, the carrier (slot over the pot ear), a collar, the front
+// wall, the pop spring, a collar, the carrier (slot over the pot ear), a collar, the front
 // wall and into the knob; tighten the set screw. With the knob pulled
 // out, set the carrier so the ear is stroke / 2 before the pot's middle and
 // tighten the collars against it.
@@ -61,9 +66,15 @@ small_pot_stand_height = 7;
 small_pot_full_width = 10;
 small_pot_module_height = 6;
 small_pot_full_length = 75;
-pot_travel = 54;             // MEASURE: slider ear travel
+pot_travel = 60;             // slider ear travel, measured
 pot_ear = [1, 5, 16];        // slider ear: thickness, length along the pot, height above the pot
 pot_leg0 = 6;                // first stand from the pot's front end (as in the throttle box)
+
+// --- Pop out spring, MEASURE (any spring that fits over the rod) ---
+pop_spring_od = 9;           // at most the collar's 9 mm
+pop_spring_id = 6.8;         // over the rod
+pop_spring_len = 15;         // free length
+pop_spring_solid = 5;        // fully compressed length
 
 // --- Rod and collars ---
 rod_d = 6;
@@ -73,7 +84,8 @@ collar_w = 8;                // throttle/clamp.scad clamp(8)
 collar_sweep = 9.5;          // its screw lug, from the rod axis
 
 // --- Knob and twist lock ---
-stroke = 40;                 // pull out, at most pot_travel
+stroke = 45;                 // pull out, at most pot_travel; a plunger primer has about 1 3/4"
+pop = 5;                     // the spring pushes the knob out this far when unlocked
 lock_turn = 90;              // clockwise to lock
 key_angle = 90;              // keyway direction (up)
 knob_d = 22;
@@ -144,7 +156,8 @@ z_front = tube_len;                         // bracket front wall
 z_carrier = max(z_front + wall + screw_head[1] + 1 + collar_w,
                 z_front + wall + (post_len / 2 - pot_legs[0]) + pot_l / 2 - carrier_l / 2 - stroke / 2);
 pot_z0 = z_carrier + carrier_l / 2 + stroke / 2 - pot_l / 2;   // ear in the middle at stroke / 2
-z_rear = max(z_carrier + carrier_l + collar_w + stroke + 1,    // rear collar, knob in
+z_collar_in = z_carrier + carrier_l + 0.2 + collar_w + stroke;  // rear collar's back, knob in
+z_rear = max(z_collar_in + pop_spring_len - pop,               // the spring touches it pop before in
              pot_z0 + pot_legs[1] + post_len / 2,
              pot_z0 + pot_l + 5);                              // solder tabs and wires
 z_end = z_rear + wall;
@@ -156,6 +169,10 @@ echo(primer_back = back_w, primer_face = face_w, bracket_len = z_end - z_front,
 
 // --- Checks ---
 assert(stroke <= pot_travel - 4, "Stroke longer than the pot travel");
+assert(pop > 1 && pop < stroke, "Pop out longer than the stroke");
+assert(z_rear - z_collar_in >= pop_spring_solid + 0.5, "Pop spring goes solid before the knob is in");
+assert(pop_spring_id >= rod_d + 0.5 && pop_spring_od <= 9.5, "Pop spring does not fit over the rod or on the collar");
+assert(norm([tube_screw, tube_screw]) - key_hole / 2 >= pop_spring_od / 2 + 1, "Pop spring sits on the key holes in the rear wall");
 assert(key_r + 2.5 <= tube_half, "Tube wall around the keyway too thin");
 assert(norm([tube_screw, tube_screw]) - pilot_d / 2 >= key_r + 1.2,
        "Bracket screws run into the lock pocket");
@@ -388,6 +405,7 @@ c_knob = "#1d1f22";
 c_pot = "#2a2b2e";
 c_steel = "#b9c0c8";
 c_gold = "#d9b24a";
+c_spring = "#9aa3ad";
 
 function ear_z(u) = z_carrier + carrier_l / 2 + u;
 
@@ -430,6 +448,19 @@ module rod_parts(u, t) {
       collar_part(z_carrier + u - collar_w - 0.2);
       collar_part(z_carrier + u + carrier_l + 0.2);
    }
+   pop_spring_part(u);
+}
+
+// Pop spring against the rear wall, compressed by the collar in the last pop mm
+module pop_spring_part(u) {
+   len = min(pop_spring_len, z_rear - (z_collar_in - stroke + u));
+   turns = 6;
+   w = (pop_spring_od - pop_spring_id) / 2;
+   color(c_spring)
+      translate([0, 0, z_rear - len])
+         linear_extrude(height = len, twist = 360 * turns, slices = turns * 24, convexity = 10)
+            translate([(pop_spring_od - w) / 2, 0])
+               circle(d = w, $fn = 10);
 }
 
 module panel_part() {
@@ -475,6 +506,8 @@ module section_view(u = stroke, locked = true) {
    color(c_carrier) cut() translate([0, 0, z_carrier + u]) carrier();
    pot_part(u);
    color(c_steel) translate([0, 0, rod_z0 + u]) cylinder(d = rod_d, h = rod_len);
+   color(c_clamp) cut() rotate([0, 0, 90 + t]) collar_part(z_carrier + u + carrier_l + 0.2);
+   cut() pop_spring_part(u);
 }
 
 module exploded_view(e = explode) {

@@ -257,12 +257,12 @@ module primer_part() {
    color(c_sheet)
       translate([primer_face_r[0], y_face, primer_face_r[1]]) cube([primer_face, 3, primer_face]);
    color("#3d7bd9") {
-      translate([primer_x - 11, y_face + 3, primer_z - 11]) cube([22, 45, 22]);
-      translate([primer_x - 11, y_face + 48, primer_z - primer_bracket.y / 2])
-         cube([11 + primer_bracket.x, 92, primer_bracket.y]);
+      translate([primer_x - 11, y_face + 3, primer_z - 11]) cube([22, primer_tube, 22]);
+      translate([primer_x - 11, y_face + 3 + primer_tube, primer_z - primer_bracket.y / 2])
+         cube([11 + primer_bracket.x, primer_bracket.z, primer_bracket.y]);
    }
    color("#b9c0c8")
-      translate([primer_x, y_face + 48, primer_z]) rotate([-90, 0, 0]) cylinder(d = 6, h = primer_depth - 48);
+      translate([primer_x, y_face + 3 + primer_tube, primer_z]) rotate([-90, 0, 0]) cylinder(d = 6, h = primer_depth - primer_tube);
    color("#1d1f22")
       translate([primer_x, y_face, primer_z]) rotate([90, 0, 0]) cylinder(d = 22, h = 14);
 }

@@ -723,9 +723,10 @@ the key is turned in the cockpit or the scripts are reloaded.
 `primer.scad`: the push-pull primer with its twist lock, read by a linear
 pot. It is a separate 47 x 47 mm panel above the left end of the switch
 panels, flush with their left edge, in its own cut-out in the sheet, so
-the ignition panel stays as it is. The knob pulls out 40 mm (`stroke`) and
-pushes back in; fully in, it turns a quarter turn clockwise to lock, and
-only then.
+the ignition panel stays as it is. The knob pulls out 45 mm (`stroke`,
+about the 1¾" of a panel plunger primer) and pushes back in; fully in, it
+turns a quarter turn clockwise to lock, and only then. Turned back
+(counterclockwise), a spring pops it 5 mm out (`pop`), like the real one.
 
 ### How it works
 
@@ -748,9 +749,13 @@ over the pot's slider ear. The pot is the 75 mm one used for the carb heat.
   the rod is held between two rod collars (the throttle's plain clamp). The
   rod turns in it for the twist lock; the carrier itself slides between the
   bracket's two ribs, so it cannot turn.
+- **Pop out:** a compression spring on the rod, between the rear collar and
+  the rear wall. The collar only reaches it in the last 5 mm before the knob
+  is in, so the locked lug holds it compressed, and unlocking pops the knob
+  out that far; the rest of the stroke is free.
 
 The bracket is beside the rod towards the pilot's right, about 41 x 26 mm
-across, and with the knob in, the rod ends about 180 mm behind the panel,
+across, and with the knob in, the rod ends about 193 mm behind the panel,
 over the switch panel and clear of the frame's upright and brace. The
 bracket is wider than the cut-out, so it goes on from behind the sheet.
 
@@ -759,7 +764,8 @@ bracket is wider than the cut-out, so it goes on from behind the sheet.
 | Qty | Part | Use |
 |-----|------|-----|
 | 1 | linear potentiometer, 75 mm (like the carb heat one) | primer position |
-| 1 | 6 mm rod, 195 mm (`rod_len`) | knob to the pot carrier |
+| 1 | 6 mm rod, 208 mm (`rod_len`) | knob to the pot carrier |
+| 1 | compression spring, about 9 mm OD, 6.8 mm ID, 15 mm long (`pop_spring_*`) | pops the knob out when unlocked |
 | 2 | `throttle/clamp.scad` plain clamp (`clamp_plain.stl`), with an M3 screw + nut | rod collars on both sides of the carrier |
 | 4 | M3 x 12 socket head screw | bracket onto the tube |
 | 4 | M3 x 10 screw | pot straps onto the stands |
@@ -771,9 +777,13 @@ Printed: `primer_panel.stl` (front side down), `primer_face.stl` (front
 side up), `primer_knob.stl` (on the end of its stem), `primer_bracket.stl`
 (on its spine), `primer_strap.stl` (2x), `primer_carrier.stl`.
 
-**MEASURE:** the pot's travel (`pot_travel`, 54 mm in the throttle's view
-model; the stroke has to stay 4 mm shorter) and its ear (`pot_ear`). The
-build fails if the stroke does not fit.
+The pot's travel (`pot_travel`) is measured: 60 mm, so the 45 mm stroke
+uses the middle three quarters of it (the build fails if the stroke comes
+within 4 mm of the travel). **MEASURE:** the pot's slider ear (`pot_ear`)
+and the spring you pick (`pop_spring_od`, `_id`, `_len`, `_solid`): it
+has to fit over the rod and on the collar, and it must not go solid
+before the knob is in; the bracket gets longer for a longer spring. A
+stiffer spring pops harder, the pot slider's friction works against it.
 
 ### Assembly
 
@@ -784,10 +794,10 @@ build fails if the stroke does not fit.
    in its rear wall).
 4. Solder three wires to the pot, put it onto its stands and screw the
    straps on.
-5. Push the rod in from the back: through the rear wall, a collar, the
+5. Push the rod in from the back: through the rear wall, the spring, a collar, the
    carrier (its slot over the pot's ear), the other collar, the front wall
    and into the knob, and tighten the set screw.
-6. With the knob out, slide the carrier to where the ear is 20 mm
+6. With the knob out, slide the carrier to where the ear is 22.5 mm
    (`stroke / 2`) in front of the pot's middle, and tighten the collars
    against it so the rod still turns.
 
