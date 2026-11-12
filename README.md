@@ -10,7 +10,7 @@ Each cockpit component has its own directory:
 | Directory | Component |
 |-----------|-----------|
 | [`throttle/`](throttle) | throttle quadrant: throttle, mixture and carb heat |
-| [`switchpanel/`](switchpanel) | the 172N lower left switch panel: ignition key, master, lights, avionics |
+| [`switchpanel/`](switchpanel) | the 172N lower left switch panel: ignition key, master, lights, avionics; the primer above it |
 | [`frame/`](frame) | the aluminium frame and panel sheet that everything mounts on |
 | [`hub/`](hub) | the box with the MobiFlight Mega and the Cat5 ports |
 
@@ -201,7 +201,9 @@ the panel height the monitor allows (`sheet_h_max`).
 
 The switch panel's two backs go through one hole, 1 mm larger than the
 backs all round; drill its M3 mount holes through the panel's own holes,
-with the panels in place. The same goes for the throttle box: its cut-out
+with the panels in place. The primer has its own, smaller hole above the
+left end of it, 1 mm larger than its square back, and its four flange
+holes are drilled the same way. The same goes for the throttle box: its cut-out
 is 1 mm larger than the box, open at the bottom, and its
 flange holes are drilled with the box in place.
 
@@ -352,7 +354,7 @@ cable to length, or in half for two components:
 |------|-----------|-----|-----|
 | 1 | yoke handle: PTT, trim switch, more buttons (FFB yoke, later) | D26 | A1 |
 | 2 | free | D27 | A2 |
-| 3 | switch panel | D28 | A3 (free) |
+| 3 | switch panel | D28 | A3, primer |
 
 **Direct ports** (pin 4 5 V and pin 5 GND on all of them):
 
@@ -611,6 +613,10 @@ panels meet there is no flange and the corners are square, so together
 they look like the one piece panel of the airplane (about 309 x 100 mm,
 the face 3 mm in front of the sheet).
 
+The [primer](#primer) is a third, small panel of its own above the left
+end (`primer.scad`), with its own hole in the sheet. `panel.inc.scad`
+takes the height of the back as a parameter for it.
+
 ## Ignition switch
 
 [![Ignition switch](https://robertbraeutigam.github.io/cessna172/switchpanel/ignition_montage.png)](https://robertbraeutigam.github.io/cessna172/switchpanel/ignition_montage.png)
@@ -713,6 +719,93 @@ virtual cockpit. Start X-Plane (or reload the Lua scripts) before
 connecting MobiFlight, the START dataref only exists once the script has
 run. If MobiFlight disconnects in START, the starter keeps cranking until
 the key is turned in the cockpit or the scripts are reloaded.
+
+## Primer
+
+[![Primer](https://robertbraeutigam.github.io/cessna172/switchpanel/primer_montage.png)](https://robertbraeutigam.github.io/cessna172/switchpanel/primer_montage.png)
+
+`primer.scad`: the push-pull primer with its twist lock, read by a linear
+pot. It is a separate 47 x 47 mm panel above the left end of the switch
+panels, flush with their left edge, in its own cut-out in the sheet, so
+the ignition panel stays as it is. The knob pulls out 40 mm (`stroke`) and
+pushes back in; fully in, it turns a quarter turn clockwise to lock, and
+only then.
+
+### How it works
+
+The same idea as the [throttle quadrant](#throttle-quadrant): a 6 mm rod
+moves the slider of a linear pot, through a clamp-like carrier with a slot
+over the pot's slider ear. The pot is the 75 mm one used for the carb heat.
+
+- **Knob and twist lock:** the knob's 10 mm stem slides in a square tube on
+  the back of the panel, the front bearing. A lug on the end of the stem
+  runs in a keyway along the tube, so the knob cannot turn while it is out
+  and always comes back lined up. At the back of the tube the keyway opens
+  into a quarter turn pocket: fully in, the lug turns into it and the end of
+  the keyway holds it (locked). Pulled out, the lug stops on the back of
+  the panel plate.
+- **Rod:** an M3 set screw in the knob's head holds the rod. The rod runs
+  back through the bracket, whose front wall (screwed onto the end of the
+  tube) and rear wall are two more bearings.
+- **Pot:** in the bracket the pot sits on two stands, held down by two
+  printed straps, with its slider ear pointing at the rod. The carrier on
+  the rod is held between two rod collars (the throttle's plain clamp). The
+  rod turns in it for the twist lock; the carrier itself slides between the
+  bracket's two ribs, so it cannot turn.
+
+The bracket is beside the rod towards the pilot's right, about 41 x 26 mm
+across, and with the knob in, the rod ends about 180 mm behind the panel,
+over the switch panel and clear of the frame's upright and brace. The
+bracket is wider than the cut-out, so it goes on from behind the sheet.
+
+### Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 1 | linear potentiometer, 75 mm (like the carb heat one) | primer position |
+| 1 | 6 mm rod, 195 mm (`rod_len`) | knob to the pot carrier |
+| 2 | `throttle/clamp.scad` plain clamp (`clamp_plain.stl`), with an M3 screw + nut | rod collars on both sides of the carrier |
+| 4 | M3 x 12 socket head screw | bracket onto the tube |
+| 4 | M3 x 10 screw | pot straps onto the stands |
+| 1 | M3 x 6 set screw | knob onto the rod |
+| 4 | M3 x 10 pan head screw + nut | face flange onto the sheet |
+| - | 3 wires | pot to the switch panel's mux board |
+
+Printed: `primer_panel.stl` (front side down), `primer_face.stl` (front
+side up), `primer_knob.stl` (on the end of its stem), `primer_bracket.stl`
+(on its spine), `primer_strap.stl` (2x), `primer_carrier.stl`.
+
+**MEASURE:** the pot's travel (`pot_travel`, 54 mm in the throttle's view
+model; the stroke has to stay 4 mm shorter) and its ear (`pot_ear`). The
+build fails if the stroke does not fit.
+
+### Assembly
+
+1. Paint the label, put the face on the panel, push the panel through its
+   cut-out and screw the flange onto the sheet.
+2. From behind: put the knob's stem into the tube, the lug in the keyway.
+3. Screw the bracket onto the end of the tube (hex key through the holes
+   in its rear wall).
+4. Solder three wires to the pot, put it onto its stands and screw the
+   straps on.
+5. Push the rod in from the back: through the rear wall, a collar, the
+   carrier (its slot over the pot's ear), the other collar, the front wall
+   and into the knob, and tighten the set screw.
+6. With the knob out, slide the carrier to where the ear is 20 mm
+   (`stroke / 2`) in front of the pot's middle, and tighten the collars
+   against it so the rod still turns.
+
+### Wiring and X-Plane
+
+The pot connects to the switch panel's mux board: its ends to 5 V and GND
+there, the wiper to the brown AUX wire of the Cat5 cable, which goes to
+the Mega's A3 at the hub (port 3, see [Ports](#ports)). It is an analog
+input, not a mux input. Which end goes to 5 V decides the direction; swap
+them, or invert the range in the MobiFlight Connector.
+
+In the MobiFlight Connector it is an analog input on A3 that writes the
+primer's dataref. **VERIFY** which dataref the X-Plane 172 uses for the
+primer with DataRefTool while working the primer in the virtual cockpit.
 
 ## Switches
 
@@ -874,7 +967,8 @@ cable soldered straight into its control row (see [Cables](#cables)):
 | SIG | white-brown | D28, the mux's data pin in the MobiFlight Connector |
 | EN | - | not to the hub: bridge it to GND on the board (enable is active low) |
 
-The brown wire (AUX) is not used: cut it short and insulate it. The cable
+The brown wire (AUX) is the [primer](#primer) pot's wiper; the pot's
+other two wires go to VCC and GND on the board. The cable
 comes in over the top rim and is tied down with a cable tie on the block
 right of the mux (`tie_block`: the tie goes through the slot at the panel
 and around the cable in the groove on top), so the wires fan out from
@@ -899,13 +993,15 @@ Every input is wired like a switch to GND (active low, as MobiFlight expects):
   GND, the other to the mux input.
 - **Ignition:** the A3144 outputs go to C11..C15. The sensors also need 5 V
   and GND: take them from the mux VCC and GND.
+- **Primer:** the pot's ends to the mux VCC and GND, its wiper to the Cat5
+  cable's brown AUX wire (not to the mux).
 
 So on the switch panel: one GND wire daisy chained over all 11 switches to
 the mux GND, and one signal wire from each switch to its C pin, soldered
 straight into the board. The ignition cable (5 signals, 5 V, GND) is best
 plugged in with a 7 pin Dupont or JST connector, so the two panels can be
 separated. GND and VCC get several wires (switch chain, EN bridge,
-ignition, Cat5 cable): join the extra wires into one before the pin, with
+ignition, primer, Cat5 cable): join the extra wires into one before the pin, with
 solder and heat shrink.
 
 ### Assembly

@@ -40,6 +40,14 @@ its own top-level directory; new components should follow the same layout.
     and one magnet with a digital hall sensor per position. The header comment
     has the parts list and assembly order. The `lock_*` values are measured
     (the lock's stop tab is filed off, so it turns past 90°).
+  - `primer.scad` — the primer: a small panel of its own above the left
+    end of the switch panels (own cut-out in the sheet, the ignition panel
+    is not changed), a push-pull knob with a twist lock (lug in a keyway
+    in a tube on the panel back, quarter turn pocket at its end) and a
+    bracket behind it with the 75 mm linear pot (the carb heat type),
+    driven like the throttle's (rod, carrier over the slider ear, the
+    throttle's plain clamps as collars). The pot's wiper is on port 3's AUX
+    wire. `panel.inc.scad` takes the back's height (`h`) for it.
   - `ignition.lua` — FlyWithLua script for X-Plane that holds the starter
     while START is pressed (MobiFlight writes its dataref; it cannot hold
     a command itself).
