@@ -24,6 +24,11 @@
 //   open collector and pulls low over the magnet, so it wires to a MobiFlight
 //   input like a switch to GND (needs 5V and GND too). Check which magnet
 //   face triggers the sensor before gluing the magnet in.
+// - Back cap: the sensor legs come out of the back of the cover, bent 90
+//   degrees. A cap over the cover protects them, their solder joints and the
+//   wires. The 7 wires (5 signals, 5 V, GND) leave through a notch in its
+//   wall, filled with hot glue as strain relief. The cover screws go through
+//   the cap too.
 //
 // Coordinates: z is the key axis, z=0 is the back of the panel, +z points
 // backwards. Positive rotation is clockwise seen from the front. All parts
@@ -35,7 +40,7 @@
 // - 6 mm steel ball + spring (detent_spring_*)
 // - spring for the START return (start_spring_*)
 // - 5x5x5 mm cube magnet (magnet_*), 5x A3144 hall sensors (OFF is optional)
-// - M3 screws: 4x for the cover, 4x panel to housing, 1x M3x8 as the
+// - M3 screws: 4x M3x20 for the cap and cover, 4x panel to housing, 1x M3x8 as the
 //   START pin, 4x to mount the panel
 //
 // The panel is printed as well. It has the same height, rim, mount holes and
@@ -49,7 +54,9 @@
 //
 // Assembly: lock through the panel and the housing, tighten its nut, mount
 // the rotor with the lock's cam screw, insert ball + spring and shoe +
-// spring, glue in magnet and sensors, screw on the cover, then the pin.
+// spring, glue in magnet and sensors, screw on the cover (short screws to
+// test), then the pin. Solder the wires to the legs, lay them in the cap's
+// notch, screw on the cap and fill the notch with hot glue.
 
 $fn = 60;
 
@@ -103,6 +110,7 @@ corner_r = 5;
 pilot_d = 2.8;               // M3 self tapping into plastic
 clear_d = 3.3;               // M3 clearance
 gap = 0.5;                   // axial gap rotor <-> cover
+panel_screw_len = 10;        // panel to housing, from the front
 
 // --- Rotor ---
 rotor_r = 20;
@@ -139,6 +147,14 @@ sensor_h = 3.0;
 sensor_t = 1.5;
 cover_t = 3;
 
+// --- Back cap over the sensor legs ---
+cap_floor = 2;
+cap_depth = 8;               // room behind the cover for the legs, solder joints and wires
+cap_wall = 2;
+leg_stub = 5;                // legs trimmed to this behind the cover, before soldering
+cable_d = 6;                 // notch for the 7 wire bundle, towards the switch panel (-x)
+cover_screw_len = 20;        // through cap and cover into the housing
+
 // --- Derived ---
 function arc_deg(len, r) = len / r * 180 / PI;
 
@@ -148,6 +164,9 @@ z_cam = lock_body_len - panel_t;
 body_angle = key_off_angle - lock_key_home - 90;
 screw_seat = lock_spindle_len + rotor_clamp_t;  // head underside, in the rotor
 z_back = z_cam + rotor_t + gap;
+z_cap = z_back + cover_t;
+cap_h = cap_floor + cap_depth;
+cover_screw_thread = cover_screw_len - cap_h - cover_t;  // in the housing
 bore_r = rotor_r + 0.4;
 
 ball_ch = ball_d + 0.3;
@@ -205,6 +224,11 @@ assert(atan((magnet_w / 2 + 0.1 + 0.5) / rotor_r) <= lug_w / 2, "Magnet does not
 assert(magnet_r + magnet_w / 2 + 0.1 + 1 <= lug_r, "Magnet pocket breaks through the lug rim");
 assert(rotor_t - magnet_h - 0.2 >= 1.2, "Magnet pocket floor too thin");
 assert(magnet_r * min(pitch, start_pitch) * PI / 180 >= sensor_w + 4, "Hall sensors too close to each other");
+assert(cap_depth >= 3 + 1, "Cap runs into the START pin screw head");
+assert(leg_stub + 2 <= cap_depth, "No room for the solder joints in the cap");
+assert(cable_d <= cap_depth - 1, "Cable notch too deep for the cap");
+assert(cover_screw_thread >= 5, "Cover screws too short for cap + cover");
+assert(cover_screw_thread <= z_back - (panel_screw_len - panel_t + face_t) - 1, "Cover screws run into the panel screws");
 assert(half + 0.5 <= panel_h / 2 - rim_w, "Housing does not fit between the panel rims, make panel_h higher");
 assert(title == "" || title_y + group_label_size <= panel_h / 2 - 3, "Title too close to the top edge");
 assert(tick_r >= lock_flange_d / 2 + 0.5 && tick_r + tick_len <= label_r - label_size, "Ticks run into the lock or the labels");
@@ -339,6 +363,34 @@ module cover() {
          translate([half / 2, -half + 6, cover_t - 0.4])
             linear_extrude(1)
                text("{{gitrev}}", size = 3, halign = "center", valign = "center");
+      }
+}
+
+// Back cap on the cover, open towards it: the cover closes the cable notch
+module cap() {
+   translate([0, 0, z_cap])
+      difference() {
+         linear_extrude(cap_h)
+            outline();
+         translate([0, 0, -1])
+            linear_extrude(cap_depth + 1)
+               difference() {
+                  offset(delta = -cap_wall)
+                     outline();
+                  // Solid corners for the screws
+                  for (x = [-1, 1], y = [-1, 1])
+                     translate([x * screw_xy, y * screw_xy])
+                        circle(r = corner_r);
+               }
+         corner_holes(clear_d, cap_h);
+         // Cable notch, round at its end
+         translate([-half - 1, 0, 0]) {
+            translate([0, -cable_d / 2, -1])
+               cube([cap_wall + 2, cable_d, cable_d / 2 + 1]);
+            translate([0, 0, cable_d / 2])
+               rotate([0, 90, 0])
+                  cylinder(d = cable_d, h = cap_wall + 2);
+         }
       }
 }
 
@@ -556,7 +608,7 @@ module panel_screws() {
    for (x = [-1, 1], y = [-1, 1])
       translate([x * screw_xy, y * screw_xy, -panel_t + face_t])
          rotate([180, 0, 0])
-            m3_screw(10);
+            m3_screw(panel_screw_len);
 }
 
 module detent_parts(theta) {
@@ -608,7 +660,7 @@ module sensor_parts() {
          color(c_chrome)
             for (y = [-1.27, 0, 1.27])
                translate([magnet_r + sensor_h / 2 + 0.5, y, z_back + sensor_t / 2])
-                  cylinder(d = 0.45, h = cover_t + 8, $fn = 8);
+                  cylinder(d = 0.45, h = cover_t - sensor_t / 2 + leg_stub, $fn = 8);
       }
 }
 
@@ -628,11 +680,22 @@ module cover_part(alpha = 1) {
 
 module cover_screws() {
    for (x = [-1, 1], y = [-1, 1])
-      translate([x * screw_xy, y * screw_xy, z_back + cover_t])
-         m3_screw(10);
+      translate([x * screw_xy, y * screw_xy, z_cap + cap_h])
+         m3_screw(cover_screw_len);
+}
+
+module start_pin_screw() {
    rotate([0, 0, start_pin_angle])
-      translate([start_pin_r, 0, z_back + cover_t])
+      translate([start_pin_r, 0, z_cap])
          m3_screw(start_pin_len);
+}
+
+// The wire bundle leaving the cap notch (stub)
+module cable_part() {
+   color(c_sensor)
+      translate([-half - 15, 0, z_cap + cable_d / 2])
+         rotate([0, 90, 0])
+            cylinder(d = cable_d - 1, h = 15 + cap_wall + 3);
 }
 
 // Everything in place, explode lifts the cover off
@@ -646,6 +709,7 @@ module bought_parts(theta, explode = 0) {
    cam_screw_part();
    translate([0, 0, explode]) {
       sensor_parts();
+      start_pin_screw();
       cover_screws();
    }
 }
@@ -653,10 +717,10 @@ module bought_parts(theta, explode = 0) {
 module exploded_view(pos = 0, e = 16) {
    theta = pos_angle(pos);
    // Assembly lines
-   dashed_line(-4.2 * e, 6 * e);
+   dashed_line(-4.2 * e, 7 * e);
    for (x = [-1, 1], y = [-1, 1])
       translate([x * screw_xy, y * screw_xy, 0])
-         dashed_line(-2.4 * e, 5.6 * e, 0.35);
+         dashed_line(-2.4 * e, 7 * e, 0.35);
 
    translate([0, 0, -4.2 * e]) key_part(theta);
    translate([0, 0, -3 * e]) lock_part(theta);
@@ -676,7 +740,9 @@ module exploded_view(pos = 0, e = 16) {
    translate([0, 0, 3.3 * e]) cam_screw_part();
    translate([0, 0, 3.9 * e]) sensor_parts();
    translate([0, 0, 4.6 * e]) cover_part();
-   translate([0, 0, 5.6 * e]) cover_screws();
+   translate([0, 0, 5.4 * e]) start_pin_screw();
+   translate([0, 0, 6.2 * e]) color(c_cover) cap();
+   translate([0, 0, 7 * e]) cover_screws();
 }
 
 module assembled_view(pos = 3) {
@@ -688,6 +754,8 @@ module assembled_view(pos = 3) {
    translate([0, 0, z_cam]) rotate([0, 0, theta]) color(c_rotor) rotor();
    bought_parts(theta);
    cover_part(0.35);
+   color(c_cover, 0.35) cap();
+   cable_part();
 }
 
 // Back view without the cover, to see the mechanism work
@@ -725,6 +793,7 @@ translate([0, 0, -2 * explode]) rotate([0, 180, 0]) face(); // Make module face
 translate([0, 0, z_cam]) rotate([0, 0, pos_angle(view_pos)]) rotor(); // Make module rotor
 shoe_in_place(pos_angle(view_pos)); // Make module shoe
 translate([0, 0, explode]) cover(); // Make module cover
+translate([0, 0, 2 * explode]) rotate([0, 180, 0]) cap(); // Make module cap
 
 //bought_parts(pos_angle(view_pos), explode); // Ignore module
 
