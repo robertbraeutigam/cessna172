@@ -62,7 +62,8 @@ echo(front_part_2020 = [["top bar", frame_w], ["bottom bar", frame_w], ["4 uprig
 echo(desk_part_2020 = [["front rail left", rails[0][1] - rails[0][0]], ["front rail right", rails[1][1] - rails[1][0]],
                        ["rear rail", frame_w], ["5 crossbars", crossbar_len], ["4 braces, cut square", brace_len]]);
 echo(sheet = [frame_w, sheet_h + ext], screws = len(sheet_screws));
-echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut);
+echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut,
+     primer_cut = primer_cut);
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
 echo(apron_sheet = [apron[1] - apron[0], apron_h - ext], apron_screws = len(apron_screws));
 echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts, flaps_cut = flaps_cut);
@@ -250,6 +251,22 @@ module switch_panel_part() {
          rotate([90, 0, 0]) cylinder(d = 4, h = 18);
 }
 
+// Primer: face, tube through the sheet, bracket behind it, knob
+module primer_part() {
+   y_face = -sheet_t - 3;           // panel_t
+   color(c_sheet)
+      translate([primer_face_r[0], y_face, primer_face_r[1]]) cube([primer_face, 3, primer_face]);
+   color("#3d7bd9") {
+      translate([primer_x - 11, y_face + 3, primer_z - 11]) cube([22, 45, 22]);
+      translate([primer_x - 11, y_face + 48, primer_z - primer_bracket.y / 2])
+         cube([11 + primer_bracket.x, 92, primer_bracket.y]);
+   }
+   color("#b9c0c8")
+      translate([primer_x, y_face + 48, primer_z]) rotate([-90, 0, 0]) cylinder(d = 6, h = primer_depth - 48);
+   color("#1d1f22")
+      translate([primer_x, y_face, primer_z]) rotate([90, 0, 0]) cylinder(d = 22, h = 14);
+}
+
 module throttle_part() {
    r = 10;
    f = throttle_flange;
@@ -343,6 +360,7 @@ module components() {
    yoke_part();
    radio_part();
    switch_panel_part();
+   primer_part();
    throttle_part();
    pedestal_part();
    flaps_part();

@@ -49,16 +49,17 @@ assert(mount_inset + mount_nut_r + 0.3 <= flange_w - sheet_cut_clear,
 assert(face_t >= 0.8 && panel_t - face_t >= 1.6, "Face or panel plate too thin");
 assert(mount_d / 2 + 1.2 <= mount_inset, "Mount holes too close to the face edge");
 
-// Mount holes in the flange: top and bottom row
+// Mount holes in the flange: top and bottom row. h is the back's height,
+// panel_h for the two lower panels; smaller panels (the primer) pass their own.
 function panel_mount_y0(y0) = y0 - flange_w + mount_inset;
-function panel_mount_y1(y0) = y0 + panel_h + flange_w - mount_inset;
+function panel_mount_y1(y0, h = panel_h) = y0 + h + flange_w - mount_inset;
 
 // Mount holes in the four corners of the face of a panel whose back goes
 // from x0 to x1, y0 up. round0 / round1 as for panel_outline_2d.
-function panel_corner_holes(x0, x1, y0, round0 = true, round1 = true) =
+function panel_corner_holes(x0, x1, y0, round0 = true, round1 = true, h = panel_h) =
    [for (x = [round0 ? x0 - flange_w + mount_inset : x0 + mount_inset,
               round1 ? x1 + flange_w - mount_inset : x1 - mount_inset],
-         y = [panel_mount_y0(y0), panel_mount_y1(y0)]) [x, y]];
+         y = [panel_mount_y0(y0), panel_mount_y1(y0, h)]) [x, y]];
 
 // Outline from x0 to x1, y0 up, h high. round0 / round1: round the
 // corners on the x0 / x1 side, square ones meet the other panel.
@@ -77,23 +78,23 @@ module panel_outline_2d(x0, x1, y0, round0 = true, round1 = true, h = panel_h) {
 
 // The face: the back's outline with the flange on the top, the bottom and
 // the rounded (outer) ends
-module panel_face_2d(x0, x1, y0, round0 = true, round1 = true) {
+module panel_face_2d(x0, x1, y0, round0 = true, round1 = true, h = panel_h) {
    panel_outline_2d(x0 - (round0 ? flange_w : 0), x1 + (round1 ? flange_w : 0), y0 - flange_w,
-                    round0, round1, face_h);
+                    round0, round1, h + 2 * flange_w);
 }
 
 // Face plate and rim, with the mount holes in the flange, front at z=0
-module panel_blank(x0, x1, y0, holes, round0 = true, round1 = true) {
+module panel_blank(x0, x1, y0, holes, round0 = true, round1 = true, h = panel_h) {
    difference() {
       union() {
          linear_extrude(panel_t)
-            panel_face_2d(x0, x1, y0, round0, round1);
+            panel_face_2d(x0, x1, y0, round0, round1, h);
          translate([0, 0, panel_t - 0.01])
             linear_extrude(rim_h + 0.01)
                difference() {
-                  panel_outline_2d(x0, x1, y0, round0, round1);
+                  panel_outline_2d(x0, x1, y0, round0, round1, h);
                   offset(delta = -rim_w)
-                     panel_outline_2d(x0, x1, y0, round0, round1);
+                     panel_outline_2d(x0, x1, y0, round0, round1, h);
                }
       }
       for (h = holes)

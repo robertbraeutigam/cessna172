@@ -119,6 +119,17 @@ switch_panel = switch_back + 2 * [switch_flange, switch_flange];   // the face
 switch_depth = 40;           // switches behind the sheet (view only)
 switch_z = ext + 5;          // face bottom above the desk
 
+// Primer, from switchpanel/primer.scad: its own small panel above the left
+// end of the switch panel, flush with its left edge. The square back
+// (primer_back, the tube for the knob) goes through its own cut-out, the
+// face flange (all round) is screwed onto the sheet; the bracket with the
+// pot behind it is wider than the cut-out and goes on from behind.
+primer_back = 27;            // back_w
+primer_flange = 10;          // flange_w
+primer_face = primer_back + 2 * primer_flange;
+primer_depth = 180;          // behind the panel with the knob in (view only)
+primer_bracket = [41, 26];   // beside the rod towards the pilot's right, height (view only)
+
 // --- Under-desk controls ---
 // Pedestal (trim wheel and trim indicator), a future component, same rule
 // as the throttle box: the
@@ -194,11 +205,18 @@ radio_front_z0 = radio_cut[1] + 0.5 - (radio_front.y - radio_body.y) / 2;
 switch_cut = [x_sw0 + switch_flange - switch_cut_clear, switch_z + switch_flange - switch_cut_clear,
               x_sw1 - switch_flange + switch_cut_clear, switch_z + switch_flange + switch_back.y + switch_cut_clear];
 bay_cut = [x_bay0, 0, x_bay1, max(yoke_housing.z, ffb_h) + yoke_play];
-cuts = [switch_cut, bay_cut, throttle_cut, radio_cut];   // [x0, z0, x1, z1] on the sheet
+// primer: as low as sheet_web over the switch panel's cut-out allows
+primer_x = x_sw0 + primer_face / 2;                     // rod axis
+primer_z = switch_cut[3] + sheet_web + switch_cut_clear + primer_back / 2;
+primer_cut = [primer_x - primer_back / 2 - switch_cut_clear, primer_z - primer_back / 2 - switch_cut_clear,
+              primer_x + primer_back / 2 + switch_cut_clear, primer_z + primer_back / 2 + switch_cut_clear];
+primer_face_r = [primer_x - primer_face / 2, primer_z - primer_face / 2,
+                 primer_x + primer_face / 2, primer_z + primer_face / 2];
+cuts = [switch_cut, bay_cut, throttle_cut, radio_cut, primer_cut];   // [x0, z0, x1, z1] on the sheet
 
 // Height: sheet_web over the highest cut-out (or the radio front), then the
 // top bar; the uprights (on the bottom bar, under the top bar) a stock length
-upright_len = ceil((max(radio_front_z0 + radio_front.y, bay_cut[3], switch_cut[3]) + sheet_web) / round_d) * round_d;
+upright_len = ceil((max(radio_front_z0 + radio_front.y, bay_cut[3], switch_cut[3], primer_cut[3]) + sheet_web) / round_d) * round_d;
 sheet_h = upright_len + ext;                 // panel height above the desk (the sheet also covers the bottom bar, ext more)
 
 // desk part: the front rail behind the front part, cut at the bay
@@ -247,7 +265,7 @@ under_y0 = -sheet_t - under_face_t;                     // face front
 function spread(a, b, step) = let(n = max(1, ceil((b - a) / step))) [for (i = [0 : n]) a + (b - a) * i / n];
 function clear_of(p, rects, m) =
    len([for (r = rects) if (p.x > r[0] - m && p.x < r[2] + m && p.y > r[1] - m && p.y < r[3] + m) 1]) == 0;
-avoid = concat(cuts, [throttle_face]);
+avoid = concat(cuts, [throttle_face, primer_face_r]);
 sheet_screws = [for (p = concat(
       [for (ux = upright_xs, z = spread(20, sheet_h - ext - 20, screw_step_upright)) [ux + ext / 2, z]],
       [for (x = spread(ext / 2, frame_w - ext / 2, screw_step)) [x, sheet_h - ext / 2]],
@@ -284,6 +302,11 @@ assert(sheet_h <= sheet_h_max, "Panel too high for the monitor");
 assert(radio_front_z0 + radio_front.y <= sheet_h - ext - sheet_web, "Radio panel too high for the sheet");
 assert(bay_cut[3] <= sheet_h - ext - sheet_web, "Yoke notch too high for the sheet");
 assert(switch_cut[3] <= sheet_h - ext - sheet_web, "Switch panel too high for the sheet");
+assert(primer_cut[3] <= sheet_h - ext - sheet_web, "Primer too high for the sheet");
+assert(primer_face_r[1] >= switch_z + switch_panel.y + 1, "Primer face runs into the switch panel face");
+assert(primer_cut[0] >= sheet_edge, "Primer cut-out too close to the sheet edge");
+assert(primer_x - primer_back / 2 >= ext + 3 && primer_x + primer_bracket.x <= x_bay0 - ext - 3,
+       "Primer runs into the uprights behind the sheet");
 assert(abs(throttle_y0 + throttle_bolt_y - ext * 3 / 2) < 0.01, "Throttle floor bolts miss the front rail slot");
 assert(ext + brace_rise + ext / sqrt(2) <= rear_y, "Braces do not land on the crossbars");
 assert(brace_top + brace_room <= sheet_h - ext, "Braces too long: no room for the connector on the upright");
