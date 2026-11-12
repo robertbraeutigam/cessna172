@@ -46,7 +46,8 @@ its own top-level directory; new components should follow the same layout.
     in a tube on the panel back, quarter turn pocket at its end) and a
     bracket behind it with the 75 mm linear pot (the carb heat type),
     driven like the throttle's (rod, carrier over the slider ear, the
-    throttle's plain clamps as collars). The pot's wiper is on port 3's AUX
+    throttle's plain clamps as collars) and a spring on the rod that pops the
+    knob out when it is unlocked. The pot's wiper is on port 3's AUX
     wire. `panel.inc.scad` takes the back's height (`h`) for it.
   - `ignition.lua` — FlyWithLua script for X-Plane that holds the starter
     while START is pressed (MobiFlight writes its dataref; it cannot hold
