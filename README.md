@@ -649,9 +649,16 @@ closed by a cover:
 - **Sensing:** a magnet in the rotor lug and one digital hall sensor per
   position in the cover. The sensors (A3144, unipolar, not latching) are
   open collector and pull low over the magnet, so each one is wired like a
-  switch to GND.
+  switch to GND. They are glued into pockets on the inside of the cover,
+  marked face towards the rotor, and their legs are bent 90° backwards
+  through slots in the cover.
+- **Back cap:** a cap over the cover protects the legs, their solder
+  joints and the wires. The 7 wires (5 signals, 5 V, GND) leave through a
+  notch in its wall towards the switch panel; hot glue in the notch is the
+  strain relief, so pulling the cable does not pull on the legs. The cover
+  screws go through the cap as well.
 
-Printed parts: face, panel, housing, rotor, shoe, cover.
+Printed parts: face, panel, housing, rotor, shoe, cover, cap.
 
 The panel is 87 x 100 mm (the back 77 x 80 mm). Its front is a separate
 1 mm face with the position labels, tick marks and MAGNETOS standing 0.8 mm
@@ -675,7 +682,7 @@ between the rims. The cutout is turned so the key points at OFF
 | 1 | spring, 5 mm OD, 15 mm | START return (`start_spring_*`) |
 | 1 | cube magnet, 5 x 5 x 5 mm | position sensing (`magnet_*`) |
 | 5 | A3144 hall sensor | one per position (OFF is optional) |
-| 4 | M3 screw | cover |
+| 4 | M3 x 20 screw | cap and cover (M3 x 10 to test without the cap) |
 | 4 | M3 x 10 screw | panel to housing |
 | 1 | M3 x 8 screw | START pin |
 | 4 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet |
@@ -688,7 +695,13 @@ between the rims. The cutout is turned so the key points at OFF
 3. Insert the ball and its spring, and the shoe and its spring.
 4. Check which magnet face triggers the sensors, then glue in the magnet and
    the sensors.
-5. Screw on the cover, then put in the START pin.
+5. Screw on the cover (M3 x 10 screws to test), then put in the START pin.
+6. Trim the sensor legs to about 5 mm, solder the wires: 5 V and GND
+   chained from sensor to sensor, one signal wire each. Insulate the joints
+   with heat shrink.
+7. Lay the bundle into the cap's notch, screw on the cap with the M3 x 20
+   screws, and fill the notch with hot glue, with a blob on the inside that
+   is bigger than the notch.
 
 The positions (30° apart) should be verified against the real switch.
 
