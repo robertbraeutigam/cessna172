@@ -83,6 +83,7 @@ lock_spindle_angle = 0;      // spindle flats vs. body flats at home (OFF)
 lock_key_home = 90;          // key vs. body flats where it comes out (every 90 degrees: 0 or 90)
 key_off_angle = 30;          // where the key points at OFF (home), from +x; the lock body is turned to match
 lock_screw_d = 4;            // cam screw, M4
+lock_screw_hole = 5;         // its hole in the rotor, loose: the spindle centres the rotor
 lock_screw_len = 5;          // thread length
 lock_screw_head_d = 12;
 lock_screw_head_h = 2;
@@ -183,6 +184,7 @@ echo(panel_size = [panel_w, panel_h], face_size = [face_w, face_h]);
 assert(z_cam >= front_t + lock_nut_t + 1, "Lock body too short for panel + front plate + nut");
 assert(bore_r > lock_nut_d / 2 + 1, "Lock nut does not fit in the bore");
 assert(rotor_clamp_t - 0.2 >= 1.5, "Too little material under the cam screw head");
+assert(lock_screw_hole > lock_screw_d && lock_screw_hole <= lock_screw_head_d - 4, "Cam screw hole does not fit under its head");
 assert(screw_seat + lock_screw_head_h <= rotor_t, "Cam screw head sticks out of the rotor");
 assert(lock_screw_len - rotor_clamp_t >= 2, "Cam screw too short to reach into the spindle");
 assert(lug_angle - lug_w / 2 > arc_deg(ball_d, rotor_r)
@@ -277,7 +279,7 @@ module rotor() {
                spindle_profile(0.1);
       // Cam screw and its head
       translate([0, 0, -1])
-         cylinder(d = lock_screw_d + 0.4, h = rotor_t + 2);
+         cylinder(d = lock_screw_hole, h = rotor_t + 2);
       translate([0, 0, screw_seat])
          cylinder(d = lock_screw_head_d + 0.6, h = rotor_t);
       // Detent notches for OFF, R, L, BOTH (the ball is at world angle 0)
