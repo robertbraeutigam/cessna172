@@ -175,26 +175,18 @@ clamp_pad_d = 20;            // MEASURE: rubber jaw diameter
 clamp_y = (frame_overhang + 2 * ext) / 2;  // screw axis from the frame front
 
 // --- Layout ---
-// The right part is packed as tight as its cut-outs allow, the left
-// margin takes what the rounding of frame_w leaves (room for the left part
-// to grow). The radio front is the widest there; its cut-out is radio_inset
-// inside it, and the front may lie over the uprights behind the sheet, but
-// not on the sheet screws in them.
-gap = 25;                    // between the switch panel and the bay; the bay upright stands in it
+gap = 25;                    // between two parts; the bay uprights stand in it
 right_w = max(radio_front.x, throttle_size.x + 2 * throttle_flange);
-radio_inset = (radio_front.x - radio_body.x) / 2 - 0.5;    // radio front edge to its cut-out
-gap_r = max(ext + 3, ext / 2 + screw_edge) - radio_inset;  // bay to the radio front
-margin_r = max(sheet_edge, ext + 3) - radio_inset;         // radio front to the sheet edge
 bay_w = yoke_housing.x + 2 * yoke_play;
-parts_w = switch_panel.x + gap + bay_w + gap_r + right_w;
-frame_w = ceil((parts_w + sheet_edge + margin_r) / round_w) * round_w;
-margin = frame_w - parts_w - margin_r;      // sheet edge to the switch panel
+parts_w = switch_panel.x + gap + bay_w + gap + right_w;
+frame_w = ceil((parts_w + 2 * sheet_edge) / round_w) * round_w;
+margin = (frame_w - parts_w) / 2;           // sheet edge to the outer cut-outs
 
 x_sw0 = margin;                              // switch panel
 x_sw1 = x_sw0 + switch_panel.x;
 x_bay0 = x_sw1 + gap;                        // yoke bay
 x_bay1 = x_bay0 + bay_w;
-x_r0 = x_bay1 + gap_r;                       // radio and throttle
+x_r0 = x_bay1 + gap;                         // radio and throttle
 x_r1 = x_r0 + right_w;
 x_rc = (x_r0 + x_r1) / 2;
 
@@ -299,8 +291,6 @@ pedestal_bolts = [for (s = [-1, 1]) [pedestal_x + s * pedestal_size.x / 4, under
 // --- Checks ---
 assert(gap >= ext + 3 && margin >= ext + 3, "No room for the uprights next to the cut-outs");
 assert(margin >= sheet_edge, "Cut-outs too close to the sheet edge");
-assert(right_w == radio_front.x, "The throttle face is wider than the radio, gap_r and margin_r assume the radio");
-assert(min(gap_r, margin_r) >= ext / 2 + m5_head_d / 2 + 1, "Radio front lies on the sheet screws in the uprights");
 assert(switch_cut[1] >= ext, "Switch panel cut-out runs into the bottom of the sheet");
 assert(throttle_x0 >= rails[1][0] && throttle_x0 + throttle_size.x <= frame_w, "Throttle box not on the front rail");
 assert(throttle_y0 + throttle_size.y <= rear_y, "Throttle box does not fit on the frame");

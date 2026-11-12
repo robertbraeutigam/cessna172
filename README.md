@@ -162,11 +162,7 @@ The extrusion carries the
 loads, the sheet only covers the front, so cut-outs do not weaken it.
 Keep at least 25 mm of sheet to the edge and 20 mm between cut-outs, and
 drill the corners of a cut-out before sawing it. Holes for future
-components are cut when they arrive. The right part is packed as tight as
-that allows (the radio front may lie over the uprights behind the sheet,
-not on their screws); the left margin takes the rest of the rounded
-width, so the switch panel can still grow by about 24 mm before the frame
-gets wider.
+components are cut when they arrive.
 
 All values are in `frame.inc.scad`; the layout (cut-outs, screw holes) is
 computed from the component sizes, and the build prints the cut list
@@ -176,11 +172,11 @@ bar (between the leg room and the pedestal, `round_cut`) is cut to an odd
 length. With the current guesses the frame is 1000 x 360 mm and 220 mm
 high above the desk, the sheet 1000 x 240 mm (it also covers the bottom
 bar), the apron sheet
-240 x 220 mm. With the ears the frame takes 1143 mm of the desk width.
+250 x 220 mm. With the ears the frame takes 1143 mm of the desk width.
 
 | Part | 2020 bars |
 |------|-----------|
-| front part | top bar 1000, bottom bar 1000, 4 uprights 200, 2 apron hangers 200, lower bar 200 |
+| front part | top bar 1000, bottom bar 1000, 4 uprights 200, 2 apron hangers 200, lower bar 210 |
 | desk part | front rail left 450, front rail right 400, rear rail 1000, 5 crossbars 300, 4 braces 200 (cut square) |
 
 | File | Parts |
