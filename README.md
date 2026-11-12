@@ -771,9 +771,9 @@ Printed: `primer_panel.stl` (front side down), `primer_face.stl` (front
 side up), `primer_knob.stl` (on the end of its stem), `primer_bracket.stl`
 (on its spine), `primer_strap.stl` (2x), `primer_carrier.stl`.
 
-**MEASURE:** the pot's travel (`pot_travel`, 54 mm in the throttle's view
-model; the stroke has to stay 4 mm shorter) and its ear (`pot_ear`). The
-build fails if the stroke does not fit.
+The pot's travel (`pot_travel`) is measured: 60 mm, so the 40 mm stroke
+uses the middle two thirds of it (the build fails if the stroke comes
+within 4 mm of the travel). **MEASURE:** the pot's slider ear (`pot_ear`).
 
 ### Assembly
 

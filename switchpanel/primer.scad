@@ -61,7 +61,7 @@ small_pot_stand_height = 7;
 small_pot_full_width = 10;
 small_pot_module_height = 6;
 small_pot_full_length = 75;
-pot_travel = 54;             // MEASURE: slider ear travel
+pot_travel = 60;             // slider ear travel, measured
 pot_ear = [1, 5, 16];        // slider ear: thickness, length along the pot, height above the pot
 pot_leg0 = 6;                // first stand from the pot's front end (as in the throttle box)
 
