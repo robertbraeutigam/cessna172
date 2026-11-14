@@ -37,7 +37,9 @@ its own top-level directory; new components should follow the same layout.
     OFF/R/L/BOTH/START key switch built around a cheap
     mailbox cam lock (its 90° stop removed). It has a ball detent, end stops
     on a rotor lug, a spring-return START (pin + shoe + spring in an arc slot),
-    and one magnet with a digital hall sensor per position. The header comment
+    and one magnet with a digital hall sensor per position; the wires are
+    soldered to small prototype board pieces on the sensor legs, held on a
+    printed arc (`holder`) under the cap. The header comment
     has the parts list and assembly order. The `lock_*` values are measured
     (the lock's stop tab is filed off, so it turns past 90°).
   - `primer.scad` — the primer: a small panel of its own above the left
