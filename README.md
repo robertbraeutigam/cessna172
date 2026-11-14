@@ -658,6 +658,10 @@ closed by a cover:
   (`board_z`), where they have spread to 2.54 mm. A printed holder, an
   arc on the back of the cover, has a post under each board, and one M2
   screw through a hole drilled in the board's outer row holds it there.
+  The hole is in the OUT leg's column (the A3144 legs are 5 V, GND, OUT
+  seen on the marked face), which needs only one wire, so the 5 V and GND
+  columns keep two free holes each: one for the wire in, one for the wire
+  on to the next board.
   The holder's two ears go under the two cover screws on the switch panel
   side and are clamped by the cap. A 3 x 5 piece works too, with the legs
   in its second row (`board_rows = 5`, `board_leg_row = 1`).
@@ -707,7 +711,8 @@ between the rims. The cutout is turned so the key points at OFF
 4. Check which magnet face triggers the sensors, then glue in the magnet and
    the sensors.
 5. Screw on the cover (M3 x 10 screws to test), then put in the START pin.
-6. Drill the middle hole of the outer row of each board piece to 2.2 mm.
+6. Drill the outer row hole in the OUT leg's column of each board piece
+   to 2.2 mm.
    Put the holder on the cover (ears over the two cover screw holes on the
    switch panel side), slip the boards onto the sensor legs and screw them
    onto the posts with the M2 screws.

@@ -30,7 +30,7 @@
 //   soldered to it instead of to the bare legs. A printed holder, an arc
 //   on the back of the cover, has a post under each board: it holds them
 //   board_z above the cover, one M2 screw each through a hole drilled in
-//   the board's outer row. The holder's two ears are clamped under the cap
+//   the board's outer row, in the OUT leg's column (board_out_side). The holder's two ears are clamped under the cap
 //   by the cover screws.
 // - Back cap: a cap over the cover protects the boards, their solder joints
 //   and the wires. The 7 wires (5 signals, 5 V, GND) leave through a notch
@@ -163,6 +163,11 @@ board_pitch = 2.54;
 board_cols = 3;              // along the arc, one leg in each
 board_rows = 4;              // radially, from the inside; the M2 screw goes in the outermost
 board_leg_row = 0;           // row the legs go in (1 for 5 rows: one row inside the legs)
+// The screw goes in the column of the OUT leg, which needs only one wire;
+// the 5 V and GND columns keep two free holes each (wire in, wire on to
+// the next board). A3144 legs, marked face towards the rotor: 5 V, GND,
+// OUT, OUT on the clockwise side seen from the back (-1); 1 if mirrored.
+board_out_side = -1;
 board_t = 1.6;
 board_z = 5;                 // board underside above the cover, where it fits on the spread legs
 board_drill = 2.2;           // the screw hole, drilled through the board
@@ -223,9 +228,12 @@ board_w = board_cols * board_pitch;
 function board_row_r(k) = leg_r + (k - board_leg_row) * board_pitch;
 board_r0 = board_row_r(0) - board_pitch / 2;               // inner edge
 board_r1 = board_row_r(board_rows - 1) + board_pitch / 2;  // outer edge
-board_screw_r = board_row_r(board_rows - 1);
-holder_a0 = lug_angle - arc_deg(holder_post_d / 2, board_screw_r);
-holder_a1 = lug_angle + sweep + arc_deg(holder_post_d / 2, board_screw_r);
+board_screw_r = board_row_r(board_rows - 1);           // its row
+board_screw_y = board_out_side * board_pitch;          // its column, along the arc
+board_screw_dist = norm([board_screw_r, board_screw_y]); // from the key axis
+board_screw_a = atan2(board_screw_y, board_screw_r);   // vs. the sensor's angle
+holder_a0 = lug_angle + min(0, board_screw_a) - arc_deg(holder_post_d / 2, board_screw_r);
+holder_a1 = lug_angle + sweep + max(0, board_screw_a) + arc_deg(holder_post_d / 2, board_screw_r);
 holder_ears = [[-screw_xy, screw_xy], [-screw_xy, -screw_xy]];
 
 // Panel back, centered on the key, as wide as the housing needs inside
@@ -271,7 +279,8 @@ assert(cable_z + cable_d / 2 <= cap_depth - 1, "Cable notch too deep for the cap
 assert(board_leg_row >= 0 && board_leg_row < board_rows - 1, "Board needs a row for the screw outside the legs");
 assert(board_r0 * sin(min(pitch, start_pitch) / 2) >= board_w / 2 + 0.5, "Sensor boards run into each other");
 assert(board_r1 <= half - cap_wall - 0.5, "Sensor boards run into the cap wall, use fewer rows");
-assert(board_screw_r + max(holder_post_d, board_screw_head_d) / 2 <= half - cap_wall - 0.3, "Board screws run into the cap wall");
+assert(board_screw_dist + max(holder_post_d, board_screw_head_d) / 2 <= half - cap_wall - 0.3, "Board screws run into the cap wall");
+assert(abs(board_out_side) == 1 && board_cols == 3, "Board screw column: board_out_side is -1 or 1, three columns");
 assert(board_screw_r - holder_post_d / 2 >= leg_r + 2, "Holder runs into the sensor legs");
 assert(board_screw_len - board_t >= 3 && board_screw_len - board_t <= board_z - 0.5, "Board screw length does not fit the posts");
 assert(holder_t <= board_z - 2.5, "No room under the boards for the solder joints");
@@ -439,12 +448,12 @@ module holder() {
                holder_ears_2d();
             for (i = [0 : 4])
                rotate([0, 0, lug_angle + pos_angle(i)])
-                  translate([board_screw_r, 0, 0])
+                  translate([board_screw_r, board_screw_y, 0])
                      cylinder(d = holder_post_d, h = board_z);
          }
          for (i = [0 : 4])
             rotate([0, 0, lug_angle + pos_angle(i)])
-               translate([board_screw_r, 0, -1])
+               translate([board_screw_r, board_screw_y, -1])
                   cylinder(d = board_screw_hole, h = board_z + 2);
          for (e = holder_ears)
             translate([e.x, e.y, -1])
@@ -778,7 +787,7 @@ module board_parts() {
                      cube([board_r1 - board_r0, board_w, board_t]);
                   for (k = [0 : board_rows - 1], j = [0 : board_cols - 1])
                      translate([board_row_r(k), (j - (board_cols - 1) / 2) * board_pitch, -1])
-                        cylinder(d = k == board_rows - 1 && j == (board_cols - 1) / 2 ? board_drill : 1, h = board_t + 2, $fn = 12);
+                        cylinder(d = k == board_rows - 1 && j - 1 == board_out_side ? board_drill : 1, h = board_t + 2, $fn = 12);
                }
          // Copper pads on top
          color(c_copper)
@@ -790,16 +799,20 @@ module board_parts() {
                            circle(d = 1.9, $fn = 16);
                            circle(d = 1, $fn = 12);
                         }
-         translate([board_screw_r, 0, z_cap + board_z + board_t])
+         translate([board_screw_r, board_screw_y, z_cap + board_z + board_t])
             screw(2, board_screw_len, board_screw_head_d, 1.6);
       }
 }
 
-// Wires soldered to the boards (view only): 5 V and GND chained, a signal each
+// Wires soldered to the boards (view only): 5 V and GND chained (in on the
+// row next to the legs, on to the next board from the row after it), a
+// signal each from the OUT column
 module wire_parts() {
    wd = 1.2;
    z = z_cap + board_z + board_t + wd / 2 + 0.3;
-   function p(i, j) = let(a = lug_angle + pos_angle(i), y = (j - 1) * board_pitch, r = board_row_r(board_leg_row + 1))
+   out_j = board_out_side + 1;
+   vcc_j = 2 - out_j;
+   function p(i, j, k = board_leg_row + 1) = let(a = lug_angle + pos_angle(i), y = (j - 1) * board_pitch, r = board_row_r(k))
       [r * cos(a) - y * sin(a), r * sin(a) + y * cos(a), z];
    module seg(a, b, c) {
       color(c)
@@ -810,13 +823,13 @@ module wire_parts() {
    }
    exit = [-half - 2, 0, z_cap + cable_z];
    for (i = [0 : 3]) {
-      seg(p(i, 0), p(i + 1, 0), "#d03030");
-      seg(p(i, 2), p(i + 1, 2), "#202020");
+      seg(p(i, vcc_j, board_leg_row + 2), p(i + 1, vcc_j), "#d03030");
+      seg(p(i, 1, board_leg_row + 2), p(i + 1, 1), "#202020");
    }
-   seg(p(2, 0), exit, "#d03030");
-   seg(p(2, 2), exit, "#202020");
+   seg(p(0, vcc_j), exit, "#d03030");
+   seg(p(0, 1), exit, "#202020");
    for (i = [0 : 4])
-      seg(p(i, 1), exit, ["#f0f0f0", "#e0c020", "#30a050", "#3070d0", "#e07020"][i]);
+      seg(p(i, out_j), exit, ["#f0f0f0", "#e0c020", "#30a050", "#3070d0", "#e07020"][i]);
 }
 
 // Cover with the engraved labels filled in
