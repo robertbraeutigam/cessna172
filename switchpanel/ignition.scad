@@ -24,11 +24,18 @@
 //   open collector and pulls low over the magnet, so it wires to a MobiFlight
 //   input like a switch to GND (needs 5V and GND too). Check which magnet
 //   face triggers the sensor before gluing the magnet in.
-// - Back cap: the sensor legs come out of the back of the cover, bent 90
-//   degrees. A cap over the cover protects them, their solder joints and the
-//   wires. The 7 wires (5 signals, 5 V, GND) leave through a notch in its
-//   wall, filled with hot glue as strain relief. The cover screws go through
-//   the cap too.
+// - Sensor boards: the sensor legs come out of the back of the cover, bent
+//   90 degrees. A small piece of prototype board (board_*) slips onto each
+//   sensor's legs, where they have spread to 2.54 mm, and the wires are
+//   soldered to it instead of to the bare legs. A printed holder, an arc
+//   on the back of the cover, has a post under each board: it holds them
+//   board_z above the cover, one M2 screw each through a hole drilled in
+//   the board's outer row. The holder's two ears are clamped under the cap
+//   by the cover screws.
+// - Back cap: a cap over the cover protects the boards, their solder joints
+//   and the wires. The 7 wires (5 signals, 5 V, GND) leave through a notch
+//   in its wall, filled with hot glue as strain relief. The cover screws go
+//   through the cap too.
 //
 // Coordinates: z is the key axis, z=0 is the back of the panel, +z points
 // backwards. Positive rotation is clockwise seen from the front. All parts
@@ -40,7 +47,9 @@
 // - 6 mm steel ball + spring (detent_spring_*)
 // - spring for the START return (start_spring_*)
 // - 5x5x5 mm cube magnet (magnet_*), 5x A3144 hall sensors (OFF is optional)
-// - M3 screws: 4x M3x20 for the cap and cover, 4x panel to housing, 1x M3x8 as the
+// - prototype board (2.54 mm pitch), 5 pieces of 3 x board_rows holes,
+//   5x M2x6 screws to hold them on the holder
+// - M3 screws: 4x M3x25 for the cap and cover, 4x panel to housing, 1x M3x8 as the
 //   START pin, 4x to mount the panel
 //
 // The panel is printed as well. It has the same height, rim, mount holes and
@@ -55,8 +64,10 @@
 // Assembly: lock through the panel and the housing, tighten its nut, mount
 // the rotor with the lock's cam screw, insert ball + spring and shoe +
 // spring, glue in magnet and sensors, screw on the cover (short screws to
-// test), then the pin. Solder the wires to the legs, lay them in the cap's
-// notch, screw on the cap and fill the notch with hot glue.
+// test), then the pin. Put the holder on the cover, slip the boards onto the
+// legs, screw them onto the posts, solder the legs and the wires to the
+// boards, lay the wires in the cap's notch, screw on the cap (it clamps the
+// holder's ears) and fill the notch with hot glue.
 
 $fn = 60;
 
@@ -147,13 +158,32 @@ sensor_h = 3.0;
 sensor_t = 1.5;
 cover_t = 3;
 
-// --- Back cap over the sensor legs ---
+// --- Sensor boards on the legs (prototype board pieces, MEASURE) ---
+board_pitch = 2.54;
+board_cols = 3;              // along the arc, one leg in each
+board_rows = 4;              // radially, from the inside; the M2 screw goes in the outermost
+board_leg_row = 0;           // row the legs go in (1 for 5 rows: one row inside the legs)
+board_t = 1.6;
+board_z = 5;                 // board underside above the cover, where it fits on the spread legs
+board_drill = 2.2;           // the screw hole, drilled through the board
+board_screw_hole = 2.1;      // M2 pilot hole in the holder posts
+board_screw_len = 6;         // M2 x 6
+board_screw_head_d = 3.8;
+
+// --- Board holder (an arc on the back of the cover, under the cap) ---
+holder_t = 2;                // the arc band and the ears
+holder_post_d = 4.6;         // under each board, board_z high
+holder_ear_r = 3.5;          // around the two cover screws on the -x side
+holder_clamp = 0.2;          // the ears stand this much out of their pocket in the cap
+
+// --- Back cap over the sensor boards ---
 cap_floor = 2;
-cap_depth = 8;               // room behind the cover for the legs, solder joints and wires
+cap_depth = 12;              // room behind the cover for the boards, solder joints and wires
 cap_wall = 2;
-leg_stub = 5;                // legs trimmed to this behind the cover, before soldering
+leg_stub = board_z + board_t + 1;  // legs trimmed to this behind the cover, after soldering
 cable_d = 6;                 // notch for the 7 wire bundle, towards the switch panel (-x)
-cover_screw_len = 20;        // through cap and cover into the housing
+cable_z = board_z + board_t; // bundle centre in the notch, at the board tops
+cover_screw_len = 25;        // through cap and cover into the housing
 
 // --- Derived ---
 function arc_deg(len, r) = len / r * 180 / PI;
@@ -187,6 +217,16 @@ slot_step = start_pin_angle - pos_angle(3) - arc_deg(start_pin_d / 2, start_pin_
 slot_narrow_end = start_pin_angle + arc_deg(start_pin_d / 2 + 0.5, start_pin_r) + 3;
 slot_wide_end = slot_step - arc_deg(start_shoe_len + start_spring_inst, start_pin_r);
 pin_protrusion = start_pin_len - cover_t - gap;
+
+leg_r = magnet_r + sensor_h / 2 + 0.5;   // where the legs come out of the cover
+board_w = board_cols * board_pitch;
+function board_row_r(k) = leg_r + (k - board_leg_row) * board_pitch;
+board_r0 = board_row_r(0) - board_pitch / 2;               // inner edge
+board_r1 = board_row_r(board_rows - 1) + board_pitch / 2;  // outer edge
+board_screw_r = board_row_r(board_rows - 1);
+holder_a0 = lug_angle - arc_deg(holder_post_d / 2, board_screw_r);
+holder_a1 = lug_angle + sweep + arc_deg(holder_post_d / 2, board_screw_r);
+holder_ears = [[-screw_xy, screw_xy], [-screw_xy, -screw_xy]];
 
 // Panel back, centered on the key, as wide as the housing needs inside
 // the rim. Its pilot's right side (-x) meets the switch panel; the flange
@@ -226,7 +266,17 @@ assert(rotor_t - magnet_h - 0.2 >= 1.2, "Magnet pocket floor too thin");
 assert(magnet_r * min(pitch, start_pitch) * PI / 180 >= sensor_w + 4, "Hall sensors too close to each other");
 assert(cap_depth >= 3 + 1, "Cap runs into the START pin screw head");
 assert(leg_stub + 2 <= cap_depth, "No room for the solder joints in the cap");
-assert(cable_d <= cap_depth - 1, "Cable notch too deep for the cap");
+assert(cap_depth >= board_z + board_t + 4, "No room for the wires on the boards in the cap");
+assert(cable_z + cable_d / 2 <= cap_depth - 1, "Cable notch too deep for the cap");
+assert(board_leg_row >= 0 && board_leg_row < board_rows - 1, "Board needs a row for the screw outside the legs");
+assert(board_r0 * sin(min(pitch, start_pitch) / 2) >= board_w / 2 + 0.5, "Sensor boards run into each other");
+assert(board_r1 <= half - cap_wall - 0.5, "Sensor boards run into the cap wall, use fewer rows");
+assert(board_screw_r + max(holder_post_d, board_screw_head_d) / 2 <= half - cap_wall - 0.3, "Board screws run into the cap wall");
+assert(board_screw_r - holder_post_d / 2 >= leg_r + 2, "Holder runs into the sensor legs");
+assert(board_screw_len - board_t >= 3 && board_screw_len - board_t <= board_z - 0.5, "Board screw length does not fit the posts");
+assert(holder_t <= board_z - 2.5, "No room under the boards for the solder joints");
+assert(holder_ear_r >= clear_d / 2 + 1.5 && holder_ear_r + 0.3 <= corner_r - 1, "Holder ears do not fit the cap corners");
+assert(holder_a0 < 135 && holder_a1 > 225, "Holder arc does not reach its ears");
 assert(cover_screw_thread >= 5, "Cover screws too short for cap + cover");
 assert(cover_screw_thread <= z_back - (panel_screw_len - panel_t + face_t) - 1, "Cover screws run into the panel screws");
 assert(half + 0.5 <= panel_h / 2 - rim_w, "Housing does not fit between the panel rims, make panel_h higher");
@@ -366,6 +416,42 @@ module cover() {
       }
 }
 
+// Ears of the holder, from the arc out to the two cover screws
+module holder_ears_2d() {
+   for (e = holder_ears)
+      hull() {
+         translate(e)
+            circle(r = holder_ear_r);
+         translate(board_screw_r * [cos(atan2(e.y, e.x)), sin(atan2(e.y, e.x))])
+            circle(d = holder_post_d);
+      }
+}
+
+// Board holder on the back of the cover: an arc band with a post under the
+// screw of each sensor board and two ears clamped under the cap
+module holder() {
+   translate([0, 0, z_cap])
+      difference() {
+         union() {
+            sector(board_screw_r - holder_post_d / 2, board_screw_r + holder_post_d / 2,
+                   holder_a0, holder_a1, holder_t);
+            linear_extrude(holder_t)
+               holder_ears_2d();
+            for (i = [0 : 4])
+               rotate([0, 0, lug_angle + pos_angle(i)])
+                  translate([board_screw_r, 0, 0])
+                     cylinder(d = holder_post_d, h = board_z);
+         }
+         for (i = [0 : 4])
+            rotate([0, 0, lug_angle + pos_angle(i)])
+               translate([board_screw_r, 0, -1])
+                  cylinder(d = board_screw_hole, h = board_z + 2);
+         for (e = holder_ears)
+            translate([e.x, e.y, -1])
+               cylinder(d = clear_d, h = holder_t + 2);
+      }
+}
+
 // Back cap on the cover, open towards it: the cover closes the cable notch
 module cap() {
    translate([0, 0, z_cap])
@@ -383,11 +469,16 @@ module cap() {
                         circle(r = corner_r);
                }
          corner_holes(clear_d, cap_h);
+         // Pockets for the holder's ears
+         translate([0, 0, -1])
+            linear_extrude(holder_t - holder_clamp + 1)
+               offset(delta = 0.3)
+                  holder_ears_2d();
          // Cable notch, round at its end
          translate([-half - 1, 0, 0]) {
             translate([0, -cable_d / 2, -1])
-               cube([cap_wall + 2, cable_d, cable_d / 2 + 1]);
-            translate([0, 0, cable_d / 2])
+               cube([cap_wall + 2, cable_d, cable_z + 1]);
+            translate([0, 0, cable_z])
                rotate([0, 90, 0])
                   cylinder(d = cable_d, h = cap_wall + 2);
          }
@@ -473,6 +564,9 @@ c_key = "#26282b";
 c_sensor = "#1d1f22";
 c_spring = "#9aa3ad";
 c_line = "#8fd0ff";
+c_board = "#2f8f4e";
+c_copper = "#d9a05a";
+c_holder = "#7a52c7";
 
 function in_detent(theta) = theta <= pos_angle(3) + 0.01 && abs(theta / pitch - round(theta / pitch)) < 0.01;
 function shoe_face(theta) = min(slot_step, start_pin_angle - theta - arc_deg(start_pin_d / 2, start_pin_r));
@@ -657,11 +751,72 @@ module sensor_parts() {
          color(c_sensor)
             translate([magnet_r - sensor_h / 2, -sensor_w / 2, z_back])
                cube([sensor_h, sensor_w, sensor_t]);
+         // Legs at 1.27 mm through the cover, spread to the board pitch
          color(c_chrome)
-            for (y = [-1.27, 0, 1.27])
-               translate([magnet_r + sensor_h / 2 + 0.5, y, z_back + sensor_t / 2])
-                  cylinder(d = 0.45, h = cover_t - sensor_t / 2 + leg_stub, $fn = 8);
+            for (j = [-1 : 1]) {
+               pts = [[leg_r, 1.27 * j, z_back + sensor_t / 2],
+                      [leg_r, 1.27 * j, z_cap + 1],
+                      [leg_r, board_pitch * j, z_cap + board_z - 0.5],
+                      [leg_r, board_pitch * j, z_cap + leg_stub]];
+               for (k = [0 : 2])
+                  hull()
+                     for (p = [pts[k], pts[k + 1]])
+                        translate(p)
+                           sphere(d = 0.45, $fn = 8);
+            }
       }
+}
+
+// Prototype board pieces on the legs, with their M2 screws
+module board_parts() {
+   for (i = [0 : 4])
+      rotate([0, 0, lug_angle + pos_angle(i)]) {
+         color(c_board)
+            translate([0, 0, z_cap + board_z])
+               difference() {
+                  translate([board_r0, -board_w / 2, 0])
+                     cube([board_r1 - board_r0, board_w, board_t]);
+                  for (k = [0 : board_rows - 1], j = [0 : board_cols - 1])
+                     translate([board_row_r(k), (j - (board_cols - 1) / 2) * board_pitch, -1])
+                        cylinder(d = k == board_rows - 1 && j == (board_cols - 1) / 2 ? board_drill : 1, h = board_t + 2, $fn = 12);
+               }
+         // Copper pads on top
+         color(c_copper)
+            translate([0, 0, z_cap + board_z + board_t])
+               linear_extrude(0.05)
+                  for (k = [0 : board_rows - 2], j = [0 : board_cols - 1])
+                     translate([board_row_r(k), (j - (board_cols - 1) / 2) * board_pitch])
+                        difference() {
+                           circle(d = 1.9, $fn = 16);
+                           circle(d = 1, $fn = 12);
+                        }
+         translate([board_screw_r, 0, z_cap + board_z + board_t])
+            screw(2, board_screw_len, board_screw_head_d, 1.6);
+      }
+}
+
+// Wires soldered to the boards (view only): 5 V and GND chained, a signal each
+module wire_parts() {
+   wd = 1.2;
+   z = z_cap + board_z + board_t + wd / 2 + 0.3;
+   function p(i, j) = let(a = lug_angle + pos_angle(i), y = (j - 1) * board_pitch, r = board_row_r(board_leg_row + 1))
+      [r * cos(a) - y * sin(a), r * sin(a) + y * cos(a), z];
+   module seg(a, b, c) {
+      color(c)
+         hull() {
+            translate(a) sphere(d = wd, $fn = 8);
+            translate(b) sphere(d = wd, $fn = 8);
+         }
+   }
+   exit = [-half - 2, 0, z_cap + cable_z];
+   for (i = [0 : 3]) {
+      seg(p(i, 0), p(i + 1, 0), "#d03030");
+      seg(p(i, 2), p(i + 1, 2), "#202020");
+   }
+   seg(p(2, 0), exit, "#d03030");
+   seg(p(2, 2), exit, "#202020");
+   for (i = [0 : 4])
+      seg(p(i, 1), exit, ["#f0f0f0", "#e0c020", "#30a050", "#3070d0", "#e07020"][i]);
 }
 
 // Cover with the engraved labels filled in
@@ -693,7 +848,7 @@ module start_pin_screw() {
 // The wire bundle leaving the cap notch (stub)
 module cable_part() {
    color(c_sensor)
-      translate([-half - 15, 0, z_cap + cable_d / 2])
+      translate([-half - 15, 0, z_cap + cable_z])
          rotate([0, 90, 0])
             cylinder(d = cable_d - 1, h = 15 + cap_wall + 3);
 }
@@ -717,10 +872,10 @@ module bought_parts(theta, explode = 0) {
 module exploded_view(pos = 0, e = 16) {
    theta = pos_angle(pos);
    // Assembly lines
-   dashed_line(-4.2 * e, 7 * e);
+   dashed_line(-4.2 * e, 9.4 * e);
    for (x = [-1, 1], y = [-1, 1])
       translate([x * screw_xy, y * screw_xy, 0])
-         dashed_line(-2.4 * e, 7 * e, 0.35);
+         dashed_line(-2.4 * e, 9.4 * e, 0.35);
 
    translate([0, 0, -4.2 * e]) key_part(theta);
    translate([0, 0, -3 * e]) lock_part(theta);
@@ -741,8 +896,10 @@ module exploded_view(pos = 0, e = 16) {
    translate([0, 0, 3.9 * e]) sensor_parts();
    translate([0, 0, 4.6 * e]) cover_part();
    translate([0, 0, 5.4 * e]) start_pin_screw();
-   translate([0, 0, 6.2 * e]) color(c_cover) cap();
-   translate([0, 0, 7 * e]) cover_screws();
+   translate([0, 0, 6.2 * e]) color(c_holder) holder();
+   translate([0, 0, 7.2 * e]) board_parts();
+   translate([0, 0, 8.4 * e]) color(c_cover) cap();
+   translate([0, 0, 9.4 * e]) cover_screws();
 }
 
 module assembled_view(pos = 3) {
@@ -754,8 +911,22 @@ module assembled_view(pos = 3) {
    translate([0, 0, z_cam]) rotate([0, 0, theta]) color(c_rotor) rotor();
    bought_parts(theta);
    cover_part(0.35);
+   color(c_holder) holder();
+   board_parts();
+   wire_parts();
    color(c_cover, 0.35) cap();
    cable_part();
+}
+
+// The back of the cover with the holder, the boards and the wires, no cap
+module boards_view() {
+   color(c_housing) housing();
+   cover_part();
+   sensor_parts();
+   start_pin_screw();
+   color(c_holder) holder();
+   board_parts();
+   wire_parts();
 }
 
 // Back view without the cover, to see the mechanism work
@@ -793,6 +964,7 @@ translate([0, 0, -2 * explode]) rotate([0, 180, 0]) face(); // Make module face
 translate([0, 0, z_cam]) rotate([0, 0, pos_angle(view_pos)]) rotor(); // Make module rotor
 shoe_in_place(pos_angle(view_pos)); // Make module shoe
 translate([0, 0, explode]) cover(); // Make module cover
+translate([0, 0, 1.5 * explode]) holder(); // Make module holder
 translate([0, 0, 2 * explode]) rotate([0, 180, 0]) cap(); // Make module cap
 
 //bought_parts(pos_angle(view_pos), explode); // Ignore module
@@ -802,3 +974,4 @@ translate([0, 0, 2 * explode]) rotate([0, 180, 0]) cap(); // Make module cap
 //inside_view(pos = 0); // Make view inside_off 0,0,0
 //inside_view(pos = 4); // Make view inside_start 0,0,0
 //front_view(pos = 3); // Make view front 160,0,180
+//boards_view(); // Make view boards 35,0,200
