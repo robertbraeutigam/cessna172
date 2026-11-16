@@ -1078,8 +1078,9 @@ and an arm ("horn") at each end, flared at its root, 34 mm wide and
 leaning 25 degrees inwards (`arm_tilt`). Each arm goes on into a head at
 about its width, square on its end (so its top slopes down towards the
 middle) and standing out towards the pilot: a flat top pad, a 45 degree
-pad between it and the pilot face for the thumb, and a thumb rest standing
-out of the arm's inner side just under the head. It is 378 mm wide,
+pad between it and the pilot face for the thumb, and a thumb rest: a shelf
+square to the arm, out of the head's inner side at its bottom, with a lip
+along its edge, so the thumb lies on it. It is 378 mm wide,
 212 mm high (with the heads) and
 40 mm deep, 54 mm at the heads,
 with flat front and back faces and 8 mm rounded edges. The yoke ends at
@@ -1110,11 +1111,15 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
   its middle, so the wires pass between them; in the arms they are on the
   outer side. A lip around the rim of the back pieces goes into the front
   pieces and lines them up.
-- **Heads:** separate prints, top face down (the 45 degree pad and the
-  thumb rest's 45 degree faces print without supports), 36 mm wide and
-  44 mm high (`head`, `head_chamfer`, `thumb`). They stand out 14 mm
+- **Heads:** separate prints, top face down (the 45 degree pad prints
+  without supports), 36 mm wide and 44 mm high (`head`, `head_chamfer`). They stand out 14 mm
   towards the pilot (`head_bulge`), which the flat shells could not. A spigot under each goes into the arm's
   open end, one M3 x 10 through the front of the arm holds it.
+- **Thumb rests:** separate prints, shelf down: a 16 x 30 mm shelf with a
+  4 mm lip (`thumb`, `thumb_lip`) and a flange up the head's inner side.
+  A 1 mm tab on the flange sits in a pocket in the head's side, which
+  lines it up, and two M3 x 8 through the flange go into pads inside the
+  head wall (glue as well if you like).
 - **Control tube:** a 25 x 2 mm aluminium round tube (about the real 1",
   `tube_od`), 110 mm above the bar's bottom (`z_shaft`). Its end stands on
   the hub's front; a printed collar holds it, bolted onto the hub's front
@@ -1143,7 +1148,7 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
 
 | File | Parts |
 |------|-------|
-| `yoke.scad` | `center_fwd`, `center_aft`, `horn_fwd_left/right`, `horn_aft_left/right` (shells), `head_left/right`, `collar` |
+| `yoke.scad` | `center_fwd`, `center_aft`, `horn_fwd_left/right`, `horn_aft_left/right` (shells), `head_left/right`, `thumb_left/right`, `collar` |
 
 ### Hardware
 
@@ -1156,6 +1161,7 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
 | 1 | stranded copper Cat5 patch cable, cable tie | to hub port 1 |
 | 22 | M3 x 12 socket head screw | shell pieces |
 | 2 | M3 x 10 screw | heads |
+| 4 | M3 x 8 pan head screw | thumb rests |
 | 4 | M4 x 20 socket head screw, nut, washer | collar onto the hub |
 | 2 | M4 x 40 screw, nut | cross bolts through collar and tube |
 
@@ -1179,8 +1185,9 @@ panel range), the rocker (`trim_*`: cut-out and body depth), the mux board
    block.
 5. Put the front pieces on, the lips into them, and screw them on from the
    front: the center piece first, then the horn pieces.
-6. Put the heads on (spigots into the arms, wires pulled through) and
-   screw them on.
+6. Screw the thumb rests onto the heads (tab into the pocket). Put the
+   heads on (spigots into the arms, wires pulled through) and screw them
+   on.
 7. In the MobiFlight Connector, the mux on port 1 (SIG D26) is a
    Multiplexer device; C0 and C3 are buttons for the PTT, C1 and C2 for the
    trim.

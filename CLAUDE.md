@@ -95,8 +95,9 @@ its own top-level directory; new components should follow the same layout.
   (`xs_fwd`, `xs_aft`) so the pieces overlap like bricks; M3 screws from
   the front into bosses in the back pieces, a lip on the back pieces' rim.
   The heads are separate prints on spigots (they stand out towards the
-  pilot): top pad with the PTT, a 45 degree pad (left: trim rocker), a
-  thumb rest on the inner side. A printed collar bolted
+  pilot): top pad with the PTT, a 45 degree pad (left: trim rocker); a
+  separate thumb rest (shelf square to the arm, lip, flange with a tab
+  in a pocket) is screwed onto each head's inner side. A printed collar bolted
   onto the hub front holds the bought aluminium control tube (cross
   bolts); the cable runs through the tube. Inside: a CD74HC4067 mux on
   standoffs in the hub (C0..C3, hub port 1) and a cable tie block. Only

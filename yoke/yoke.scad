@@ -7,7 +7,8 @@
 // its end (its top sloping down towards the middle) and standing out
 // towards the pilot: a flat top pad with the PTT, a 45 degree pad for the
 // thumb between it and the pilot face (the trim rocker on the left one)
-// and a thumb rest out of the arm's inner side under it.
+// and a thumb rest (a separate print, screwed on) out of its inner side:
+// a shelf square to the arm with a lip, which holds the thumb.
 // Everything is hollow: the wires run from the heads down the arms and
 // along the bar to a CD74HC4067 mux in the hub, and the Cat5 cable from
 // there through the hollow control tube to hub port 1 (mux port: SIG D26,
@@ -49,11 +50,13 @@
 // - 1x momentary (ON)-OFF-(ON) mini rocker (trim_*, MEASURE)
 // - CD74HC4067 breakout board, 2x M2x6 self tapping screws
 // - stranded copper Cat5 patch cable, a cable tie
-// - 22x M3x12 socket head screws (shells), 2x M3x10 (heads),
+// - 22x M3x12 socket head screws (shells), 2x M3x10 (heads), 4x M3x8
+//   pan head (thumb rests),
 //   4x M4x20 + nuts + washers (collar onto the hub),
 //   2x M4x40 + nuts (cross bolts through the tube)
 //
-// Assembly: put the buttons and the rocker into the heads (nuts inside),
+// Assembly: screw the thumb rests onto the heads (tabs into the pockets),
+// put the buttons and the rocker into the heads (nuts inside),
 // solder a wire pair to each. Screw the mux onto its standoffs. Push the
 // Cat5 cable through the tube; bolt the collar onto the front center piece
 // (nuts inside), push the tube into the collar up to the hub, drill it
@@ -90,14 +93,27 @@ arm_inner = [[123.5, 121.6], [136, 94.4], [147, 71.7], [153, 55]];
 
 // --- Heads ---
 // The arm goes on into the head at about its width: a flat top pad (the
-// PTT), a 45 degree pad towards the pilot (thumb, the trim rocker) and a
-// thumb rest standing out of the inner side just under it
+// PTT) and a 45 degree pad towards the pilot (thumb, the trim rocker)
 head = [36, 44];             // width, height (along the arm)
 head_bulge = 14;             // stands out towards the pilot beyond the shells
 head_chamfer = 22;           // the 45 degree pad between the top and the pilot face
 head_r = 4;
-thumb = [13, 30];            // thumb rest: out of the arm's inner side, down from the head
-thumb_y = [2, -4];           // its extent in y: from the pilot face + this, to this
+
+// --- Thumb rest: a separate print screwed onto the head's inner side ---
+// A shelf square to the arm at the head's bottom with a lip along its
+// edge, and a flange up the head's side: its tab sits in a pocket there,
+// two M3 through it into pads inside the head wall
+thumb = [16, 30];            // shelf: out of the head's side, along y
+thumb_y0 = 4;                // shelf from the head's pilot face + this
+thumb_t = 4;                 // shelf thickness
+thumb_r = 7;                 // shelf corners
+thumb_lip = [2.5, 4];        // lip along the shelf's edge: thickness, height above it
+thumb_flange = [3, 22];      // flange: thickness, height from the shelf's bottom
+thumb_tab = 1;               // into the pocket in the head's side
+thumb_tab_clear = 0.2;
+thumb_screw_z = 13;          // along the arm from the head's bottom
+thumb_screw_dy = 8;          // screws in from the flange's ends
+thumb_pad = [8, 5];          // pads inside the head wall: diameter, length
 head_wall = 2.5;
 spigot_h = 12;               // into the arm
 spigot_wall = 2;
@@ -271,7 +287,12 @@ assert(head_pad.y - (trim_depth + trim_cut.y / 2) / sqrt(2) >= head_wall + 1 &&
 assert(head_pad.x + (trim_depth + trim_cut.y / 2) / sqrt(2) <= ptt_pos.y - ptt_d / 2 - 1 ||
        head_pad.y - (trim_depth - trim_cut.y / 2) / sqrt(2) >= head.y - ptt_body_len + 1,
        "PTT body runs into the trim rocker");
-assert(thumb.y <= arm_w + 10 && thumb.x <= thumb.y - 5, "Thumb rest out of proportion");
+assert(head_y[0] + thumb_y0 + thumb.y <= head_y[1] - head_r && thumb_flange.y <= head.y - head_chamfer,
+       "Thumb rest flange runs off the head's flat side");
+assert(-head.x / 2 + head_wall + thumb_pad.y <= -trim_cut.x / 2 - 1, "Thumb rest screw pads run into the trim rocker");
+assert(thumb_screw_z - thumb_pad.x / 2 >= head_wall + 1 && thumb_screw_z + thumb_pad.x / 2 <= thumb_flange.y - 1,
+       "Thumb rest screws off the flange");
+assert(thumb.x > thumb_lip.x + 8, "Thumb rest shelf too narrow for the thumb");
 // hub: collar, cable, tie, mux
 assert(z_shaft + collar_flange.x / 2 <= hub_top.y - round - 2 &&
        collar_flange.x / 2 + wall <= hub_hw(z_shaft + collar_flange.x / 2), "Collar flange does not fit the hub");
@@ -504,19 +525,62 @@ module head_block(o) {
       }
 }
 
-// Thumb rest on the inner side (-x), under the head: a 45 degree slab out
-// of the head's side and the rest under it, beside the arm
-module thumb_rest() {
-   xi = -arm_w / 2;
-   module slab(pts) {
-      hull() {
-         y_extrude(head_y[0] + thumb_y[0] + 1.5, thumb_y[1] - 1.5) polygon(pts);
-         y_extrude(head_y[0] + thumb_y[0], thumb_y[1]) offset(delta = -1.5) polygon(pts);
+// Thumb rest for the head's inner side (-x) in the head's frame: the
+// shelf on z=0 out of the side, the flange up against it
+function thumb_screws() = [for (dy = [thumb_screw_dy, thumb.y - thumb_screw_dy])
+                              [head_y[0] + thumb_y0 + dy, thumb_screw_z]];
+module thumb_pocket_2d(clear = 0) {   // (y, z) on the head's side
+   translate([head_y[0] + thumb_y0 + 2 - clear, head_r - clear])
+      square([thumb.y - 4 + 2 * clear, thumb_flange.y - head_r - 2 + 2 * clear]);
+}
+module thumb_rest() render() {
+   xs = -head.x / 2;                  // the head's side
+   y0 = head_y[0] + thumb_y0;
+   difference() {
+      union() {
+         // shelf, with its lip
+         translate([0, 0, 0])
+            linear_extrude(thumb_t)
+               translate([xs - thumb_flange.x - thumb.x, y0])
+                  offset(r = thumb_r) offset(delta = -thumb_r)
+                     square([thumb.x + thumb_flange.x + thumb_r, thumb.y]);
+         linear_extrude(thumb_t + thumb_lip.y)
+            difference() {
+               translate([xs - thumb_flange.x - thumb.x, y0])
+                  offset(r = thumb_r) offset(delta = -thumb_r)
+                     square([thumb.x + thumb_flange.x + thumb_r, thumb.y]);
+               translate([xs - thumb_flange.x - thumb.x + thumb_lip.x, y0 + thumb_lip.x])
+                  offset(r = thumb_r - thumb_lip.x) offset(delta = -(thumb_r - thumb_lip.x))
+                     square([thumb.x + thumb_flange.x + thumb_r, thumb.y - 2 * thumb_lip.x]);
+               translate([xs - thumb_flange.x - 1, y0 - 1]) square([thumb_flange.x + thumb_r + 2, thumb.y + 2]);
+            }
+         // flange and its tab
+         x_extrude(xs - thumb_flange.x, xs)
+            offset(r = 2) offset(delta = -2)
+               translate([y0, 0]) square([thumb.y, thumb_flange.y]);
+         x_extrude(xs - 0.01, xs + thumb_tab - 0.1)
+            thumb_pocket_2d(-thumb_tab_clear);
+      }
+      // the head's side and the arm stay clear of the shelf
+      translate([xs, -100, -1]) cube([100, 200, 100]);
+      for (p = thumb_screws())
+         translate([xs - thumb_flange.x - 1, p.x, p.y])
+            rotate([0, 90, 0])
+               cylinder(d = clear_d, h = thumb_flange.x + thumb_tab + 2);
+   }
+   // the tab, cut off above
+   intersection() {
+      x_extrude(xs - 0.01, xs + thumb_tab - 0.1)
+         thumb_pocket_2d(-thumb_tab_clear);
+      difference() {
+         translate([xs - 1, -100, -1]) cube([thumb_tab + 1, 200, 100]);
+         for (p = thumb_screws())
+            translate([xs - 1, p.x, p.y]) rotate([0, 90, 0]) cylinder(d = clear_d, h = 5);
       }
    }
-   slab([[xi + 1, 2], [xi + 1, 9], [xi - thumb.x, -thumb.x + 7], [xi - thumb.x, -thumb.x]]);
-   slab([[xi - 0.3, 1], [xi - thumb.x, -thumb.x], [xi - thumb.x, -thumb.x - 4], [xi - 0.3, -thumb.y]]);
 }
+
+module thumb_in_place(s) arm_frame(s) thumb_rest();
 
 // On the 45 degree pad: z out of it, y up along it
 module pad_frame() {
@@ -536,7 +600,11 @@ module head(s) render() {
                   head_block(0);
                   head_block(head_wall);
                }
-               thumb_rest();
+               // pads for the thumb rest screws, inside the inner side
+               for (p = thumb_screws())
+                  translate([-head.x / 2 + 0.5, p.x, p.y])
+                     rotate([0, 90, 0])
+                        cylinder(d = thumb_pad.x, h = head_wall - 0.5 + thumb_pad.y);
                // spigot, with a pad for the screw from the front
                translate([0, 0, -spigot_h])
                   linear_extrude(spigot_h + head_wall)
@@ -554,6 +622,13 @@ module head(s) render() {
                linear_extrude(spigot_h + head_wall + 2)
                   rrect(spigot - 2 * [spigot_wall, spigot_wall], spigot_r - spigot_wall);
             y_cyl([0, -head_screw_z], pilot_d, 0, spigot.y);
+            // pocket for the thumb rest's tab, pilot holes for its screws
+            x_extrude(-head.x / 2 - 1, -head.x / 2 + thumb_tab)
+               thumb_pocket_2d();
+            for (p = thumb_screws())
+               translate([-head.x / 2 - 1, p.x, p.y])
+                  rotate([0, 90, 0])
+                     cylinder(d = pilot_d, h = head_wall + thumb_pad.y);
             if (ptt[i])
                translate([ptt_pos.x, ptt_pos.y, head.y - head_wall - 1])
                   cylinder(d = ptt_hole, h = head_wall + 2);
@@ -628,8 +703,8 @@ module tube_part() {
 }
 
 // Buttons and the rocker in the heads
-module controls_part() {
-   for (s = [-1, 1]) {
+module controls_part(sides = [-1, 1]) {
+   for (s = sides) {
       i = s > 0 ? 1 : 0;
       arm_frame(s) {
             if (ptt[i])
@@ -753,6 +828,7 @@ module aft_parts() {
 
 module heads_part() {
    color(c_shell) for (s = [-1, 1]) head(s);
+   color(c_shell2) for (s = [-1, 1]) thumb_in_place(s);
    controls_part();
 }
 
@@ -778,7 +854,8 @@ module exploded_view(e = explode) {
       translate([s * e, 2 * e, 0]) color(c_shell2) horn_fwd(s);
       translate([s * e, 0, 0]) color(c_shell) horn_aft(s);
       translate([s * e, 0, 1.5 * e]) color(c_shell) head(s);
-      translate([s * e, 0, 1.5 * e]) controls_part();
+      translate([s * e, 0, 1.5 * e]) controls_part([s]);
+      translate([s * 2 * e, 0, 1.5 * e]) color(c_shell2) thumb_in_place(s);
    }
    translate([0, 2 * e, 0]) color(c_shell) center_fwd();
    color(c_shell2) center_aft();
@@ -797,6 +874,8 @@ print_aft() horn_aft(-1); // Make module horn_aft_left
 print_aft() horn_aft(1); // Make module horn_aft_right
 print_head(-1) head(-1); // Make module head_left
 print_head(1) head(1); // Make module head_right
+mirror([1, 0, 0]) thumb_rest(); // Make module thumb_left
+thumb_rest(); // Make module thumb_right
 translate([0, 0, -y_fwd]) rotate([90, 0, 0]) translate([0, 0, -z_shaft]) collar(); // Make module collar
 
 //assembled_view(); // Make view main 70,0,-25
