@@ -3,9 +3,11 @@
 // The Cessna control wheel: a trapezoid hub in the middle that the control
 // tube goes into, a bar under it with a flat top and a bottom that sags in
 // a curve, and an arm ("horn") at each end, flared at its root and leaning
-// 25 degrees inwards, with a block head square on its end (its top sloping
-// down towards the middle) that stands out towards the pilot. The left head has the PTT on top
-// and a trim rocker on its pilot face, the right head a PTT (copilot).
+// 25 degrees inwards, going on into a head at about its width, square on
+// its end (its top sloping down towards the middle) and standing out
+// towards the pilot: a flat top pad with the PTT, a 45 degree pad for the
+// thumb between it and the pilot face (the trim rocker on the left one)
+// and a thumb rest out of the arm's inner side under it.
 // Everything is hollow: the wires run from the heads down the arms and
 // along the bar to a CD74HC4067 mux in the hub, and the Cat5 cable from
 // there through the hollow control tube to hub port 1 (mux port: SIG D26,
@@ -87,9 +89,15 @@ arm_outer = [[184, 27], [189, 37], [187, 52], [180, 72], [169, 102], [154, 136]]
 arm_inner = [[123.5, 121.6], [136, 94.4], [147, 71.7], [153, 55]];
 
 // --- Heads ---
-head = [40, 40];             // width, height (along the arm)
+// The arm goes on into the head at about its width: a flat top pad (the
+// PTT), a 45 degree pad towards the pilot (thumb, the trim rocker) and a
+// thumb rest standing out of the inner side just under it
+head = [36, 44];             // width, height (along the arm)
 head_bulge = 14;             // stands out towards the pilot beyond the shells
-head_r = 6;
+head_chamfer = 22;           // the 45 degree pad between the top and the pilot face
+head_r = 4;
+thumb = [13, 30];            // thumb rest: out of the arm's inner side, down from the head
+thumb_y = [2, -4];           // its extent in y: from the pilot face + this, to this
 head_wall = 2.5;
 spigot_h = 12;               // into the arm
 spigot_wall = 2;
@@ -135,11 +143,11 @@ ptt_d = 12;
 ptt_head = [14, 3];          // bezel diameter, height above the head
 ptt_body_len = 22;           // below the head's top, with the solder tabs
 ptt_nut_af = 16;
-ptt_pos = [4, 4];            // on the head's top: outboard, in front of the rocker
+ptt_pos = [0, 7];            // on the top pad, in front of the rocker
 
 // --- Trim rocker, MEASURE: momentary (ON)-OFF-(ON) mini rocker ---
 trim = [true, false];        // left, right head
-trim_cut = [13, 19];         // panel cut-out, width x height
+trim_cut = [13, 19];         // panel cut-out, across x along the 45 degree pad
 trim_depth = 20;             // body behind the face
 trim_bezel = [15, 21, 2];    // view only
 
@@ -200,6 +208,8 @@ z_arm = arm_top_out.y;
 
 // Head: on the arm end, its front flush with the shells' front
 head_y = [y_aft - head_bulge, y_fwd];
+head_pad = [head_y[0] + head_chamfer / 2, head.y - head_chamfer / 2];  // 45 degree pad center (y, z)
+head_top_y0 = head_y[0] + head_chamfer;      // top pad from here to the front
 spigot = [arm_w - 2 * wall - 2 * spigot_clear, yoke_d - 2 * wall - 2 * spigot_clear];
 spigot_r = edge_r - wall + 1.5;
 
@@ -247,15 +257,21 @@ assert(head.x - 2 * head_r >= arm_w - 2 * edge_r, "Head narrower than the arm en
 assert(arm_boss_s[0] - boss_d / 2 >= spigot_h + 1, "Head spigot runs into the top arm boss");
 assert(arm_boss_off - boss_d / 2 >= cable_d / 2 - arm_w / 2 + wall + 4, "Arm bosses leave no room for the wires");
 assert(abs(ptt_pos.x) + ptt_nut_af / cos(30) / 2 <= head.x / 2 - head_wall &&
-       ptt_pos.y - ptt_nut_af / cos(30) / 2 >= head_y[0] + head_wall, "PTT nut does not fit inside the head");
+       ptt_pos.y - ptt_nut_af / cos(30) / 2 >= head_top_y0 &&
+       ptt_pos.y + ptt_nut_af / cos(30) / 2 <= head_y[1] - head_wall, "PTT nut does not fit under the top pad");
+assert(ptt_pos.y - ptt_head.x / 2 >= head_top_y0 + head_r && ptt_pos.y + ptt_head.x / 2 <= head_y[1] - head_r,
+       "PTT does not fit the flat top pad");
 assert(ptt_body_len <= head.y - head_wall - 2, "PTT body runs out of the head's bottom");
-assert(trim_cut.y + 4 <= head.y - 2 * head_r && trim_cut.x + 4 <= head.x - 2 * head_r,
-       "Trim rocker does not fit the head's flat back");
-assert(trim_depth <= head_y[1] - head_y[0] - 2 * head_wall - 2, "Trim rocker body too deep for the head");
-// the PTT body hangs down from the top, the rocker body goes in from the back
-assert(head.y - ptt_body_len >= head.y / 2 + trim_cut.y / 2 + 1 ||
-       ptt_pos.y - ptt_d / 2 >= head_y[0] + trim_depth + 1 ||
-       abs(ptt_pos.x) - ptt_d / 2 >= trim_cut.x / 2 + 1, "PTT body runs into the trim rocker");
+assert(trim_cut.y + 4 <= head_chamfer * sqrt(2) - 2 * head_r && trim_cut.x + 4 <= head.x - 2 * head_r,
+       "Trim rocker does not fit the 45 degree pad");
+// the rocker body goes in square to the pad: its far end inside the head,
+// its upper far corner behind the PTT body
+assert(head_pad.y - (trim_depth + trim_cut.y / 2) / sqrt(2) >= head_wall + 1 &&
+       head_pad.x + (trim_depth - trim_cut.y / 2) / sqrt(2) <= head_y[1] - head_wall - 1, "Trim rocker body too deep for the head");
+assert(head_pad.x + (trim_depth + trim_cut.y / 2) / sqrt(2) <= ptt_pos.y - ptt_d / 2 - 1 ||
+       head_pad.y - (trim_depth - trim_cut.y / 2) / sqrt(2) >= head.y - ptt_body_len + 1,
+       "PTT body runs into the trim rocker");
+assert(thumb.y <= arm_w + 10 && thumb.x <= thumb.y - 5, "Thumb rest out of proportion");
 // hub: collar, cable, tie, mux
 assert(z_shaft + collar_flange.x / 2 <= hub_top.y - round - 2 &&
        collar_flange.x / 2 + wall <= hub_hw(z_shaft + collar_flange.x / 2), "Collar flange does not fit the hub");
@@ -454,30 +470,73 @@ module center_aft() piece(-xs_aft, xs_aft, -1);
 module horn_fwd(s) if (s > 0) piece(xs_fwd, x_max + 1, 1); else piece(-x_max - 1, -xs_fwd, 1);
 module horn_aft(s) if (s > 0) piece(xs_aft, x_max + 1, -1); else piece(-x_max - 1, -xs_aft, -1);
 
-// Rounded box from p0 to p1, corner radius r
-module rbox(p0, p1, r) {
-   hull()
-      for (x = [p0.x + r, p1.x - r], y = [p0.y + r, p1.y - r], z = [p0.z + r, p1.z - r])
-         translate([x, y, z]) sphere(r = r, $fn = 24);
-}
-
 module rrect(size, r) {
    offset(r = r) square(size - 2 * [r, r], center = true);
+}
+
+// Along x from x0 to x1, a 2D shape in (y, z)
+module x_extrude(x0, x1) {
+   translate([x0, 0, 0])
+      rotate([90, 0, 90])
+         linear_extrude(x1 - x0)
+            children();
+}
+
+// Head side profile (y, z), offset inwards by o: front, top pad, 45 degree pad, pilot face
+module head_profile_2d(o) {
+   c = head_chamfer - o * (2 - sqrt(2));
+   y0 = head_y[0] + o;
+   y1 = head_y[1] - o;
+   h = head.y - o;
+   polygon([[y1, o], [y1, h], [y0 + c, h], [y0, h - c], [y0, o]]);
+}
+
+// The head block offset inwards by o, its edges rounded (in steps across x)
+module head_block(o) {
+   r = max(head_r - o, 0.5);
+   hull()
+      for (t = [0, 30, 60, 90]) {
+         w = head.x / 2 - o - r + r * sin(t);
+         x_extrude(-w, w)
+            offset(delta = -r * (1 - cos(t)))
+               offset(r = r) offset(delta = -r)
+                  head_profile_2d(o);
+      }
+}
+
+// Thumb rest on the inner side (-x), under the head: a 45 degree slab out
+// of the head's side and the rest under it, beside the arm
+module thumb_rest() {
+   xi = -arm_w / 2;
+   module slab(pts) {
+      hull() {
+         y_extrude(head_y[0] + thumb_y[0] + 1.5, thumb_y[1] - 1.5) polygon(pts);
+         y_extrude(head_y[0] + thumb_y[0], thumb_y[1]) offset(delta = -1.5) polygon(pts);
+      }
+   }
+   slab([[xi + 1, 2], [xi + 1, 9], [xi - thumb.x, -thumb.x + 7], [xi - thumb.x, -thumb.x]]);
+   slab([[xi - 0.3, 1], [xi - thumb.x, -thumb.x], [xi - thumb.x, -thumb.x - 4], [xi - 0.3, -thumb.y]]);
+}
+
+// On the 45 degree pad: z out of it, y up along it
+module pad_frame() {
+   translate([0, head_pad.x, head_pad.y])
+      rotate([45, 0, 0])
+         children();
 }
 
 // Head on the right arm (s=1) or the left one (s=-1), in place: its
 // bottom on the arm end, a spigot down into the arm
 module head(s) render() {
    i = s > 0 ? 1 : 0;
-   p0 = [-head.x / 2, head_y[0], 0];
-   p1 = [head.x / 2, head_y[1], head.y];
    arm_frame(s)
          difference() {
             union() {
                difference() {
-                  rbox(p0, p1, head_r);
-                  rbox(p0 + [1, 1, 1] * head_wall, p1 - [1, 1, 1] * head_wall, head_r - head_wall);
+                  head_block(0);
+                  head_block(head_wall);
                }
+               thumb_rest();
                // spigot, with a pad for the screw from the front
                translate([0, 0, -spigot_h])
                   linear_extrude(spigot_h + head_wall)
@@ -499,12 +558,12 @@ module head(s) render() {
                translate([ptt_pos.x, ptt_pos.y, head.y - head_wall - 1])
                   cylinder(d = ptt_hole, h = head_wall + 2);
             if (trim[i])
-               translate([0, head_y[0] - 1, head.y / 2])
-                  rotate([-90, 0, 0])
+               pad_frame()
+                  translate([0, 0, -head_wall - 1])
                      linear_extrude(head_wall + 2)
                         square([trim_cut.x, trim_cut.y], center = true);
             // version inside the front wall
-            translate([0, head_y[1] - head_wall + 0.01, head.y - 12])
+            translate([0, head_y[1] - head_wall + 0.01, head.y - 14])
                rotate([90, 0, 0])
                   linear_extrude(gitrev_depth + 0.01)
                      text("{{gitrev}}", size = 3, halign = "center", valign = "center");
@@ -583,11 +642,11 @@ module controls_part() {
                         cylinder(d = ptt_nut_af / cos(30), h = 2.5, $fn = 6);
                }
             if (trim[i])
-               translate([0, head_y[0], head.y / 2])
+               pad_frame()
                   color(c_body) {
-                     translate([0, -trim_bezel.z / 2, 0]) cube([trim_bezel.x, trim_bezel.z, trim_bezel.y], center = true);
-                     translate([0, -trim_bezel.z, 0]) rotate([0, 90, 0]) cylinder(d = 10, h = trim_cut.x - 3, center = true);
-                     translate([0, trim_depth / 2, 0]) cube([trim_cut.x, trim_depth, trim_cut.y], center = true);
+                     translate([0, 0, trim_bezel.z / 2]) cube([trim_bezel.x, trim_bezel.y, trim_bezel.z], center = true);
+                     translate([0, 0, trim_bezel.z]) rotate([0, 90, 0]) cylinder(d = 10, h = trim_cut.x - 3, center = true);
+                     translate([0, 0, -trim_depth / 2]) cube([trim_cut.x, trim_cut.y, trim_depth], center = true);
                   }
          }
    }

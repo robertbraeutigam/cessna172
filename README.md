@@ -1075,9 +1075,12 @@ The shape is the Cessna wheel's (proportions from photos, not measured): a
 trapezoid hub in the middle that the control tube goes into, a bar under
 it with a flat top and a bottom that sags in one curve from end to end,
 and an arm ("horn") at each end, flared at its root, 34 mm wide and
-leaning 25 degrees inwards (`arm_tilt`), with a block head square on its
-end, so the head's top slopes down towards the middle, and standing out
-towards the pilot. It is 378 mm wide, 208 mm high (with the heads) and
+leaning 25 degrees inwards (`arm_tilt`). Each arm goes on into a head at
+about its width, square on its end (so its top slopes down towards the
+middle) and standing out towards the pilot: a flat top pad, a 45 degree
+pad between it and the pilot face for the thumb, and a thumb rest standing
+out of the arm's inner side just under the head. It is 378 mm wide,
+212 mm high (with the heads) and
 40 mm deep, 54 mm at the heads,
 with flat front and back faces and 8 mm rounded edges. The yoke ends at
 the control tube: the base the tube goes into (the future force feedback
@@ -1107,9 +1110,10 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
   its middle, so the wires pass between them; in the arms they are on the
   outer side. A lip around the rim of the back pieces goes into the front
   pieces and lines them up.
-- **Heads:** separate prints, top face down, 40 x 40 mm, a little wider
-  than the arms. They stand out 14 mm towards the pilot (`head_bulge`),
-  which the flat shells could not. A spigot under each goes into the arm's
+- **Heads:** separate prints, top face down (the 45 degree pad and the
+  thumb rest's 45 degree faces print without supports), 36 mm wide and
+  44 mm high (`head`, `head_chamfer`, `thumb`). They stand out 14 mm
+  towards the pilot (`head_bulge`), which the flat shells could not. A spigot under each goes into the arm's
   open end, one M3 x 10 through the front of the arm holds it.
 - **Control tube:** a 25 x 2 mm aluminium round tube (about the real 1",
   `tube_od`), 110 mm above the bar's bottom (`z_shaft`). Its end stands on
@@ -1120,10 +1124,10 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
 
 ### Inside
 
-- **Buttons:** a 12 mm momentary push button with a red cap on top of each
-  head, in front of the left rocker; on the left head's pilot face a
+- **Buttons:** a 12 mm momentary push button with a red cap on the top
+  pad of each head; on the left head's 45 degree pad, under the thumb, a
   momentary (ON)-OFF-(ON) mini rocker for the electric trim, as on the
-  real wheel. Their nuts are inside the heads; the wires run down the inner
+  real wheel (the right pad is blank, room for one more button). Their nuts are inside the heads; the wires run down the inner
   side of the arms and along the bar into the hub.
 - **Mux:** a CD74HC4067 board (as on the switch panel) on two standoffs on
   the back center piece's inside, under the tube's hole, the control row
