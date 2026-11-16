@@ -85,8 +85,9 @@ its own top-level directory; new components should follow the same layout.
   components and README in sync with them. The `rj_*` and `proto_*`
   values are guesses until the parts are measured.
 
-- `yoke/` — `yoke.scad`: the hollow Cessna control wheel (tall trapezoid
-  hub, bar with a sagging bottom, grips with block heads), its outline a
+- `yoke/` — `yoke.scad`: the hollow Cessna control wheel (trapezoid hub,
+  bar with a sagging bottom, arms leaning inwards with block heads square
+  on their ends; `arm_frame` places things on an arm end), its outline a
   point list rounded with offsets and extruded with stepped rounded edges
   (`body`). A 2.5 mm shell cut in its middle plane into front (`fwd`,
   panel side) and back (`aft`, pilot side) halves, and each half across

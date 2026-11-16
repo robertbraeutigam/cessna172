@@ -1,11 +1,12 @@
 // Yoke: hollow Cessna 172 control wheel
 //
-// The Cessna control wheel: a tall trapezoid hub in the middle that the
-// control tube goes into, a bar under it whose bottom sags in a curve, and
-// a grip ("horn") at each end, flared at its root, with a block head on
-// top that stands out towards the pilot. The left head has the PTT on top
+// The Cessna control wheel: a trapezoid hub in the middle that the control
+// tube goes into, a bar under it with a flat top and a bottom that sags in
+// a curve, and an arm ("horn") at each end, flared at its root and leaning
+// 25 degrees inwards, with a block head square on its end (its top sloping
+// down towards the middle) that stands out towards the pilot. The left head has the PTT on top
 // and a trim rocker on its pilot face, the right head a PTT (copilot).
-// Everything is hollow: the wires run from the heads down the grips and
+// Everything is hollow: the wires run from the heads down the arms and
 // along the bar to a CD74HC4067 mux in the hub, and the Cat5 cable from
 // there through the hollow control tube to hub port 1 (mux port: SIG D26,
 // AUX A1; README "Ports").
@@ -23,7 +24,7 @@
 //   bosses in the front pieces into bosses in the back pieces. A lip
 //   around the back pieces' rim goes into the front pieces and lines them up.
 // - The heads are separate prints (top face down): a spigot under each goes
-//   into the grip's open top, one M3 from the front holds it. They stand
+//   into the arm's open end, one M3 from the front holds it. They stand
 //   out towards the pilot (head_bulge), which the flat shells can not.
 // - The control tube (bought aluminium tube) goes into a collar, a separate
 //   print that is bolted onto the front of the hub with 4 M4 (nuts inside)
@@ -46,7 +47,7 @@
 // - 1x momentary (ON)-OFF-(ON) mini rocker (trim_*, MEASURE)
 // - CD74HC4067 breakout board, 2x M2x6 self tapping screws
 // - stranded copper Cat5 patch cable, a cable tie
-// - 20x M3x12 socket head screws (shells), 2x M3x10 (heads),
+// - 22x M3x12 socket head screws (shells), 2x M3x10 (heads),
 //   4x M4x20 + nuts + washers (collar onto the hub),
 //   2x M4x40 + nuts (cross bolts through the tube)
 //
@@ -55,10 +56,10 @@
 // Cat5 cable through the tube; bolt the collar onto the front center piece
 // (nuts inside), push the tube into the collar up to the hub, drill it
 // through the cross bolt holes and bolt it. Lay the back pieces face down
-// side by side, push the head wires down the grips and along the bar,
+// side by side, push the head wires down the arms and along the bar,
 // solder them and the cable to the mux (README "Cable to the hub"), tie the
 // cable onto its block. Put the front pieces on (lips in) and screw them
-// on, then the heads (spigots into the grips), one screw each.
+// on, then the heads (spigots into the arms), one screw each.
 
 $fn = 48;
 
@@ -70,28 +71,30 @@ yoke_d = 40;                 // depth along the tube, both faces flat
 edge_r = 8;                  // rounding of the face edges
 edge_steps = 4;              // the rounding is printed in steps, per edge
 wall = 2.5;
-fillet = 18;                 // inner corners (hub base, grip roots)
-round = 10;                  // outer corners
-bar_h = 38;                  // bar height
-bar_sag = 35;                // bar bottom: up this much at bar_x from the middle
+fillet = 15;                 // inner corners (hub base, arm roots)
+round = 8;                   // outer corners
+bar_sag = 21;                // bar bottom: up this much at bar_x from the middle
 bar_x = 175;
-hub_base = 60;               // hub half width where it stands on the bar
-hub_top = [42, 172];         // hub top: half width, height
+bar_top = [[56, 57], [150, 50]];  // bar top (x, z): at the hub, at the arm
+hub_top = [40, 157];         // hub top: half width, height
 z_shaft = 110;               // control tube axis
-// Right grip outline: outer edge from the root up, inner edge from the top down
-grip_outer = [[176, 41], [182, 48], [186, 57], [188.5, 68], [189, 82], [186, 120], [180, 155], [175, 185]];
-grip_inner = [[137, 185], [139, 155], [140, 125], [136, 100], [128, 80]];
-z_top = 185;                 // the grips end here, the heads sit on them
+// Right arm: it leans inwards, the head sits square on its end
+arm_end = [122, 165];        // center of its end
+arm_tilt = 25;               // inwards from vertical
+arm_w = 34;                  // across, at the end
+// below the end: outer edge from the root up, inner edge from the end down
+arm_outer = [[184, 27], [189, 37], [187, 52], [180, 72], [169, 102], [154, 136]];
+arm_inner = [[123.5, 121.6], [136, 94.4], [147, 71.7], [153, 55]];
 
 // --- Heads ---
-head = [58, 46];             // width, height
+head = [40, 40];             // width, height (along the arm)
 head_bulge = 14;             // stands out towards the pilot beyond the shells
-head_r = 8;
+head_r = 6;
 head_wall = 2.5;
-spigot_h = 12;               // into the grip
+spigot_h = 12;               // into the arm
 spigot_wall = 2;
 spigot_clear = 0.3;
-head_screw_z = 6;            // below z_top, M3 from the front into the spigot
+head_screw_z = 6;            // below the arm end, M3 from the front into the spigot
 head_screw_pad = 4;
 
 // --- Cuts into printable pieces ---
@@ -108,7 +111,6 @@ screw_seat = 4;              // head seat in front of the middle plane
 clear_d = 3.3;
 pilot_d = 2.8;               // M3 self tapping
 head_bore = 6.2;             // M3 socket head
-boss_dz = bar_h / 2 - wall - boss_d / 2 + 0.5;  // bar bosses above and below its middle
 
 // --- Control tube and collar, MEASURE the tube ---
 tube_od = 25;                // aluminium tube, about the real 1"
@@ -133,7 +135,7 @@ ptt_d = 12;
 ptt_head = [14, 3];          // bezel diameter, height above the head
 ptt_body_len = 22;           // below the head's top, with the solder tabs
 ptt_nut_af = 16;
-ptt_pos = [10, 2];           // on the head's top: outboard, in front of the rocker
+ptt_pos = [4, 4];            // on the head's top: outboard, in front of the rocker
 
 // --- Trim rocker, MEASURE: momentary (ON)-OFF-(ON) mini rocker ---
 trim = [true, false];        // left, right head
@@ -165,43 +167,54 @@ tie_z = 82;
 gitrev_depth = 0.6;
 
 // --- Calculated ---
+function lerp(a, b, t) = a + (b - a) * t;
 function bar_bottom(x) = bar_sag * pow(abs(x) / bar_x, 2);
+function bar_top_z(x) = lerp(bar_top[0].y, bar_top[1].y, (abs(x) - bar_top[0].x) / (bar_top[1].x - bar_top[0].x));
+function bar_mid(x) = (bar_bottom(x) + bar_top_z(x)) / 2;
+arm_a = [-sin(arm_tilt), cos(arm_tilt)];     // along the right arm, up
+arm_n = [cos(arm_tilt), sin(arm_tilt)];      // across it, outboard
+// on the right arm: s along it from its end (negative: down), off outboard
+function arm_pt(s, off) = arm_end + s * arm_a + off * arm_n;
+arm_top_out = arm_pt(0, arm_w / 2);
+arm_top_in = arm_pt(0, -arm_w / 2);
 // Right half of the outline, from the bottom middle round to the hub's top
-// middle; the grips run on above z_top so the cut there is open
+// middle; the arms run on beyond their ends so the cut there is open
 right = concat(
    [for (x = [0 : 25 : 150]) [x, bar_bottom(x)]], [[170, bar_bottom(170)]],
-   grip_outer,
-   [[grip_outer[len(grip_outer) - 1].x, z_top + 20], [grip_inner[0].x, z_top + 20]],
-   grip_inner,
-   [for (x = [115, 100, 85]) [x, bar_bottom(x) + bar_h]],
-   [[hub_base, bar_bottom(hub_base) + bar_h], hub_top, [0, hub_top.y]]);
+   arm_outer,
+   [arm_top_out, arm_top_out + 20 * arm_a, arm_top_in + 20 * arm_a, arm_top_in],
+   arm_inner,
+   [for (x = [bar_top[1].x, 120, 90]) [x, bar_top_z(x)]],
+   [bar_top[0], hub_top, [0, hub_top.y]]);
 outline = concat(right, [for (i = [len(right) - 2 : -1 : 1]) [-right[i].x, right[i].y]]);
 
-function lerp(a, b, t) = a + (b - a) * t;
-hub_z0 = bar_bottom(hub_base) + bar_h;
-function hub_hw(z) = lerp(hub_base, hub_top.x, (z - hub_z0) / (hub_top.y - hub_z0));
+hub_z0 = bar_top[0].y;
+function hub_hw(z) = lerp(bar_top[0].x, hub_top.x, (z - hub_z0) / (hub_top.y - hub_z0));
 
 y_fwd = yoke_d / 2;
 y_aft = -yoke_d / 2;
 y_in_aft = y_aft + wall;
 y_in_fwd = y_fwd - wall;
-x_max = max([for (p = grip_outer) p.x]);
+x_max = max([for (p = arm_outer) p.x]);
+z_arm = arm_top_out.y;
 
-// Head: on the grip top, its front flush with the shells' front
-head_x = (grip_inner[0].x + grip_outer[len(grip_outer) - 1].x) / 2;
-grip_top_w = grip_outer[len(grip_outer) - 1].x - grip_inner[0].x;
+// Head: on the arm end, its front flush with the shells' front
 head_y = [y_aft - head_bulge, y_fwd];
-spigot = [grip_top_w - 2 * wall - 2 * spigot_clear, yoke_d - 2 * wall - 2 * spigot_clear];
+spigot = [arm_w - 2 * wall - 2 * spigot_clear, yoke_d - 2 * wall - 2 * spigot_clear];
 spigot_r = edge_r - wall + 1.5;
 
 // Screw bosses (x, z), right half, mirrored for the left: hub; overlap of
-// the front center and back horn pieces; horn pieces
-function bar_boss(x, s) = [x, bar_bottom(x) + bar_h / 2 + s * boss_dz];
+// the front center and back horn pieces; horn pieces (bar, arm root, arm)
+horn_bar_x = 128;
+boss_dz = (bar_top_z(horn_bar_x) - bar_bottom(horn_bar_x)) / 2 - wall - boss_d / 2 + 0.5;
+function bar_boss(x, s) = [x, bar_mid(x) + s * boss_dz];
+arm_boss_s = [spigot_h + boss_d / 2 + 3, 58];   // from the arm end
+arm_boss_off = arm_w / 2 - wall - boss_d / 2 + 0.5;
 bosses_right = concat(
-   [[hub_top.x - 7, hub_top.y - 13], [hub_base - 10, hub_z0 + 15]],
+   [[hub_top.x - 7, hub_top.y - 13], [bar_top[0].x - 10, hub_z0 + 15]],
    [for (x = [xs_aft + boss_d, xs_fwd - boss_d], s = [-1, 1]) bar_boss(x, s)],
-   [[128, bar_bottom(128) + wall + boss_d / 2 + 2], [160, bar_bottom(160) + wall + boss_d / 2 + 2],
-    [180, 105], [170, 163]]);
+   [bar_boss(horn_bar_x, -1), bar_boss(horn_bar_x, 1), [166, bar_bottom(166) + wall + boss_d / 2 + 2]],
+   [for (s = arm_boss_s) arm_pt(-s, arm_boss_off)]);
 bosses = concat(bosses_right, [for (b = bosses_right) [-b.x, b.y]]);
 screw_tip = screw_seat - screw_len;
 
@@ -213,25 +226,26 @@ collar_od = tube_od + 2 * collar_wall;
 collar_bolts = [for (a = [45 : 90 : 315]) [0, z_shaft] + collar_bolt_r * [cos(a), sin(a)]];
 
 center_fwd_size = [2 * xs_fwd, hub_top.y];
-horn_aft_size = [x_max - xs_aft, z_top];
+horn_aft_size = [x_max - xs_aft, z_arm];
 
-echo(yoke_size = [2 * x_max, yoke_d + head_bulge, z_top + head.y], center_fwd = center_fwd_size,
+echo(yoke_size = [2 * x_max, yoke_d + head_bulge, arm_pt(head.y, arm_w / 2).y], center_fwd = center_fwd_size,
      horn_aft = horn_aft_size, screws = len(bosses));
 
 // --- Checks ---
-assert(edge_r - wall >= 2 && edge_r < round, "Edge radius does not fit the shape");
+assert(edge_r - wall >= 2 && edge_r <= round, "Edge radius does not fit the shape");
 assert(center_fwd_size.x <= bed.x && center_fwd_size.y <= bed.y, "Front center piece does not fit the bed");
 assert(horn_aft_size.x <= bed.x && horn_aft_size.y <= bed.y, "Back horn piece does not fit the bed");
 assert(head.x <= bed.x && yoke_d + head_bulge <= bed.y, "Head does not fit the bed");
-assert(hub_base + 5 <= xs_aft, "Back center cut runs into the hub");
+assert(bar_top[0].x + 5 <= xs_aft, "Back center cut runs into the hub");
 assert(xs_fwd - xs_aft >= 2 * boss_d + 10, "Front and back cuts too close for the overlap screws");
-assert(xs_fwd + 2 <= bosses_right[6].x - boss_d, "Horn piece bosses too close to the cut");
+assert(xs_fwd + 2 <= horn_bar_x - boss_d, "Horn piece bosses too close to the cut");
 assert(boss_dz - boss_d / 2 >= cable_d / 2, "Bar bosses leave no room for the wires");
 assert(screw_tip >= y_aft + 2.5, "Shell screws come out of the back");
 assert(boss_d >= head_bore + 3, "Boss wall around the screw heads too thin");
-// heads: flat bottom over the grip top, buttons inside
-assert(head.x - 2 * head_r >= grip_top_w - 2 * edge_r, "Head narrower than the grip top");
-assert(z_top - spigot_h - 1 >= bosses_right[9].y + boss_d / 2, "Head spigot runs into the top grip boss");
+// heads: flat bottom over the arm end, buttons inside
+assert(head.x - 2 * head_r >= arm_w - 2 * edge_r, "Head narrower than the arm end");
+assert(arm_boss_s[0] - boss_d / 2 >= spigot_h + 1, "Head spigot runs into the top arm boss");
+assert(arm_boss_off - boss_d / 2 >= cable_d / 2 - arm_w / 2 + wall + 4, "Arm bosses leave no room for the wires");
 assert(abs(ptt_pos.x) + ptt_nut_af / cos(30) / 2 <= head.x / 2 - head_wall &&
        ptt_pos.y - ptt_nut_af / cos(30) / 2 >= head_y[0] + head_wall, "PTT nut does not fit inside the head");
 assert(ptt_body_len <= head.y - head_wall - 2, "PTT body runs out of the head's bottom");
@@ -252,22 +266,40 @@ assert(cable_hole < tube_od - 1, "The tube does not stand on the hub front");
 assert(tie_z + tie_block.x / 2 <= z_shaft - cable_hole / 2 - 2, "Cable tie block runs into the hole");
 assert(mux_z + mux_board.y / 2 + 3 <= tie_z - tie_block.x / 2, "Mux too close to the tie block");
 assert(mux_board.x / 2 + 2 <= hub_hw(mux_z + mux_board.y / 2) - wall - edge_r &&
-       mux_z - mux_board.y / 2 >= hub_z0 - bar_h + wall + edge_r, "Mux does not fit the hub");
+       mux_z - mux_board.y / 2 >= wall + edge_r, "Mux does not fit the hub");
 assert(min([for (b = bosses, h = mux_holes) norm(b - [h.x, mux_z + h.y])]) >= boss_d / 2 + mux_board.y / 2,
        "Mux runs into a boss");
 
 // --- Shape ---
 
-// The outline with its corners rounded, offset inwards by o; open above
-// z_top unless closed
+// Beyond the arm ends
+module arm_cut_2d() {
+   for (m = [0, 1])
+      mirror([m, 0])
+         translate(arm_end)
+            rotate(arm_tilt)
+               translate([-arm_w, 0]) square([2 * arm_w, 100]);
+}
+
+// The outline with its corners rounded, offset inwards by o; open beyond
+// the arm ends unless closed
 module outline_2d(o = 0, closed = true) {
-   intersection() {
+   difference() {
       offset(delta = -o)
          offset(r = round) offset(delta = -round)
             offset(r = -fillet) offset(delta = fillet)
                polygon(outline);
-      translate([-500, -1]) square([1000, z_top + 1 + (closed ? 0 : 50)]);
+      if (closed)
+         arm_cut_2d();
    }
+}
+
+// The right (s=1) or left arm's end: z along the arm, x outboard
+module arm_frame(s) {
+   mirror([s > 0 ? 0 : 1, 0, 0])
+      translate([arm_end.x, 0, arm_end.y])
+         rotate([0, -arm_tilt, 0])
+            children();
 }
 
 // Along y from y0 to y1
@@ -343,14 +375,15 @@ module holes() {
       y_cyl(b, m4_clear, 0, y_fwd + 1);
    for (h = mux_holes)
       y_cyl([h.x, mux_z + h.y], mux_screw_hole, y_in_aft + 1, mux_y + 1);
-   // head screws, through the front grip wall
+   // head screws, through the front arm wall
    for (s = [-1, 1])
-      y_cyl([s * head_x, z_top - head_screw_z], clear_d, 0, y_fwd + 1);
+      arm_frame(s)
+         y_cyl([0, -head_screw_z], clear_d, 0, y_fwd + 1);
 }
 
 // Version on the front of the bar, readable from the front
 module gitrev(x) {
-   translate([x, y_fwd + 0.01, bar_bottom(x) + bar_h / 2])
+   translate([x, y_fwd + 0.01, bar_mid(x)])
       multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0]])
          translate([0, 0, -gitrev_depth])
             linear_extrude(gitrev_depth + 1)
@@ -374,7 +407,7 @@ module yoke() {
 }
 
 // Lip around the back pieces' rim, standing into the front pieces (not
-// at the grip tops, where the head spigots go in)
+// at the arm ends, where the head spigots go in)
 module lip() {
    difference() {
       union() {
@@ -391,7 +424,9 @@ module lip() {
       }
       for (b = bosses)
          y_cyl(b, boss_d + 2 * lip_clear + 1, -2, lip_h + 1);
-      translate([-500, -5, z_top - spigot_h - 1]) cube([1000, 10, 100]);
+      for (s = [-1, 1])
+         arm_frame(s)
+            translate([-arm_w, -5, -spigot_h - 1]) cube([2 * arm_w, 10, 100]);
    }
 }
 
@@ -430,14 +465,13 @@ module rrect(size, r) {
    offset(r = r) square(size - 2 * [r, r], center = true);
 }
 
-// Head on the right grip (s=1) or the left one (s=-1), in place: its
-// bottom on z_top, a spigot down into the grip
+// Head on the right arm (s=1) or the left one (s=-1), in place: its
+// bottom on the arm end, a spigot down into the arm
 module head(s) render() {
    i = s > 0 ? 1 : 0;
    p0 = [-head.x / 2, head_y[0], 0];
    p1 = [head.x / 2, head_y[1], head.y];
-   translate([s * head_x, 0, z_top])
-      mirror([s > 0 ? 0 : 1, 0, 0])
+   arm_frame(s)
          difference() {
             union() {
                difference() {
@@ -456,7 +490,7 @@ module head(s) render() {
                   y_cyl([0, -head_screw_z], 8, spigot.y / 2 - spigot_wall - head_screw_pad, spigot.y / 2);
                }
             }
-            // open into the grip
+            // open into the arm
             translate([0, 0, -spigot_h - 1])
                linear_extrude(spigot_h + head_wall + 2)
                   rrect(spigot - 2 * [spigot_wall, spigot_wall], spigot_r - spigot_wall);
@@ -514,7 +548,8 @@ module collar() render() {
 // --- Print placement: outer faces down ---
 module print_fwd() translate([0, 0, y_fwd]) rotate([-90, 0, 0]) children();
 module print_aft() translate([0, 0, -y_aft]) rotate([90, 0, 0]) children();
-module print_head(s) translate([-s * head_x, 0, z_top + head.y]) rotate([180, 0, 0]) children();
+module print_head(s) translate([0, 0, head.y]) rotate([180, 0, 0]) rotate([0, arm_tilt, 0])
+   translate([-arm_end.x, 0, -arm_end.y]) mirror([s > 0 ? 0 : 1, 0, 0]) children();
 
 // --- Views (rendered to PNG by "make views") ---
 
@@ -537,8 +572,7 @@ module tube_part() {
 module controls_part() {
    for (s = [-1, 1]) {
       i = s > 0 ? 1 : 0;
-      translate([s * head_x, 0, z_top])
-         mirror([s > 0 ? 0 : 1, 0, 0]) {
+      arm_frame(s) {
             if (ptt[i])
                translate([ptt_pos.x, ptt_pos.y, head.y]) {
                   color(c_steel) cylinder(d = ptt_head.x, h = ptt_head.y - 1.5);
@@ -590,7 +624,7 @@ module wire(path, d = 1.4) {
 }
 
 // Cat5 out of the tube, tied onto the block, the wires to the control row;
-// a wire from each button down the grip and along the bar to the channel row
+// a wire from each button down the arm and along the bar to the channel row
 module wiring_part() {
    yt = y_in_aft + tie_block.z - tie_groove + cable_d / 2;   // cable axis on the block
    z_end = tie_z - tie_block.x / 2 - 1;                     // jacket end
@@ -610,26 +644,27 @@ module wiring_part() {
             wire([[(j - 3.5) * 0.8, yt, z_end], [p.x * 0.6, yt - 1, z_end - 3],
                   [p.x, mux_y + mux_board_t + 2, p.y + 1]], 1);
    }
-   // C0 left PTT, C1/C2 trim, C3 right PTT
+   // C0 left PTT, C1/C2 trim, C3 right PTT, down the inner side of the arm
+   function arm_path(s, off) = [for (q = [arm_pt(10, off), arm_pt(-10, off), arm_pt(-50, off - 2),
+                                         arm_pt(-85, off), arm_pt(-108, off + 8), [150, 30 + off / 3]])
+                                [s * q.x, q.y]];
    runs = [[-1, 0, c_red], [-1, 1, "#f2c23a"], [-1, 2, "#3dbf5a"], [1, 3, c_red]];
    for (k = [0 : len(runs) - 1]) {
       r = runs[k];
       s = r[0];
       p = mux_ch_pin(r[1]);
       dy = -6 + k * 1.6;
-      xi = s * (grip_inner[1].x + wall + 4);
       color(r[2])
-         wire([[s * head_x, dy, z_top + 10], [s * head_x, dy, z_top - 10], [xi, dy, 140], [xi, dy, 90],
-               [s * 110, dy, bar_bottom(110) + bar_h / 2 + 2], [s * (hub_base - 8), dy, bar_bottom(60) + bar_h / 2 + 2],
-               [p.x, dy, p.y - 6], [p.x, mux_y + mux_board_t + 2, p.y]]);
+         wire(concat([for (q = arm_path(s, -6)) [q.x, dy, q.y]],
+                     [[s * 130, dy, bar_mid(130) + 2], [s * 48, dy, bar_mid(60) + 2],
+                      [p.x, dy, p.y - 6], [p.x, mux_y + mux_board_t + 2, p.y]]));
    }
    // the GND wire, daisy chained over the left buttons
    gnd = mux_ctl_pin("GND");
-   xg = -(grip_inner[1].x + wall + 6);
    color("#222222")
-      wire([[-head_x + 4, -3, z_top + 10], [-head_x + 4, -3, z_top - 10], [xg, -3, 140], [xg, -3, 90],
-            [-110, -3, bar_bottom(110) + bar_h / 2 - 2], [-(hub_base - 8), -3, bar_bottom(60) + bar_h / 2 - 2],
-            [-mux_board.x / 2 - 4, -3, mux_z + mux_board.y / 2 + 3], [gnd.x, mux_y + mux_board_t + 2, gnd.y]]);
+      wire(concat([for (q = arm_path(-1, -9)) [q.x, -3, q.y]],
+                  [[-130, -3, bar_mid(130) - 2], [-48, -3, bar_mid(60) - 2],
+                   [-mux_board.x / 2 - 4, -3, mux_z + mux_board.y / 2 + 3], [gnd.x, mux_y + mux_board_t + 2, gnd.y]]));
 }
 
 module collar_bolts_part() {

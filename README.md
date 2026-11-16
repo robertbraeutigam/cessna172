@@ -1072,18 +1072,20 @@ cable out through the control tube.
 [![Yoke](https://robertbraeutigam.github.io/cessna172/yoke/yoke_montage.png)](https://robertbraeutigam.github.io/cessna172/yoke/yoke_montage.png)
 
 The shape is the Cessna wheel's (proportions from photos, not measured): a
-tall trapezoid hub in the middle that the control tube goes into, a bar
-under it whose bottom sags in one curve from horn to horn, and a grip
-("horn") at each end, flared at its root and leaning a little inwards,
-with a block head on top that stands out towards the pilot. It is 380 mm
-wide, 231 mm high (with the heads) and 40 mm deep, 54 mm at the heads,
+trapezoid hub in the middle that the control tube goes into, a bar under
+it with a flat top and a bottom that sags in one curve from end to end,
+and an arm ("horn") at each end, flared at its root, 34 mm wide and
+leaning 25 degrees inwards (`arm_tilt`), with a block head square on its
+end, so the head's top slopes down towards the middle, and standing out
+towards the pilot. It is 378 mm wide, 208 mm high (with the heads) and
+40 mm deep, 54 mm at the heads,
 with flat front and back faces and 8 mm rounded edges. The yoke ends at
 the control tube: the base the tube goes into (the future force feedback
 yoke, or any bearing that takes the tube) is not part of it.
 
 `yoke.scad` holds everything. The outline is a list of points at the top
-(`bar_*`, `hub_*`, `grip_outer`, `grip_inner`), rounded with `fillet` and
-`round`; `assert`s check that the pieces fit the bed and that the
+(`bar_*`, `hub_top`, `arm_end`, `arm_outer`, `arm_inner`), rounded with
+`fillet` and `round`; `assert`s check that the pieces fit the bed and that the
 buttons, the mux and the cable fit inside.
 
 ### How it is built
@@ -1095,20 +1097,20 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
   into a center piece and two horn pieces. The front half is cut further
   out (`xs_fwd`, 115 mm from the middle) than the back half (`xs_aft`,
   70 mm), so the pieces overlap like bricks: the front center piece (230 x
-  172 mm) reaches over both joints of the back half and holds the back
+  157 mm) reaches over both joints of the back half and holds the back
   horn pieces, the front horn pieces sit on the back horn pieces. All six
   print outer face down, without supports (the rounded edges are printed
-  in 4 steps, `edge_steps`); a back horn piece is 120 x 185 mm.
-- **Screws:** 20 M3 x 12 socket head screws from the front, the side the
+  in 4 steps, `edge_steps`); a back horn piece is 119 x 172 mm.
+- **Screws:** 22 M3 x 12 socket head screws from the front, the side the
   pilot does not see, through bosses in the front pieces into bosses in
   the back pieces (self tapping). The bosses in the bar are above and below
-  its middle, so the wires pass between them; in the grips they are on the
+  its middle, so the wires pass between them; in the arms they are on the
   outer side. A lip around the rim of the back pieces goes into the front
   pieces and lines them up.
-- **Heads:** separate prints, top face down. They are wider than the grips
-  and stand out 14 mm towards the pilot (`head_bulge`), which the flat
-  shells could not. A spigot under each goes into the grip's open top, one
-  M3 x 10 through the front of the grip holds it.
+- **Heads:** separate prints, top face down, 40 x 40 mm, a little wider
+  than the arms. They stand out 14 mm towards the pilot (`head_bulge`),
+  which the flat shells could not. A spigot under each goes into the arm's
+  open end, one M3 x 10 through the front of the arm holds it.
 - **Control tube:** a 25 x 2 mm aluminium round tube (about the real 1",
   `tube_od`), 110 mm above the bar's bottom (`z_shaft`). Its end stands on
   the hub's front; a printed collar holds it, bolted onto the hub's front
@@ -1122,7 +1124,7 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
   head, in front of the left rocker; on the left head's pilot face a
   momentary (ON)-OFF-(ON) mini rocker for the electric trim, as on the
   real wheel. Their nuts are inside the heads; the wires run down the inner
-  side of the grips and along the bar into the hub.
+  side of the arms and along the bar into the hub.
 - **Mux:** a CD74HC4067 board (as on the switch panel) on two standoffs on
   the back center piece's inside, under the tube's hole, the control row
   up. Inputs, all to GND (active low): C0 left PTT, C1 trim nose down, C2
@@ -1148,7 +1150,7 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
 | 1 | momentary (ON)-OFF-(ON) mini rocker, 13 x 19 mm cut-out | electric trim |
 | 1 | CD74HC4067 breakout board, 2 M2 x 6 self tapping screws | input mux |
 | 1 | stranded copper Cat5 patch cable, cable tie | to hub port 1 |
-| 20 | M3 x 12 socket head screw | shell pieces |
+| 22 | M3 x 12 socket head screw | shell pieces |
 | 2 | M3 x 10 screw | heads |
 | 4 | M4 x 20 socket head screw, nut, washer | collar onto the hub |
 | 2 | M4 x 40 screw, nut | cross bolts through collar and tube |
@@ -1168,12 +1170,12 @@ panel range), the rocker (`trim_*`: cut-out and body depth), the mux board
    center piece (nuts inside), push the tube into the collar up to the
    hub, drill it through the cross bolt holes and bolt it.
 4. Lay the back pieces face down side by side. Push the head wires down
-   the grips and along the bar, solder them to C0..C3 and GND, and the
+   the arms and along the bar, solder them to C0..C3 and GND, and the
    cable to the mux control row (bridge EN to GND); tie the cable onto its
    block.
 5. Put the front pieces on, the lips into them, and screw them on from the
    front: the center piece first, then the horn pieces.
-6. Put the heads on (spigots into the grips, wires pulled through) and
+6. Put the heads on (spigots into the arms, wires pulled through) and
    screw them on.
 7. In the MobiFlight Connector, the mux on port 1 (SIG D26) is a
    Multiplexer device; C0 and C3 are buttons for the PTT, C1 and C2 for the
