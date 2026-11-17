@@ -10,7 +10,8 @@ Each cockpit component has its own directory:
 | Directory | Component |
 |-----------|-----------|
 | [`throttle/`](throttle) | throttle quadrant: throttle, mixture and carb heat |
-| [`switchpanel/`](switchpanel) | the 172N lower left switch panel: ignition key, master, lights, avionics; the primer above it |
+| [`switchpanel/`](switchpanel) | the 172N lower left switch panel: master, lights, avionics; the primer above it |
+| [`ignition/`](ignition) | the ignition key switch, the left end of the switch panel |
 | [`frame/`](frame) | the aluminium frame and panel sheet that everything mounts on |
 | [`hub/`](hub) | the box with the MobiFlight Mega and the Cat5 ports |
 | [`yoke/`](yoke) | the hollow control wheel: PTT, trim rocker, a mux inside |
@@ -598,9 +599,11 @@ Similar in function to the Saitek Switch Panel, but it should look as close
 to the real panel as possible. Every switch position is a raw input for
 MobiFlight, active low, like a switch to GND.
 
-It is two panels, printed separately and mounted side by side: the ignition
-on the left and the switch row, which also carries the input multiplexer
-for both. Their basics are in `panel.inc.scad`: both are 3 mm thick,
+It is two panels, printed separately and mounted side by side: the
+[ignition](#ignition) on the left, a component of its own
+([`ignition/`](ignition)), and the switch row, which also carries the
+input multiplexer for both. Their basics are in `panel.inc.scad`, which is
+in both directories (keep the copies identical): both are 3 mm thick,
 with the same rim, flange, mount holes and lettering. The back of each
 panel is 80 mm high (`panel_h`), closed by an 8 mm rim, and goes through a
 hole in the cockpit sheet ([frame](#cockpit-frame)); a 10 mm face flange
@@ -613,146 +616,6 @@ the face 3 mm in front of the sheet).
 The [primer](#primer) is a third, small panel of its own above the left
 end (`primer.scad`), with its own hole in the sheet. `panel.inc.scad`
 takes the height of the back as a parameter for it.
-
-## Ignition switch
-
-[![Ignition switch](https://robertbraeutigam.github.io/cessna172/switchpanel/ignition_montage.png)](https://robertbraeutigam.github.io/cessna172/switchpanel/ignition_montage.png)
-
-`ignition.scad`: the OFF - R - L - BOTH - START key switch. The key turns
-clockwise; OFF, R, L and BOTH are detents, START is spring loaded and
-returns to BOTH.
-
-### How it works
-
-It is built around a cheap mailbox (cabinet) cam lock. These locks turn
-only 90°, so the lock is made to turn freely and the assembly has its own
-end stops for the whole OFF..START sweep. On the lock used here the stop is
-a small tab (about 1 mm) on the plug just behind the face, which runs into
-two of the four grooves in the housing: take the cam, its washer and the
-cam screw off, pull the plug out with the key in (the small detent ball
-falls out, it is not needed), file the tab flush with the plug and put it
-back; the printed rotor on the spindle then holds the plug in. The key can
-be pulled every 90°, with the key parallel or perpendicular to the body
-flats (`lock_key_home`), so the flats of the cutouts in the face, panel
-and housing are turned to put one of these positions at OFF. It also
-comes out 90° further, at BOTH.
-
-A printed rotor on the lock's spindle sits in a housing behind the panel,
-closed by a cover:
-
-- **Detents:** a steel ball, pushed by a spring in a radial channel of the
-  housing, drops into notches in the rotor rim. START has no notch.
-- **End stops:** a lug on the rotor rim moves in a pocket of the housing.
-- **START return:** an M3 screw through the cover is a pin in an arc slot of
-  the rotor. From OFF to BOTH it moves freely in the narrow part of the
-  slot. Past BOTH it pushes a printed shoe that compresses a spring in the
-  wide part, and the spring pushes the key back to BOTH. The shoe is a
-  block that fills the slot, with a spigot inside the spring's end, so the
-  spring is held centred and cannot slip past the shoe and catch the pin
-  screw.
-- **Sensing:** a magnet in the rotor lug and one digital hall sensor per
-  position in the cover. The sensors (A3144, unipolar, not latching) are
-  open collector and pull low over the magnet, so each one is wired like a
-  switch to GND. They are glued into pockets on the inside of the cover,
-  marked face towards the rotor, and their legs are bent 90° backwards
-  through slots in the cover.
-- **Sensor boards:** the wires are not soldered to the thin legs but to a
-  small piece of prototype board on each sensor (3 x 4 holes, 2.54 mm
-  pitch). It slips onto the legs about 5 mm behind the cover
-  (`board_z`), where they have spread to 2.54 mm. A printed holder, an
-  arc on the back of the cover, has a post under each board, and one M2
-  screw through a hole drilled in the board's outer row holds it there.
-  The hole is in the OUT leg's column (the A3144 legs are 5 V, GND, OUT
-  seen on the marked face), which needs only one wire, so the 5 V and GND
-  columns keep two free holes each: one for the wire in, one for the wire
-  on to the next board.
-  The holder's two ears go under the two cover screws on the switch panel
-  side and are clamped by the cap. A 3 x 5 piece works too, with the legs
-  in its second row (`board_rows = 5`, `board_leg_row = 1`).
-- **Back cap:** a cap over the cover protects the boards, their solder
-  joints and the wires. The 7 wires (5 signals, 5 V, GND) leave through a
-  notch in its wall towards the switch panel; hot glue in the notch is the
-  strain relief, so pulling the cable does not pull on the legs. The cover
-  screws go through the cap as well.
-
-Printed parts: face, panel, housing, rotor, shoe, cover, holder, cap.
-
-The panel is 87 x 100 mm (the back 77 x 80 mm). Its front is a separate
-1 mm face with the position labels, tick marks and MAGNETOS standing 0.8 mm
-out of it around the key, to be painted with a white acrylic paint pen.
-The face is printed front side up (the STL is already flipped), the panel
-front side down, so neither needs supports; together they are 3 mm thick,
-like the switch panel. The mount screws clamp the face onto the panel,
-and so does the lock flange (glue or double sided tape it on
-as well if it bows); it has holes around the heads of the panel screws.
-The lock body goes through
-a cutout with flats, so it cannot turn, and the housing sits on the back,
-between the rims. The cutout is turned so the key points at OFF
-(`key_off_angle`) where it comes out of the lock.
-
-### Hardware
-
-| Qty | Part | Use |
-|-----|------|-----|
-| 1 | mailbox / cabinet cam lock | key and spindle (`lock_*`: 18 mm thread, 17 mm body, 25 x 4 mm nut, 7 mm square spindle, its M4 x 5 cam screw with a 12 mm head holds the rotor) |
-| 1 | 6 mm steel ball + spring | detent (`detent_spring_*`, spring OD below 6 mm) |
-| 1 | spring, 5 mm OD, about 3.8 mm ID, 15 mm | START return (`start_spring_*`, measure the ID: the shoe spigot goes inside) |
-| 1 | cube magnet, 5 x 5 x 5 mm | position sensing (`magnet_*`) |
-| 5 | A3144 hall sensor | one per position (OFF is optional) |
-| 1 | prototype board, 2.54 mm pitch | 5 pieces of 3 x 4 holes, one on each sensor's legs |
-| 5 | M2 x 6 screw | sensor boards onto the holder |
-| 4 | M3 x 25 screw | cap and cover (M3 x 10 to test without the cap) |
-| 4 | M3 x 10 screw | panel to housing |
-| 1 | M3 x 8 screw | START pin |
-| 4 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet |
-
-### Assembly
-
-1. Put the lock through the panel and the housing, screw the panel to the
-   housing, tighten the lock nut.
-2. Mount the rotor with the lock's cam screw.
-3. Insert the ball and its spring, and the START spring with the shoe on
-   its end (spigot in the spring, flat face out).
-4. Check which magnet face triggers the sensors, then glue in the magnet and
-   the sensors.
-5. Screw on the cover (M3 x 10 screws to test), then put in the START pin.
-6. Drill the outer row hole in the OUT leg's column of each board piece
-   to 2.2 mm.
-   Put the holder on the cover (ears over the two cover screw holes on the
-   switch panel side), slip the boards onto the sensor legs and screw them
-   onto the posts with the M2 screws.
-7. Solder the legs to the boards and trim them. Solder the wires into the
-   next row, each next to its leg, and bridge them to it: 5 V and GND
-   chained from board to board, one signal wire each.
-8. Lay the bundle into the cap's notch, screw on the cap with the M3 x 25
-   screws (it clamps the holder's ears), and fill the notch with hot glue,
-   with a blob on the inside that is bigger than the notch.
-
-The positions (30° apart) should be verified against the real switch.
-
-### In X-Plane
-
-X-Plane's key is spring loaded: writing START (4) to
-`sim/cockpit2/engine/actuators/ignition_key` jumps back to BOTH in the next
-frame, and MobiFlight cannot hold the starter command. So START goes
-through `switchpanel/ignition.lua`, a FlyWithLua script: it creates the
-dataref `cessna172/ignition/start` and holds `sim/starters/engage_starter_1`
-while it is 1. Copy it to `X-Plane/Resources/plugins/FlyWithLua/Scripts/`.
-
-In the MobiFlight Connector (inputs C11..C15 of the mux):
-
-| Input | On press | On release |
-|-------|----------|------------|
-| OFF, R, L, BOTH | `sim/cockpit2/engine/actuators/ignition_key[0]` = the position | nothing |
-| START | `cessna172/ignition/start` = 1 | `cessna172/ignition/start` = 0 |
-
-Releasing START springs the key back to BOTH, whose sensor sets the key
-position again. **VERIFY** the key values (0 is OFF, 3 is BOTH; check
-which of 1 and 2 is L) with DataRefTool while turning the key in the
-virtual cockpit. Start X-Plane (or reload the Lua scripts) before
-connecting MobiFlight, the START dataref only exists once the script has
-run. If MobiFlight disconnects in START, the starter keeps cranking until
-the key is turned in the cockpit or the scripts are reloaded.
 
 ## Primer
 
@@ -1066,6 +929,148 @@ solder and heat shrink.
 - ALT and BAT are two independent switches. The real split master has an
   interlock (ALT pushes BAT on, BAT pushes ALT off); X-Plane does not need
   it.
+
+# Ignition
+
+[![Ignition switch](https://robertbraeutigam.github.io/cessna172/ignition/ignition_montage.png)](https://robertbraeutigam.github.io/cessna172/ignition/ignition_montage.png)
+
+[`ignition/`](ignition): the left one of the two
+[switch panel](#switch-panel) halves. `ignition.scad`: the OFF - R - L -
+BOTH - START key switch. The key turns
+clockwise; OFF, R, L and BOTH are detents, START is spring loaded and
+returns to BOTH.
+
+## How it works
+
+It is built around a cheap mailbox (cabinet) cam lock. These locks turn
+only 90°, so the lock is made to turn freely and the assembly has its own
+end stops for the whole OFF..START sweep. On the lock used here the stop is
+a small tab (about 1 mm) on the plug just behind the face, which runs into
+two of the four grooves in the housing: take the cam, its washer and the
+cam screw off, pull the plug out with the key in (the small detent ball
+falls out, it is not needed), file the tab flush with the plug and put it
+back; the printed rotor on the spindle then holds the plug in. The key can
+be pulled every 90°, with the key parallel or perpendicular to the body
+flats (`lock_key_home`), so the flats of the cutouts in the face, panel
+and housing are turned to put one of these positions at OFF. It also
+comes out 90° further, at BOTH.
+
+A printed rotor on the lock's spindle sits in a housing behind the panel,
+closed by a cover:
+
+- **Detents:** a steel ball, pushed by a spring in a radial channel of the
+  housing, drops into notches in the rotor rim. START has no notch.
+- **End stops:** a lug on the rotor rim moves in a pocket of the housing.
+- **START return:** an M3 screw through the cover is a pin in an arc slot of
+  the rotor. From OFF to BOTH it moves freely in the narrow part of the
+  slot. Past BOTH it pushes a printed shoe that compresses a spring in the
+  wide part, and the spring pushes the key back to BOTH. The shoe is a
+  block that fills the slot, with a spigot inside the spring's end, so the
+  spring is held centred and cannot slip past the shoe and catch the pin
+  screw.
+- **Sensing:** a magnet in the rotor lug and one digital hall sensor per
+  position in the cover. The sensors (A3144, unipolar, not latching) are
+  open collector and pull low over the magnet, so each one is wired like a
+  switch to GND. They are glued into pockets on the inside of the cover,
+  marked face towards the rotor, and their legs are bent 90° backwards
+  through slots in the cover.
+- **Sensor boards:** the wires are not soldered to the thin legs but to a
+  small piece of prototype board on each sensor (3 x 4 holes, 2.54 mm
+  pitch). It slips onto the legs about 5 mm behind the cover
+  (`board_z`), where they have spread to 2.54 mm. A printed holder, an
+  arc on the back of the cover, has a post under each board, and one M2
+  screw through a hole drilled in the board's outer row holds it there.
+  The hole is in the OUT leg's column (the A3144 legs are 5 V, GND, OUT
+  seen on the marked face), which needs only one wire, so the 5 V and GND
+  columns keep two free holes each: one for the wire in, one for the wire
+  on to the next board.
+  The holder's two ears go under the two cover screws on the switch panel
+  side and are clamped by the cap. A 3 x 5 piece works too, with the legs
+  in its second row (`board_rows = 5`, `board_leg_row = 1`).
+- **Back cap:** a cap over the cover protects the boards, their solder
+  joints and the wires. The 7 wires (5 signals, 5 V, GND) leave through a
+  notch in its wall towards the switch panel; hot glue in the notch is the
+  strain relief, so pulling the cable does not pull on the legs. The cover
+  screws go through the cap as well.
+
+Printed parts: face, panel, housing, rotor, shoe, cover, holder, cap.
+
+The panel is 87 x 100 mm (the back 77 x 80 mm). Its front is a separate
+1 mm face with the position labels, tick marks and MAGNETOS standing 0.8 mm
+out of it around the key, to be painted with a white acrylic paint pen.
+The face is printed front side up (the STL is already flipped), the panel
+front side down, so neither needs supports; together they are 3 mm thick,
+like the switch panel. The mount screws clamp the face onto the panel,
+and so does the lock flange (glue or double sided tape it on
+as well if it bows); it has holes around the heads of the panel screws.
+The lock body goes through
+a cutout with flats, so it cannot turn, and the housing sits on the back,
+between the rims. The cutout is turned so the key points at OFF
+(`key_off_angle`) where it comes out of the lock.
+
+## Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 1 | mailbox / cabinet cam lock | key and spindle (`lock_*`: 18 mm thread, 17 mm body, 25 x 4 mm nut, 7 mm square spindle, its M4 x 5 cam screw with a 12 mm head holds the rotor) |
+| 1 | 6 mm steel ball + spring | detent (`detent_spring_*`, spring OD below 6 mm) |
+| 1 | spring, 5 mm OD, about 3.8 mm ID, 15 mm | START return (`start_spring_*`, measure the ID: the shoe spigot goes inside) |
+| 1 | cube magnet, 5 x 5 x 5 mm | position sensing (`magnet_*`) |
+| 5 | A3144 hall sensor | one per position (OFF is optional) |
+| 1 | prototype board, 2.54 mm pitch | 5 pieces of 3 x 4 holes, one on each sensor's legs |
+| 5 | M2 x 6 screw | sensor boards onto the holder |
+| 4 | M3 x 25 screw | cap and cover (M3 x 10 to test without the cap) |
+| 4 | M3 x 10 screw | panel to housing |
+| 1 | M3 x 8 screw | START pin |
+| 4 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet |
+
+## Assembly
+
+1. Put the lock through the panel and the housing, screw the panel to the
+   housing, tighten the lock nut.
+2. Mount the rotor with the lock's cam screw.
+3. Insert the ball and its spring, and the START spring with the shoe on
+   its end (spigot in the spring, flat face out).
+4. Check which magnet face triggers the sensors, then glue in the magnet and
+   the sensors.
+5. Screw on the cover (M3 x 10 screws to test), then put in the START pin.
+6. Drill the outer row hole in the OUT leg's column of each board piece
+   to 2.2 mm.
+   Put the holder on the cover (ears over the two cover screw holes on the
+   switch panel side), slip the boards onto the sensor legs and screw them
+   onto the posts with the M2 screws.
+7. Solder the legs to the boards and trim them. Solder the wires into the
+   next row, each next to its leg, and bridge them to it: 5 V and GND
+   chained from board to board, one signal wire each.
+8. Lay the bundle into the cap's notch, screw on the cap with the M3 x 25
+   screws (it clamps the holder's ears), and fill the notch with hot glue,
+   with a blob on the inside that is bigger than the notch.
+
+The positions (30° apart) should be verified against the real switch.
+
+## In X-Plane
+
+X-Plane's key is spring loaded: writing START (4) to
+`sim/cockpit2/engine/actuators/ignition_key` jumps back to BOTH in the next
+frame, and MobiFlight cannot hold the starter command. So START goes
+through `ignition/ignition.lua`, a FlyWithLua script: it creates the
+dataref `cessna172/ignition/start` and holds `sim/starters/engage_starter_1`
+while it is 1. Copy it to `X-Plane/Resources/plugins/FlyWithLua/Scripts/`.
+
+In the MobiFlight Connector (inputs C11..C15 of the mux):
+
+| Input | On press | On release |
+|-------|----------|------------|
+| OFF, R, L, BOTH | `sim/cockpit2/engine/actuators/ignition_key[0]` = the position | nothing |
+| START | `cessna172/ignition/start` = 1 | `cessna172/ignition/start` = 0 |
+
+Releasing START springs the key back to BOTH, whose sensor sets the key
+position again. **VERIFY** the key values (0 is OFF, 3 is BOTH; check
+which of 1 and 2 is L) with DataRefTool while turning the key in the
+virtual cockpit. Start X-Plane (or reload the Lua scripts) before
+connecting MobiFlight, the START dataref only exists once the script has
+run. If MobiFlight disconnects in START, the starter keeps cranking until
+the key is turned in the cockpit or the scripts are reloaded.
 
 # Yoke
 

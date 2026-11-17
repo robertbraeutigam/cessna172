@@ -23,9 +23,9 @@
 //   clamp it on.
 // - A rim on the back stiffens the long, thin panel; it goes through the
 //   hole in the cockpit sheet and the face flange around it is screwed onto
-//   the sheet. It mounts to the right of the ignition panel and has the same
-//   height, rim, flange and mount holes (panel.inc.scad); its left corners
-//   are square and without a flange where they meet.
+//   the sheet. It mounts to the right of the ignition panel (ignition/)
+//   and has the same height, rim, flange and mount holes (panel.inc.scad);
+//   its left corners are square and without a flange where they meet.
 // - A CD74HC4067 input multiplexer board sits on two standoffs on the back,
 //   in the strip behind the group labels. All switches (and the ignition)
 //   are soldered to it, so only one Cat5 cable runs to the hub (port 3).

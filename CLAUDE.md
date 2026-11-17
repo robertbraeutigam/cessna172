@@ -19,13 +19,14 @@ its own top-level directory; new components should follow the same layout.
     the other files, keep them in sync.
   - `carb_heat_knob.scad`, `clamp.scad`, `pin.scad` — small parts (knob,
     rod clamps, pot hold-down pins).
-- `switchpanel/` — the Cessna 172N lower-left switch panel (ignition key,
-  master, light switches, ...). Similar in function to the Saitek Switch Panel,
-  but it should look as close to the real 172N panel as possible, and every
+- `switchpanel/` — the Cessna 172N lower-left switch panel (master, light
+  switches, ...; the ignition key is its own component, `ignition/`).
+  Similar in function to the Saitek Switch Panel, but it should look as close to the real 172N panel as possible, and every
   switch position is a raw output wire for MobiFlight (active low, like a switch
   to GND). It is two panels printed separately and mounted side by side,
-  ignition on the left.
-  - `panel.inc.scad` — included by both: back height (`panel_h`, the same
+  ignition (`ignition/`) on the left.
+  - `panel.inc.scad` — included by both (`ignition/` has an identical
+    copy, keep them the same): back height (`panel_h`, the same
     for both), thickness, rim, face flange (`flange_w`) with the mount
     holes, lettering, the separate front face (`face_t`, printed front
     side up, labels standing out of it for a paint pen) and the
@@ -33,15 +34,6 @@ its own top-level directory; new components should follow the same layout.
     flange where the panels meet). The back goes through a hole in the
     frame's sheet, the flange is screwed onto it; `frame/frame.inc.scad`
     repeats these sizes.
-  - `ignition.scad` — its panel and face and the
-    OFF/R/L/BOTH/START key switch built around a cheap
-    mailbox cam lock (its 90° stop removed). It has a ball detent, end stops
-    on a rotor lug, a spring-return START (pin + shoe + spring in an arc slot),
-    and one magnet with a digital hall sensor per position; the wires are
-    soldered to small prototype board pieces on the sensor legs, held on a
-    printed arc (`holder`) under the cap. The header comment
-    has the parts list and assembly order. The `lock_*` values are measured
-    (the lock's stop tab is filed off, so it turns past 90°).
   - `primer.scad` — the primer: a small panel of its own above the left
     end of the switch panels (own cut-out in the sheet, the ignition panel
     is not changed), a push-pull knob with a twist lock (lug in a keyway
@@ -51,9 +43,6 @@ its own top-level directory; new components should follow the same layout.
     throttle's plain clamps as collars) and a spring on the rod that pops the
     knob out when it is unlocked. The pot's wiper is on port 3's AUX
     wire. `panel.inc.scad` takes the back's height (`h`) for it.
-  - `ignition.lua` — FlyWithLua script for X-Plane that holds the starter
-    while START is pressed (MobiFlight writes its dataref; it cannot hold
-    a command itself).
   - `switches.scad` — a separate panel with the switch row: a red double
     rocker for MASTER (ALT, BAT), M12 toggles in the middle (lights,
     pitot heat, fuel pump) and a black double rocker for
@@ -65,6 +54,22 @@ its own top-level directory; new components should follow the same layout.
     tied onto `tie_block` next to it). The switch list
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
+
+- `ignition/` — the left half of the switch panel, a component of its own.
+  - `panel.inc.scad` — a copy of `switchpanel/panel.inc.scad`, keep them
+    identical.
+  - `ignition.scad` — its panel and face and the
+    OFF/R/L/BOTH/START key switch built around a cheap
+    mailbox cam lock (its 90° stop removed). It has a ball detent, end stops
+    on a rotor lug, a spring-return START (pin + shoe + spring in an arc slot),
+    and one magnet with a digital hall sensor per position; the wires are
+    soldered to small prototype board pieces on the sensor legs, held on a
+    printed arc (`holder`) under the cap. The header comment
+    has the parts list and assembly order. The `lock_*` values are measured
+    (the lock's stop tab is filed off, so it turns past 90°).
+  - `ignition.lua` — FlyWithLua script for X-Plane that holds the starter
+    while START is pressed (MobiFlight writes its dataref; it cannot hold
+    a command itself).
 
 - `hub/` — `hub.scad`: the box (and lid) with the Arduino Mega running
   MobiFlight (the Connector on the Windows PC talks to X-Plane; servos and
