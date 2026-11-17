@@ -78,7 +78,7 @@ its own top-level directory; new components should follow the same layout.
   encoders go straight to Mega pins, encoders never through a mux; no
   prototype board, the 330 Ohm resistors are soldered into the wires; the
   right part of the box is free for boards later) and 6 RJ45 breakout
-  boards in one row (MobiFlight takes at most 6 muxes per Mega; more
+  boards, ports 1-3 along the front wall and 4-6 along the right wall (MobiFlight takes at most 6 muxes per Mega; more
   ports means a second hub with its own Mega). Ports 1-3 are mux ports
   (S0..S3, 5 V, GND, SIG, AUX), ports 4-6 direct ports (5 V and GND on
   the same pins 4 and 5, the other six wires are lines to their own Mega

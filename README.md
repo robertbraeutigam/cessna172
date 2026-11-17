@@ -323,8 +323,8 @@ the sim until the cable is in its own port again (they are numbered). Every
 Mega output that goes into a cable has a 330 Ohm resistor in series at the
 hub (S0-S3 and each servo signal, soldered into the wire), so a component
 in the wrong kind of port can not short a Mega output against a switch to
-GND or a pot at its end stop. Still, mark the direct ports at the hub (a
-paint pen dot next to their numbers).
+GND or a pot at its end stop. The direct ports are on the hub's right
+wall, the mux ports on its front, so they are hard to mix up.
 
 ### Cables
 
@@ -448,25 +448,25 @@ back wall.
 [![Hub](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)
 
 `hub.scad` prints the box (`hub_box.stl`, floor down) and the lid
-(`hub_lid.stl`, top down). The box is 249 x 110 x 39 mm with the lid
-(one row of 6 ports, `port_cols`); the build checks that it fits the
-printer bed.
+(`hub_lid.stl`, top down). The box is 166 x 135 x 39 mm with the lid
+(6 ports on two walls, `port_front` and `port_side`); the build checks that
+it fits the printer bed.
 
-From the front wall to the back:
-
-- **Ports**: 6 RJ45 breakout boards in a row along the front wall,
-  their jacks behind cut-outs in it, numbered 1-6 from the left, the
-  numbers beside the jacks: 1-3 are the mux ports, 4-6 the direct ports
-  (see [Port pinout](#port-pinout); mark them). The boards are screwed onto bosses on the
+- **Ports**: 6 RJ45 breakout boards, their jacks behind cut-outs in the
+  walls, the numbers beside the jacks. The mux ports 1-3 are along the
+  front wall, numbered from the left; the direct ports 4-6 along the right
+  wall, numbered from the front (see [Port pinout](#port-pinout)), so the
+  two kinds can not be mixed up. The boards are screwed onto bosses on the
   floor with M3 self tapping screws from above. Their angled 8 pin headers
-  point into the box. Behind them is a 15 mm strip for the jumper plugs,
-  then:
-- **Mega** (left): on 6 standoffs, its USB jack through the left wall
-  (flush with the outside, so any USB-B plug fits), with a cut-out in
-  front of the power jack for later.
-- The rest of that row, on the right, is free for boards later (the power
-  bus distribution, a stepper driver); the hole for the power bus is in
-  the back wall there. There is no prototype board: the few resistors are
+  point into the box, each with a strip for the jumper plugs behind it
+  (15 mm behind the front ports).
+- **Mega**: behind the front ports, left of the right ports' jumpers, on
+  6 standoffs, its USB jack through the left wall (flush with the outside,
+  so any USB-B plug fits), with a cut-out in front of the power jack for
+  later.
+- The strip behind the Mega is free for small boards later (the power bus
+  distribution, a stepper driver); the hole for the power bus is in the
+  back wall there. There is no prototype board: the few resistors are
   soldered into the wires.
 - The build checks the room for a plugged jumper (20 mm: a 14 mm Dupont
   housing and the bent wire) behind the RJ45 pins and above the Mega.
@@ -506,11 +506,12 @@ clear of the traces around it. The Mega values are from the Arduino drawing.
 ### Wiring
 
 **Bus**: one insulated wire per line, one color each, soldered along the
-row of boards. Strip a short piece of insulation where it passes a pin and
+boards. Strip a short piece of insulation where it passes a pin and
 solder it there, at the pin's base by the header, so it does not touch the
 other pins it crosses:
 
-- 5 V and GND (pins 4 and 5): across all 6 ports.
+- 5 V and GND (pins 4 and 5): across all 6 ports, round the corner from
+  port 3 to port 4.
 - S0, S1, S2, S3 (pins 1, 2, 3 and 6): across the mux ports 1-3 only.
   Ports 4-6 keep these pins for their own lines.
 - To the Mega: six wires from port 1's pins 1, 2, 3, 6 (S0-S3) and 4, 5
@@ -539,7 +540,7 @@ Add a Servo device on D2 and D3 in the Connector.
 ### Assembly
 
 1. Screw the RJ45 boards onto their bosses (M3 x 6).
-2. Solder the bus wires along the row (S0-S3 only across ports 1-3) and
+2. Solder the bus wires along the ports (S0-S3 only across ports 1-3) and
    the six wires to the Mega on port 1, with the resistors in S0-S3.
 3. Screw the Mega onto its standoffs.
 4. Plug the bus wires and the jumpers as above and label them.
