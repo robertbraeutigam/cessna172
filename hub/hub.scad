@@ -17,15 +17,16 @@
 // - The bus: an insulated wire per line along the row, soldered to pins
 //   4 and 5 (5 V, GND) of all boards and to pins 1, 2, 3, 6 (S0-S3) of the
 //   mux ports. The other pins get jumpers. Six wires take the bus from port
-//   1 to a header on the prototype board (S0-S3 through 330 Ohm), where the
-//   Mega plugs in; a servo header there feeds the direct ports' servos.
-// - Behind them is a free strip for the jumper wires, then one row: the
-//   Mega (left, its USB and power jacks through the left wall) and the
-//   prototype board on standoffs (right, the bus header and room for small
-//   extra circuits).
+//   1 to the Mega, S0-S3 through a 330 Ohm resistor each, soldered into the
+//   wire (heat shrink over it), ending in Dupont plugs.
+// - Behind them is a strip for the jumper plugs, then the Mega (left, its
+//   USB and power jacks through the left wall). The rest of the row is free
+//   for boards later (power bus, stepper drivers); no prototype board yet.
 // - Nothing on the Mega is soldered: jumper wires go from the RJ45 pins
-//   and the bus header to it. Servos and encoders go straight to Mega
-//   pins, MobiFlight drives them without a second board.
+//   to it. Servos and encoders go straight to Mega pins, MobiFlight drives
+//   them without a second board; a servo's power goes to its own 5 V and
+//   GND pins on the Mega, its signal through a 330 Ohm resistor in the
+//   jumper.
 // - A lid with a locating lip is screwed onto four corner posts. Four ears
 //   on the floor screw the box onto the frame or under the desk.
 //
@@ -34,16 +35,16 @@
 // The box is printed floor down, the lid top down.
 //
 // Parts to buy (details in the README):
-// - Arduino Mega 2560, 50 x 70 mm prototype board, two 8 pin female
-//   headers (bus and servo header), 6 x 330 Ohm resistors
+// - Arduino Mega 2560, 6 x 330 Ohm resistors, heat shrink
 // - 6 RJ45 breakout boards (34 x 28 mm, 8 pin angled header)
-// - 18 M3 x 6 self tapping screws (RJ45 boards), 4 x M3 x 6 (prototype
-//   board), 6 x M3 x 6 self tapping screws (Mega), 4 x M3 x 10 (lid)
-// - insulated wire for the bus, male-female and male-male jumper wires
+// - 18 M3 x 6 self tapping screws (RJ45 boards), 6 x M3 x 6 self tapping
+//   screws (Mega), 4 x M3 x 10 (lid)
+// - insulated wire for the bus, male-female jumper wires, Dupont male
+//   pins and housings (1, 2 and 4 pin)
 //
-// Assembly: screw the RJ45 boards on, solder their bus, solder the headers
-// and resistors on the prototype board and wire the bus to it, screw it and the Mega on, plug the jumpers as in the
-// README, screw the lid on.
+// Assembly: screw the RJ45 boards on, solder their bus and its wires to
+// the Mega (resistors in S0-S3), screw the Mega on, plug the jumpers as in
+// the README, screw the lid on.
 
 $fn = 48;
 
@@ -53,7 +54,7 @@ bed = [255, 255];            // Kobra 3 V2
 // --- Box ---
 wall = 2.5;
 floor_t = 2.5;
-inner_h = 50;                // floor top to the lid
+inner_h = 36;                // floor top to the lid
 post = 8;                    // lid screw posts in the corners, square
 post_hole = 2.8;             // M3 self tapping into plastic
 lid_t = 2.5;
@@ -90,9 +91,8 @@ label_depth = 0.6;
 font = "Liberation Sans:style=Bold";
 
 // --- Jumper wires and spacing ---
-dupont = 30;                 // a plugged jumper: housing + bent wire, above its pin
-cable_gap = 30;              // free strip behind the RJ45 boards
-board_gap = 15;              // at least, between two boards in the row
+dupont = 20;                 // a plugged jumper: housing (14) + bent wire, past its pin
+cable_gap = 15;              // strip behind the RJ45 boards, for the jumper plugs
 
 // --- Arduino Mega 2560 (from the Arduino drawing) ---
 mega = [101.6, 53.34];
@@ -107,16 +107,9 @@ mega_usb = [31.75, 43.75, 10.9, 6.2];
 mega_power = [3.3, 12.2, 11, 1.8];
 jack_cut_clear = 0.6;
 
-// --- Prototype board, 50 x 70 mm (MEASURE) ---
-proto = [50, 70, 1.6];       // along the wall x depth
-proto_holes_inset = 2.5;     // hole centers from the edges
-proto_screw_hole = 2.8;      // M3 self tapping
-proto_standoff = [6.5, 6];   // room for the solder side under it
-proto_parts_h = 9;           // tallest part soldered on it (female headers 8.5)
-bus_header = 8;              // S0, S1, S2, S3, 5 V, GND, 5 V, GND
-
 // --- Power bus (later) ---
-power_hole_d = 9;            // through the back wall, behind the prototype board
+power_hole_d = 9;            // through the back wall, right of the Mega
+power_hole_x = 40;           // from the right inner wall
 
 // --- Derived ---
 port_x0 = post + port_margin;
@@ -124,17 +117,13 @@ port_x = function(c) port_x0 + c * (rj.x + port_gap);
 inner_x = 2 * port_x0 + port_cols * rj.x + (port_cols - 1) * port_gap;
 port_z = rj_standoff[1];       // PCB bottom
 jack_z = port_z + rj_pcb_t;    // jack bottom
-// The board row: Mega (left), prototype board (right)
+// The Mega behind the ports, on the left
 row_y = rj.y + cable_gap;
 mega_x = mega_usb[3] - wall;  // the USB jack ends flush with the outside
 mega_z = mega_standoff[1];
-proto_x = mega_x + mega.x + board_gap + 5;  // close to port 1, the bus wires are short
-proto_y = row_y;
-inner_y = max(row_y + mega.y + post + 1, proto_y + proto.y + 2);
+inner_y = row_y + mega.y + post + 1;
 outer = [inner_x + 2 * wall, inner_y + 2 * wall, floor_t + inner_h];
 ear_xs = [0, inner_x - ear.x];
-proto_hole_pos = [for (x = [proto_holes_inset, proto.x - proto_holes_inset],
-                       y = [proto_holes_inset, proto.y - proto_holes_inset]) [x, y]];
 
 // --- Checks ---
 assert(outer.x <= bed.x && outer.y + 2 * ear.y <= bed.y,
@@ -154,18 +143,15 @@ assert(jack_z + rj_jack.z + jack_clear <= inner_h - lip_h,
        "Jacks run into the lid lip");
 assert(rj.x - rj_jack_x - rj_jack.x - jack_clear - 1 + port_gap >= 1.4 * label_size,
        "No room for the port numbers beside the jacks");
-assert(rj_pin_y + rj_pin_reach + 15 <= row_y,
+assert(rj_pin_y + dupont <= row_y,
        "No room for the jumpers behind the RJ45 boards");
-assert(proto_x + proto.x <= inner_x - post, "Prototype board runs into the right posts");
-assert(bus_header * 2.54 <= proto.x - 10, "Bus header does not fit the prototype board");
 assert(row_y + mega.y <= inner_y - post, "Mega runs into the back posts");
 assert(mega_z + mega_pcb_t + mega_header_h + dupont <= inner_h,
        "No room for the jumpers above the Mega");
-assert(proto_standoff[1] + proto.z + proto_parts_h + dupont <= inner_h,
-       "No room above the prototype board");
 assert(mega_z + mega_pcb_t + mega_usb[2] + jack_cut_clear < inner_h - lip_h,
        "USB cut-out runs into the lid lip");
-assert(power_hole_d < proto.x, "Power bus hole does not fit behind the prototype board");
+assert(inner_x - power_hole_x - power_hole_d / 2 > mega_x + mega.x,
+       "Power bus hole is behind the Mega");
 
 // --- Box ---
 
@@ -205,8 +191,8 @@ module box() {
       for (j = [mega_usb, mega_power])
          translate([-wall - 1, row_y + j[0] - jack_cut_clear, mega_z + mega_pcb_t - jack_cut_clear])
             cube([wall + 2, j[1] - j[0] + 2 * jack_cut_clear, j[2] + 2 * jack_cut_clear]);
-      // Power bus, later: through the back wall behind the prototype board
-      translate([proto_x + proto.x / 2, inner_y - 1, inner_h / 2])
+      // Power bus, later: through the back wall, right of the Mega
+      translate([inner_x - power_hole_x, inner_y - 1, inner_h / 2])
          rotate([-90, 0, 0]) cylinder(d = power_hole_d, h = wall + 2);
    }
    // Corner posts for the lid screws
@@ -228,10 +214,6 @@ module box() {
    for (h = mega_holes)
       translate([mega_x + h.x, row_y + h.y, 0])
          standoff(mega_standoff, mega_screw_hole);
-   // Prototype board standoffs
-   for (h = proto_hole_pos)
-      translate([proto_x + h.x, proto_y + h.y, 0])
-         standoff(proto_standoff, proto_screw_hole);
 }
 
 module standoff(s, hole) {
@@ -318,19 +300,6 @@ module mega_part() {
    }
 }
 
-module proto_part() {
-   color(c_pcb_green)
-      difference() {
-         cube(proto);
-         for (h = proto_hole_pos) translate([h.x, h.y, -1]) cylinder(d = 2.2, h = 4);
-      }
-   color(c_pin)
-      for (x = [6 : 2.54 : proto.x - 5], y = [6 : 2.54 : proto.y - 5])
-         translate([x, y, proto.z]) cylinder(d = 1.2, h = 0.05, $fn = 8);
-   // The bus header, at the front
-   color(c_black) translate([5, 5, proto.z]) cube([bus_header * 2.54, 2.54, 8.5]);
-}
-
 // The soldered bus: one wire per line (pins 1-6) along the row
 c_bus = ["#3a7bd5", "#2fa84f", "#e0a020", "#d83a3a", "#2b2e33", "#9b59b6"];
 module bus_part() {
@@ -351,7 +320,6 @@ module inside_parts() {
       translate([port_x(c), 0, port_z]) rj_part();
    bus_part();
    translate([mega_x, row_y, mega_z]) mega_part();
-   translate([proto_x, proto_y, proto_standoff[1]]) proto_part();
 }
 
 // Open, with everything in it
