@@ -37,12 +37,17 @@ jobs:
 
       # Views need a display (xvfb), the montages ImageMagick and DejaVu,
       # the panel labels Liberation Sans. The runner has no FUSE, so the
-      # AppImage is extracted and run through a wrapper on the PATH.
+      # AppImage is extracted and run through a wrapper on the PATH. It
+      # takes OpenGL/EGL and X from the system (Mesa renders under Xvfb).
       - name: Install OpenSCAD
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            xvfb xauth imagemagick fonts-dejavu-core fonts-liberation
+            xvfb xauth imagemagick fonts-dejavu-core fonts-liberation \
+            libegl1 libgl1 libglx0 libopengl0 libgbm1 libglvnd0 libdrm2 \
+            libgl1-mesa-dri libglx-mesa0 libegl-mesa0 \
+            libx11-6 libx11-xcb1 libxcb1 libsm6 libice6 libwayland-client0 \
+            libfontconfig1 libfreetype6 libharfbuzz0b
           mkdir -p ~/openscad
           cd ~/openscad
           [ -f "$OPENSCAD_APPIMAGE" ] || \
