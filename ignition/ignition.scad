@@ -55,7 +55,8 @@
 //   START pin, 4x to mount the panel
 //
 // The panel is printed as well. It has the same height, rim, mount holes and
-// lettering as the switch panel (panel.inc.scad) and mounts to its left.
+// lettering as the switch panel (panel.inc.scad, a copy of the one in
+// switchpanel/) and mounts to its left.
 // Its front is a separate thin face (face_t) with the position labels
 // standing out of it (label_raise), to be painted with a white paint pen.
 // The face is printed front side up and the panel front side down, so

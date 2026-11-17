@@ -106,7 +106,7 @@ throttle_play = 1;           // box to its cut-out, sheet_cut_clear
 throttle_bolt_xs = [47.5, 102.5]; // floor_bolt_xs
 throttle_bolt_y = 36;        // floor_bolt_y, from the face front
 
-// --- Switch panel, from switchpanel/ ---
+// --- Switch panel, from ignition/ and switchpanel/ ---
 // The backs of the ignition (77) and the switches (211.6), panel_h high,
 // go through one hole in the sheet; the face flange (flange_w, on the top,
 // the bottom and the two outer ends) is screwed onto the sheet with M3

@@ -3,7 +3,9 @@
 // The two panels are printed separately and mounted side by side, the
 // ignition on the left (seen from the front), like the one piece lower left
 // panel of the 172N. So they share their height, thickness, rim, flange,
-// mount holes, corners and lettering. Both files "include" this one.
+// mount holes, corners and lettering. The ignition is a component of its
+// own (ignition/), so this file is in both ignition/ and switchpanel/;
+// keep the two copies identical. The panels "include" it.
 //
 // They mount on the cockpit sheet (frame/): the back of a panel, panel_h
 // high and closed by the rim, goes through a hole in the sheet, and the
