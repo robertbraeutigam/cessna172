@@ -18,7 +18,9 @@
 // - START return: an M3 screw through the cover is a pin in an arc slot in
 //   the rotor. From OFF to BOTH it moves freely in the narrow part of the
 //   slot. Past BOTH it pushes a printed shoe that compresses a spring in the
-//   wide part, and the spring pushes the key back to BOTH.
+//   wide part, and the spring pushes the key back to BOTH. The spring sits
+//   between two identical shoes (print 2), each with a spigot inside the
+//   spring's end, so its ends cannot slip past a shoe and catch the pin.
 // - Sensing: one magnet in the rotor lug, one unipolar (NOT latching)
 //   digital hall sensor per position in the cover, e.g. A3144. The output is
 //   open collector and pulls low over the magnet, so it wires to a MobiFlight
@@ -45,7 +47,7 @@
 // Parts to buy:
 // - mailbox lock (file off its stop tab, see above), its M4 cam screw
 // - 6 mm steel ball + spring (detent_spring_*)
-// - spring for the START return (start_spring_*)
+// - spring for the START return (start_spring_*, measure its inner diameter)
 // - 5x5x5 mm cube magnet (magnet_*), 5x A3144 hall sensors (OFF is optional)
 // - prototype board (2.54 mm pitch), 5 pieces of 3 x board_rows holes,
 //   5x M2x6 screws to hold them on the holder
@@ -62,8 +64,9 @@
 // or double sided tape it on as well if it bows).
 //
 // Assembly: lock through the panel and the housing, tighten its nut, mount
-// the rotor with the lock's cam screw, insert ball + spring and shoe +
-// spring, glue in magnet and sensors, screw on the cover (short screws to
+// the rotor with the lock's cam screw, insert ball + spring, and the
+// spring with a shoe on each end (spigots in the spring, flat faces out),
+// glue in magnet and sensors, screw on the cover (short screws to
 // test), then the pin. Put the holder on the cover, slip the boards onto the
 // legs, screw them onto the posts, solder the legs and the wires to the
 // boards, lay the wires in the cap's notch, screw on the cap (it clamps the
@@ -143,10 +146,15 @@ start_pin_r = 14;
 start_pin_d = 3;             // M3 screw
 start_pin_len = 8;           // screw length
 start_spring_od = 5;
+start_spring_id = 3.8;       // MEASURE inner diameter (OD - 2x wire)
 start_spring_len = 15;       // free length
 start_spring_solid = 5.5;    // fully compressed length
 start_spring_preload = 1.5;
-start_shoe_len = 3;
+// Two identical shoes, one at each end of the spring: a block that fills
+// the slot's cross section with a spigot that goes into the spring, so the
+// spring ends are held centred and cannot slip past a shoe to the pin
+start_shoe_len = 5;          // block, along the arc
+start_spigot_len = 2.5;      // into the spring, chamfered tip included
 start_slot_depth = 5;
 
 // --- Sensing ---
@@ -215,12 +223,15 @@ screw_xy = half - corner_r;
 slot_narrow_w = start_pin_d + 0.6;
 slot_wide_w = start_spring_od + 0.6;
 shoe_w = slot_wide_w - 0.4;
+shoe_h = start_slot_depth + gap - 0.2;   // up into the gap under the cover
+spigot_d = start_spring_id - 0.6;
+spigot_tip = 0.6;                        // chamfer
 start_spring_inst = start_spring_len - start_spring_preload;
 start_travel = start_pitch * PI / 180 * start_pin_r;
 // Slot angles are in the rotor frame, the pin moves to lower angles
 slot_step = start_pin_angle - pos_angle(3) - arc_deg(start_pin_d / 2, start_pin_r);
 slot_narrow_end = start_pin_angle + arc_deg(start_pin_d / 2 + 0.5, start_pin_r) + 3;
-slot_wide_end = slot_step - arc_deg(start_shoe_len + start_spring_inst, start_pin_r);
+slot_wide_end = slot_step - arc_deg(2 * start_shoe_len + start_spring_inst, start_pin_r);
 pin_protrusion = start_pin_len - cover_t - gap;
 
 leg_r = magnet_r + sensor_h / 2 + 0.5;   // where the legs come out of the cover
@@ -263,6 +274,12 @@ assert(lug_angle - lug_w / 2 - stop_slack > arc_deg(ball_ch / 2 + 1, bore_r)
        "Stop pocket runs into the detent channel");
 assert(start_spring_inst - start_travel >= start_spring_solid, "START spring goes solid before START");
 assert(shoe_w >= slot_narrow_w + 1, "Shoe can slip into the narrow part of the slot");
+assert(spigot_d >= 2, "Shoe spigot too thin, check start_spring_id");
+assert(start_spring_od - start_spring_id >= 0.6, "start_spring_id does not fit start_spring_od");
+assert(2 * start_spigot_len + 1 <= start_spring_inst - start_travel, "Shoe spigots meet in the spring before START");
+assert(start_spigot_len - spigot_tip >= 1.5, "Shoe spigot too short to hold the spring");
+assert(start_shoe_len >= shoe_h - 1, "Shoe too short along the slot, it can tip");
+assert(slot_narrow_end - slot_wide_end <= 300, "START slot too long for the rotor");
 assert(start_pin_r + slot_wide_w / 2 + 1 <= rotor_r - notch_depth, "START slot runs into the detent notches");
 assert(start_pin_r - slot_wide_w / 2 - 1 >= lock_screw_head_d / 2 + 0.3, "START slot runs into the cam screw head");
 assert(rotor_t - start_slot_depth >= 1.2, "START slot floor too thin");
@@ -383,16 +400,44 @@ module rotor() {
    }
 }
 
+// In the slot frame: the flat face at angle 0, the block and the spigot
+// towards negative angles, the slot floor at z=0
 module shoe() {
-   sector(start_pin_r - shoe_w / 2, start_pin_r + shoe_w / 2, -arc_deg(start_shoe_len, start_pin_r), 0, start_slot_depth - 0.5);
+   a_block = arc_deg(start_shoe_len, start_pin_r);
+   a_spigot = arc_deg(start_spigot_len - spigot_tip, start_pin_r);
+   sector(start_pin_r - shoe_w / 2, start_pin_r + shoe_w / 2, -a_block, 0, shoe_h);
+   // Spigot on the spring axis, bent along the slot like the spring, its
+   // tip chamfered to find the spring
+   translate([0, 0, start_slot_depth / 2]) {
+      rotate([0, 0, -a_block - a_spigot])
+         rotate_extrude(angle = a_spigot + 1, $fn = 180)
+            translate([start_pin_r, 0])
+               circle(d = spigot_d, $fn = 30);
+      rotate([0, 0, -a_block - a_spigot])
+         translate([start_pin_r, 0, 0])
+            rotate([90, 0, 0])
+               cylinder(d1 = spigot_d, d2 = spigot_d - 2 * spigot_tip, h = spigot_tip, $fn = 30);
+   }
 }
 
-// Shoe in the rotor slot with the key at angle theta
-module shoe_in_place(theta) {
+// Print orientation: standing on the flat face, spigot up (print 2)
+module shoe_print() {
+   rotate([-90, 0, 0])
+      translate([-start_pin_r, 0, -shoe_h / 2])
+         shoe();
+}
+
+// Both shoes in the rotor slot with the key at angle theta: the end shoe
+// against the slot end, the other one against the step or the START pin
+module shoes_in_place(theta) {
    face = min(slot_step, start_pin_angle - theta - arc_deg(start_pin_d / 2, start_pin_r));
-   translate([0, 0, z_cam + rotor_t - start_slot_depth])
+   translate([0, 0, z_cam + rotor_t - start_slot_depth]) {
       rotate([0, 0, face + theta])
          shoe();
+      rotate([0, 0, slot_wide_end + theta])
+         mirror([0, 1, 0])
+            shoe();
+   }
 }
 
 module cover() {
@@ -731,11 +776,11 @@ function detent_spring_od() = ball_d - 1;
 module start_parts(theta) {
    face = shoe_face(theta);
    color(c_shoe)
-      shoe_in_place(theta);
+      shoes_in_place(theta);
    color(c_spring)
       translate([0, 0, z_cam + rotor_t - start_slot_depth / 2])
          rotate([0, 0, theta])
-            arc_coil(start_pin_r, slot_wide_end, face - arc_deg(start_shoe_len, start_pin_r), start_spring_od, 8);
+            arc_coil(start_pin_r, slot_wide_end + arc_deg(start_shoe_len, start_pin_r), face - arc_deg(start_shoe_len, start_pin_r), start_spring_od, 8);
 }
 
 module magnet_part(theta) {
@@ -975,7 +1020,7 @@ housing(); // Make module housing
 translate([0, 0, -explode]) panel(); // Make module panel
 translate([0, 0, -2 * explode]) rotate([0, 180, 0]) face(); // Make module face
 translate([0, 0, z_cam]) rotate([0, 0, pos_angle(view_pos)]) rotor(); // Make module rotor
-shoe_in_place(pos_angle(view_pos)); // Make module shoe
+translate([half + 10, 0, 0]) shoe_print(); // Make module shoe
 translate([0, 0, explode]) cover(); // Make module cover
 translate([0, 0, 1.5 * explode]) holder(); // Make module holder
 translate([0, 0, 2 * explode]) rotate([0, 180, 0]) cap(); // Make module cap
