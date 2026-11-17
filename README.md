@@ -646,7 +646,10 @@ closed by a cover:
 - **START return:** an M3 screw through the cover is a pin in an arc slot of
   the rotor. From OFF to BOTH it moves freely in the narrow part of the
   slot. Past BOTH it pushes a printed shoe that compresses a spring in the
-  wide part, and the spring pushes the key back to BOTH.
+  wide part, and the spring pushes the key back to BOTH. The shoe is a
+  block that fills the slot, with a spigot inside the spring's end, so the
+  spring is held centred and cannot slip past the shoe and catch the pin
+  screw.
 - **Sensing:** a magnet in the rotor lug and one digital hall sensor per
   position in the cover. The sensors (A3144, unipolar, not latching) are
   open collector and pull low over the magnet, so each one is wired like a
@@ -693,7 +696,7 @@ between the rims. The cutout is turned so the key points at OFF
 |-----|------|-----|
 | 1 | mailbox / cabinet cam lock | key and spindle (`lock_*`: 18 mm thread, 17 mm body, 25 x 4 mm nut, 7 mm square spindle, its M4 x 5 cam screw with a 12 mm head holds the rotor) |
 | 1 | 6 mm steel ball + spring | detent (`detent_spring_*`, spring OD below 6 mm) |
-| 1 | spring, 5 mm OD, 15 mm | START return (`start_spring_*`) |
+| 1 | spring, 5 mm OD, about 3.8 mm ID, 15 mm | START return (`start_spring_*`, measure the ID: the shoe spigot goes inside) |
 | 1 | cube magnet, 5 x 5 x 5 mm | position sensing (`magnet_*`) |
 | 5 | A3144 hall sensor | one per position (OFF is optional) |
 | 1 | prototype board, 2.54 mm pitch | 5 pieces of 3 x 4 holes, one on each sensor's legs |
@@ -708,7 +711,8 @@ between the rims. The cutout is turned so the key points at OFF
 1. Put the lock through the panel and the housing, screw the panel to the
    housing, tighten the lock nut.
 2. Mount the rotor with the lock's cam screw.
-3. Insert the ball and its spring, and the shoe and its spring.
+3. Insert the ball and its spring, and the START spring with the shoe on
+   its end (spigot in the spring, flat face out).
 4. Check which magnet face triggers the sensors, then glue in the magnet and
    the sensors.
 5. Screw on the cover (M3 x 10 screws to test), then put in the START pin.
