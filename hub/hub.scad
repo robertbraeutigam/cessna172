@@ -10,7 +10,7 @@
 //
 // - The RJ45 boards sit in one row of six along the front wall, their
 //   jacks behind cut-outs in it, numbered 1-6 from the left, the numbers
-//   beside the jacks. They are screwed onto bosses on the floor (M2 self
+//   beside the jacks. They are screwed onto bosses on the floor (M3 self
 //   tapping, from above). Their 8 pin angled headers point into the box.
 //   More components than ports (or than the 6 muxes MobiFlight takes on a
 //   Mega) get a second hub with its own Mega, not more ports here.
@@ -37,7 +37,7 @@
 // - Arduino Mega 2560, 50 x 70 mm prototype board, two 8 pin female
 //   headers (bus and servo header), 6 x 330 Ohm resistors
 // - 6 RJ45 breakout boards (34 x 28 mm, 8 pin angled header)
-// - 18 M2 x 6 self tapping screws (RJ45 boards), 4 x M2 x 6 (prototype
+// - 18 M3 x 6 self tapping screws (RJ45 boards), 4 x M3 x 6 (prototype
 //   board), 6 x M3 x 6 self tapping screws (Mega), 4 x M3 x 10 (lid)
 // - insulated wire for the bus, male-female and male-male jumper wires
 //
@@ -74,9 +74,9 @@ rj_jack = [16, 16, 13.5];    // width x depth x height (height MEASURE)
 rj_jack_x = 7;               // PCB left edge to the jack (MEASURE)
 rj_jack_inset = 0.5;         // PCB front edge to the jack face (MEASURE)
 rj_holes = [[3.5, 8], [29.5, 5], [30, 15]];  // MEASURE: PCB front left corner
-rj_screw_hole = 2.1;         // M2 pilot hole in the floor boss
-rj_screw_depth = 5.5;        // into the boss and the floor, for an M2 x 6
-rj_standoff = [5.5, 4];      // floor boss, diameter x height
+rj_screw_hole = 2.8;         // M3 self tapping, in the floor boss
+rj_screw_depth = 5.5;        // into the boss and the floor, for an M3 x 6
+rj_standoff = [6.5, 4];      // floor boss, diameter x height
 rj_solder = 1.5;             // solder joints under a PCB
 rj_pins = 8;
 rj_pin_x = 9.5;              // PCB left edge to pin 1 (MEASURE)
@@ -110,8 +110,8 @@ jack_cut_clear = 0.6;
 // --- Prototype board, 50 x 70 mm (MEASURE) ---
 proto = [50, 70, 1.6];       // along the wall x depth
 proto_holes_inset = 2.5;     // hole centers from the edges
-proto_screw_hole = 2.1;      // M2 pilot hole
-proto_standoff = [5.5, 6];   // room for the solder side under it
+proto_screw_hole = 2.8;      // M3 self tapping
+proto_standoff = [6.5, 6];   // room for the solder side under it
 proto_parts_h = 9;           // tallest part soldered on it (female headers 8.5)
 bus_header = 8;              // S0, S1, S2, S3, 5 V, GND, 5 V, GND
 

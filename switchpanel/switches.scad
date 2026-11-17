@@ -50,8 +50,8 @@
 // - 1 red and 1 black double rocker switch, 6 pin
 // - 7 toggle switches, M12 neck (2 pin ON-OFF or 6 pin ON-ON)
 // - mount_count x M3 screws to mount the panel
-// - CD74HC4067 16 channel mux breakout board, 2 x M2 x 6 screws
-// - 2 x M3 x 8 self tapping screws, carrier onto the panel
+// - CD74HC4067 16 channel mux breakout board
+// - 4 x M3 x 8 self tapping screws: mux onto the carrier, carrier onto the panel
 // - a stranded copper Cat5 patch cable (cut off at one end), a cable tie
 // - glue for the printed dummy breakers
 // - wire: one GND wire daisy chained over all switches, one wire per switch
@@ -115,23 +115,25 @@ tg_pitch = 19;
 tg_pocket_depth = 1;         // body pocket in the back, keeps the toggle from turning
 
 // --- Input multiplexer, CD74HC4067 breakout (MEASURE: from listings) ---
-mux_board = [40.6, 18];      // PCB, along the pin rows x across
+mux_board = [41, 18];        // PCB, along the pin rows x across (measured)
 mux_board_t = 1.6;
 mux_holes = [[-17.5, 0], [17.5, 0]];  // MEASURE: guess, from the board center
-mux_hole_d = 2.2;            // in the board, for the view
+mux_hole_min = 3.1;          // MEASURE: the board's holes must take an M3 (drill them out if not)
+mux_hole_d = mux_hole_min;   // in the board, for the view
 mux_pin_inset = 1.3;         // pin row to the board edge
 mux_pin_stub = 3;            // wire ends and solder below the board
 mux_channels = 16;
 mux_ctl_names = ["SIG", "S3", "S2", "S1", "S0", "EN", "VCC", "GND"];  // MEASURE: order on the board
 ignition_inputs = 5;         // OFF, R, L, BOTH, START, after the switches
 mux_x = 45;                  // board center; left half, the ignition is left of the panel
-mux_standoff_d = 6;
+mux_standoff_d = 6.5;
 mux_standoff_h = 5;          // carrier plate to the board
-mux_screw_hole = 2.1;        // M2 pilot hole
+mux_screw_hole = 2.8;        // M3 self tapping
 mux_clear = 0.3;
+mux_screw_len = 8;           // M3 x 8, through the board into the standoff and plate
 
 // --- Cable to the hub: soldered to the mux, tied down next to it ---
-cable_d = 6;                 // Cat5 patch cable (MEASURE)
+cable_d = 6;                 // Cat5 patch cable (measured)
 tie = [3.6, 1.3];            // cable tie, width x thickness
 tie_clear = 0.6;             // added to the tie's width and thickness in the slot
 tie_block = [10, 13, 6];     // along the cable (x) x across x height off the carrier plate
@@ -314,6 +316,9 @@ assert(mux_x + carrier_x0 >= panel_x0 + rim_w + mux_clear && mux_x + carrier_x0 
        "Mux carrier does not fit inside the rim, move mux_x");
 assert(mux_standoff_h >= mux_pin_stub + 1, "Mux standoffs too short for the pin ends");
 assert(mux_standoff_d >= mux_screw_hole + 3, "Mux standoff wall too thin");
+assert(mux_hole_min >= 3.1, "Mux board holes too small for M3 screws");
+assert(min([for (h = mux_holes) mux_board.x / 2 - abs(h.x)]) >= 2.5, "Mux holes too close to the board ends for an M3 head");
+assert(mux_screw_len - mux_board_t <= mux_standoff_h + carrier_t && mux_screw_len - mux_board_t >= 4, "Mux screws do not fit the standoffs");
 assert(carrier_end >= carrier_boss_d && carrier_end / 2 - carrier_screw_hole / 2 >= 2, "Carrier too short at the ends for its screws");
 assert(carrier_size.y >= carrier_boss_d && carrier_size.y >= tie_block.y, "Carrier too narrow for its bosses or the tie block");
 assert(carrier_boss_d >= carrier_pilot + 3, "Carrier boss wall too thin");
@@ -662,13 +667,9 @@ module mux_part() {
 }
 
 module mux_screws() {
-   color(c_steel)
-      for (h = mux_holes)
-         translate([mux_x + h.x, mux_y + h.y, mux_z - mux_board_t]) {
-            translate([0, 0, -1.3])
-               cylinder(d = 3.8, h = 1.3);
-            cylinder(d = 2, h = 6 - mux_board_t);
-         }
+   for (h = mux_holes)
+      translate([mux_x + h.x, mux_y + h.y, mux_z - mux_board_t])
+         mount_screw(mux_screw_len, c_steel);
 }
 
 module carrier_screws() {

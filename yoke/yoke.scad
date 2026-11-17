@@ -50,7 +50,7 @@
 //   base it goes into is not part of this design)
 // - 2x 12 mm momentary push button (ptt_*, MEASURE)
 // - 1x momentary (ON)-OFF-(ON) mini rocker (trim_*, MEASURE)
-// - CD74HC4067 breakout board, 2x M2x6 self tapping screws
+// - CD74HC4067 breakout board, 2x M3x6 self tapping screws
 // - stranded copper Cat5 patch cable, a cable tie
 // - 22x M3x12 socket head screws (shells), 2x M3x10 (heads), 4x M3x8
 //   socket head (thumb rests),
@@ -172,20 +172,21 @@ trim_depth = 20;             // body behind the face
 trim_bezel = [15, 21, 2];    // view only
 
 // --- Input multiplexer, CD74HC4067 breakout (as in switchpanel/switches.scad) ---
-mux_board = [40.6, 18];
+mux_board = [41, 18];        // measured
 mux_board_t = 1.6;
 mux_holes = [[-17.5, 0], [17.5, 0]];  // MEASURE: guess, from the board center
-mux_hole_d = 2.2;
+mux_hole_min = 3.1;          // MEASURE: the board's holes must take an M3 (drill them out if not)
+mux_hole_d = mux_hole_min;
 mux_pin_inset = 1.3;
 mux_channels = 16;
 mux_ctl_names = ["SIG", "S3", "S2", "S1", "S0", "EN", "VCC", "GND"];  // MEASURE: order on the board
-mux_standoff_d = 6;
+mux_standoff_d = 6.5;
 mux_standoff_h = 5;          // back wall to the board, room for the pin ends
-mux_screw_hole = 2.1;        // M2 pilot hole
+mux_screw_hole = 2.8;        // M3 self tapping
 mux_z = 58;                  // board center: in the hub, under the tube, control row up
 
 // --- Cable to the hub: tied down between the tube and the mux ---
-cable_d = 6;                 // Cat5 patch cable (MEASURE)
+cable_d = 6;                 // Cat5 patch cable (measured)
 tie = [3.6, 1.3];            // cable tie, width x thickness
 tie_clear = 0.6;
 tie_block = [10, 13, 6];     // along the cable (z) x across (x) x height off the wall
