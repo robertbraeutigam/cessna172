@@ -50,7 +50,7 @@
 //   base it goes into is not part of this design)
 // - 2x 12 mm momentary push button (ptt_*, MEASURE)
 // - 1x momentary (ON)-OFF-(ON) mini rocker (trim_*, MEASURE)
-// - CD74HC4067 breakout board, 2x M2x6 self tapping screws
+// - CD74HC4067 breakout board, 2x M3x6 self tapping screws
 // - stranded copper Cat5 patch cable, a cable tie
 // - 22x M3x12 socket head screws (shells), 2x M3x10 (heads), 4x M3x8
 //   socket head (thumb rests),
@@ -172,20 +172,21 @@ trim_depth = 20;             // body behind the face
 trim_bezel = [15, 21, 2];    // view only
 
 // --- Input multiplexer, CD74HC4067 breakout (as in switchpanel/switches.scad) ---
-mux_board = [40.6, 18];
+mux_board = [41, 18];        // measured
 mux_board_t = 1.6;
 mux_holes = [[-17.5, 0], [17.5, 0]];  // MEASURE: guess, from the board center
-mux_hole_d = 2.2;
+mux_hole_min = 3.1;          // MEASURE: the board's holes must take an M3 (drill them out if not)
+mux_hole_d = mux_hole_min;
 mux_pin_inset = 1.3;
 mux_channels = 16;
 mux_ctl_names = ["SIG", "S3", "S2", "S1", "S0", "EN", "VCC", "GND"];  // MEASURE: order on the board
-mux_standoff_d = 6;
+mux_standoff_d = 6.5;
 mux_standoff_h = 5;          // back wall to the board, room for the pin ends
-mux_screw_hole = 2.1;        // M2 pilot hole
+mux_screw_hole = 2.8;        // M3 self tapping
 mux_z = 58;                  // board center: in the hub, under the tube, control row up
 
 // --- Cable to the hub: tied down between the tube and the mux ---
-cable_d = 6;                 // Cat5 patch cable (MEASURE)
+cable_d = 6;                 // Cat5 patch cable (measured)
 tie = [3.6, 1.3];            // cable tie, width x thickness
 tie_clear = 0.6;
 tie_block = [10, 13, 6];     // along the cable (z) x across (x) x height off the wall
@@ -326,16 +327,27 @@ module arm_cut_2d() {
                translate([-arm_w, 0]) square([2 * arm_w, 100]);
 }
 
+// Rendering speed: piece() sets $clip = [x0, x1, side] and everything
+// below only builds what is near that piece (the outline clipped to its x
+// range, the shell only on its side of y=0, only its bosses, holes and
+// text), so CGAL never has to work on the whole yoke. Unset: the whole yoke.
+function in_clip(x, m = 0) = is_undef($clip) || (x >= $clip[0] - m && x <= $clip[1] + m);
+function clip_side(s) = is_undef($clip) || $clip[2] == s;
+
 // The outline with its corners rounded, offset inwards by o; open beyond
 // the arm ends unless closed
 module outline_2d(o = 0, closed = true) {
-   difference() {
-      offset(delta = -o)
-         offset(r = round) offset(delta = -round)
-            offset(r = -fillet) offset(delta = fillet)
-               polygon(outline);
-      if (closed)
-         arm_cut_2d();
+   intersection() {
+      difference() {
+         offset(delta = -o)
+            offset(r = round) offset(delta = -round)
+               offset(r = -fillet) offset(delta = fillet)
+                  polygon(outline);
+         if (closed)
+            arm_cut_2d();
+      }
+      if (!is_undef($clip))
+         translate([$clip[0] - 1, -1000]) square([$clip[1] - $clip[0] + 2, 2000]);
    }
 }
 
@@ -360,9 +372,9 @@ module y_extrude(y0, y1) {
 module body(o = 0) {
    re = edge_r - o;
    core = yoke_d / 2 - edge_r;
-   y_extrude(-core, core)
+   y_extrude(clip_side(-1) ? -core : -1, clip_side(1) ? core : 1)
       outline_2d(o, o == 0);
-   for (s = [-1, 1], i = [1 : edge_steps]) {
+   for (s = [-1, 1], i = [1 : edge_steps]) if (clip_side(s)) {
       t = re * (i - 0.5) / edge_steps;
       ya = core + re * (i - 1) / edge_steps;
       yb = core + re * i / edge_steps;
@@ -398,32 +410,43 @@ module inner_parts() {
    intersection() {
       body(0);
       union() {
-         for (b = bosses)
+         for (b = bosses) if (in_clip(b.x, boss_d))
             y_cyl(b, boss_d, y_aft, y_fwd);
          // hub front, thicker under the collar bolts
-         y_cyl([0, z_shaft], collar_flange.x, y_in_fwd - collar_pad, y_in_fwd + 0.01);
+         if (clip_side(1) && in_clip(0, collar_flange.x))
+            y_cyl([0, z_shaft], collar_flange.x, y_in_fwd - collar_pad, y_in_fwd + 0.01);
       }
    }
-   for (h = mux_holes)
-      y_cyl([h.x, mux_z + h.y], mux_standoff_d, y_in_aft - 0.01, mux_y);
-   tie_block();
+   if (clip_side(-1)) {
+      for (h = mux_holes) if (in_clip(h.x, mux_standoff_d))
+         y_cyl([h.x, mux_z + h.y], mux_standoff_d, y_in_aft - 0.01, mux_y);
+      if (in_clip(0, tie_block.y))
+         tie_block();
+   }
 }
 
 module holes() {
-   for (b = bosses) {
-      y_cyl(b, pilot_d, screw_tip - 1, 0.01);
-      y_cyl(b, clear_d, 0, screw_seat + 0.01);
-      y_cyl(b, head_bore, screw_seat, y_fwd + 1);
+   for (b = bosses) if (in_clip(b.x, boss_d)) {
+      if (clip_side(-1))
+         y_cyl(b, pilot_d, screw_tip - 1, 0.01);
+      if (clip_side(1)) {
+         y_cyl(b, clear_d, 0, screw_seat + 0.01);
+         y_cyl(b, head_bore, screw_seat, y_fwd + 1);
+      }
    }
-   y_cyl([0, z_shaft], cable_hole, 0, y_fwd + 1);
-   for (b = collar_bolts)
-      y_cyl(b, m4_clear, 0, y_fwd + 1);
-   for (h = mux_holes)
-      y_cyl([h.x, mux_z + h.y], mux_screw_hole, y_in_aft + 1, mux_y + 1);
-   // head screws, through the front arm wall
-   for (s = [-1, 1])
-      arm_frame(s)
-         y_cyl([0, -head_screw_z], clear_d, 0, y_fwd + 1);
+   if (clip_side(1)) {
+      if (in_clip(0, cable_hole))
+         y_cyl([0, z_shaft], cable_hole, 0, y_fwd + 1);
+      for (b = collar_bolts) if (in_clip(b.x, m4_clear))
+         y_cyl(b, m4_clear, 0, y_fwd + 1);
+      // head screws, through the front arm wall
+      for (s = [-1, 1]) if (in_clip(s * arm_end.x, arm_w))
+         arm_frame(s)
+            y_cyl([0, -head_screw_z], clear_d, 0, y_fwd + 1);
+   }
+   if (clip_side(-1))
+      for (h = mux_holes) if (in_clip(h.x, mux_standoff_d))
+         y_cyl([h.x, mux_z + h.y], mux_screw_hole, y_in_aft + 1, mux_y + 1);
 }
 
 // Version on the front of the bar, readable from the front
@@ -446,8 +469,9 @@ module yoke() {
          inner_parts();
       }
       holes();
-      for (x = [-(xs_aft + xs_fwd) / 2, (xs_aft + xs_fwd) / 2, -144, 144])
-         gitrev(x);
+      if (clip_side(1))
+         for (x = [-(xs_aft + xs_fwd) / 2, (xs_aft + xs_fwd) / 2, -144, 144]) if (in_clip(x))
+            gitrev(x);
    }
 }
 
@@ -479,6 +503,7 @@ module lip() {
 
 // side 1: front (y >= 0), -1: back (y <= 0); x from x0 to x1
 module piece(x0, x1, side) render() {
+   $clip = [x0, x1, side];
    intersection() {
       yoke();
       translate([x0, side > 0 ? 0 : -50, -50])

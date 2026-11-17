@@ -49,9 +49,11 @@ its own top-level directory; new components should follow the same layout.
     AVIONICS (BUS 1, BUS 2), with the labels on its face. Above the
     toggles is a row of printed dummy circuit breakers (`breakers`, for
     show only, glued into hex holes in the face). A CD74HC4067
-    input mux on standoffs on the back collects all switches and the
-    ignition, so one Cat5 cable runs to hub port 3 (soldered to the mux,
-    tied onto `tie_block` next to it). The switch list
+    input mux collects all switches and the ignition, so one Cat5 cable
+    runs to hub port 3 (soldered to the mux, tied onto `tie_block` next to
+    it); the mux and the tie block are on a separate printed carrier
+    (`mux_carrier`) screwed onto two bosses on the panel back, so it can be
+    wired before the panel exists. The switch list
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
 
@@ -234,8 +236,9 @@ so a version can be embossed into a part. Files are rendered from the copy in
 - Dimensions go in named variables at the top of the file, with derived values
   computed from them; reuse the same names across files (e.g. `pin.scad`
   repeats the `big_pot_*` values from `throttle_box.scad`).
-- Hole clearances used so far: 3.2–3.3 mm for M3 screws, 2.1 mm for M2 pilot
-  holes, 4.2 mm for M4 / the USB cable, 5.3 mm for M5 (frame), 6.2 mm for the 6 mm rods, 11.2 mm for
+- Hole clearances used so far: 3.2–3.3 mm for M3 screws, 2.8 mm for M3 self
+  tapping pilot holes, 2.1 mm for M2 pilot holes (only the ignition, built;
+  use M3 for new parts), 4.2 mm for M4 / the USB cable, 5.3 mm for M5 (frame), 6.2 mm for the 6 mm rods, 11.2 mm for
   the rod nuts.
 - The printer is an Anycubic Kobra 3 V2 with a 255 x 255 mm bed. Pieces must
   fit it; files with big parts check it with a `bed = [255, 255]` parameter.

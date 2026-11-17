@@ -337,8 +337,8 @@ cable to length, or in half for two components:
   soldering, with a multimeter or a cable tester: most patch cables are
   T568B, a few are T568A (orange and green pairs swapped).
 - **Strain relief**: tie the jacket down on the component right before the
-  wires fan out (the switch panel has a block for a cable tie next to the
-  mux), so pulling the cable never pulls a solder joint. Tin the strands
+  wires fan out (the switch panel's mux carrier has a block for a cable
+  tie next to the mux), so pulling the cable never pulls a solder joint. Tin the strands
   first and put heat shrink over every joint; cut unused wires short and
   insulate them.
 - Measure the run to the hub and leave some slack: the length is fixed
@@ -456,7 +456,7 @@ From the front wall to the back:
   their jacks behind cut-outs in it, numbered 1-6 from the left, the
   numbers beside the jacks: 1-3 are the mux ports, 4-6 the direct ports
   (see [Port pinout](#port-pinout); mark them). The boards are screwed onto bosses on the
-  floor with M2 self tapping screws from above. Their angled 8 pin headers
+  floor with M3 self tapping screws from above. Their angled 8 pin headers
   point into the box. Behind them is a 30 mm strip for the jumpers, then one row of
   boards:
 - **Mega** (left): on 6 standoffs, its USB jack through the left wall
@@ -488,8 +488,8 @@ lid on.
 | 2 | female header strip, 8 pin, 2.54 mm | bus header, servo header |
 | 6 | 330 Ohm resistor | in series with S0-S3 and the 2 servo signals |
 | 6 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
-| 18 | M2 x 6 self tapping screw | RJ45 boards |
-| 4 | M2 x 6 screw | prototype board |
+| 18 | M3 x 6 self tapping screw | RJ45 boards |
+| 4 | M3 x 6 self tapping screw | prototype board |
 | 6 | M3 x 6 self tapping screw | Mega |
 | 4 | M3 x 10 self tapping screw | lid |
 | - | insulated wire, about 0.25 mm2, 6 colors | the bus |
@@ -503,8 +503,9 @@ component end (see [Cables](#cables)).
 and its position on the board, the header position and the mounting holes
 (guessed from the listing picture; fix `rj_holes` before printing, the
 build checks that the bosses stay on the board). The
-prototype board's hole positions (`proto_*`; if its holes are smaller than
-M2, use M1.6 screws). The Mega values are from the Arduino drawing.
+prototype board's hole positions (`proto_*`). All boards are screwed on
+with M3: if a hole is smaller than about 3.1 mm, drill it out, keeping
+clear of the traces around it. The Mega values are from the Arduino drawing.
 
 ### Wiring
 
@@ -543,7 +544,7 @@ Add a Servo device on D2 and D3 in the Connector.
 
 ### Assembly
 
-1. Screw the RJ45 boards onto their bosses (M2 x 6).
+1. Screw the RJ45 boards onto their bosses (M3 x 6).
 2. Solder the bus wires along the row (S0-S3 only across ports 1-3).
 3. Solder the bus header, the servo header and the resistors onto the
    prototype board and wire the bus header to port 1.
@@ -744,7 +745,7 @@ it.
 | 7 | toggle switch, M12 neck, 18 mm lever | FUEL PUMP, BEACON, LAND, TAXI, NAV, STROBE, PITOT HEAT |
 | 6 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet (`mount_count`) |
 | 1 | CD74HC4067 16 channel mux breakout board | all inputs, see [Multiplexer](#multiplexer) |
-| 2 | M2 x 6 screw | mux onto its standoffs |
+| 4 | M3 x 8 self tapping screw | mux onto its standoffs on the carrier, carrier (`switches_carrier.stl`) onto the panel |
 | 7 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
 | 1 | 4.7 kOhm resistor | SIG pull-up on the mux |
 | 1 | Cat5 patch cable, stranded copper (see [Cables](#cables)) | to hub port 3, soldered to the mux |
@@ -828,17 +829,23 @@ back of the switch panel. MobiFlight reads it as a Multiplexer device: 16
 inputs through one Mega pin. So everything is soldered on the panels, and
 only one Cat5 cable runs to the hub (port 3).
 
-The board sits on two standoffs in the strip behind the group labels, on
-the left (pilot side) half, where the ignition cable comes in. Mount it with
-the chip outwards, so the solder joints face you; `assert`s check that it
+The board sits on two standoffs on a small printed carrier plate
+(`switches_carrier.stl`, printed plate down), together with the block for
+the cable tie. The carrier is a part of its own, so the mux, the Cat5 cable
+and the ignition can be wired up before the switch panel is printed; it is
+then screwed with two M3 x 8 self tapping screws onto two bosses on the
+panel back, in the strip behind the group labels, on the left (pilot side)
+half, where the ignition cable comes in. Mount the mux with the chip
+outwards, so the solder joints face you; `assert`s check that the carrier
 clears the switches and fits inside the rim.
 
-**MEASURE when it arrives** (`mux_*`): the board is 40 x 18 mm in the
-listings (one says 41 x 18.7 mm). The mounting holes (`mux_holes`, guessed
+**MEASURE when it arrives** (`mux_*`): the board is 41 x 18 mm (measured). The mounting holes (`mux_holes`, guessed
 on the center line 17.5 mm from the middle) and the order of the control
 pins (`mux_ctl_names`) are guesses. If the board turns out bigger the build
-fails; then increase `margin_top`. If it has no mounting holes, glue it onto
-the standoffs.
+fails; then increase `margin_top`. It is screwed on with M3: its holes must
+be at least about 3.1 mm (`mux_hole_min`), drill them out if they are
+smaller. If it has no mounting holes, glue it onto the standoffs. The carrier is printed from the same values, so measure the
+board before printing it.
 
 #### Inputs
 
@@ -877,10 +884,10 @@ cable soldered straight into its control row (see [Cables](#cables)):
 The brown wire (AUX) is the [primer](#primer) pot's wiper; the pot's
 other two wires go to VCC and GND on the board. The cable
 comes in over the top rim and is tied down with a cable tie on the block
-right of the mux (`tie_block`: the tie goes through the slot at the panel
-and around the cable in the groove on top), so the wires fan out from
-there to the pins without any pull on them. **MEASURE** the cable
-(`cable_d`, 6 mm) and the tie (`tie`, 3.6 x 1.3 mm).
+right of the mux on the carrier (`tie_block`: the tie goes through the slot
+at the plate and around the cable in the groove on top), so the wires fan out from
+there to the pins without any pull on them. The cable is 6 mm
+(`cable_d`, measured); **MEASURE** the tie (`tie`, 3.6 x 1.3 mm).
 
 The switches and the hall sensors have no pull-up resistors of their own:
 one 4.7 kOhm resistor from SIG to VCC on the mux board pulls whichever
@@ -913,14 +920,17 @@ solder and heat shrink.
 
 ### Assembly
 
-1. Solder the wires to the switches first; the rockers are hard to get out
+1. Screw the mux onto the carrier's standoffs, solder the Cat5 cable to
+   the mux control row and tie it onto its block. The ignition (and the
+   EN bridge, the SIG pull-up) can be soldered on now as well; the carrier
+   does not need the panel yet.
+2. Solder the wires to the switches; the rockers are hard to get out
    again once snapped in.
-2. Lay the face on the front, put the toggles in from the back and
+3. Lay the face on the front, put the toggles in from the back and
    tighten their nuts.
-3. Snap the rockers in from the front.
-4. Solder the other wire ends to the mux and screw it onto its standoffs.
-5. Solder the Cat5 cable to the mux control row and tie it onto its
-   block.
+4. Snap the rockers in from the front.
+5. Screw the carrier onto its bosses on the panel back and solder the
+   switch wires to the mux.
 6. Glue the dummy breakers into their pockets.
 7. Mount the panel.
 
@@ -1181,7 +1191,7 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
 | 1 | aluminium round tube, 25 x 2 mm | control tube, the length the base needs |
 | 2 | 12 mm momentary push button | PTT, left and right |
 | 1 | momentary (ON)-OFF-(ON) mini rocker, 13 x 19 mm cut-out | electric trim |
-| 1 | CD74HC4067 breakout board, 2 M2 x 6 self tapping screws | input mux |
+| 1 | CD74HC4067 breakout board, 2 M3 x 6 self tapping screws | input mux |
 | 1 | stranded copper Cat5 patch cable, cable tie | to hub port 1 |
 | 22 | M3 x 12 socket head screw | shell pieces |
 | 2 | M3 x 10 screw | heads |
@@ -1191,8 +1201,8 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
 
 **MEASURE:** the tube (`tube_od`, `tube_wall`), the buttons (`ptt_*`:
 hole, body length, nut size; the head's 2.5 mm top must be within their
-panel range), the rocker (`trim_*`: cut-out and body depth), the mux board
-(`mux_*`, as on the switch panel) and the cable (`cable_d`).
+panel range), the rocker (`trim_*`: cut-out and body depth) and the mux
+board's holes (`mux_*`, as on the switch panel).
 
 ### Assembly
 
