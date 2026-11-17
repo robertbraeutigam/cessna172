@@ -49,9 +49,11 @@ its own top-level directory; new components should follow the same layout.
     AVIONICS (BUS 1, BUS 2), with the labels on its face. Above the
     toggles is a row of printed dummy circuit breakers (`breakers`, for
     show only, glued into hex holes in the face). A CD74HC4067
-    input mux on standoffs on the back collects all switches and the
-    ignition, so one Cat5 cable runs to hub port 3 (soldered to the mux,
-    tied onto `tie_block` next to it). The switch list
+    input mux collects all switches and the ignition, so one Cat5 cable
+    runs to hub port 3 (soldered to the mux, tied onto `tie_block` next to
+    it); the mux and the tie block are on a separate printed carrier
+    (`mux_carrier`) screwed onto two bosses on the panel back, so it can be
+    wired before the panel exists. The switch list
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
 

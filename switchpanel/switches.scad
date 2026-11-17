@@ -26,12 +26,15 @@
 //   the sheet. It mounts to the right of the ignition panel (ignition/)
 //   and has the same height, rim, flange and mount holes (panel.inc.scad);
 //   its left corners are square and without a flange where they meet.
-// - A CD74HC4067 input multiplexer board sits on two standoffs on the back,
-//   in the strip behind the group labels. All switches (and the ignition)
-//   are soldered to it, so only one Cat5 cable runs to the hub (port 3).
-//   The cable is soldered straight to the mux (no connector, the plug at
-//   the hub end is the only one) and a cable tie holds it on a block next
-//   to the mux, so pulling the cable does not pull the solder joints.
+// - A CD74HC4067 input multiplexer board sits on two standoffs on a
+//   separate carrier plate (`mux_carrier`), with a block for a cable tie
+//   next to it. All switches (and the ignition) are soldered to the mux, so
+//   only one Cat5 cable runs to the hub (port 3). The cable is soldered
+//   straight to the mux (no connector, the plug at the hub end is the only
+//   one) and a cable tie holds it on the block, so pulling the cable does
+//   not pull the solder joints. The carrier can be wired up on its own
+//   (ignition, cable) before the panel is made, and is then screwed onto
+//   two bosses on the panel back, in the strip behind the group labels.
 //
 // Wiring: every switch closes one contact: one side to a common GND wire,
 // the other to a mux input (active low, like any switch to GND). ALT and
@@ -48,17 +51,19 @@
 // - 7 toggle switches, M12 neck (2 pin ON-OFF or 6 pin ON-ON)
 // - mount_count x M3 screws to mount the panel
 // - CD74HC4067 16 channel mux breakout board, 2 x M2 x 6 screws
+// - 2 x M3 x 8 self tapping screws, carrier onto the panel
 // - a stranded copper Cat5 patch cable (cut off at one end), a cable tie
 // - glue for the printed dummy breakers
 // - wire: one GND wire daisy chained over all switches, one wire per switch
 //
-// Assembly: solder the wires to the switches first (the rockers are hard to
-// get out again), put the toggles in from the back and tighten their nuts,
-// snap the rockers in from the front, solder the other wire ends to the mux
-// and screw it onto its standoffs, solder the Cat5 cable to the mux control
-// row and tie it onto its block, glue the dummy breakers into their
-// pockets, then mount the panel. The face goes on before the toggle nuts
-// and the rockers.
+// Assembly: screw the mux onto the carrier, solder the Cat5 cable to the
+// mux control row and tie it onto its block (the ignition can be soldered
+// on now too). Then solder the wires to the switches (the rockers are hard
+// to get out again), put the toggles in from the back and tighten their
+// nuts, snap the rockers in from the front, screw the carrier onto its
+// bosses, solder the other wire ends to the mux, glue the dummy breakers
+// into their pockets, then mount the panel. The face goes on before the
+// toggle nuts and the rockers.
 
 $fn = 48;
 
@@ -121,7 +126,7 @@ mux_ctl_names = ["SIG", "S3", "S2", "S1", "S0", "EN", "VCC", "GND"];  // MEASURE
 ignition_inputs = 5;         // OFF, R, L, BOTH, START, after the switches
 mux_x = 45;                  // board center; left half, the ignition is left of the panel
 mux_standoff_d = 6;
-mux_standoff_h = 5;          // panel back to the board
+mux_standoff_h = 5;          // carrier plate to the board
 mux_screw_hole = 2.1;        // M2 pilot hole
 mux_clear = 0.3;
 
@@ -129,9 +134,21 @@ mux_clear = 0.3;
 cable_d = 6;                 // Cat5 patch cable (MEASURE)
 tie = [3.6, 1.3];            // cable tie, width x thickness
 tie_clear = 0.6;             // added to the tie's width and thickness in the slot
-tie_block = [10, 13, 6];     // along the cable (x) x across x height off the panel back
+tie_block = [10, 13, 6];     // along the cable (x) x across x height off the carrier plate
 tie_groove = 1.5;            // cable groove in the block top
 tie_gap = 12;                // mux board edge to the block, the wires fan out there
+
+// --- Mux carrier: a plate with the mux and the tie block, screwed onto
+// two bosses on the panel back ---
+carrier_t = 3;               // plate
+carrier_rim = 1.5;           // plate beyond the mux board, top and bottom
+carrier_end = 9;             // plate beyond the board and the block, for the screws
+carrier_r = 2;               // plate corners
+carrier_screw_hole = 3.2;    // M3, in the plate
+carrier_screw_len = 8;       // M3 x 8 self tapping
+carrier_boss_d = 7;          // on the panel back
+carrier_boss_h = 6;          // panel back to the plate
+carrier_pilot = 2.8;         // M3 self tapping, in the bosses
 
 // --- Layout ---
 // Groups from left to right: label above the group, type ("rocker2" or
@@ -240,16 +257,26 @@ mount_holes = concat(
    mount_center ? [[panel_cx, panel_mount_y0(panel_y0)], [mount_top_cx, panel_mount_y1(panel_y0)]] : []);
 mount_count = len(mount_holes);
 
-// Mux board as high as the rim allows. Its panel side is at mux_z.
-mux_y = panel_y1 - rim_w - mux_clear - mux_board.y / 2;
-mux_z = -panel_t - mux_standoff_h;
+// Mux carrier. Its own coordinates: the mux board center at x=y=0, the
+// plate's panel side at z=0, +z away from the panel (as printed). On the
+// panel it is as high as the rim allows; carrier_z is its panel side.
+carrier_size = [mux_board.x + tie_gap + tie_block.x + 2 * carrier_end, mux_board.y + 2 * carrier_rim];
+carrier_x0 = -mux_board.x / 2 - carrier_end;
+tie_lx = mux_board.x / 2 + tie_gap + tie_block.x / 2;   // tie block center
+carrier_holes = [[carrier_x0 + carrier_end / 2, 0], [carrier_x0 + carrier_size.x - carrier_end / 2, 0]];
+mux_y = panel_y1 - rim_w - mux_clear - carrier_size.y / 2;
+carrier_z = -panel_t - carrier_boss_h;
+carrier_pilot_len = carrier_boss_h + panel_t - face_t - 1;   // stops 1 mm before the face
+// The mux board's panel side is at mux_z
+mux_z = carrier_z - carrier_t - mux_standoff_h;
 mux_switch_y = max(rk_cutout_c.y, tg_pocket.y) / 2;  // the switches reach up to here behind the panel
 function mux_ch_pin(i) = [mux_x + (i - 7.5) * 2.54, mux_y - mux_board.y / 2 + mux_pin_inset];
 function mux_ctl_pin(name) = [mux_x + (search([name], mux_ctl_names)[0] - 3.5) * 2.54,
                               mux_y + mux_board.y / 2 - mux_pin_inset];
 // Cable tie block, right of the mux; the cable runs along x on its top
-tie_x = mux_x + mux_board.x / 2 + tie_gap + tie_block.x / 2;
+tie_x = mux_x + tie_lx;
 tie_y = mux_y;
+tie_z = carrier_z - carrier_t;   // foot of the block
 tie_slot = tie + [tie_clear, tie_clear];
 
 // Distance from a point to a centered box
@@ -282,14 +309,16 @@ assert(min_web >= 1.2, "Too thin a wall between two pockets, increase tg_pitch o
 assert(panel_y0 + rim_w + 0.5 <= -max(rk_pocket.y, tg_pocket.y) / 2, "Rim runs into a switch pocket, increase margin_bottom");
 assert(len(view_on) <= switch_count, "view_on has more entries than there are switches");
 assert(switch_count + ignition_inputs <= mux_channels, "More switches than mux inputs");
-assert(mux_y - mux_board.y / 2 >= mux_switch_y + mux_clear, "Mux board runs into the switches, increase margin_top");
-assert(mux_x - mux_board.x / 2 >= panel_x0 + rim_w + mux_clear && mux_x + mux_board.x / 2 <= panel_x1 - rim_w - mux_clear,
-       "Mux board does not fit inside the rim, move mux_x");
+assert(mux_y - carrier_size.y / 2 >= mux_switch_y + mux_clear, "Mux carrier runs into the switches, increase margin_top");
+assert(mux_x + carrier_x0 >= panel_x0 + rim_w + mux_clear && mux_x + carrier_x0 + carrier_size.x <= panel_x1 - rim_w - mux_clear,
+       "Mux carrier does not fit inside the rim, move mux_x");
 assert(mux_standoff_h >= mux_pin_stub + 1, "Mux standoffs too short for the pin ends");
 assert(mux_standoff_d >= mux_screw_hole + 3, "Mux standoff wall too thin");
-assert(tie_x + tie_block.x / 2 <= panel_x1 - rim_w - 1, "Cable tie block does not fit inside the rim, move mux_x");
-assert(tie_y - tie_block.y / 2 >= mux_switch_y + mux_clear && tie_y + tie_block.y / 2 <= panel_y1 - rim_w,
-       "Cable tie block runs into the switches or the rim");
+assert(carrier_end >= carrier_boss_d && carrier_end / 2 - carrier_screw_hole / 2 >= 2, "Carrier too short at the ends for its screws");
+assert(carrier_size.y >= carrier_boss_d && carrier_size.y >= tie_block.y, "Carrier too narrow for its bosses or the tie block");
+assert(carrier_boss_d >= carrier_pilot + 3, "Carrier boss wall too thin");
+assert(carrier_screw_len - carrier_t >= 4 && carrier_screw_len - carrier_t <= carrier_pilot_len - 0.5,
+       "Carrier screws too short for the bosses or too long for the pilot holes");
 assert(tie_block.y >= cable_d + 2 * tie_slot.y + 2, "Cable tie block too narrow for the cable");
 assert(tie_block.z - tie_groove - tie_slot.y >= 2, "Cable tie block too thin above the slot");
 assert(tie_block.x >= tie_slot.x + 4, "Cable tie block too short for the slot");
@@ -340,15 +369,15 @@ module panel() {
          // Square corners on the left, where the ignition panel is
          mirror([0, 0, 1])
             panel_blank(panel_x0, panel_x1, panel_y0, mount_holes, round0 = false);
-         for (h = mux_holes)
-            translate([mux_x + h.x, mux_y + h.y, mux_z])
-               cylinder(d = mux_standoff_d, h = mux_standoff_h + 0.01);
-         tie_block();
+         // Bosses for the mux carrier
+         for (h = carrier_holes)
+            translate([mux_x + h.x, mux_y + h.y, carrier_z])
+               cylinder(d = carrier_boss_d, h = carrier_boss_h + 0.01);
       }
-      // Mux screw holes, not through the front
-      for (h = mux_holes)
-         translate([mux_x + h.x, mux_y + h.y, mux_z - 1])
-            cylinder(d = mux_screw_hole, h = mux_standoff_h + 2);
+      // Carrier screw holes, not through the front
+      for (h = carrier_holes)
+         translate([mux_x + h.x, mux_y + h.y, carrier_z - 1])
+            cylinder(d = carrier_pilot, h = carrier_pilot_len + 1);
       for (u = units)
          translate([u[0], 0, 0])
             if (is_rocker(u)) {
@@ -567,19 +596,47 @@ module toggle_nut_part(cut = false) {
          }
 }
 
-// Block for the cable tie on the panel back: the tie goes through a slot
-// along y at the panel, around the cable lying in the groove on top
+// Block for the cable tie, foot at z=0: the tie goes through a slot along
+// y at its foot, around the cable lying in the groove on top
 module tie_block() {
-   translate([tie_x, tie_y, -panel_t])
+   difference() {
+      translate([-tie_block.x / 2, -tie_block.y / 2, -0.01])
+         cube(tie_block + [0, 0, 0.01]);
+      translate([-tie_slot.x / 2, -tie_block.y / 2 - 1, -1])
+         cube([tie_slot.x, tie_block.y + 2, tie_slot.y + 1]);
+      translate([-tie_block.x / 2 - 1, 0, tie_block.z + cable_d / 2 - tie_groove])
+         rotate([0, 90, 0]) cylinder(d = cable_d, h = tie_block.x + 2);
+   }
+}
+
+// Mux carrier in its own coordinates (see carrier_size), as printed: plate
+// on the bed, the mux standoffs and the tie block on top
+module mux_carrier() {
+   difference() {
+      union() {
+         translate([carrier_x0 + carrier_size.x / 2, 0, 0])
+            linear_extrude(carrier_t)
+               rrect(carrier_size, carrier_r);
+         for (h = mux_holes)
+            translate([h.x, h.y, carrier_t - 0.01])
+               cylinder(d = mux_standoff_d, h = mux_standoff_h + 0.01);
+         translate([tie_lx, 0, carrier_t])
+            tie_block();
+      }
+      for (h = mux_holes)
+         translate([h.x, h.y, -1])
+            cylinder(d = mux_screw_hole, h = carrier_t + mux_standoff_h + 2);
+      for (h = carrier_holes)
+         translate([h.x, h.y, -1])
+            cylinder(d = carrier_screw_hole, h = carrier_t + 2);
+   }
+}
+
+// The carrier where it goes on the panel back
+module carrier_placed() {
+   translate([mux_x, mux_y, carrier_z])
       mirror([0, 0, 1])
-         difference() {
-            translate([-tie_block.x / 2, -tie_block.y / 2, -0.01])
-               cube(tie_block + [0, 0, 0.01]);
-            translate([-tie_slot.x / 2, -tie_block.y / 2 - 1, -1])
-               cube([tie_slot.x, tie_block.y + 2, tie_slot.y + 1]);
-            translate([-tie_block.x / 2 - 1, 0, tie_block.z + cable_d / 2 - tie_groove])
-               rotate([0, 90, 0]) cylinder(d = cable_d, h = tie_block.x + 2);
-         }
+         mux_carrier();
 }
 
 // Mux board with its pin holes, panel side at mux_z
@@ -612,6 +669,19 @@ module mux_screws() {
                cylinder(d = 3.8, h = 1.3);
             cylinder(d = 2, h = 6 - mux_board_t);
          }
+}
+
+module carrier_screws() {
+   for (h = carrier_holes)
+      translate([mux_x + h.x, mux_y + h.y, carrier_z - carrier_t])
+         mount_screw(carrier_screw_len, c_steel);
+}
+
+module carrier_part() {
+   color(c_panel)
+      carrier_placed();
+   mux_part();
+   mux_screws();
 }
 
 module unit_part(u, cut = false, nuts = true) {
@@ -689,14 +759,15 @@ function wire_tabs() = [for (u = units)
          ? [[u[0] + p.x, rk_pin_pitch, -rk_body_depth - rk_tab.z], [u[0] + p.x, 0, -rk_body_depth - rk_tab.z]]
          : [[u[0] + p.x, 0, tg_body_z - tg_body_depth - tg_tab.z], [u[0] + p.x, -tg_pin_pitch.y, tg_body_z - tg_body_depth - tg_tab.z]]];
 
+mux_joint_z = mux_z - mux_board_t - 0.3;   // solder joints on the outer face of the mux
+
 // GND daisy chained over the switches to the mux GND, a signal wire from
-// every switch to its mux input, and the Cat5 cable to the hub, soldered to
-// the control row and tied onto its block. The ignition cable (C11..C15,
-// VCC, GND) is not shown.
+// every switch to its mux input, and the cable (cable_part). The ignition
+// cable (C11..C15, VCC, GND) is not shown.
 module wires_part() {
    t = wire_tabs();
    z = min([for (w = t) w[0].z]) - 2;
-   zb = mux_z - mux_board_t - 0.3;   // solder joints on the outer face of the mux
+   zb = mux_joint_z;
    gnd = mux_ctl_pin("GND");
    wire(concat(
       [[gnd.x, gnd.y, zb], [gnd.x, gnd.y, z], [gnd.x, t[0][0].y, z]],
@@ -710,12 +781,20 @@ module wires_part() {
       wire([s + [0, 0, 0.5], [s.x + 1.5, s.y, zs], [s.x + 1.5, p.y - 1.5, zs], [p.x, p.y - 1.5, zs], [p.x, p.y, zb]],
            wire_colors[i % len(wire_colors)]);
    }
+   cable_part();
+}
+
+// EN bridged to GND and the Cat5 cable to the hub, soldered to the control
+// row and tied onto its block
+module cable_part() {
+   zb = mux_joint_z;
+   gnd = mux_ctl_pin("GND");
    // EN to GND: the mux is always enabled
    en = mux_ctl_pin("EN");
    wire([[en.x, en.y, zb], [en.x, en.y - 1.5, zb - 1], [gnd.x, gnd.y - 1.5, zb - 1], [gnd.x, gnd.y, zb]], c_gnd);
    // Cat5 cable to the hub: its pairs soldered to the control row (T568B
    // colors), the jacket tied onto the block, then over the top rim
-   zt = -panel_t - tie_block.z + tie_groove - cable_d / 2;  // cable axis
+   zt = tie_z - tie_block.z + tie_groove - cable_d / 2;     // cable axis
    x_end = tie_x - tie_block.x / 2 - 2;                     // jacket end
    for (j = [0 : len(mux_ctl_names) - 1])
       if (mux_ctl_names[j] != "EN") {
@@ -724,9 +803,10 @@ module wires_part() {
                [x_end + 0.5, tie_y + (j - 3.5) * 0.6, zt]],
               cat5_colors[search([mux_ctl_names[j]], cat5_names)[0]]);
       }
-   // Past the block it bends away from the panel and over the top rim
+   // Past the block it bends away from the panel (if it is not clear of the
+   // rim already) and over the top rim
    x_bend = tie_x + tie_block.x / 2 + cable_d;
-   z_over = -panel_t - rim_h - cable_d / 2 - 1;
+   z_over = min(zt, -panel_t - rim_h - cable_d / 2 - 1);
    path = [[x_end, tie_y, zt], [x_bend, tie_y, zt], [x_bend + 4, tie_y, z_over],
            [x_bend + 4, panel_y1 + 20, z_over]];
    color(c_cable)
@@ -742,12 +822,12 @@ module wires_part() {
             difference() {
                hull() {
                   cylinder(d = cable_d + 2 * tie.y, h = tie.x, center = true);
-                  translate([zt + panel_t + tie_slot.y / 2, 0, 0])
+                  translate([zt - tie_z + tie_slot.y / 2, 0, 0])
                      cube([tie.y, tie_block.y - 2, tie.x], center = true);
                }
                hull() {
                   cylinder(d = cable_d, h = tie.x + 1, center = true);
-                  translate([zt + panel_t + tie_slot.y / 2, 0, 0])
+                  translate([zt - tie_z + tie_slot.y / 2, 0, 0])
                      cube([0.01, tie_block.y - 2 - 2 * tie.y, tie.x + 1], center = true);
                }
             }
@@ -764,8 +844,8 @@ module assembled_view() {
    panel_part();
    switches_part();
    breakers_part();
-   mux_part();
-   mux_screws();
+   carrier_part();
+   carrier_screws();
    mount_screws();
 }
 
@@ -804,19 +884,26 @@ module exploded_view(e = 30) {
          dashed_line(0, e);
    translate([0, 0, e])
       breakers_part();
-   // The mux goes on from the back
-   for (h = mux_holes)
+   // The carrier with the mux goes on from the back
+   for (h = carrier_holes)
       translate([mux_x + h.x, mux_y + h.y, 0])
-         dashed_line(-1.6 * e, mux_z, 0.35);
+         dashed_line(-1.6 * e, carrier_z, 0.35);
    translate([0, 0, -e])
-      mux_part();
+      carrier_part();
    translate([0, 0, -1.6 * e])
-      mux_screws();
+      carrier_screws();
    for (h = mount_holes)
       translate([h.x, h.y, 0])
          dashed_line(0, 1.6 * e, 0.35);
    translate([0, 0, 1.6 * e])
       mount_screws();
+}
+
+// The mux carrier on its own, from the back: mux, cable tied on
+module carrier_view() {
+   carrier_part();
+   carrier_screws();
+   cable_part();
 }
 
 // Panel, face and switch cut vertically through the middle of unit u
@@ -837,6 +924,7 @@ module section_view(u, w = 40) {
 rotate([0, 180, 0]) panel(); // Make module panel
 translate([0, 0, -30]) face(); // Make module face
 breakers_plate(); // Make module breakers
+mux_carrier(); // Make module carrier
 
 //switches_part(); // Ignore module
 
@@ -846,3 +934,4 @@ breakers_plate(); // Make module breakers
 //exploded_view(); // Make view exploded 62,0,30
 //section_view(units[0]); // Make view section_rocker 100,0,70
 //section_view(units[4], 1.5 * tg_pitch); // Make view section_toggle 100,0,70
+//carrier_view(); // Make view carrier 150,0,195

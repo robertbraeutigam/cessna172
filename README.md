@@ -337,8 +337,8 @@ cable to length, or in half for two components:
   soldering, with a multimeter or a cable tester: most patch cables are
   T568B, a few are T568A (orange and green pairs swapped).
 - **Strain relief**: tie the jacket down on the component right before the
-  wires fan out (the switch panel has a block for a cable tie next to the
-  mux), so pulling the cable never pulls a solder joint. Tin the strands
+  wires fan out (the switch panel's mux carrier has a block for a cable
+  tie next to the mux), so pulling the cable never pulls a solder joint. Tin the strands
   first and put heat shrink over every joint; cut unused wires short and
   insulate them.
 - Measure the run to the hub and leave some slack: the length is fixed
@@ -744,7 +744,8 @@ it.
 | 7 | toggle switch, M12 neck, 18 mm lever | FUEL PUMP, BEACON, LAND, TAXI, NAV, STROBE, PITOT HEAT |
 | 6 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet (`mount_count`) |
 | 1 | CD74HC4067 16 channel mux breakout board | all inputs, see [Multiplexer](#multiplexer) |
-| 2 | M2 x 6 screw | mux onto its standoffs |
+| 2 | M2 x 6 screw | mux onto its standoffs on the carrier |
+| 2 | M3 x 8 self tapping screw | mux carrier (`switches_carrier.stl`) onto the panel |
 | 7 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
 | 1 | 4.7 kOhm resistor | SIG pull-up on the mux |
 | 1 | Cat5 patch cable, stranded copper (see [Cables](#cables)) | to hub port 3, soldered to the mux |
@@ -828,9 +829,14 @@ back of the switch panel. MobiFlight reads it as a Multiplexer device: 16
 inputs through one Mega pin. So everything is soldered on the panels, and
 only one Cat5 cable runs to the hub (port 3).
 
-The board sits on two standoffs in the strip behind the group labels, on
-the left (pilot side) half, where the ignition cable comes in. Mount it with
-the chip outwards, so the solder joints face you; `assert`s check that it
+The board sits on two standoffs on a small printed carrier plate
+(`switches_carrier.stl`, printed plate down), together with the block for
+the cable tie. The carrier is a part of its own, so the mux, the Cat5 cable
+and the ignition can be wired up before the switch panel is printed; it is
+then screwed with two M3 x 8 self tapping screws onto two bosses on the
+panel back, in the strip behind the group labels, on the left (pilot side)
+half, where the ignition cable comes in. Mount the mux with the chip
+outwards, so the solder joints face you; `assert`s check that the carrier
 clears the switches and fits inside the rim.
 
 **MEASURE when it arrives** (`mux_*`): the board is 40 x 18 mm in the
@@ -838,7 +844,8 @@ listings (one says 41 x 18.7 mm). The mounting holes (`mux_holes`, guessed
 on the center line 17.5 mm from the middle) and the order of the control
 pins (`mux_ctl_names`) are guesses. If the board turns out bigger the build
 fails; then increase `margin_top`. If it has no mounting holes, glue it onto
-the standoffs.
+the standoffs. The carrier is printed from the same values, so measure the
+board before printing it.
 
 #### Inputs
 
@@ -877,8 +884,8 @@ cable soldered straight into its control row (see [Cables](#cables)):
 The brown wire (AUX) is the [primer](#primer) pot's wiper; the pot's
 other two wires go to VCC and GND on the board. The cable
 comes in over the top rim and is tied down with a cable tie on the block
-right of the mux (`tie_block`: the tie goes through the slot at the panel
-and around the cable in the groove on top), so the wires fan out from
+right of the mux on the carrier (`tie_block`: the tie goes through the slot
+at the plate and around the cable in the groove on top), so the wires fan out from
 there to the pins without any pull on them. **MEASURE** the cable
 (`cable_d`, 6 mm) and the tie (`tie`, 3.6 x 1.3 mm).
 
@@ -913,14 +920,17 @@ solder and heat shrink.
 
 ### Assembly
 
-1. Solder the wires to the switches first; the rockers are hard to get out
+1. Screw the mux onto the carrier's standoffs, solder the Cat5 cable to
+   the mux control row and tie it onto its block. The ignition (and the
+   EN bridge, the SIG pull-up) can be soldered on now as well; the carrier
+   does not need the panel yet.
+2. Solder the wires to the switches; the rockers are hard to get out
    again once snapped in.
-2. Lay the face on the front, put the toggles in from the back and
+3. Lay the face on the front, put the toggles in from the back and
    tighten their nuts.
-3. Snap the rockers in from the front.
-4. Solder the other wire ends to the mux and screw it onto its standoffs.
-5. Solder the Cat5 cable to the mux control row and tie it onto its
-   block.
+4. Snap the rockers in from the front.
+5. Screw the carrier onto its bosses on the panel back and solder the
+   switch wires to the mux.
 6. Glue the dummy breakers into their pockets.
 7. Mount the panel.
 
