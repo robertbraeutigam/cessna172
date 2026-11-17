@@ -989,11 +989,20 @@ closed by a cover:
   in its second row (`board_rows = 5`, `board_leg_row = 1`).
 - **Back cap:** a cap over the cover protects the boards, their solder
   joints and the wires. The 7 wires (5 signals, 5 V, GND) leave through a
-  notch in its wall towards the switch panel; hot glue in the notch is the
-  strain relief, so pulling the cable does not pull on the legs. The cover
-  screws go through the cap as well.
+  slot in its wall towards the switch panel, side by side in one flat row.
+  Outside the wall they lie in a groove under a block on the cap, and a
+  printed clamp bar under them is pulled up against the block by two M3 x 10
+  screws from the back. Tight, the bar sits flat on the block and squeezes
+  the wires by `wire_squeeze` (0.25 mm, `wire_d` is the measured diameter
+  over the insulation), so pulling them does not pull on the solder joints.
+  The cover screws go through the cap as well. The cap goes on only one way
+  (the pockets for the holder's ears). The housing also fits the panel
+  turned 180° (with the rotor turned to match), but then the slot faces
+  away from the switch panel: print the cap with `cable_side = 1` for such
+  a housing.
 
-Printed parts: face, panel, housing, rotor, shoe, cover, holder, cap.
+Printed parts: face, panel, housing, rotor, shoe, cover, holder, cap,
+cable clamp.
 
 The panel is 87 x 100 mm (the back 77 x 80 mm). Its front is a separate
 1 mm face with the position labels, tick marks and MAGNETOS standing 0.8 mm
@@ -1019,7 +1028,8 @@ between the rims. The cutout is turned so the key points at OFF
 | 5 | A3144 hall sensor | one per position (OFF is optional) |
 | 1 | prototype board, 2.54 mm pitch | 5 pieces of 3 x 4 holes, one on each sensor's legs |
 | 5 | M2 x 6 screw | sensor boards onto the holder |
-| 4 | M3 x 25 screw | cap and cover (M3 x 10 to test without the cap) |
+| 4 | M3 x 30 screw | cap and cover (M3 x 10 to test without the cap) |
+| 2 | M3 x 10 screw | wire clamp bar |
 | 4 | M3 x 10 screw | panel to housing |
 | 1 | M3 x 8 screw | START pin |
 | 4 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet |
@@ -1042,9 +1052,10 @@ between the rims. The cutout is turned so the key points at OFF
 7. Solder the legs to the boards and trim them. Solder the wires into the
    next row, each next to its leg, and bridge them to it: 5 V and GND
    chained from board to board, one signal wire each.
-8. Lay the bundle into the cap's notch, screw on the cap with the M3 x 25
-   screws (it clamps the holder's ears), and fill the notch with hot glue,
-   with a blob on the inside that is bigger than the notch.
+8. Lay the wires into the cap's slot, screw on the cap with the M3 x 30
+   screws (it clamps the holder's ears), lay the wires side by side in the
+   groove under the clamp block and screw the clamp bar up against it with
+   the M3 x 10 screws.
 
 The positions (30° apart) should be verified against the real switch.
 

@@ -35,9 +35,14 @@
 //   the board's outer row, in the OUT leg's column (board_out_side). The holder's two ears are clamped under the cap
 //   by the cover screws.
 // - Back cap: a cap over the cover protects the boards, their solder joints
-//   and the wires. The 7 wires (5 signals, 5 V, GND) leave through a notch
-//   in its wall, filled with hot glue as strain relief. The cover screws go
-//   through the cap too.
+//   and the wires. The 7 wires (5 signals, 5 V, GND) leave through a slot
+//   in its wall towards the switch panel in one flat row. Outside the wall
+//   a printed bar (cable_clamp) is screwed up against a block on the cap
+//   with 2 M3 screws from the back and squeezes them in a groove, so
+//   pulling the wires does not pull on the solder joints. The cover screws
+//   go through the cap too. The cap fits the housing only one way (the
+//   holder's ears); for a housing mounted turned 180 degrees in the panel
+//   (it fits, with the rotor turned too) print it with cable_side = 1.
 //
 // Coordinates: z is the key axis, z=0 is the back of the panel, +z points
 // backwards. Positive rotation is clockwise seen from the front. All parts
@@ -51,8 +56,8 @@
 // - 5x5x5 mm cube magnet (magnet_*), 5x A3144 hall sensors (OFF is optional)
 // - prototype board (2.54 mm pitch), 5 pieces of 3 x board_rows holes,
 //   5x M2x6 screws to hold them on the holder
-// - M3 screws: 4x M3x25 for the cap and cover, 4x panel to housing, 1x M3x8 as the
-//   START pin, 4x to mount the panel
+// - M3 screws: 4x M3x30 for the cap and cover, 4x panel to housing, 1x M3x8 as the
+//   START pin, 2x M3x10 for the wire clamp, 4x to mount the panel
 //
 // The panel is printed as well. It has the same height, rim, mount holes and
 // lettering as the switch panel (panel.inc.scad, a copy of the one in
@@ -70,8 +75,9 @@
 // glue in magnet and sensors, screw on the cover (short screws to
 // test), then the pin. Put the holder on the cover, slip the boards onto the
 // legs, screw them onto the posts, solder the legs and the wires to the
-// boards, lay the wires in the cap's notch, screw on the cap (it clamps the
-// holder's ears) and fill the notch with hot glue.
+// boards, lay the wires in the cap's slot, screw on the cap (it clamps the
+// holder's ears), lay the wires side by side in the clamp groove and screw
+// the clamp bar on.
 
 $fn = 60;
 
@@ -195,9 +201,23 @@ cap_floor = 2;
 cap_depth = 12;              // room behind the cover for the boards, solder joints and wires
 cap_wall = 2;
 leg_stub = board_z + board_t + 1;  // legs trimmed to this behind the cover, after soldering
-cable_d = 6;                 // notch for the 7 wire bundle, towards the switch panel (-x)
-cable_z = board_z + board_t; // bundle centre in the notch, at the board tops
-cover_screw_len = 25;        // through cap and cover into the housing
+cover_screw_len = 30;        // through cap and cover into the housing
+
+// --- Wire clamp on the cap ---
+// The wires leave through a slot in the cap wall in one flat row and lie
+// in a groove in the underside of a block on the outside of the wall. A
+// bar under them is pulled up against the block by two M3 screws from the
+// back; tight, it sits flat on the block and squeezes the wires by
+// wire_squeeze.
+cable_side = -1;             // -1: the wall over the holder's ears, towards the switch panel; 1: the opposite wall (housing turned 180 degrees in the panel)
+wire_d = 1.0;                // MEASURE: wire diameter over the insulation (28 AWG)
+wire_n = 7;                  // 5 signals, 5 V, GND
+wire_squeeze = 0.25;
+clamp_z0 = board_z + board_t + 2;  // block underside (the wire row) above the cover
+clamp_len = 8;               // block and bar, out of the wall
+clamp_bar_t = 6;
+clamp_screw_len = 10;        // M3 x 10, through the block into the bar
+clamp_room = 10;             // room past the panel's back towards the switch panel (its MASTER rocker body starts about 12 mm in)
 
 // --- Derived ---
 function arc_deg(len, r) = len / r * 180 / PI;
@@ -234,6 +254,14 @@ slot_step = start_pin_angle - pos_angle(3) - arc_deg(start_pin_d / 2, start_pin_
 slot_narrow_end = start_pin_angle + arc_deg(start_pin_d / 2 + 0.5, start_pin_r) + 3;
 slot_wide_end = slot_step - arc_deg(start_shoe_len + start_spring_inst, start_pin_r);
 pin_protrusion = start_pin_len - cover_t - gap;
+
+groove_w = wire_n * wire_d + 0.6;
+groove_d = wire_d - wire_squeeze;
+clamp_block_t = cap_h - clamp_z0;
+clamp_screw_y = groove_w / 2 + 1 + clear_d / 2;
+clamp_w = 2 * (clamp_screw_y + clear_d / 2 + 2);
+clamp_thread = clamp_screw_len - clamp_block_t;   // in the bar
+wire_row_z = clamp_z0 + groove_d - wire_d / 2;     // wire centres, above the cover
 
 leg_r = magnet_r + sensor_h / 2 + 0.5;   // where the legs come out of the cover
 board_w = board_cols * board_pitch;
@@ -292,7 +320,16 @@ assert(magnet_r * min(pitch, start_pitch) * PI / 180 >= sensor_w + 4, "Hall sens
 assert(cap_depth >= 3 + 1, "Cap runs into the START pin screw head");
 assert(leg_stub + 2 <= cap_depth, "No room for the solder joints in the cap");
 assert(cap_depth >= board_z + board_t + 4, "No room for the wires on the boards in the cap");
-assert(cable_z + cable_d / 2 <= cap_depth - 1, "Cable notch too deep for the cap");
+assert(cable_side == -1 || cable_side == 1, "cable_side is -1 or 1");
+assert(groove_d >= 0.5 && wire_squeeze >= 0.1, "Wire clamp groove: check wire_d and wire_squeeze");
+assert(clamp_z0 >= board_z + board_t + 1.5, "Wire row too low, the wires cannot pass over the boards");
+assert(clamp_z0 + groove_d + 0.5 <= cap_depth - 1, "Wire slot too deep for the cap");
+assert(clamp_block_t >= 4, "Wire clamp block too thin");
+assert(clamp_thread >= 4 && clamp_thread <= clamp_bar_t, "Wire clamp screw length does not fit block + bar");
+assert(clamp_len >= 5.5 + 2, "Wire clamp too short for the screw heads");
+assert(clamp_w / 2 <= half - corner_r, "Wire clamp wider than the straight part of the cap wall");
+assert(clamp_len - rim_w - 0.5 <= clamp_room, "Wire clamp sticks out too far towards the switch panel");
+assert(z_cap + clamp_z0 - clamp_bar_t >= rim_h + 2, "Wire clamp bar runs into the panel rim");
 assert(board_leg_row >= 0 && board_leg_row < board_rows - 1, "Board needs a row for the screw outside the legs");
 assert(board_r0 * sin(min(pitch, start_pitch) / 2) >= board_w / 2 + 0.5, "Sensor boards run into each other");
 assert(board_r1 <= half - cap_wall - 0.5, "Sensor boards run into the cap wall, use fewer rows");
@@ -502,12 +539,24 @@ module holder() {
       }
 }
 
-// Back cap on the cover, open towards it: the cover closes the cable notch
-module cap() {
+// Puts the wire clamp, modeled on the -x wall, on the cable_side wall
+module on_cable_side(side = cable_side) {
+   scale([-side, 1, 1])
+      children();
+}
+
+// Back cap on the cover, open towards it: the cover closes the wire slot
+module cap(side = cable_side) {
    translate([0, 0, z_cap])
       difference() {
-         linear_extrude(cap_h)
-            outline();
+         union() {
+            linear_extrude(cap_h)
+               outline();
+            // Wire clamp block on the wall, flush with the cap's back
+            on_cable_side(side)
+               translate([-half - clamp_len, -clamp_w / 2, clamp_z0])
+                  cube([clamp_len + cap_wall / 2, clamp_w, clamp_block_t]);
+         }
          translate([0, 0, -1])
             linear_extrude(cap_depth + 1)
                difference() {
@@ -524,15 +573,38 @@ module cap() {
             linear_extrude(holder_t - holder_clamp + 1)
                offset(delta = 0.3)
                   holder_ears_2d();
-         // Cable notch, round at its end
-         translate([-half - 1, 0, 0]) {
-            translate([0, -cable_d / 2, -1])
-               cube([cap_wall + 2, cable_d, cable_z + 1]);
-            translate([0, 0, cable_z])
-               rotate([0, 90, 0])
-                  cylinder(d = cable_d, h = cap_wall + 2);
+         on_cable_side(side) {
+            // Wire slot in the wall, open towards the cover
+            translate([-half - 1, -groove_w / 2 - 0.5, -1])
+               cube([cap_wall + 2, groove_w + 1, clamp_z0 + groove_d + 1.5]);
+            // Groove for the wire row in the block's underside
+            translate([-half - clamp_len - 1, -groove_w / 2, clamp_z0 - 1])
+               cube([clamp_len + cap_wall + 2, groove_w, groove_d + 1]);
+            for (y = [-1, 1])
+               translate([-half - clamp_len / 2, y * clamp_screw_y, clamp_z0 - 1])
+                  cylinder(d = clear_d, h = clamp_block_t + 2);
          }
       }
+}
+
+// Clamp bar under the block, M3 self tapping into it from the back
+module cable_clamp(side = cable_side) {
+   on_cable_side(side)
+      translate([-half - clamp_len, -clamp_w / 2, z_cap + clamp_z0 - clamp_bar_t])
+         difference() {
+            cube([clamp_len - 0.3, clamp_w, clamp_bar_t]);
+            for (y = [-1, 1])
+               translate([clamp_len / 2, clamp_w / 2 + y * clamp_screw_y, -1])
+                  cylinder(d = pilot_d, h = clamp_bar_t + 2);
+            // Rounded edge where the wires leave the clamp
+            translate([0, -1, clamp_bar_t])
+               rotate([-90, 0, 0])
+                  linear_extrude(clamp_w + 2)
+                     difference() {
+                        square(2, center = true);
+                        translate([1, 1]) circle(r = 1, $fn = 24);
+                     }
+         }
 }
 
 // Position labels and ticks, mirrored so they read from the front
@@ -845,32 +917,37 @@ module board_parts() {
       }
 }
 
+// Wire k (0: 5 V, 1: GND, 2..6: OFF..START) in the clamp's row, x along
+// the wall's outward normal
+wire_colors = ["#d03030", "#202020", "#f0f0f0", "#e0c020", "#30a050", "#3070d0", "#e07020"];
+function wire_row(k, x) = [cable_side * x, (k - (wire_n - 1) / 2) * wire_d, z_cap + wire_row_z];
+
+module wire_seg(a, b, c, wd = wire_d) {
+   color(c)
+      hull() {
+         translate(a) sphere(d = wd, $fn = 8);
+         translate(b) sphere(d = wd, $fn = 8);
+      }
+}
+
 // Wires soldered to the boards (view only): 5 V and GND chained (in on the
 // row next to the legs, on to the next board from the row after it), a
-// signal each from the OUT column
+// signal each from the OUT column, to the slot in the cap
 module wire_parts() {
-   wd = 1.2;
-   z = z_cap + board_z + board_t + wd / 2 + 0.3;
+   z = z_cap + board_z + board_t + wire_d / 2 + 0.3;
    out_j = board_out_side + 1;
    vcc_j = 2 - out_j;
    function p(i, j, k = board_leg_row + 1) = let(a = lug_angle + pos_angle(i), y = (j - 1) * board_pitch, r = board_row_r(k))
       [r * cos(a) - y * sin(a), r * sin(a) + y * cos(a), z];
-   module seg(a, b, c) {
-      color(c)
-         hull() {
-            translate(a) sphere(d = wd, $fn = 8);
-            translate(b) sphere(d = wd, $fn = 8);
-         }
-   }
-   exit = [-half - 2, 0, z_cap + cable_z];
+   function exit(k) = wire_row(k, half - cap_wall - 1);
    for (i = [0 : 3]) {
-      seg(p(i, vcc_j, board_leg_row + 2), p(i + 1, vcc_j), "#d03030");
-      seg(p(i, 1, board_leg_row + 2), p(i + 1, 1), "#202020");
+      wire_seg(p(i, vcc_j, board_leg_row + 2), p(i + 1, vcc_j), wire_colors[0]);
+      wire_seg(p(i, 1, board_leg_row + 2), p(i + 1, 1), wire_colors[1]);
    }
-   seg(p(0, vcc_j), exit, "#d03030");
-   seg(p(0, 1), exit, "#202020");
+   wire_seg(p(0, vcc_j), exit(0), wire_colors[0]);
+   wire_seg(p(0, 1), exit(1), wire_colors[1]);
    for (i = [0 : 4])
-      seg(p(i, out_j), exit, ["#f0f0f0", "#e0c020", "#30a050", "#3070d0", "#e07020"][i]);
+      wire_seg(p(i, out_j), exit(i + 2), wire_colors[i + 2]);
 }
 
 // Cover with the engraved labels filled in
@@ -899,12 +976,17 @@ module start_pin_screw() {
          m3_screw(start_pin_len);
 }
 
-// The wire bundle leaving the cap notch (stub)
+// The wire row through the slot and the clamp (stubs)
 module cable_part() {
-   color(c_sensor)
-      translate([-half - 15, 0, z_cap + cable_z])
-         rotate([0, 90, 0])
-            cylinder(d = cable_d - 1, h = 15 + cap_wall + 3);
+   for (k = [0 : wire_n - 1])
+      wire_seg(wire_row(k, half - cap_wall - 1), wire_row(k, half + clamp_len + 12), wire_colors[k]);
+}
+
+module clamp_screws() {
+   on_cable_side()
+      for (y = [-1, 1])
+         translate([-half - clamp_len / 2, y * clamp_screw_y, z_cap + cap_h])
+            m3_screw(clamp_screw_len);
 }
 
 // Everything in place, explode lifts the cover off
@@ -953,7 +1035,9 @@ module exploded_view(pos = 0, e = 16) {
    translate([0, 0, 6.2 * e]) color(c_holder) holder();
    translate([0, 0, 7.2 * e]) board_parts();
    translate([0, 0, 8.4 * e]) color(c_cover) cap();
+   translate([0, 0, 7.8 * e]) color(c_holder) cable_clamp();
    translate([0, 0, 9.4 * e]) cover_screws();
+   translate([0, 0, 9.4 * e]) clamp_screws();
 }
 
 module assembled_view(pos = 3) {
@@ -969,6 +1053,8 @@ module assembled_view(pos = 3) {
    board_parts();
    wire_parts();
    color(c_cover, 0.35) cap();
+   color(c_holder) cable_clamp();
+   clamp_screws();
    cable_part();
 }
 
@@ -1020,6 +1106,7 @@ translate([half + 10, 0, 0]) shoe_print(); // Make module shoe
 translate([0, 0, explode]) cover(); // Make module cover
 translate([0, 0, 1.5 * explode]) holder(); // Make module holder
 translate([0, 0, 2 * explode]) rotate([0, 180, 0]) cap(); // Make module cap
+translate([0, 0, 2.5 * explode]) cable_clamp(); // Make module cable_clamp
 
 //bought_parts(pos_angle(view_pos), explode); // Ignore module
 
