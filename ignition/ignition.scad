@@ -213,6 +213,7 @@ cable_side = -1;             // -1: the wall over the holder's ears, towards the
 wire_d = 1.0;                // MEASURE: wire diameter over the insulation (28 AWG)
 wire_n = 7;                  // 5 signals, 5 V, GND
 wire_squeeze = 0.25;
+groove_clear = 2.6;          // room across the row, so the wires lie side by side
 clamp_z0 = board_z + board_t + 2;  // block underside (the wire row) above the cover
 clamp_len = 8;               // block and bar, out of the wall
 clamp_bar_t = 6;
@@ -255,7 +256,7 @@ slot_narrow_end = start_pin_angle + arc_deg(start_pin_d / 2 + 0.5, start_pin_r) 
 slot_wide_end = slot_step - arc_deg(start_shoe_len + start_spring_inst, start_pin_r);
 pin_protrusion = start_pin_len - cover_t - gap;
 
-groove_w = wire_n * wire_d + 0.6;
+groove_w = wire_n * wire_d + groove_clear;
 groove_d = wire_d - wire_squeeze;
 clamp_block_t = cap_h - clamp_z0;
 clamp_screw_y = groove_w / 2 + 1 + clear_d / 2;
