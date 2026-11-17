@@ -75,22 +75,24 @@ its own top-level directory; new components should follow the same layout.
 
 - `hub/` — `hub.scad`: the box (and lid) with the Arduino Mega running
   MobiFlight (the Connector on the Windows PC talks to X-Plane; servos and
-  encoders go straight to Mega pins, encoders never through a mux), a
-  prototype board (bus header, room for extra circuits) and 6 RJ45 breakout
-  boards in one row (MobiFlight takes at most 6 muxes per Mega; more
+  encoders go straight to Mega pins, encoders never through a mux; no
+  prototype board, the 330 Ohm resistors are soldered into the wires; the
+  right part of the box is free for boards later) and 6 RJ45 breakout
+  boards, ports 1-3 along the front wall and 4-6 along the right wall (MobiFlight takes at most 6 muxes per Mega; more
   ports means a second hub with its own Mega). Ports 1-3 are mux ports
   (S0..S3, 5 V, GND, SIG, AUX), ports 4-6 direct ports (5 V and GND on
   the same pins 4 and 5, the other six wires are lines to their own Mega
   pins, a servo takes its power on the orange pair), for components
   without a mux (servos, encoders, pots). The bus wires join pins 4 and 5
-  of all boards and S0..S3 of the mux ports; everything else goes to the
-  Mega or to the servo header on the prototype board with jumper wires,
-  nothing is soldered on the Mega. Every MobiFlight component connects to
+  of all boards and S0..S3 of the mux ports and go on to the Mega in
+  Dupont plugs; everything else goes to the Mega with jumper wires
+  (servo power on Mega 5 V/GND pins of its own), nothing is soldered on
+  the Mega. Every MobiFlight component connects to
   its own numbered port with one Cat5 cable, RJ45 plug at the hub and
   soldered straight to the component (no connector there); the port
   pinouts and the port list are in the README's Connections section, keep
-  components and README in sync with them. The `rj_*` and `proto_*`
-  values are guesses until the parts are measured.
+  components and README in sync with them. The `rj_*` values
+  are guesses until the parts are measured.
 
 - `yoke/` — `yoke.scad`: the hollow Cessna control wheel (trapezoid hub,
   bar with a sagging bottom, arms leaning inwards with block heads square

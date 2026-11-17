@@ -294,13 +294,13 @@ SIG and VCC pins on each mux board, in the component.
 
 | Pin | T568B color | Signal | At the hub |
 |-----|-------------|--------|------------|
-| 1 | white-orange | servo 5 V, or line E | servo header 5 V, or its own Mega pin |
-| 2 | orange | servo GND, or line F | servo header GND, or its own Mega pin |
+| 1 | white-orange | servo 5 V, or line E | a Mega 5 V pin of its own, or its own Mega pin |
+| 2 | orange | servo GND, or line F | a Mega GND pin of its own, or its own Mega pin |
 | 3 | white-green | line A | its own Mega pin |
 | 4 | blue | 5 V | all ports, Mega 5 V |
 | 5 | white-blue | GND | all ports, Mega GND |
 | 6 | green | line B | its own Mega pin |
-| 7 | white-brown | line C | its own Mega pin, or the servo header (servo signal) |
+| 7 | white-brown | line C | its own Mega pin (a servo signal through 330 Ohm) |
 | 8 | brown | line D | its own Mega pin |
 
 Each line is whatever the component needs: a pot wiper (analog Mega
@@ -308,8 +308,8 @@ pin), an encoder contact, a switch (any digital pin) or a servo signal.
 The rules:
 
 - **A servo** takes its power on the orange pair (pin 1 5 V, pin 2 GND) and
-  its signal on pin 7. At the hub they go to the servo header on the
-  prototype board (see [Hub wiring](#wiring)), not to the blue pair: the
+  its signal on pin 7. At the hub they go to 5 V and GND pins of the Mega
+  of their own (see [Hub wiring](#wiring)), not to the blue pair: the
   servo's current peaks then do not move the GND and 5 V that the pots
   and the logic on the same cable use. Without a servo, pins 1 and 2 are
   two more lines.
@@ -321,10 +321,10 @@ The rules:
 **A wrong port does not damage anything**, it only mixes up the inputs in
 the sim until the cable is in its own port again (they are numbered). Every
 Mega output that goes into a cable has a 330 Ohm resistor in series at the
-hub (S0-S3 and each servo signal, on the prototype board), so a component
+hub (S0-S3 and each servo signal, soldered into the wire), so a component
 in the wrong kind of port can not short a Mega output against a switch to
-GND or a pot at its end stop. Still, mark the direct ports at the hub (a
-paint pen dot next to their numbers).
+GND or a pot at its end stop. The direct ports are on the hub's right
+wall, the mux ports on its front, so they are hard to mix up.
 
 ### Cables
 
@@ -397,12 +397,11 @@ same S0-S3 bus.
 
 **Logic only** on the blue pair: the muxes, pots, encoders and hall
 sensors draw a few mA. The servos take their current on their own orange
-pair from the servo header in the hub, which is fed from the Mega 5 V for
-now (see [Power](#power-later)); put a 470 uF capacitor across the supply
+pair from the Mega 5 V for now (see [Power](#power-later)); put a 470 uF capacitor across the supply
 at each servo. A 9 g servo draws about 0.15-0.3 A when it moves and up to
 0.7 A stalled, about 0.2 V drop on 2 m of the 24 AWG pair. Two of them on
 the Mega's USB 5 V is the limit: if the Mega resets when both move at
-once, feed the servo header from a 5 V supply. GND has to stay in the cable
+once, feed the servos from a 5 V supply. GND has to stay in the cable
 with the signals, and the logic 5 V has to come from the Mega, so a
 component is never powered while its inputs are not (or the other way
 round).
@@ -432,10 +431,10 @@ each extra mux costs only one Mega pin. The options:
 
 USB only for now. With lighting, gauges or the FFB yoke comes one 24 V PSU
 with fused branches, buck converters for 5 V, a separate cut-off switch on
-the FFB motor power and one star ground at the PSU. The servo header in
-the hub is then fed from a 5 V converter instead of the Mega 5 V (remove
-its link, see [Hub wiring](#wiring)), so the servos keep their orange pair
-in the Cat5. Bigger loads (backlighting, more servos in one component) get
+the FFB motor power and one star ground at the PSU. The servos' orange
+pairs then go to a 5 V converter instead of the Mega 5 V (on a small board
+in the free part of the hub, its GND joined to the Mega GND), so the
+servos keep their orange pair in the Cat5. Bigger loads (backlighting, more servos in one component) get
 their current from a separate 2 wire 5 V bus with a 2 pin plug per
 component (e.g. JST-VH or a 5.08 mm screw terminal), not from the Cat5;
 its GND is tied to the Mega GND at one point in the hub. Leave room for
@@ -449,30 +448,28 @@ back wall.
 [![Hub](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)
 
 `hub.scad` prints the box (`hub_box.stl`, floor down) and the lid
-(`hub_lid.stl`, top down). The box is 249 x 135 x 55 mm with the lid
-(one row of 6 ports, `port_cols`); the build checks that it fits the
-printer bed.
+(`hub_lid.stl`, top down). The box is 166 x 135 x 39 mm with the lid
+(6 ports on two walls, `port_front` and `port_side`); the build checks that
+it fits the printer bed.
 
-From the front wall to the back:
-
-- **Ports**: 6 RJ45 breakout boards in a row along the front wall,
-  their jacks behind cut-outs in it, numbered 1-6 from the left, the
-  numbers beside the jacks: 1-3 are the mux ports, 4-6 the direct ports
-  (see [Port pinout](#port-pinout); mark them). The boards are screwed onto bosses on the
+- **Ports**: 6 RJ45 breakout boards, their jacks behind cut-outs in the
+  walls, the numbers beside the jacks. The mux ports 1-3 are along the
+  front wall, numbered from the left; the direct ports 4-6 along the right
+  wall, numbered from the front (see [Port pinout](#port-pinout)), so the
+  two kinds can not be mixed up. The boards are screwed onto bosses on the
   floor with M3 self tapping screws from above. Their angled 8 pin headers
-  point into the box. Behind them is a 30 mm strip for the jumpers, then one row of
-  boards:
-- **Mega** (left): on 6 standoffs, its USB jack through the left wall
-  (flush with the outside, so any USB-B plug fits), with a cut-out in
-  front of the power jack for later.
-- **Prototype board** (next to the Mega, 20 mm away): a 50 x 70 mm board
-  on four standoffs, with the bus header, the servo header (below) and
-  room for small extra circuits if they are needed (later the power bus
-  distribution). The hole for the power bus is in the back wall behind it.
-  The rest of the row, on the right, stays free (a stepper driver board,
-  later).
-- The build checks the room for a plugged jumper (30 mm) above every
-  board.
+  point into the box, each with a strip for the jumper plugs behind it
+  (15 mm behind the front ports).
+- **Mega**: behind the front ports, left of the right ports' jumpers, on
+  6 standoffs, its USB jack through the left wall (flush with the outside,
+  so any USB-B plug fits), with a cut-out in front of the power jack for
+  later.
+- The strip behind the Mega is free for small boards later (the power bus
+  distribution, a stepper driver); the hole for the power bus is in the
+  back wall there. There is no prototype board: the few resistors are
+  soldered into the wires.
+- The build checks the room for a plugged jumper (20 mm: a 14 mm Dupont
+  housing and the bent wire) behind the RJ45 pins and above the Mega.
 - The lid has a locating lip and is screwed onto four corner posts. Four
   ears on the floor (5.3 mm holes) screw the box onto the frame (M5 + T-nut)
   or under the desk.
@@ -487,17 +484,14 @@ lid on.
 | Qty | Part | Use |
 |-----|------|-----|
 | 1 | Arduino Mega 2560 | MobiFlight board |
-| 1 | prototype board, 50 x 70 mm | bus header, servo header, extra circuits if needed |
-| 2 | female header strip, 8 pin, 2.54 mm | bus header, servo header |
-| 6 | 330 Ohm resistor | in series with S0-S3 and the 2 servo signals |
+| 6 | 330 Ohm resistor, heat shrink tube | in series with S0-S3 and the 2 servo signals |
 | 6 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
 | 18 | M3 x 6 self tapping screw | RJ45 boards |
-| 4 | M3 x 6 self tapping screw | prototype board |
 | 6 | M3 x 6 self tapping screw | Mega |
 | 4 | M3 x 10 self tapping screw | lid |
 | - | insulated wire, about 0.25 mm2, 6 colors | the bus |
-| ~20 | male-female jumper wire, 20 cm | RJ45 pins to the Mega and to the servo header |
-| ~10 | male-male jumper wire, 10 cm | bus and servo header to the Mega |
+| ~20 | male-female jumper wire, 20 cm | RJ45 pins to the Mega |
+| - | Dupont male pins, 1, 2 and 4 pin housings, crimper | ends of the bus wires on the Mega |
 
 Per port used: a stranded copper Cat5 patch cable, soldered at the
 component end (see [Cables](#cables)).
@@ -505,55 +499,52 @@ component end (see [Cables](#cables)).
 **MEASURE when they arrive**: the RJ45 boards (`rj_*`): the jack's height
 and its position on the board, the header position and the mounting holes
 (guessed from the listing picture; fix `rj_holes` before printing, the
-build checks that the bosses stay on the board). The
-prototype board's hole positions (`proto_*`). All boards are screwed on
+build checks that the bosses stay on the board). All boards are screwed on
 with M3: if a hole is smaller than about 3.1 mm, drill it out, keeping
 clear of the traces around it. The Mega values are from the Arduino drawing.
 
 ### Wiring
 
 **Bus**: one insulated wire per line, one color each, soldered along the
-row of boards. Strip a short piece of insulation where it passes a pin and
+boards. Strip a short piece of insulation where it passes a pin and
 solder it there, at the pin's base by the header, so it does not touch the
 other pins it crosses:
 
-- 5 V and GND (pins 4 and 5): across all 6 ports.
+- 5 V and GND (pins 4 and 5): across all 6 ports, round the corner from
+  port 3 to port 4.
 - S0, S1, S2, S3 (pins 1, 2, 3 and 6): across the mux ports 1-3 only.
   Ports 4-6 keep these pins for their own lines.
-- To the prototype board: six wires from port 1's pins 1-6 to an 8 pin
-  female header on it (the bus header): S0, S1, S2, S3, 5 V, GND, 5 V,
-  GND. S0-S3 go through a 330 Ohm resistor each, soldered between the
-  wire and the header pin.
+- To the Mega: six wires from port 1's pins 1, 2, 3, 6 (S0-S3) and 4, 5
+  (5 V, GND), crimped into Dupont male pins. S0-S3 go through a 330 Ohm
+  resistor each, soldered into the wire near the Mega end, heat shrink
+  over it, and end in one 4 pin housing on pins 22-25; 5 V and GND in a
+  2 pin housing on the 5 V and GND pins next to each other in the power
+  header.
 
-**Servo header**: a second 8 pin female header on the prototype board,
-for the servos of ports 4 and 5: 5 V, GND, signal in, signal out, twice.
-Each signal in goes through a 330 Ohm resistor to its signal out. Its 5 V
-pins are joined to the bus header 5 V by one wire link (the one to remove
-when a 5 V supply feeds the servos, see [Power](#power-later)), its GND
-pins to the bus header GND for good.
+Everything else is a jumper, plugged onto the RJ45 boards' angled pins:
 
-Everything else is a jumper:
+| From | To |
+|------|----|
+| ports 1-3 pin 7 (SIG) and pin 8 (AUX) | their Mega pins (see [Ports](#ports)) |
+| ports 4-6, each pin with a line | its Mega pin |
+| ports 4 and 5 pins 1, 2 (servo 5 V, GND) | the 5 V and GND pins at the end of the Mega's double header |
+| ports 4 and 5 pin 7 (servo signal) | Mega D2 (port 4), D3 (port 5), through a 330 Ohm resistor soldered into the jumper |
 
-| From | To | Jumper |
-|------|----|--------|
-| ports 1-3 pin 7 (SIG) and pin 8 (AUX) | their Mega pins (see [Ports](#ports)) | male-female |
-| ports 4-6, each pin with a line | its Mega pin | male-female |
-| ports 4 and 5 pins 1, 2, 7 (servo 5 V, GND, signal) | servo header 5 V, GND, signal in | male-female |
-| servo header signal out | Mega D2 (port 4), D3 (port 5) | male-male |
-| bus header S0-S3 | Mega pins 22-25 | male-male |
-| bus header 5 V, GND | Mega 5 V, GND | male-male |
+Plugs on the Mega hold well enough for good: use multi-pin housings where
+the pins are next to each other, tie each Cat5 cable to the box so a pull
+on it does not reach the jumpers, and once everything works a dab of hot
+glue across the housings keeps them in (it peels off).
 
 Add a Servo device on D2 and D3 in the Connector.
 
 ### Assembly
 
 1. Screw the RJ45 boards onto their bosses (M3 x 6).
-2. Solder the bus wires along the row (S0-S3 only across ports 1-3).
-3. Solder the bus header, the servo header and the resistors onto the
-   prototype board and wire the bus header to port 1.
-4. Screw the prototype board and the Mega onto their standoffs.
-5. Plug the jumpers as above and label them.
-6. Screw the lid on.
+2. Solder the bus wires along the ports (S0-S3 only across ports 1-3) and
+   the six wires to the Mega on port 1, with the resistors in S0-S3.
+3. Screw the Mega onto its standoffs.
+4. Plug the bus wires and the jumpers as above and label them.
+5. Screw the lid on.
 
 # Throttle quadrant
 
