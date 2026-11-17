@@ -155,7 +155,9 @@ date of the build that last rendered them.
 
 Run `make` inside a component directory (e.g. `throttle/`). The OpenSCAD binary
 comes from the `OPENSCAD` environment variable (set in the user's environment
-to an OpenSCAD 2021.01 AppImage; the Makefile does not define it):
+to an OpenSCAD development snapshot AppImage, the one pinned in
+`.github/workflows/build.yml` (`OPENSCAD_APPIMAGE`), for the Manifold backend;
+the Makefile does not define it):
 
 ```sh
 cd throttle

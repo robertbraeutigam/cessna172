@@ -14,20 +14,45 @@ concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/master' }}
 
+# A pinned OpenSCAD development snapshot: its Manifold backend renders the
+# models and the render() parts of the views 3-190 times faster than the
+# 2021.01 of Ubuntu 24.04. files.openscad.org keeps snapshots for about a
+# year; the AppImage is cached, but move the pin on before it disappears
+# (name and sha256sum of the new file).
+env:
+  OPENSCAD_APPIMAGE: OpenSCAD-2026.11.16-x86_64.AppImage
+  OPENSCAD_SHA256: 0aa755edccf9700a35043aeeae9426266643c956d7453dc81d00b71691ef2d74
+
 jobs:
   build:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
-      # Ubuntu 24.04 ships OpenSCAD 2021.01, the version the designs use.
+      - name: Restore OpenSCAD
+        uses: actions/cache@v4
+        with:
+          path: ~/openscad/${{ env.OPENSCAD_APPIMAGE }}
+          key: openscad-${{ env.OPENSCAD_SHA256 }}
+
       # Views need a display (xvfb), the montages ImageMagick and DejaVu,
-      # the panel labels Liberation Sans.
+      # the panel labels Liberation Sans. The runner has no FUSE, so the
+      # AppImage is extracted and run through a wrapper on the PATH.
       - name: Install OpenSCAD
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends \
-            openscad xvfb xauth imagemagick fonts-dejavu-core fonts-liberation
+            xvfb xauth imagemagick fonts-dejavu-core fonts-liberation
+          mkdir -p ~/openscad
+          cd ~/openscad
+          [ -f "$OPENSCAD_APPIMAGE" ] || \
+            curl -fsSL -o "$OPENSCAD_APPIMAGE" "https://files.openscad.org/snapshots/$OPENSCAD_APPIMAGE"
+          echo "$OPENSCAD_SHA256  $OPENSCAD_APPIMAGE" | sha256sum -c
+          chmod +x "$OPENSCAD_APPIMAGE"
+          "./$OPENSCAD_APPIMAGE" --appimage-extract >/dev/null
+          printf '#!/bin/sh\nexec "%s/squashfs-root/AppRun" "$@"\n' "$PWD" | sudo tee /usr/local/bin/openscad >/dev/null
+          sudo chmod +x /usr/local/bin/openscad
+          openscad --version
 
       # The renders of the last successful build. Each component's
       # target/.sources.sha256 lists the hashes of the sources they were
@@ -43,8 +68,8 @@ jobs:
       # markers. Touch the markers of unchanged files so make skips them, and
       # remove the markers and outputs of changed or deleted files (and of
       # files whose names start with theirs, as the output globs cover them).
-      # A changed Makefile or *.inc.scad (included by the models) renders the
-      # whole component again.
+      # A changed Makefile, *.inc.scad (included by the models) or OpenSCAD
+      # renders the whole component again.
       - name: Keep unchanged renders
         run: |
           for makefile in */Makefile; do
@@ -55,6 +80,7 @@ jobs:
               [ -d target ] || exit 0
               incs=$(awk '$2 ~ /\.inc\.scad$/' "$sums" 2>/dev/null)
               if ! awk '$2 == "Makefile"' "$sums" 2>/dev/null | sha256sum -c --status 2>/dev/null \
+                || ! grep -qx "$OPENSCAD_SHA256  openscad" "$sums" 2>/dev/null \
                 || { [ -n "$incs" ] && ! echo "$incs" | sha256sum -c --status 2>/dev/null; } \
                 || [ "$(ls *.inc.scad 2>/dev/null)" != "$(echo "$incs" | awk 'NF { print $2 }')" ]; then
                 echo "$dir: Makefile or an include changed, rendering everything"
@@ -95,7 +121,10 @@ jobs:
           kill %1
           [ $status = 0 ] || exit 1
           for makefile in */Makefile; do
-            (cd "$(dirname "$makefile")" && sha256sum *.scad Makefile > target/.sources.sha256)
+            (cd "$(dirname "$makefile")" && {
+              sha256sum *.scad Makefile
+              echo "$OPENSCAD_SHA256  openscad"
+            } > target/.sources.sha256)
           done
 
       - name: Save renders

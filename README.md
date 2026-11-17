@@ -24,7 +24,10 @@ all printable STLs, on the
 ## Building
 
 The OpenSCAD binary comes from the `OPENSCAD` environment variable; the
-designs use OpenSCAD 2021.01. Run `make` in a component directory:
+designs use an OpenSCAD development snapshot (the AppImage pinned in the
+[Build](.github/workflows/build.yml) workflow, from
+[files.openscad.org/snapshots](https://files.openscad.org/snapshots/)) for
+its much faster Manifold backend. Run `make` in a component directory:
 
 ```sh
 cd switchpanel

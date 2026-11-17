@@ -327,27 +327,16 @@ module arm_cut_2d() {
                translate([-arm_w, 0]) square([2 * arm_w, 100]);
 }
 
-// Rendering speed: piece() sets $clip = [x0, x1, side] and everything
-// below only builds what is near that piece (the outline clipped to its x
-// range, the shell only on its side of y=0, only its bosses, holes and
-// text), so CGAL never has to work on the whole yoke. Unset: the whole yoke.
-function in_clip(x, m = 0) = is_undef($clip) || (x >= $clip[0] - m && x <= $clip[1] + m);
-function clip_side(s) = is_undef($clip) || $clip[2] == s;
-
 // The outline with its corners rounded, offset inwards by o; open beyond
 // the arm ends unless closed
 module outline_2d(o = 0, closed = true) {
-   intersection() {
-      difference() {
-         offset(delta = -o)
-            offset(r = round) offset(delta = -round)
-               offset(r = -fillet) offset(delta = fillet)
-                  polygon(outline);
-         if (closed)
-            arm_cut_2d();
-      }
-      if (!is_undef($clip))
-         translate([$clip[0] - 1, -1000]) square([$clip[1] - $clip[0] + 2, 2000]);
+   difference() {
+      offset(delta = -o)
+         offset(r = round) offset(delta = -round)
+            offset(r = -fillet) offset(delta = fillet)
+               polygon(outline);
+      if (closed)
+         arm_cut_2d();
    }
 }
 
@@ -372,9 +361,9 @@ module y_extrude(y0, y1) {
 module body(o = 0) {
    re = edge_r - o;
    core = yoke_d / 2 - edge_r;
-   y_extrude(clip_side(-1) ? -core : -1, clip_side(1) ? core : 1)
+   y_extrude(-core, core)
       outline_2d(o, o == 0);
-   for (s = [-1, 1], i = [1 : edge_steps]) if (clip_side(s)) {
+   for (s = [-1, 1], i = [1 : edge_steps]) {
       t = re * (i - 0.5) / edge_steps;
       ya = core + re * (i - 1) / edge_steps;
       yb = core + re * i / edge_steps;
@@ -410,43 +399,32 @@ module inner_parts() {
    intersection() {
       body(0);
       union() {
-         for (b = bosses) if (in_clip(b.x, boss_d))
+         for (b = bosses)
             y_cyl(b, boss_d, y_aft, y_fwd);
          // hub front, thicker under the collar bolts
-         if (clip_side(1) && in_clip(0, collar_flange.x))
-            y_cyl([0, z_shaft], collar_flange.x, y_in_fwd - collar_pad, y_in_fwd + 0.01);
+         y_cyl([0, z_shaft], collar_flange.x, y_in_fwd - collar_pad, y_in_fwd + 0.01);
       }
    }
-   if (clip_side(-1)) {
-      for (h = mux_holes) if (in_clip(h.x, mux_standoff_d))
-         y_cyl([h.x, mux_z + h.y], mux_standoff_d, y_in_aft - 0.01, mux_y);
-      if (in_clip(0, tie_block.y))
-         tie_block();
-   }
+   for (h = mux_holes)
+      y_cyl([h.x, mux_z + h.y], mux_standoff_d, y_in_aft - 0.01, mux_y);
+   tie_block();
 }
 
 module holes() {
-   for (b = bosses) if (in_clip(b.x, boss_d)) {
-      if (clip_side(-1))
-         y_cyl(b, pilot_d, screw_tip - 1, 0.01);
-      if (clip_side(1)) {
-         y_cyl(b, clear_d, 0, screw_seat + 0.01);
-         y_cyl(b, head_bore, screw_seat, y_fwd + 1);
-      }
+   for (b = bosses) {
+      y_cyl(b, pilot_d, screw_tip - 1, 0.01);
+      y_cyl(b, clear_d, 0, screw_seat + 0.01);
+      y_cyl(b, head_bore, screw_seat, y_fwd + 1);
    }
-   if (clip_side(1)) {
-      if (in_clip(0, cable_hole))
-         y_cyl([0, z_shaft], cable_hole, 0, y_fwd + 1);
-      for (b = collar_bolts) if (in_clip(b.x, m4_clear))
-         y_cyl(b, m4_clear, 0, y_fwd + 1);
-      // head screws, through the front arm wall
-      for (s = [-1, 1]) if (in_clip(s * arm_end.x, arm_w))
-         arm_frame(s)
-            y_cyl([0, -head_screw_z], clear_d, 0, y_fwd + 1);
-   }
-   if (clip_side(-1))
-      for (h = mux_holes) if (in_clip(h.x, mux_standoff_d))
-         y_cyl([h.x, mux_z + h.y], mux_screw_hole, y_in_aft + 1, mux_y + 1);
+   y_cyl([0, z_shaft], cable_hole, 0, y_fwd + 1);
+   for (b = collar_bolts)
+      y_cyl(b, m4_clear, 0, y_fwd + 1);
+   // head screws, through the front arm wall
+   for (s = [-1, 1])
+      arm_frame(s)
+         y_cyl([0, -head_screw_z], clear_d, 0, y_fwd + 1);
+   for (h = mux_holes)
+      y_cyl([h.x, mux_z + h.y], mux_screw_hole, y_in_aft + 1, mux_y + 1);
 }
 
 // Version on the front of the bar, readable from the front
@@ -469,9 +447,8 @@ module yoke() {
          inner_parts();
       }
       holes();
-      if (clip_side(1))
-         for (x = [-(xs_aft + xs_fwd) / 2, (xs_aft + xs_fwd) / 2, -144, 144]) if (in_clip(x))
-            gitrev(x);
+      for (x = [-(xs_aft + xs_fwd) / 2, (xs_aft + xs_fwd) / 2, -144, 144])
+         gitrev(x);
    }
 }
 
@@ -503,7 +480,6 @@ module lip() {
 
 // side 1: front (y >= 0), -1: back (y <= 0); x from x0 to x1
 module piece(x0, x1, side) render() {
-   $clip = [x0, x1, side];
    intersection() {
       yoke();
       translate([x0, side > 0 ? 0 : -50, -50])
