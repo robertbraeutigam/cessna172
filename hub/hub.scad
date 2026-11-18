@@ -29,7 +29,8 @@
 //   (`shield` view): each line to the Mega has a row, its resistor or
 //   network pin in the hole beside the Mega pin and a solder bridge on top
 //   onto it; neighbouring pins that belong together are bridged on the
-//   back, everything else is a short wire-wrap wire from pin to pin. The
+//   back, and the pins are placed so that this is every connection (no
+//   wires): those that are a line of their own, or power, loose. The
 //   servos' power has the double header's second 5 V and GND pins.
 // - Nothing in the box is soldered and no wire goes to the Mega: the
 //   shield comes off with 4 screws, and the Mega can be reused.
@@ -47,9 +48,9 @@
 // - Arduino Mega 2560
 // - 6 RJ45 breakout boards (34 x 28 mm, 9 pin angled header: 1-8 and SH)
 // - shield: 90 x 70 mm perfboard (31 x 26 holes, double sided, plated
-//   through), a 2 x 18 and nine 1 x 8
+//   through), a 2 x 18 and ten 1 x 8
 //   male pin headers, 6 x 330 Ohm, a 4.7 kOhm x 8 bussed network (SIP 9),
-//   wire-wrap and tinned wire
+//   tinned wire for the bridges
 // - 24 + 6 M3 x 6 self tapping screws (RJ45 boards, Mega), 4 x M3 x 8
 //   self tapping (shield), 4 x M3 x 10 (lid)
 // - 48 female-female jumper wires, 15 cm, as 8 wire ribbons
@@ -181,8 +182,8 @@ sh_ana_row = 3;
 // analog line goes from its port pin over the hole behind the analog pin,
 // bridged on the back and on top. Everything else is a solder bridge
 // between two neighbouring pins that belong together (the mux bus across
-// the mux ports, the shared pins of ports 4 and 5) or a short wire-wrap
-// wire on the back, from pin to pin.
+// the mux ports, the 5 V and GND rows, ...) or a wire-wrap wire on the
+// back, from pin to pin (none so far: the loose pins are placed so).
 // Port headers: [pin 1, step to the next pin]. The mux ports stand side by
 // side over the analog header (pin 8, AUX, at the front), so the pins they
 // share are neighbours, and port 3's S0-S3 pins are next to their
@@ -195,15 +196,17 @@ sh_ports = [[[23, 12], [0, -1]], [[24, 12], [0, -1]], [[25, 12], [0, -1]],
 // peeled off the port's ribbon: the pins with a pull-up in one strip next
 // to the pull-up network, each beside its network pin, the servo signals
 // beside their 330 Ohm, port 5's pot two holes behind a free analog pin,
-// the servo power beside the double header's outer 5 V and GND pins,
-// the 5 V and GND of ports 4 and 5 beside the Mega's, port 6's beside the
-// mux ports' (ports 4 and 5 have no header left): [[port, pin], hole]
+// the servo power beside the double header's outer 5 V and GND pins, and
+// the 5 V and GND pins of all ports in a row of neighbours each, onto the
+// Mega's 5 V and GND (ports 4 and 5 have no header left): [[port, pin], hole]
 sh_loose_pins = [[[1, 7], [26, 20]], [[2, 7], [26, 19]], [[4, 3], [26, 18]], [[3, 7], [26, 17]],
                  [[5, 8], [26, 16]], [[4, 6], [26, 15]], [[5, 6], [26, 14]], [[4, 8], [26, 13]],
                  [[4, 7], [26, 9]], [[5, 7], [26, 8]], [[5, 3], [22, 5]],
                  [[4, 1], [30, 23]], [[5, 1], [30, 24]], [[4, 2], [30, 2]], [[5, 2], [30, 1]],
-                 [[4, 4], [27, 22]], [[5, 4], [28, 22]], [[4, 5], [28, 3]], [[5, 5], [28, 2]],
-                 [[6, 4], [22, 9]], [[6, 5], [22, 8]]];
+                 [[6, 4], [23, 22]], [[1, 4], [24, 22]], [[2, 4], [25, 22]], [[3, 4], [26, 22]],
+                 [[4, 4], [27, 22]], [[5, 4], [28, 22]],
+                 [[6, 5], [25, 1]], [[1, 5], [26, 1]], [[2, 5], [27, 1]], [[3, 5], [28, 1]],
+                 [[5, 5], [28, 2]], [[4, 5], [28, 3]]];
 function loose(port, p) = len([for (x = sh_loose_pins) if (x[0] == [port, p]) 1]) > 0;
 function sh_pin(port, p) =
    let (m = [for (x = sh_loose_pins) if (x[0] == [port, p]) x[1]])
@@ -284,10 +287,10 @@ sh_links = concat(
    // From each line's (last) port pin to its resistor or network pin
    [for (l = sh_lines) if (l[2] != "") let (p = l[1][len(l[1]) - 1])
       [P(p[0], p[1]), l[2] == "330" ? r330(l[0]) : sip_in_row(mega_hole(l[3]).y), 0, l[0]]],
-   [// 5 V: port 6 onto the mux ports, ports 4 and 5 onto the Mega, a wire between
-    [P(6, 4), P(1, 4), 1, "5V"], [P(5, 4), hole_before(["5V", 0]), 1, "5V"], [P(3, 4), P(4, 4), 1, "5V"],
+   [// 5 V: port 6, the mux ports, ports 4 and 5, onto the Mega
+    [P(6, 4), P(1, 4), 1, "5V"], [P(3, 4), P(4, 4), 1, "5V"], [P(5, 4), hole_before(["5V", 0]), 1, "5V"],
     // GND the same way
-    [P(6, 5), P(1, 5), 2, "GND"], [P(4, 5), hole_before(["GND", 0]), 2, "GND"], [P(3, 5), P(4, 5), 2, "GND"],
+    [P(6, 5), P(1, 5), 2, "GND"], [P(3, 5), P(5, 5), 2, "GND"], [P(4, 5), hole_before(["GND", 0]), 2, "GND"],
     // Servo power
     [P(4, 1), mega_hole(["5V", 1]) + [0, 1], 3, "servo 5V"],
     [P(4, 2), mega_hole(["GND", 1]) - [0, 1], 3, "servo GND"]]);
@@ -784,7 +787,7 @@ module shield_view() {
              [3, "4.7 kOhm x 8 bussed network (SIP 9), pin 1 (common, 5 V) on the big dot"],
              [4, "solder bridge (or tinned wire) on the back between two neighbouring pins"],
              [5, "solder bridge on top: the hole beside a Mega pin onto it"],
-             [6, "wire-wrap wire on the back, pin to pin: signal, 5 V, GND, servo power"]];
+             if (len(sh_wires)) [6, "wire-wrap wire on the back, pin to pin: signal, 5 V, GND, servo power"]];
    for (i = [0 : len(legend) - 1]) translate([2, -5.5 - i * 2.2]) {
       k = legend[i][0];
       if (k == 0) { color("#7b241c") layer(6) square(1.4, center = true); }

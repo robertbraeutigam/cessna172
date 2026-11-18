@@ -544,10 +544,10 @@ with the lid on.
 | 1 | perfboard, 90 x 70 mm, 2.54 mm grid (31 x 26 holes), double sided, plated through holes | shield |
 | 1 | male pin header, 2 x 18, straight | shield onto the Mega's double header |
 | 2 | male pin header, 1 x 8, straight | shield onto the Mega's analog headers |
-| 7 | male pin header, 1 x 8, straight | the headers of ports 1-3 and 6, the strip of pins with a pull-up, two cut into the other loose pins |
+| 8 | male pin header, 1 x 8, straight | the headers of ports 1-3 and 6, the strip of pins with a pull-up, three cut into the other loose pins |
 | 6 | 330 Ohm resistor | in series with S0-S3 and the 2 servo signals |
 | 1 | resistor network, 4.7 kOhm x 8, bussed, SIP 9 (marked A09-472, e.g. Bourns 4609X-101-472LF) | pull-ups: 3 mux SIG lines, 5 direct-port switch/encoder lines |
-| - | wire-wrap wire, 30 AWG, a few colors; a bit of tinned copper wire | the shield's 2 wires; bridges between neighbouring pins |
+| - | a bit of tinned copper wire | bridges between neighbouring pins |
 | 48 | female-female jumper wire, 15 cm, as 8 wire ribbons | RJ45 pins to the shield, 8 per port |
 
 Per port used: a stranded copper Cat5 patch cable, soldered at the
@@ -587,9 +587,9 @@ analog line goes from its port pin on the back to the hole behind the
 analog pin, a bridge on top onto it. The rows of the double header's
 inner (even) column are the lines; its outer column has no free hole
 beside it and only gives the servo power (its 5 V and GND pins, at the
-ends). Apart from these, a solder bridge only joins two neighbouring pins
-that belong together, and everything else is a wire-wrap wire from pin to
-pin.
+ends). Apart from these, a solder bridge joins two neighbouring pins
+that belong together; the pins are placed so that this is every
+connection, and the shield has no wires.
 
 - **Mega side**: the 2 x 18 header under the double header and the two
   1 x 8 headers under the analog headers, pushed in from below (their
@@ -601,14 +601,17 @@ pin.
   (pin 1 dark red in the drawing; plug each ribbon on the same way round
   as on its RJ45 board). The other pins are loose (blue in the drawing,
   marked port.pin), each pulled out of its port's header (pliers on the
-  pin, the plastic held) and set beside what it goes to, bridged to it:
+  pin, the plastic held) and set beside what it goes to, bridged to it
+  (each a line of its own, or 5 V, GND or servo power, which are joined
+  anyway):
   the 8 pins with a pull-up (SIG of the mux ports, A, B, D of port 4, B,
   D of port 5) as one more 1 x 8 strip next to the pull-up network, each
   beside its network pin; the servo signals beside their 330 Ohm; port
   5's pot two holes behind A10; the servo power of ports 4 and 5 beside
-  the double header's outer 5 V and GND; their 5 V and GND beside the
-  Mega's; port 6's 5 V and GND beside the mux ports'. Ports 4 and 5 have
-  no header left: mark their jumpers. The mux ports P1-P3 stand side by side over the analog header,
+  the double header's outer 5 V and GND; the 5 V pins (pin 4) of all six
+  ports in a row of neighbours onto the Mega's 5 V, the GND pins (pin 5)
+  the same onto its GND. Ports 4 and 5 have no header left: mark their
+  jumpers. The mux ports P1-P3 stand side by side over the analog header,
   pin 8 (AUX) at the front: their pins 1-6 are neighbours, bridged into
   the mux bus (S0-S3, 5 V and GND), and each AUX pin is two holes behind
   its analog pin; port 3's S0-S3 pins are next to their 330 Ohm
@@ -625,8 +628,7 @@ pin.
   in the 5 V row above them: each pull-up line has its own resistor to
   the one 5 V pin.
 - **Back**: the bridges between neighbouring pins (a blob, or a short
-  piece of tinned wire), and 2 wire-wrap wires (the thin lines in the
-  drawing): 5 V and GND from the mux ports to ports 4 and 5. Keep the joints flat: the shield sits 2.5 mm above the Mega's
+  piece of tinned wire); there are no wires. Keep the joints flat: the shield sits 2.5 mm above the Mega's
   digital header and its 2 x 3 ICSP header in the middle. Nothing is
   soldered above the ICSP header (the red frame in the drawing: the build
   checks it); run the wires around it or flat over it.

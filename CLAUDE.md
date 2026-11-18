@@ -89,7 +89,7 @@ its own top-level directory; new components should follow the same layout.
   corners, double sided and plated through, wired on the bench (each
   line to the Mega in its own row, its resistor or network pin beside the
   Mega pin with a solder bridge on top onto it; bridges only between
-  neighbouring used pins, everything else wire-wrap from pin to pin; layout
+  neighbouring used pins, no wires (`sh_wires` is empty); layout
   lists `sh_*`, the lines in `sh_lines`, drawn by the `shield` view; the
   build checks that the Mega's pins land on its grid, that every hole has
   one use and is on one net, and that every line connects): every RJ45 pin goes to it, each
