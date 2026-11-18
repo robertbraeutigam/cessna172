@@ -184,10 +184,12 @@ sh_ana_row = 3;
 // wire on the back, from pin to pin.
 // Port headers: [pin 1, step to the next pin]. The mux ports stand side by
 // side over the analog header (pin 8, AUX, at the front), so the pins they
-// share are neighbours; port 6 lies along the analog header; ports 4 and 5
-// stand side by side in front of the pull-up network.
-sh_ports = [[[20, 12], [0, -1]], [[21, 12], [0, -1]], [[22, 12], [0, -1]],
-            [[23, 20], [0, -1]], [[24, 20], [0, -1]], [[11, 5], [1, 0]]];
+// share are neighbours, and port 3's S0-S3 pins are next to their
+// resistors; port 6 lies along the analog header; ports 4 and 5 stand side
+// by side behind them, port 4 next to the pull-up network, so its pull-up
+// pins are next to theirs.
+sh_ports = [[[23, 12], [0, -1]], [[24, 12], [0, -1]], [[25, 12], [0, -1]],
+            [[26, 20], [0, -1]], [[25, 20], [0, -1]], [[11, 5], [1, 0]]];
 function sh_pin(port, p) = sh_ports[port - 1][0] + (p - 1) * sh_ports[port - 1][1];
 function P(port, p) = sh_pin(port, p);
 // Mega pins: ["D", n], ["A", n], ["5V", 0 logic / 1 servo], ["GND", 0 / 1]
@@ -215,20 +217,20 @@ sh_lines = [
    ["S1", [[1, 2], [2, 2], [3, 2]], "330", ["D", 40]],
    ["S2", [[1, 3], [2, 3], [3, 3]], "330", ["D", 42]],
    ["S3", [[1, 6], [2, 6], [3, 6]], "330", ["D", 48]],
-   ["SIG1", [[1, 7]], "4k7", ["D", 28]],
-   ["SIG2", [[2, 7]], "4k7", ["D", 30]],
-   ["SIG3", [[3, 7]], "4k7", ["D", 34]],
-   ["AUX1", [[1, 8]], "", ["A", 8]],
-   ["AUX2", [[2, 8]], "", ["A", 9]],
-   ["AUX3", [[3, 8]], "", ["A", 10]],
+   ["SIG1", [[1, 7]], "4k7", ["D", 22]],
+   ["SIG2", [[2, 7]], "4k7", ["D", 24]],
+   ["SIG3", [[3, 7]], "4k7", ["D", 28]],
+   ["AUX1", [[1, 8]], "", ["A", 11]],
+   ["AUX2", [[2, 8]], "", ["A", 12]],
+   ["AUX3", [[3, 8]], "", ["A", 13]],
    ["P4 A", [[4, 3]], "4k7", ["D", 26]],
-   ["P4 B", [[4, 6]], "4k7", ["D", 24]],
+   ["P4 B", [[4, 6]], "4k7", ["D", 32]],
    ["P4 C", [[4, 7]], "330", ["D", 44]],
-   ["P4 D", [[4, 8]], "4k7", ["D", 22]],
-   ["P5 A", [[5, 3]], "", ["A", 11]],
-   ["P5 B", [[5, 6]], "4k7", ["D", 32]],
+   ["P4 D", [[4, 8]], "4k7", ["D", 36]],
+   ["P5 A", [[5, 3]], "", ["A", 14]],
+   ["P5 B", [[5, 6]], "4k7", ["D", 34]],
    ["P5 C", [[5, 7]], "330", ["D", 46]],
-   ["P5 D", [[5, 8]], "4k7", ["D", 36]],
+   ["P5 D", [[5, 8]], "4k7", ["D", 30]],
    ["P6 E", [[6, 1]], "", ["A", 0]],
    ["P6 F", [[6, 2]], "", ["A", 1]],
    ["P6 A", [[6, 3]], "", ["A", 2]],
@@ -245,11 +247,10 @@ function line(name) = [for (l = sh_lines) if (l[0] == name) l][0];
 function hole_before(m) = mega_hole(m) - [1, 0];    // the hole beside a double header pin
 function hole_behind(m) = mega_hole(m) + [0, 1];    // the hole behind an analog pin
 // 330 Ohm resistors, standing in their row: [body hole, line]; the lead
-// goes into the hole beside the Mega pin. Every other one stands a hole
-// further left (its lead over the hole between), so the bodies of
-// neighbouring rows do not touch.
-sh_330 = [[[26, 12], "S0"], [[27, 11], "S1"], [[26, 10], "S2"], [[27, 9], "P4 C"],
-          [[26, 8], "P5 C"], [[27, 7], "S3"]];
+// goes into the hole beside the Mega pin. S0-S3 stand a hole further left
+// (the lead over the hole between), next to port 3's pins.
+sh_330 = [[[26, 12], "S0"], [[26, 11], "S1"], [[26, 10], "S2"], [[27, 9], "P4 C"],
+          [[27, 8], "P5 C"], [[26, 7], "S3"]];
 function r330(name) = [for (r = sh_330) if (r[1] == name) r[0]][0];
 function r330_lead(name) = hole_before(line(name)[3]);
 // The pull-ups: one 4.7 kOhm x 8 bussed resistor network (SIP 9, pin 1 the
@@ -259,6 +260,24 @@ sh_sip = [[27, 21], [0, -1]];
 sip_pins = 9;
 function sip_pin(k) = sh_sip[0] + (k - 1) * sh_sip[1];
 function sip_in_row(r) = [for (k = [1 : sip_pins]) if (sip_pin(k).y == r) sip_pin(k)][0];
+// Links from pin to pin: [hole, hole, kind, net]: kind 0 signal, 1 5 V,
+// 2 GND, 3 servo power. Between two neighbours a link is a bridge on the
+// back, else a wire-wrap wire on the back.
+sh_links = concat(
+   // From each line's (last) port pin to its resistor or network pin
+   [for (l = sh_lines) if (l[2] != "") let (p = l[1][len(l[1]) - 1])
+      [P(p[0], p[1]), l[2] == "330" ? r330(l[0]) : sip_in_row(mega_hole(l[3]).y), 0, l[0]]],
+   [[P(5, 3), hole_behind(["A", 14]), 0, "P5 A"],
+    // 5 V: port 6 to the mux ports, on to ports 4 and 5, from there to the Mega
+    [P(6, 4), P(1, 4), 1, "5V"], [P(3, 4), P(5, 4), 1, "5V"], [P(4, 4), hole_before(["5V", 0]), 1, "5V"],
+    // GND the same way
+    [P(6, 5), P(1, 5), 2, "GND"], [P(3, 5), P(5, 5), 2, "GND"], [P(3, 5), hole_before(["GND", 0]), 2, "GND"],
+    // Servo power
+    [P(4, 1), mega_hole(["5V", 1]) + [0, 1], 3, "servo 5V"],
+    [P(4, 2), mega_hole(["GND", 1]) - [0, 1], 3, "servo GND"]]);
+function next_to(l) = norm(l[0] - l[1]) == 1;
+sh_wires = [for (l = sh_links) if (!next_to(l)) l];
+
 // Bridges between neighbouring holes, on the back (side 0) or on top
 // (side 1): [a, b, side, net]
 function B(a, b, net) = [a, b, 0, net];
@@ -285,21 +304,9 @@ sh_runs = concat(
     T(hole_before(["GND", 0]), mega_hole(["GND", 0]), "GND")],
    // Servo power onto the double header's outer 5 V and GND
    [T(mega_hole(["5V", 1]) + [0, 1], mega_hole(["5V", 1]), "servo 5V"),
-    T(mega_hole(["GND", 1]) - [0, 1], mega_hole(["GND", 1]), "servo GND")]);
-// Wire-wrap wires on the back, pin to pin: [hole, hole, kind, net]: kind
-// 0 signal, 1 5 V, 2 GND, 3 servo power
-sh_wires = concat(
-   // From each line's (last) port pin to its resistor or network pin
-   [for (l = sh_lines) if (l[2] != "") let (p = l[1][len(l[1]) - 1])
-      [P(p[0], p[1]), l[2] == "330" ? r330(l[0]) : sip_in_row(mega_hole(l[3]).y), 0, l[0]]],
-   [[P(5, 3), hole_behind(["A", 11]), 0, "P5 A"],
-    // 5 V: port 6 to the mux ports, on to ports 4 and 5, from there to the Mega
-    [P(6, 4), P(1, 4), 1, "5V"], [P(3, 4), P(4, 4), 1, "5V"], [P(5, 4), hole_before(["5V", 0]), 1, "5V"],
-    // GND the same way
-    [P(6, 5), P(1, 5), 2, "GND"], [P(3, 5), P(4, 5), 2, "GND"], [P(3, 5), hole_before(["GND", 0]), 2, "GND"],
-    // Servo power
-    [P(5, 1), mega_hole(["5V", 1]) + [0, 1], 3, "servo 5V"],
-    [P(5, 2), mega_hole(["GND", 1]) - [0, 1], 3, "servo GND"]]);
+    T(mega_hole(["GND", 1]) - [0, 1], mega_hole(["GND", 1]), "servo GND")],
+   // Links between neighbours
+   [for (l = sh_links) if (next_to(l)) B(l[0], l[1], l[3])]);
 sh_port_pins = [for (port = [1 : 6], p = [1 : 8]) sh_pin(port, p)];
 sh_res_holes = [for (r = sh_330) each [r[0], r330_lead(r[1])]];
 sh_sip_holes = [for (k = [1 : sip_pins]) sip_pin(k)];
@@ -726,10 +733,13 @@ module shield_view() {
          color(p == 1 ? "#7b241c" : c_black) layer(6) square(1.4, center = true);
          label(str(p), 0.75, "#f4d03f", "center", "center", l = 7);
       }
+      // The mux ports side by side: one label left of them
       d = sh_ports[port - 1][1];
-      translate(at(sh_pin(port, 1)) - d * 1.3)
-         label(str("P", port), 0.85, port <= 3 ? "#c0392b" : "#2471a3",
-               d.x ? "right" : "center", d.x ? "center" : "bottom", true);
+      if (port == 1)
+         translate(at(sh_pin(1, 1)) - [1.1, 0]) label("P1 P2 P3", 0.85, "#c0392b", "right", "center", true);
+      else if (port > 3)
+         translate(at(sh_pin(port, 1)) - d * 1.3)
+            label(str("P", port), 0.85, "#2471a3", d.x ? "right" : "center", d.x ? "center" : "bottom", true);
    }
    // Mega pin names: analog in front of their row, the double header's rows
    // (only the inner pins and the servo power on the outer ones are used) on

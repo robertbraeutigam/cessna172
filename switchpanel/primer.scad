@@ -26,7 +26,7 @@
 //   the rear wall. The collar reaches it only in the last pop mm, so it
 //   pushes the knob out that far when unlocked and leaves it free after.
 // - The pot goes to the switch panel's mux board: 5 V, GND, and the
-//   wiper on the Cat5 cable's spare AUX wire (hub port 3, Mega A10).
+//   wiper on the Cat5 cable's spare AUX wire (hub port 3, Mega A13).
 //
 // Coordinates: z is the rod axis, z=0 is the back of the panel plate, +z
 // points backwards. x is to the pilot's left, y up (seen from the front,

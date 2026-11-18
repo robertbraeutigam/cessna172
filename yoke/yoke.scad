@@ -13,8 +13,8 @@
 // underside angled back into the side; all of it on the head's side.
 // Everything is hollow: the wires run from the heads down the arms and
 // along the bar to a CD74HC4067 mux in the hub, and the Cat5 cable from
-// there through the hollow control tube to hub port 1 (mux port: SIG D28,
-// AUX A8; README "Ports").
+// there through the hollow control tube to hub port 1 (mux port: SIG D22,
+// AUX A11; README "Ports").
 //
 // Printing: 378 mm wide, so the wheel is cut into six shells, all printed
 // outer face down (both faces are flat, the edges rounded), no supports:
