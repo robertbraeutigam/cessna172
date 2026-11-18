@@ -268,7 +268,8 @@ what the direct ports are for.
 
 At the hub it is the RJ45 pin, at the component the wire color (the cable
 is soldered there). Pins 4 and 5 (the blue pair) are 5 V and GND on every
-port; at the hub they are soldered together across all 6 ports.
+port; at the hub they are joined on the distributor board (see
+[Hub wiring](#wiring)) for all 6 ports.
 
 **Mux ports (1-3):**
 
@@ -284,11 +285,14 @@ port; at the hub they are soldered together across all 6 ports.
 | 8 | brown | AUX | the port's own Mega pin: one analog input, a button or a servo |
 
 S0-S3 are shared by every mux (MobiFlight takes them once per board); at
-the hub pins 1, 2, 3 and 6 of ports 1-3 are soldered together (the mux
-bus). Every mux gets a pull-up resistor from SIG to 5 V. MobiFlight turns
-on the Mega's internal pull-up, but that is weak (20-50 kOhm), and its
-docs recommend an extra one for long wires: solder a 4.7 kOhm between the
-SIG and VCC pins on each mux board, in the component.
+the hub pins 1, 2, 3 and 6 of ports 1-3 are joined on the distributor
+board (the mux bus). Every SIG line gets a 4.7 kOhm pull-up resistor to
+5 V there. MobiFlight turns on the Mega's internal pull-up, but that is
+weak (20-50 kOhm): on a long cable the line rises slowly after an open
+switch (the cable's capacitance) and picks up the S0-S3 edges next to it,
+so the mux could read a ghost input. MobiFlight's docs recommend an extra
+one for long wires. It does not matter at which end of the cable it sits,
+so it is on the hub's board and the components have no resistors.
 
 **Direct ports (4-6):**
 
@@ -315,13 +319,14 @@ The rules:
   two more lines.
 - **Pots** go between 5 V and GND of the blue pair, the wiper on a line.
 - **Switches and encoders** go to GND (pin 5) like on a mux, active low,
-  with a 4.7 kOhm pull-up to 5 V at the component on each line (the same
-  reason as the mux SIG pull-up).
+  with a 4.7 kOhm pull-up to 5 V on the hub's distributor board on each
+  line (the same reason as the mux SIG pull-up). Pots get none: it would
+  pull the wiper reading.
 
 **A wrong port does not damage anything**, it only mixes up the inputs in
 the sim until the cable is in its own port again (they are numbered). Every
 Mega output that goes into a cable has a 330 Ohm resistor in series at the
-hub (S0-S3 and each servo signal, soldered into the wire), so a component
+hub (S0-S3 and each servo signal, on the distributor board), so a component
 in the wrong kind of port can not short a Mega output against a switch to
 GND or a pot at its end stop. The direct ports are on the hub's right
 wall, the mux ports on its front, so they are hard to mix up.
@@ -464,18 +469,21 @@ it fits the printer bed.
   6 standoffs, its USB jack through the left wall (flush with the outside,
   so any USB-B plug fits), with a cut-out in front of the power jack for
   later.
-- The strip behind the Mega is free for small boards later (the power bus
-  distribution, a stepper driver); the hole for the power bus is in the
-  back wall there. There is no prototype board: the few resistors are
-  soldered into the wires.
+- **Distributor board**: a 30 x 70 mm perfboard behind the Mega, on 4
+  standoffs (M3 self tapping), soldered on the bench before it goes in.
+  It joins the shared lines and carries every resistor of the hub (see
+  [Wiring](#wiring)). Left of it is room for the power bus distribution
+  later; the hole for the power bus is in the back wall there.
 - The build checks the room for a plugged jumper (20 mm: a 14 mm Dupont
-  housing and the bent wire) behind the RJ45 pins and above the Mega.
+  housing and the bent wire) behind the RJ45 pins and above the Mega and
+  the board.
 - The lid has a locating lip and is screwed onto four corner posts. Four
   ears on the floor (5.3 mm holes) screw the box onto the frame (M5 + T-nut)
   or under the desk.
 
-Nothing on the Mega is soldered: it keeps its pins free and can be reused,
-and a port is rewired by moving jumpers. The MobiFlight firmware is flashed
+Nothing in the box is soldered, every wire is a plugged Dupont jumper: the
+Mega keeps its pins free and can be reused, and a port is rewired by
+moving jumpers. The MobiFlight firmware is flashed
 from the Connector through the Mega's USB jack in the left wall, with the
 lid on.
 
@@ -484,14 +492,18 @@ lid on.
 | Qty | Part | Use |
 |-----|------|-----|
 | 1 | Arduino Mega 2560 | MobiFlight board |
-| 6 | 330 Ohm resistor, heat shrink tube | in series with S0-S3 and the 2 servo signals |
 | 6 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
 | 18 | M3 x 6 self tapping screw | RJ45 boards |
 | 6 | M3 x 6 self tapping screw | Mega |
+| 4 | M3 x 6 self tapping screw | distributor board |
 | 4 | M3 x 10 self tapping screw | lid |
-| - | insulated wire, about 0.25 mm2, 6 colors | the bus |
-| ~20 | male-female jumper wire, 20 cm | RJ45 pins to the Mega |
-| - | Dupont male pins, 1, 2 and 4 pin housings, crimper | ends of the bus wires on the Mega |
+| 1 | perfboard, 30 x 70 mm, 2.54 mm grid (10 x 24 holes) | distributor board |
+| 52 | male pin header, 2.54 mm, straight (break off strips) | distributor board |
+| 6 | 330 Ohm resistor | in series with S0-S3 and the 2 servo signals |
+| 8 | 4.7 kOhm resistor | pull-ups: 3 mux SIG lines, 5 direct-port switch/encoder lines |
+| - | tinned copper wire | the 5 V rails on the board's back |
+| ~34 | female-female jumper wire, 20 cm | RJ45 pins to the distributor board |
+| ~28 | male-female jumper wire, 20 cm | distributor board and RJ45 pins to the Mega |
 
 Per port used: a stranded copper Cat5 patch cable, soldered at the
 component end (see [Cables](#cables)).
@@ -499,39 +511,49 @@ component end (see [Cables](#cables)).
 **MEASURE when they arrive**: the RJ45 boards (`rj_*`): the jack's height
 and its position on the board, the header position and the mounting holes
 (guessed from the listing picture; fix `rj_holes` before printing, the
-build checks that the bosses stay on the board). All boards are screwed on
-with M3: if a hole is smaller than about 3.1 mm, drill it out, keeping
-clear of the traces around it. The Mega values are from the Arduino drawing.
+build checks that the bosses stay on the board) and the perfboard (`pb`,
+`pb_holes`: its size and corner holes, the hole grid is centered on it).
+All boards are screwed on with M3: if a hole is smaller than about 3.1 mm,
+drill it out, keeping clear of the traces around it. The Mega values are from the Arduino drawing.
 
 ### Wiring
 
-**Bus**: one insulated wire per line, one color each, soldered along the
-boards. Strip a short piece of insulation where it passes a pin and
-solder it there, at the pin's base by the header, so it does not touch the
-other pins it crosses:
+**Distributor board**: the lines that are shared or need a resistor go
+from their RJ45 pin to the board and from there to the Mega. It is a
+plain perfboard with straight male pin headers, built on the bench as in
+the drawing (component side, row 0 towards the Mega; `board` view of
+`hub.scad`, which also draws the board in the box from the same list):
 
-- 5 V and GND (pins 4 and 5): across all 6 ports, round the corner from
-  port 3 to port 4.
-- S0, S1, S2, S3 (pins 1, 2, 3 and 6): across the mux ports 1-3 only.
-  Ports 4-6 keep these pins for their own lines.
-- To the Mega: six wires from port 1's pins 1, 2, 3, 6 (S0-S3) and 4, 5
-  (5 V, GND), crimped into Dupont male pins. S0-S3 go through a 330 Ohm
-  resistor each, soldered into the wire near the Mega end, heat shrink
-  over it, and end in one 4 pin housing on pins 22-25; 5 V and GND in a
-  2 pin housing on the 5 V and GND pins next to each other in the power
-  header.
+[![Distributor board](https://robertbraeutigam.github.io/cessna172/hub/hub_board.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_board.png)
 
-Everything else is a jumper, plugged onto the RJ45 boards' angled pins:
+- **S0-S3**: one column each: the pins from ports 1, 2, 3, a 330 Ohm
+  resistor, the pin to the Mega (D22-D25).
+- **Servo signals**: below them, ports 4 and 5 pin 7 through a 330 Ohm
+  resistor to D2 and D3.
+- **GND, 5V**: a column of 8 pins each: ports 1-6, the Mega's 5 V and GND
+  pin (the power header), a spare.
+- **Pull-ups**: two 5 V rails (tinned wire on the back) run right from the
+  5V column. Each line has its pin from the port and its pin to the Mega
+  side by side, and a 4.7 kOhm resistor to the rail: the SIG of ports 1-3
+  (D26-D28), port 4 lines A, B (encoder, D30, D31) and D (parking brake,
+  D32), port 5 lines B and D (free, D33, D34), and two spares.
+- The resistors stand upright, the body on the marked hole and the lead
+  bent down into the next one, below the height of the plugs. Everything
+  else is joined on the back with solder bridges between neighbouring
+  holes. Check every column with a multimeter before it goes in: no line
+  may touch its neighbour or the 5 V rail except through its resistor.
+
+Female-female jumpers go from the RJ45 pins to the board's port pins,
+male-female ones from its Mega pins to the Mega. The rest goes from the
+RJ45 pin straight to the Mega with a male-female jumper:
 
 | From | To |
 |------|----|
-| ports 1-3 pin 7 (SIG) and pin 8 (AUX) | their Mega pins (see [Ports](#ports)) |
-| ports 4-6, each pin with a line | its Mega pin |
+| ports 1-3 pin 8 (AUX) | their Mega pins (see [Ports](#ports)) |
+| port 5 pin 3 (flaps lever pot), port 6 (throttle pots) | their analog Mega pins |
 | ports 4 and 5 pins 1, 2 (servo 5 V, GND) | the 5 V and GND pins at the end of the Mega's double header |
-| ports 4 and 5 pin 7 (servo signal) | Mega D2 (port 4), D3 (port 5), through a 330 Ohm resistor soldered into the jumper |
 
-Plugs on the Mega hold well enough for good: use multi-pin housings where
-the pins are next to each other, tie each Cat5 cable to the box so a pull
+The Dupont plugs hold well enough for good: tie each Cat5 cable to the box so a pull
 on it does not reach the jumpers, and once everything works a dab of hot
 glue across the housings keeps them in (it peels off).
 
@@ -539,11 +561,11 @@ Add a Servo device on D2 and D3 in the Connector.
 
 ### Assembly
 
-1. Screw the RJ45 boards onto their bosses (M3 x 6).
-2. Solder the bus wires along the ports (S0-S3 only across ports 1-3) and
-   the six wires to the Mega on port 1, with the resistors in S0-S3.
-3. Screw the Mega onto its standoffs.
-4. Plug the bus wires and the jumpers as above and label them.
+1. Solder the distributor board on the bench (see [Wiring](#wiring)) and
+   check it with a multimeter.
+2. Screw the RJ45 boards onto their bosses (M3 x 6).
+3. Screw the Mega and the distributor board onto their standoffs.
+4. Plug the jumpers as above and label them.
 5. Screw the lid on.
 
 # Throttle quadrant
@@ -741,7 +763,6 @@ it.
 | 1 | CD74HC4067 16 channel mux breakout board | all inputs, see [Multiplexer](#multiplexer) |
 | 4 | M3 x 8 self tapping screw | mux onto its standoffs on the carrier, carrier (`switches_carrier.stl`) onto the panel |
 | 7 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
-| 1 | 4.7 kOhm resistor | SIG pull-up on the mux |
 | 1 | Cat5 patch cable, stranded copper (see [Cables](#cables)) | to hub port 3, soldered to the mux |
 | 1 | cable tie, up to 3.6 mm wide | the cable onto its block (`tie`) |
 | - | wire, heat shrink | see [Wiring](#wiring) |
@@ -884,7 +905,7 @@ there to the pins without any pull on them. The cable is 6 mm
 (`cable_d`, measured); **MEASURE** the tie (`tie`, 3.6 x 1.3 mm).
 
 The switches and the hall sensors have no pull-up resistors of their own:
-one 4.7 kOhm resistor from SIG to VCC on the mux board pulls whichever
+the 4.7 kOhm SIG pull-up on the hub's distributor board pulls whichever
 input is selected up (see [Port pinout](#port-pinout)). Test it on
 the bench with one switch on the mux before soldering all of them.
 
@@ -916,7 +937,7 @@ solder and heat shrink.
 
 1. Screw the mux onto the carrier's standoffs, solder the Cat5 cable to
    the mux control row and tie it onto its block. The ignition (and the
-   EN bridge, the SIG pull-up) can be soldered on now as well; the carrier
+   EN bridge) can be soldered on now as well; the carrier
    does not need the panel yet.
 2. Solder the wires to the switches; the rockers are hard to get out
    again once snapped in.

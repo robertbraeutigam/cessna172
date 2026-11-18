@@ -15,21 +15,24 @@
 //   tapping, from above). Their 8 pin angled headers point into the box.
 //   More components than ports (or than the 6 muxes MobiFlight takes on a
 //   Mega) get a second hub with its own Mega, not more ports here.
-// - The bus: an insulated wire per line along the row, soldered to pins
-//   4 and 5 (5 V, GND) of all boards and to pins 1, 2, 3, 6 (S0-S3) of the
-//   mux ports (5 V and GND go round the corner to ports 4-6). The other
-//   pins get jumpers. Six wires take the bus from port
-//   1 to the Mega, S0-S3 through a 330 Ohm resistor each, soldered into the
-//   wire (heat shrink over it), ending in Dupont plugs.
+// - The distributor board: a 30 x 70 mm perfboard with male pin headers,
+//   soldered on the bench and then screwed onto standoffs behind the Mega
+//   (`board` view). It joins the shared lines (5 V and GND of all ports,
+//   S0-S3 of the mux ports) and carries every resistor of the hub: 330 Ohm
+//   in series with S0-S3 and the two servo signals, 4.7 kOhm pull-ups to
+//   5 V on the mux SIG lines and on the direct-port switch and encoder
+//   lines. Female-female jumpers go from the RJ45 pins to it, male-female
+//   ones from it to the Mega.
+// - Lines that need neither (AUX, pots, servo power) go from the RJ45 pin
+//   straight to the Mega with a male-female jumper. Servos and encoders
+//   go to Mega pins, MobiFlight drives them without a second board; a
+//   servo's power goes to its own 5 V and GND pins on the Mega.
+// - Nothing in the box is soldered: every wire is a plugged jumper, so a
+//   port is rewired by moving jumpers and the Mega can be reused.
 // - Behind the front ports is a strip for the jumper plugs, then the Mega
 //   (its USB and power jacks through the left wall), left of the right
-//   ports' jumper strip. The strip behind the Mega is free for boards
-//   later (power bus, stepper drivers); no prototype board yet.
-// - Nothing on the Mega is soldered: jumper wires go from the RJ45 pins
-//   to it. Servos and encoders go straight to Mega pins, MobiFlight drives
-//   them without a second board; a servo's power goes to its own 5 V and
-//   GND pins on the Mega, its signal through a 330 Ohm resistor in the
-//   jumper.
+//   ports' jumper strip. The board is behind the Mega, on the right; left
+//   of it is room for the power bus later (the hole in the back wall).
 // - A lid with a locating lip is screwed onto four corner posts. Four ears
 //   on the floor screw the box onto the frame or under the desk.
 //
@@ -38,16 +41,17 @@
 // The box is printed floor down, the lid top down.
 //
 // Parts to buy (details in the README):
-// - Arduino Mega 2560, 6 x 330 Ohm resistors, heat shrink
+// - Arduino Mega 2560
 // - 6 RJ45 breakout boards (34 x 28 mm, 8 pin angled header)
-// - 18 M3 x 6 self tapping screws (RJ45 boards), 6 x M3 x 6 self tapping
-//   screws (Mega), 4 x M3 x 10 (lid)
-// - insulated wire for the bus, male-female jumper wires, Dupont male
-//   pins and housings (1, 2 and 4 pin)
+// - distributor board: 30 x 70 mm perfboard, 52 male pin headers (2.54 mm),
+//   6 x 330 Ohm, 8 x 4.7 kOhm, tinned wire
+// - 18 M3 x 6 self tapping screws (RJ45 boards), 6 + 4 x M3 x 6 self
+//   tapping screws (Mega, board), 4 x M3 x 10 (lid)
+// - about 34 female-female and 28 male-female jumper wires, 20 cm
 //
-// Assembly: screw the RJ45 boards on, solder their bus and its wires to
-// the Mega (resistors in S0-S3), screw the Mega on, plug the jumpers as in
-// the README, screw the lid on.
+// Assembly: solder the distributor board on the bench, screw the RJ45
+// boards, the Mega and the board on, plug the jumpers as in the README,
+// screw the lid on.
 
 $fn = 48;
 
@@ -112,8 +116,75 @@ mega_usb = [31.75, 43.75, 10.9, 6.2];
 mega_power = [3.3, 12.2, 11, 1.8];
 jack_cut_clear = 0.6;
 
+// --- Distributor board (MEASURE: a 30 x 70 mm perfboard, 2.54 mm grid) ---
+pb = [70, 30];               // along the back wall x depth
+pb_t = 1.6;
+pitch = 2.54;
+pb_grid = [24, 10];          // holes along x, along y; row 0 faces the Mega
+pb_holes = [[2.5, 2.5], [67.5, 2.5], [2.5, 27.5], [67.5, 27.5]];  // MEASURE: corner holes
+pb_standoff = [5, 5];        // diameter x height
+pb_screw_hole = 2.8;         // M3 self tapping
+pb_header_h = 8.5;           // a male pin header above the board
+pb_res_h = 11;               // a resistor standing upright
+pb_gap = 2;                  // between the Mega and the board
+
+// --- Distributor board layout ---
+// Holes by [column, row]: columns from the left, row 0 towards the Mega.
+// P<port>.<RJ45 pin> is a pin with a female-female jumper from that RJ45
+// pin, D<n> one with a male-female jumper to that Mega pin.
+pb_s_cols = [1, 3, 5, 7];        // S0-S3; below them the servo signals
+pb_gnd_col = 10;
+pb_5v_col = 12;
+pb_rails = [3, 6];               // 5 V rails from the 5V column to the right
+pb_pull_cols = [14, 16, 18, 20, 22];
+pb_power_names = ["P1", "P2", "P3", "P4", "P5", "P6", "Mega", "spare"];
+pb_servos = [["P4.7", "D2"], ["P5.7", "D3"]];
+// Pull-ups: [column index, back tier, from, to, name]
+pb_pullups = [[0, false, "P1.7", "D26", "SIG P1"], [1, false, "P2.7", "D27", "SIG P2"],
+              [2, false, "P3.7", "D28", "SIG P3"], [3, false, "P4.3", "D30", "P4 A"],
+              [4, false, "P4.6", "D31", "P4 B"], [0, true, "P4.8", "D32", "P4 D"],
+              [1, true, "P5.6", "D33", "P5 B"], [2, true, "P5.8", "D34", "P5 D"]];
+// Column headings: [column, back side, text, kind]
+pb_heads = concat(
+   [for (i = [0 : 3]) [pb_s_cols[i], false, str("S", i), 0]],
+   [[pb_gnd_col, false, "GND", 2], [pb_5v_col, false, "5V", 3]],
+   [for (i = [0 : 1]) [pb_s_cols[i], true, str("P", 4 + i, " servo"), 4]],
+   [for (i = [2 : 3]) [pb_s_cols[i], true, "spare", 5]],
+   [for (i = [0 : len(pb_pull_cols) - 1], back = [false, true])
+      let (l = [for (u = pb_pullups) if (u[0] == i && u[1] == back) u])
+         [pb_pull_cols[i], back, len(l) ? l[0][4] : "spare", len(l) ? 1 : 5]]);
+// Pins: [column, row, label, kind]: 0 from an RJ45 pin, 1 to the Mega, 2 GND, 3 5 V
+pb_pins = concat(
+   [for (c = pb_s_cols, r = [0 : 2]) [c, r, str("P", r + 1), 0]],
+   [for (i = [0 : 3]) [pb_s_cols[i], 5, str("D", 22 + i), 1]],
+   [for (i = [0 : 1]) each [[pb_s_cols[i], 6, pb_servos[i][0], 0],
+                            [pb_s_cols[i], 9, pb_servos[i][1], 1]]],
+   [for (c = [pb_gnd_col, pb_5v_col], r = [0 : 7])
+      [c, r, pb_power_names[r], c == pb_gnd_col ? 2 : 3]],
+   [for (u = pb_pullups) each [[pb_pull_cols[u[0]], u[1] ? 9 : 0, u[2], 0],
+                               [pb_pull_cols[u[0]], u[1] ? 8 : 1, u[3], 1]]]);
+// Resistors, standing: [column, body row, lead row, value]
+pb_res = concat(
+   [for (c = pb_s_cols) [c, 3, 4, "330"]],
+   [for (i = [0 : 1]) [pb_s_cols[i], 7, 8, "330"]],
+   [for (u = pb_pullups) u[1] ? [pb_pull_cols[u[0]], 7, 6, "4k7"]
+                              : [pb_pull_cols[u[0]], 2, 3, "4k7"]]);
+// Joined on the back (solder bridges, tinned wire): [col, row, col, row]
+pb_links = concat(
+   [for (c = pb_s_cols) each [[c, 0, c, 3], [c, 4, c, 5]]],
+   [for (i = [0 : 1]) each [[pb_s_cols[i], 6, pb_s_cols[i], 7],
+                            [pb_s_cols[i], 8, pb_s_cols[i], 9]]],
+   [[pb_gnd_col, 0, pb_gnd_col, 7], [pb_5v_col, 0, pb_5v_col, 7]],
+   [for (r = pb_rails) [pb_5v_col, r, pb_pull_cols[len(pb_pull_cols) - 1], r]],
+   [for (u = pb_pullups) u[1] ? [pb_pull_cols[u[0]], 7, pb_pull_cols[u[0]], 9]
+                              : [pb_pull_cols[u[0]], 0, pb_pull_cols[u[0]], 2]]);
+// A hole on the board, from its front left corner, the grid centered
+function pb_hole(c, r) = [(pb.x - (pb_grid.x - 1) * pitch) / 2 + c * pitch,
+                          (pb.y - (pb_grid.y - 1) * pitch) / 2 + r * pitch];
+
 // --- Power bus (later) ---
-power_hole_d = 9;            // through the back wall, behind the Mega
+power_hole_d = 9;            // through the back wall, left of the board
+power_room = 30;             // left of the board, for its distribution board
 
 // --- Derived ---
 port_x0 = post + port_margin;
@@ -135,6 +206,11 @@ module at_port(c) {
    if (c < port_front) translate([port_x(c), 0, 0]) children();
    else translate([inner_x, port_x(c - port_front), 0]) rotate([0, 0, 90]) children();
 }
+// The distributor board behind the Mega, against the right ports' jumpers
+pb_x = inner_x - side_reach - pb.x;
+pb_y = row_y + mega.y + pb_gap;
+pb_z = pb_standoff[1];
+power_x = (post + pb_x) / 2;
 outer = [inner_x + 2 * wall, inner_y + 2 * wall, floor_t + inner_h];
 ear_xs = [0, inner_x - ear.x];
 
@@ -167,7 +243,27 @@ assert(inner_x - side_reach >= port_x(port_front - 1) + rj.x
        && inner_x - side_reach >= mega_x + mega.x,
        "Right ports' jumpers run into the front ports or the Mega");
 assert(port_x(port_front - 1) + rj.x <= inner_x - post, "Front ports run into the posts");
-assert(row_y + mega.y + power_hole_d < inner_y, "No room for the power bus behind the Mega");
+assert(pb_x - post >= power_room, "No room for the power bus left of the board");
+assert(pb_y + pb.y <= inner_y, "Distributor board runs into the back wall");
+assert(pb_y + pb_hole(0, pb_grid.y - 1).y + pitch / 2 <= inner_y - lip_clear - lip_w,
+       "Jumper plugs on the distributor board run into the lid lip");
+assert(pb_z + pb_t + pb_header_h + dupont <= inner_h,
+       "No room for the jumpers above the distributor board");
+assert(pb_z + pb_t + pb_res_h <= pb_z + pb_t + pb_header_h + dupont - 5,
+       "Resistors on the distributor board reach the jumper wires");
+assert(pb_grid.x * pitch <= pb.x && pb_grid.y * pitch <= pb.y, "Hole grid does not fit the board");
+// The edge columns stay empty: the standoffs may sit under them
+for (h = pb_holes)
+   assert(abs(h.x - pb_hole(1, 0).x) >= pb_standoff[0] / 2 + 1
+          && abs(h.x - pb_hole(pb_grid.x - 2, 0).x) >= pb_standoff[0] / 2 + 1
+          && h.x - pb_standoff[0] / 2 >= 0 && h.x + pb_standoff[0] / 2 <= pb.x
+          && h.y - pb_standoff[0] / 2 >= 0 && h.y + pb_standoff[0] / 2 <= pb.y,
+          "Distributor board standoff under a used hole or outside the board");
+for (p = pb_pins, r = pb_res, l = pb_links)
+   assert(p[0] > 0 && p[0] < pb_grid.x - 1 && p[1] >= 0 && p[1] < pb_grid.y
+          && r[0] > 0 && r[0] < pb_grid.x - 1 && max(r[1], r[2]) < pb_grid.y
+          && l[2] < pb_grid.x - 1 && max(l[1], l[3]) < pb_grid.y,
+          "Distributor board layout runs off the hole grid");
 
 // --- Box ---
 
@@ -207,8 +303,8 @@ module box() {
       for (j = [mega_usb, mega_power])
          translate([-wall - 1, row_y + j[0] - jack_cut_clear, mega_z + mega_pcb_t - jack_cut_clear])
             cube([wall + 2, j[1] - j[0] + 2 * jack_cut_clear, j[2] + 2 * jack_cut_clear]);
-      // Power bus, later: through the back wall, behind the Mega
-      translate([mega_x + mega.x / 2, inner_y - 1, inner_h / 2])
+      // Power bus, later: through the back wall, left of the board
+      translate([power_x, inner_y - 1, inner_h / 2])
          rotate([-90, 0, 0]) cylinder(d = power_hole_d, h = wall + 2);
    }
    // Corner posts for the lid screws
@@ -230,6 +326,10 @@ module box() {
    for (h = mega_holes)
       translate([mega_x + h.x, row_y + h.y, 0])
          standoff(mega_standoff, mega_screw_hole);
+   // Distributor board standoffs
+   for (h = pb_holes)
+      translate([pb_x + h.x, pb_y + h.y, 0])
+         standoff(pb_standoff, pb_screw_hole);
 }
 
 module standoff(s, hole) {
@@ -316,17 +416,93 @@ module mega_part() {
    }
 }
 
-// The soldered bus: one wire per line along each wall's ports, pins 1-6
-// (S0-S3, 5 V, GND) along the front, pins 4 and 5 (5 V, GND) along the right
-c_bus = ["#3a7bd5", "#2fa84f", "#e0a020", "#d83a3a", "#2b2e33", "#9b59b6"];
-module bus_part() {
-   module run(n, pins)
-      for (p = pins)
-         color(c_bus[p])
-            translate([rj_pin_x + p * 2.54, rj_pin_y + rj_pin_reach - 2, jack_z + 1.27 + 0.8])
-               rotate([0, 90, 0]) cylinder(d = 1.2, h = port_x(n - 1) - port_x(0), $fn = 8);
-   at_port(0) run(port_front, [0 : 5]);
-   at_port(port_front) run(port_side, [3, 4]);
+// The distributor board, built: pin headers, standing resistors
+c_perf = "#d9c79a";
+c_pb_pin = ["#1f1f1f", "#1f4e9a", "#1f1f1f", "#b03a0e"];
+c_330 = "#e08a2c";
+c_4k7 = "#2e86c1";
+module pb_part() {
+   color(c_perf)
+      difference() {
+         cube([pb.x, pb.y, pb_t]);
+         for (h = pb_holes) translate([h.x, h.y, -1]) cylinder(d = 3, h = pb_t + 2);
+      }
+   translate([0, 0, pb_t]) {
+      for (p = pb_pins) translate(pb_hole(p[0], p[1])) {
+         color(c_pb_pin[p[3]]) translate([-1.27, -1.27, 0]) cube([2.54, 2.54, 2.5]);
+         color(c_pin) translate([-0.32, -0.32, 0]) cube([0.64, 0.64, pb_header_h]);
+      }
+      for (r = pb_res) {
+         color(r[3] == "330" ? c_330 : c_4k7)
+            translate(pb_hole(r[0], r[1])) cylinder(d = 2.3, h = pb_res_h - 1.5, $fn = 12);
+         color(c_steel) hull() {
+            translate(concat(pb_hole(r[0], r[1]), pb_res_h - 1)) sphere(d = 0.6, $fn = 6);
+            translate(concat(pb_hole(r[0], r[2]), pb_res_h - 1)) sphere(d = 0.6, $fn = 6);
+         }
+         color(c_steel) translate(pb_hole(r[0], r[2])) cylinder(d = 0.6, h = pb_res_h - 1, $fn = 6);
+      }
+   }
+}
+
+// The board layout drawing, component side, row 0 (the Mega) at the bottom
+c_pb_head = ["#c0392b", "#2471a3", "#222222", "#d35400", "#8e44ad", "#999999"];
+module board_view() {
+   lt = 0.05;  // layers, stacked so the preview shows the upper one
+   module layer(n) translate([0, 0, n * lt]) linear_extrude(lt) children();
+   // On the board: on a patch of board color, over the holes
+   module label(t, size = 0.8, c = "#222222", ha = "left", patch = false) {
+      color(c) layer(6) text(t, size = size, font = font, halign = ha, valign = "center");
+      if (patch) color(c_perf) layer(4) offset(delta = 0.15) hull()
+         text(t, size = size, font = font, halign = ha, valign = "center");
+   }
+   color(c_perf) layer(0) offset(r = 0.6) offset(delta = -0.6) square(pb);
+   color("#b08a3e") layer(1)
+      for (c = [0 : pb_grid.x - 1], r = [0 : pb_grid.y - 1]) translate(pb_hole(c, r)) circle(d = 0.75, $fn = 12);
+   color("#3a2f1a") layer(2)
+      for (c = [0 : pb_grid.x - 1], r = [0 : pb_grid.y - 1]) translate(pb_hole(c, r)) circle(d = 0.3, $fn = 8);
+   color("#7f8c8d") layer(3)
+      for (l = pb_links) hull() {
+         translate(pb_hole(l[0], l[1])) circle(d = 0.5, $fn = 12);
+         translate(pb_hole(l[2], l[3])) circle(d = 0.5, $fn = 12);
+      }
+   for (r = pb_res) {
+      color("#555555") layer(4) hull() {
+         translate(pb_hole(r[0], r[1])) circle(d = 0.15, $fn = 6);
+         translate(pb_hole(r[0], r[2])) circle(d = 0.15, $fn = 6);
+      }
+      color("#555555") layer(4) translate(pb_hole(r[0], r[2])) circle(d = 0.45, $fn = 12);
+      color(r[3] == "330" ? c_330 : c_4k7) layer(5) translate(pb_hole(r[0], r[1])) circle(d = 1.35, $fn = 24);
+      translate(pb_hole(r[0], (r[1] + r[2]) / 2) + [0.9, 0])
+         label(r[3], 0.65, r[3] == "330" ? c_330 : c_4k7, patch = true);
+   }
+   for (p = pb_pins) translate(pb_hole(p[0], p[1])) {
+      color(c_pb_pin[p[3]]) layer(5) square(1.2, center = true);
+      color("#e6c34a") layer(6) square(0.45, center = true);
+      // GND and 5V labelled on the left, clear of the 5 V rails
+      left = p[3] >= 2;
+      translate([left ? -0.85 : 0.85, 0])
+         label(p[2], 0.6, p[3] == 1 ? "#1f4e9a" : "#222222", left ? "right" : "left", true);
+   }
+   for (h = pb_heads)
+      translate([pb_hole(h[0], 0).x, h[1] ? pb.y + 1.6 : -1.6])
+         label(h[2], 0.75, c_pb_head[h[3]], "center");
+   translate([pb.x / 2, -4.2]) label("Mega side", 0.9, "#666666", "center");
+   translate([pb.x / 2, pb.y + 4.2]) label("back wall", 0.9, "#666666", "center");
+   // Legend
+   legend = [[0, "pin, female-female jumper from that RJ45 pin (P4.7: port 4, pin 7)"],
+             [1, "pin, male-female jumper to that Mega pin"],
+             [2, "330 Ohm in series, standing, body on the dot"],
+             [3, "4.7 kOhm pull-up to the 5 V rail, standing, body on the dot"],
+             [4, "joined on the back: solder bridge or tinned wire"]];
+   for (i = [0 : len(legend) - 1]) translate([2, -7.5 - i * 2.2]) {
+      k = legend[i][0];
+      if (k < 2) {
+         color(c_pb_pin[k]) layer(5) square(1.2, center = true);
+         color("#e6c34a") layer(6) square(0.45, center = true);
+      } else if (k < 4) color(k == 2 ? c_330 : c_4k7) layer(5) circle(d = 1.35, $fn = 24);
+      else color("#7f8c8d") layer(3) square([2, 0.5], center = true);
+      translate([2, 0]) label(legend[i][1], 0.9);
+   }
 }
 
 module box_part() { color(c_print) box(); }
@@ -335,8 +511,8 @@ module lid_part() { color(c_lid) lid(); }
 module inside_parts() {
    for (c = [0 : port_cols - 1])
       at_port(c) translate([0, 0, port_z]) rj_part();
-   bus_part();
    translate([mega_x, row_y, mega_z]) mega_part();
+   translate([pb_x, pb_y, pb_z]) pb_part();
 }
 
 // Open, with everything in it
@@ -366,3 +542,4 @@ box(); // Make module box
 //closed_view(); // Make view ports 70,0,-20
 //closed_view(); // Make view right 70,0,70
 //inside_view(); // Make view top 0,0,0
+//board_view(); // Make view board 0,0,0
