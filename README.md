@@ -479,7 +479,8 @@ it fits the printer bed.
   analog headers and the double header: they are on one 2.54 mm grid,
   the digital header is not (pins 8-13 are 1.5 mm off).
 - The build checks that every Mega pin the shield takes lands on a hole
-  of its grid, that the posts stand beside the Mega and behind the front
+  of its grid, that nothing is soldered above the Mega's ICSP header in
+  the middle (measured, `mega_icsp`), that the posts stand beside the Mega and behind the front
   ports' jumpers, and the room for a plugged jumper (20 mm: a 14 mm
   Dupont housing and the bent wire) behind the RJ45 pins and above the
   shield.
@@ -555,7 +556,10 @@ at the bottom.
 - **Back**: tinned wire where a straight run joins one net (5 V and GND
   through P4-P6, the servo power of P4 and P5, the pull-up rail),
   wire-wrap wire for everything else. Keep the joints flat: the shield
-  sits 2.5 mm above the Mega's digital header.
+  sits 2.5 mm above the Mega's digital header and its 2 x 3 ICSP header
+  in the middle. Nothing is soldered above the ICSP header (the red frame
+  in the drawing: the build checks it); run the wires around it or flat
+  over it, and trim the leads flush there.
 
 Every line on the shield:
 
