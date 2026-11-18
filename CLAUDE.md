@@ -94,7 +94,8 @@ its own top-level directory; new components should follow the same layout.
   build checks that the Mega's pins land on its grid, that every hole has
   one use and is on one net, and that every line connects): every RJ45 pin goes to it, each
   port as one ribbon of female-female jumpers onto an 8 pin header in RJ45
-  order, it joins 5 V and GND of all ports and S0..S3 of the mux ports
+  order (the pins with a pull-up peeled off to a strip next to the
+  pull-up network), it joins 5 V and GND of all ports and S0..S3 of the mux ports
   and carries every resistor (330 Ohm in series with S0..S3 and the servo
   signals, 4.7 kOhm pull-ups on the mux SIG lines and the direct-port
   switch/encoder lines, one bussed network; the components have none). No wire goes to the

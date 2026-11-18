@@ -19,7 +19,8 @@
 //   headers and its double header (they share a 2.54 mm grid, the digital
 //   header does not) and screwed onto four posts at its corner holes. Every
 //   RJ45 pin goes to it, each port as one 8 wire ribbon of female-female
-//   jumpers onto a header in RJ45 order; it joins the shared lines (5 V and
+//   jumpers onto a header in RJ45 order (the pins with a pull-up peeled
+//   off to a strip next to the pull-up network); it joins the shared lines (5 V and
 //   GND of all ports, S0-S3 of the mux ports) and carries every resistor
 //   of the hub (330 Ohm in series with S0-S3 and the two servo signals, a
 //   4.7 kOhm x 8 bussed network for the pull-ups to 5 V on the mux SIG
@@ -46,7 +47,7 @@
 // - Arduino Mega 2560
 // - 6 RJ45 breakout boards (34 x 28 mm, 9 pin angled header: 1-8 and SH)
 // - shield: 90 x 70 mm perfboard (31 x 26 holes, double sided, plated
-//   through), a 2 x 18 and eight 1 x 8
+//   through), a 2 x 18 and nine 1 x 8
 //   male pin headers, 6 x 330 Ohm, a 4.7 kOhm x 8 bussed network (SIP 9),
 //   wire-wrap and tinned wire
 // - 24 + 6 M3 x 6 self tapping screws (RJ45 boards, Mega), 4 x M3 x 8
@@ -186,11 +187,18 @@ sh_ana_row = 3;
 // side over the analog header (pin 8, AUX, at the front), so the pins they
 // share are neighbours, and port 3's S0-S3 pins are next to their
 // resistors; port 6 lies along the analog header; ports 4 and 5 stand side
-// by side behind them, port 4 next to the pull-up network, so its pull-up
-// pins are next to theirs.
+// by side behind them, their shared pins neighbours.
 sh_ports = [[[23, 12], [0, -1]], [[24, 12], [0, -1]], [[25, 12], [0, -1]],
-            [[26, 20], [0, -1]], [[25, 20], [0, -1]], [[11, 5], [1, 0]]];
-function sh_pin(port, p) = sh_ports[port - 1][0] + (p - 1) * sh_ports[port - 1][1];
+            [[24, 20], [0, -1]], [[25, 20], [0, -1]], [[11, 5], [1, 0]]];
+// Except the pins with a pull-up: each is a line of its own, so they are one
+// strip next to the pull-up network, each pin beside its network pin (the
+// jumper peeled off its port's ribbon), and pulled out of its port's
+// header: [[port, pin], hole]
+sh_pullup_pins = [[[1, 7], [26, 20]], [[2, 7], [26, 19]], [[4, 3], [26, 18]], [[3, 7], [26, 17]],
+                  [[5, 8], [26, 16]], [[4, 6], [26, 15]], [[5, 6], [26, 14]], [[4, 8], [26, 13]]];
+function sh_pin(port, p) =
+   let (m = [for (x = sh_pullup_pins) if (x[0] == [port, p]) x[1]])
+   len(m) ? m[0] : sh_ports[port - 1][0] + (p - 1) * sh_ports[port - 1][1];
 function P(port, p) = sh_pin(port, p);
 // Mega pins: ["D", n], ["A", n], ["5V", 0 logic / 1 servo], ["GND", 0 / 1]
 function mega_pin_pt(m) =
@@ -484,6 +492,9 @@ for (l = sh_lines) {
    assert(len([for (k = [2 : sip_pins]) if (has(l[0], sip_pin(k))) 1]) == (l[2] == "4k7" ? 1 : 0),
           str(l[0], l[2] == "4k7" ? " misses its pull-up" : " has a pull-up"));
 }
+for (l = sh_lines) if (l[2] == "4k7")
+   assert(len([for (k = [2 : sip_pins]) if (norm(P(l[1][0][0], l[1][0][1]) - sip_pin(k)) == 1) 1]) == 1,
+          str(l[0], ": its pin is not beside its network pin"));
 assert(len([for (l = sh_lines) if (l[2] == "4k7") 1]) == sip_pins - 1 && has("5V", sip_pin(1)),
        "The pull-up network does not fit its lines");
 
@@ -730,8 +741,9 @@ module shield_view() {
    // Port headers: the pin numbers on the pins, the port before pin 1
    for (port = [1 : 6]) {
       for (p = [1 : 8]) translate(at(sh_pin(port, p))) {
-         color(p == 1 ? "#7b241c" : c_black) layer(6) square(1.4, center = true);
-         label(str(p), 0.75, "#f4d03f", "center", "center", l = 7);
+         moved = len([for (x = sh_pullup_pins) if (x[0] == [port, p]) 1]);
+         color(p == 1 ? "#7b241c" : moved ? "#1a5276" : c_black) layer(6) square(1.4, center = true);
+         label(moved ? str(port, ".", p) : str(p), moved ? 0.42 : 0.75, "#f4d03f", "center", "center", l = 7);
       }
       // The mux ports side by side: one label left of them
       d = sh_ports[port - 1][1];
@@ -758,7 +770,7 @@ module shield_view() {
    translate([sh.x / 2, -2.2]) label("front wall side: ribbons from ports 1-3", 0.9, "#666666", "center");
    translate([sh.x + 1, sh.y + 1.6]) label("right wall side: ribbons from ports 4-6 ->", 0.9, "#666666", "right");
    // Legend
-   legend = [[0, "port header pin (pin 1 dark red), ribbon from that port"],
+   legend = [[0, "port header pin (pin 1 dark red), ribbon from that port; blue: port.pin, a pin with a pull-up"],
              [1, "Mega header pin under the shield (red: wired)"],
              [2, "330 Ohm in series, standing, body on the dot, lead into the hole beside the Mega pin"],
              [3, "4.7 kOhm x 8 bussed network (SIP 9), pin 1 (common, 5 V) on the big dot"],
