@@ -20,12 +20,15 @@
 //   header does not) and screwed onto four posts at its corner holes. Every
 //   RJ45 pin goes to it, each port as one 8 wire ribbon of female-female
 //   jumpers onto a header in RJ45 order; it joins the shared lines (5 V and
-//   GND of all ports, S0-S3 of the mux ports), carries every resistor of
-//   the hub (330 Ohm in series with S0-S3 and the two servo signals,
-//   4.7 kOhm pull-ups to 5 V on the mux SIG lines and on the direct-port
-//   switch and encoder lines) and is wired on its back, on the bench
-//   (`shield` view). The servos' power has the double header's second
-//   5 V and GND pins.
+//   GND of all ports, S0-S3 of the mux ports) and carries every resistor
+//   of the hub (330 Ohm in series with S0-S3 and the two servo signals, a
+//   4.7 kOhm x 8 bussed network for the pull-ups to 5 V on the mux SIG
+//   lines and on the direct-port switch and encoder lines). It is
+//   double sided with plated through holes and wired like a stripboard,
+//   on the bench (`shield` view): each line is a run of tinned wire along
+//   its own row on the back, with its resistor in it, and a solder
+//   bridge on top onto its Mega pin; ten wire-wrap wires do the rest. The
+//   servos' power has the double header's second 5 V and GND pins.
 // - Nothing in the box is soldered and no wire goes to the Mega: the
 //   shield comes off with 4 screws, and the Mega can be reused.
 // - Behind the front ports is a strip for their jumper plugs, then the
@@ -41,8 +44,10 @@
 // Parts to buy (details in the README):
 // - Arduino Mega 2560
 // - 6 RJ45 breakout boards (34 x 28 mm, 9 pin angled header: 1-8 and SH)
-// - shield: 90 x 70 mm perfboard (31 x 26 holes), a 2 x 18 and eight 1 x 8
-//   male pin headers, 6 x 330 Ohm, 8 x 4.7 kOhm, wire-wrap and tinned wire
+// - shield: 90 x 70 mm perfboard (31 x 26 holes, double sided, plated
+//   through), a 2 x 18 and eight 1 x 8
+//   male pin headers, 6 x 330 Ohm, a 4.7 kOhm x 8 bussed network (SIP 9),
+//   wire-wrap and tinned wire
 // - 24 + 6 M3 x 6 self tapping screws (RJ45 boards, Mega), 4 x M3 x 8
 //   self tapping (shield), 4 x M3 x 10 (lid)
 // - 48 female-female jumper wires, 15 cm, as 8 wire ribbons
@@ -142,7 +147,7 @@ icsp_clear = 1;              // around it, kept free on the shield
 // --- Shield (measured: a 90 x 70 mm perfboard, 2.54 mm grid) ---
 // Plugged onto the Mega's analog headers and double header, screwed onto
 // four posts at its corner holes. Every RJ45 pin is plugged onto it, it
-// carries every resistor, and it is wired on its back.
+// carries every resistor. Double sided, plated through holes.
 sh = [90, 70];               // along the Mega x across it
 sh_t = 1.6;
 pitch = 2.54;
@@ -155,6 +160,7 @@ sh_screw_depth = 7;          // an M3 x 8 through the board into the post
 sh_screw_head = 5.6;         // its pan head, clear of the pins
 sh_header_h = 8.5;           // a male pin header above the board
 sh_res_h = 11;               // a resistor standing upright
+sh_sip_h = 6.5;              // the pull-up network (SIP 9), standing
 sh_stack = 2.5;              // header plastic under the shield, on the Mega's sockets
 sh_solder = 1.5;             // solder joints and wires under the shield
 // Where it sits on the Mega: these shield holes take the double header's
@@ -164,30 +170,24 @@ sh_ana_row = 3;
 
 // --- Shield layout ---
 // Holes by [column, row]: columns from the left (the USB end), row 0 at the
-// front. Every RJ45 pin has a male pin on the shield, in a header of 8 in
-// RJ45 order, so each port is one 8 wire ribbon of female-female jumpers.
-// Port headers, [col of pin 1, row]: the mux ports side by side at the
-// front edge (their ribbons come from the front wall), the direct ports
-// on the right, one behind the other in wall order (theirs come from the
-// right wall).
-sh_ports = [[1, 1], [10, 1], [19, 1], [20, 6], [20, 10], [20, 14]];
-function sh_pin(port, p) = sh_ports[port - 1] + [p - 1, 0];
-// Resistors stand in two banks behind the direct ports, next to the Mega
-// pins they go to: the body on [col, row], the lead one row behind
-sh_pull_cols = [13, 15, 17, 19, 21, 23, 25, 27];  // 4.7 kOhm, the leads on the 5 V rail
-sh_pull_row = 16;
-sh_series_cols = [17, 19, 21, 23, 25, 27];   // 330 Ohm: S0-S3, servo P4, servo P5
-sh_series_row = 19;
-// What goes through them: [[port, RJ45 pin], Mega pin, name]
-sh_s_pins = [1, 2, 3, 6];                // S0-S3 on the mux ports
-sh_series = [for (i = [0 : 3]) [[3, sh_s_pins[i]], ["D", 22 + i], str("S", i)]];
-sh_servos = [[[4, 7], ["D", 32], "P4 C"], [[5, 7], ["D", 35], "P5 C"]];
-sh_pulls = [[[1, 7], ["D", 26], "SIG1"], [[2, 7], ["D", 27], "SIG2"], [[3, 7], ["D", 28], "SIG3"],
-            [[4, 3], ["D", 30], "P4 A"], [[4, 6], ["D", 31], "P4 B"], [[4, 8], ["D", 33], "P4 D"],
-            [[5, 6], ["D", 34], "P5 B"], [[5, 8], ["D", 36], "P5 D"]];
-// Straight to an analog pin: [[port, RJ45 pin], An]: AUX, the pots, port 6's free lines
-sh_analog = [[[1, 8], 1], [[2, 8], 2], [[3, 8], 3], [[5, 3], 4],
-             [[6, 3], 5], [[6, 6], 6], [[6, 7], 7], [[6, 8], 8], [[6, 1], 9], [[6, 2], 10]];
+// front. The board is double sided with plated through holes, so a
+// hole joins its pads on both sides. It is wired like a stripboard: each
+// line that goes to the double header is a run of tinned wire along its
+// own row on the back, with its resistor standing in it, ending one hole
+// before the Mega pin; a solder bridge on top joins that hole to the pin
+// (the Mega pins' pads on the back are under their header's plastic). An
+// analog line goes from its port pin over the hole in front of it onto
+// the analog pin the same way. The port headers' pins are soldered on the
+// back (their plastic is on top), and they sit where their pins start
+// their runs; the rest is a few wire-wrap wires.
+// Port headers: [pin 1, step to the next pin]. The mux ports stand side by
+// side over the analog header (pin 8, AUX, at the front), so the pins they
+// share are in one row each; port 6 lies along the analog header; port 5
+// stands left of the runs, port 4 lies behind them.
+sh_ports = [[[20, 12], [0, -1]], [[21, 12], [0, -1]], [[22, 12], [0, -1]],
+            [[19, 22], [1, 0]], [[19, 20], [0, -1]], [[11, 5], [1, 0]]];
+function sh_pin(port, p) = sh_ports[port - 1][0] + (p - 1) * sh_ports[port - 1][1];
+function P(port, p) = sh_pin(port, p);
 // Mega pins: ["D", n], ["A", n], ["5V", 0 logic / 1 servo], ["GND", 0 / 1]
 function mega_pin_pt(m) =
    m[0] == "A" ? mega_analog[m[1] < 8 ? 0 : 1] + [(m[1] % 8) * pitch, 0]
@@ -204,42 +204,112 @@ function mega_hole(m) = let (cr = sh_cr(mega_pin_pt(m))) [round(cr.x), round(cr.
 sh_mega_pins = concat([for (n = [0 : 15]) ["A", n]], [for (n = [22 : 53]) ["D", n]],
                       [["5V", 0], ["5V", 1], ["GND", 0], ["GND", 1]]);
 sh_stacked = [for (m = sh_mega_pins) mega_hole(m)];
-function series_top(i) = [sh_series_cols[i], sh_series_row];
-function series_bot(i) = [sh_series_cols[i], sh_series_row + 1];
-function pull_top(i) = [sh_pull_cols[i], sh_pull_row];
-sh_rail = [[sh_pull_cols[0], sh_pull_row + 1], [sh_pull_cols[len(sh_pull_cols) - 1], sh_pull_row + 1]];
-// Resistors: [body hole, lead hole, value, name]
-sh_res = concat(
-   [for (i = [0 : 5]) [series_top(i), series_bot(i), "330", concat(sh_series, sh_servos)[i][2]]],
-   [for (i = [0 : 7]) [pull_top(i), pull_top(i) + [0, 1], "4k7", sh_pulls[i][2]]]);
-// Bare tinned wire on the back: [hole, hole]
-sh_bridges = [[sh_pin(4, 4), sh_pin(6, 4)], [sh_pin(4, 5), sh_pin(6, 5)],  // 5 V, GND through ports 4-6
-              [sh_pin(4, 1), sh_pin(5, 1)], [sh_pin(4, 2), sh_pin(5, 2)],  // servo power of ports 4, 5
-              sh_rail];                                                    // 5 V rail of the pull-ups
-// Insulated wire (wire-wrap) on the back: [hole, hole, kind]: 0 signal,
+// Lines: [name, port pins [port, pin], resistor ("330" in series, "4k7"
+// pull-up to 5 V, "" none), Mega pin, the start of its row's run on the
+// back (digital lines)]. MobiFlight takes any of the D pins for a button,
+// encoder or servo; the outer column of the double header (odd pins) has no
+// free hole next to it, so only the even ones are used.
+sh_lines = [
+   ["S0", [[1, 1], [2, 1], [3, 1]], "330", ["D", 38], P(3, 1)],
+   ["S1", [[1, 2], [2, 2], [3, 2]], "330", ["D", 40], P(3, 2)],
+   ["S2", [[1, 3], [2, 3], [3, 3]], "330", ["D", 42], P(3, 3)],
+   ["S3", [[1, 6], [2, 6], [3, 6]], "330", ["D", 48], P(3, 6)],
+   ["SIG1", [[1, 7]], "4k7", ["D", 28], [22, 17]],
+   ["SIG2", [[2, 7]], "4k7", ["D", 30], [22, 16]],
+   ["SIG3", [[3, 7]], "4k7", ["D", 34], [22, 14]],
+   ["AUX1", [[1, 8]], "", ["A", 8]],
+   ["AUX2", [[2, 8]], "", ["A", 9]],
+   ["AUX3", [[3, 8]], "", ["A", 10]],
+   ["P4 A", [[4, 3]], "4k7", ["D", 26], [21, 18]],
+   ["P4 B", [[4, 6]], "4k7", ["D", 24], [24, 19]],
+   ["P4 C", [[4, 7]], "330", ["D", 44], [23, 9]],
+   ["P4 D", [[4, 8]], "4k7", ["D", 22], [26, 20]],
+   ["P5 A", [[5, 3]], "", ["A", 11]],
+   ["P5 B", [[5, 6]], "4k7", ["D", 32], P(5, 6)],
+   ["P5 C", [[5, 7]], "330", ["D", 46], [23, 8]],
+   ["P5 D", [[5, 8]], "4k7", ["D", 36], P(5, 8)],
+   ["P6 E", [[6, 1]], "", ["A", 0]],
+   ["P6 F", [[6, 2]], "", ["A", 1]],
+   ["P6 A", [[6, 3]], "", ["A", 2]],
+   ["P6 B", [[6, 6]], "", ["A", 5]],
+   ["P6 C", [[6, 7]], "", ["A", 6]],
+   ["P6 D", [[6, 8]], "", ["A", 7]],
+   ["5V", [for (k = [1 : 6]) [k, 4]], "", ["5V", 0]],
+   ["GND", [for (k = [1 : 6]) [k, 5]], "", ["GND", 0]],
+   ["servo 5V", [[4, 1], [5, 1]], "", ["5V", 1]],
+   ["servo GND", [[4, 2], [5, 2]], "", ["GND", 1]]];
+// A 330 Ohm line is two nets: its name up to the resistor, "<name> Mega" after it
+function mega_net(l) = l[2] == "330" ? str(l[0], " Mega") : l[0];
+function line(name) = [for (l = sh_lines) if (l[0] == name) l][0];
+// 330 Ohm resistors, standing in their row: [body hole, line]; the lead goes
+// into the next hole towards the Mega
+sh_330 = [[[24, 12], "S0"], [[26, 11], "S1"], [[24, 10], "S2"], [[26, 7], "S3"],
+          [[26, 9], "P4 C"], [[24, 8], "P5 C"]];
+function r330(name) = [for (r = sh_330) if (r[1] == name) r[0]][0];
+// The pull-ups: one 4.7 kOhm x 8 bussed resistor network (SIP 9, pin 1 the
+// common) standing across the 8 pull-up rows, pin 1 in the 5 V row above
+// them: [pin 1, step to the next pin]
+sh_sip = [[27, 21], [0, -1]];
+sip_pins = 9;
+function sip_pin(k) = sh_sip[0] + (k - 1) * sh_sip[1];
+// Runs: tinned wire through every hole from a to b on the back (side 0), or
+// a solder bridge between two neighbours on top (side 1): [a, b, side, net]
+function B(a, b, net) = [a, b, 0, net];
+function T(a, b, net) = [a, b, 1, net];
+function hole_before(m) = mega_hole(m) - [1, 0];    // the hole beside a double header pin
+function hole_behind(m) = mega_hole(m) + [0, 1];    // the hole behind an analog pin
+mux_nets = ["S0", "S1", "S2", "5V", "GND", "S3"];   // mux port pins 1-6
+sh_runs = concat(
+   // Digital lines: the row, the resistor in it, the bridge onto the Mega pin
+   [for (l = sh_lines) if (l[3][0] == "D") each
+      l[2] == "330"
+      ? [B(l[4], r330(l[0]), l[0]), B(r330(l[0]) + [1, 0], hole_before(l[3]), mega_net(l)),
+         T(hole_before(l[3]), mega_hole(l[3]), mega_net(l))]
+      : [B(l[4], hole_before(l[3]), l[0]), T(hole_before(l[3]), mega_hole(l[3]), l[0])]],
+   // Analog lines: the port pin over the hole behind the analog pin onto it
+   [for (l = sh_lines) if (l[3][0] == "A") each
+      concat([T(hole_behind(l[3]), mega_hole(l[3]), l[0])],
+             P(l[1][0][0], l[1][0][1]) == mega_hole(l[3]) + [0, 2]
+             ? [B(P(l[1][0][0], l[1][0][1]), hole_behind(l[3]), l[0])] : [])],
+   // The mux bus: pins 1-6 across the three mux ports
+   [for (p = [1 : 6]) B(P(1, p), P(3, p), mux_nets[p - 1])],
+   // Port 4's lines down from its pins to their rows
+   [B(P(4, 3), line("P4 A")[4], "P4 A"), B(P(4, 6), line("P4 B")[4], "P4 B"),
+    B(P(4, 8), line("P4 D")[4], "P4 D")],
+   // Servo power of ports 4 and 5, onto the double header's outer 5 V and GND
+   [B(P(4, 1), P(5, 1), "servo 5V"), B(P(4, 2), [20, 19], "servo GND"), B([20, 19], P(5, 2), "servo GND"),
+    T(mega_hole(["5V", 1]) + [0, 1], mega_hole(["5V", 1]), "servo 5V"),
+    T(mega_hole(["GND", 1]) - [0, 1], mega_hole(["GND", 1]), "servo GND")],
+   // 5 V: the network's common onto the Mega pin; a row behind port 4 from
+   // its pin 4 to a column left of everything, down to port 6, with the mux
+   // ports' 5 V row and port 5's pin 4 on it
+   [B(sip_pin(1), hole_before(["5V", 0]), "5V"), T(hole_before(["5V", 0]), mega_hole(["5V", 0]), "5V"),
+    T(mega_hole(["5V", 0]), mega_hole(["5V", 0]) + [0, 1], "5V"),
+    B(mega_hole(["5V", 0]) + [0, 1], [29, 23], "5V"), B([14, 23], [29, 23], "5V"),
+    B(P(4, 4), P(4, 4) + [0, 1], "5V"), B(P(6, 4), [14, 23], "5V"),
+    B([14, 9], P(1, 4), "5V"), B([14, 17], P(5, 4), "5V")],
+   // GND: port 6's pin 5 and the mux ports' GND row, then down between the
+   // analog headers and along the front edge onto the Mega pin
+   [B(P(6, 5), [15, 8], "GND"), B([15, 8], P(1, 5), "GND"), B([19, 8], [19, 1], "GND"),
+    B([19, 1], [29, 1], "GND"), B([29, 1], mega_hole(["GND", 0]) - [0, 1], "GND"),
+    T(mega_hole(["GND", 0]) - [0, 1], mega_hole(["GND", 0]), "GND")]);
+// Wire-wrap wires on the back: [hole, hole, kind, net]: kind 0 signal,
 // 1 5 V, 2 GND, 3 servo power
-function P(port, p) = sh_pin(port, p);
-sh_wires = concat(
-   // S0-S3 from pin to pin over the mux ports, through a 330 to the Mega
-   [for (i = [0 : 3], k = [1 : 2]) [P(k, sh_s_pins[i]), P(k + 1, sh_s_pins[i]), 0]],
-   [for (i = [0 : 3]) [P(3, sh_s_pins[i]), series_top(i), 0]],
-   [for (i = [0 : 3]) [series_bot(i), mega_hole(sh_series[i][1]), 0]],
-   // Servo signals through a 330
-   [for (i = [0 : 1]) [P(sh_servos[i][0][0], sh_servos[i][0][1]), series_top(4 + i), 0]],
-   [for (i = [0 : 1]) [series_bot(4 + i), mega_hole(sh_servos[i][1]), 0]],
-   // Pulled-up lines: the pin to the resistor, the resistor to the Mega
-   [for (i = [0 : 7]) [P(sh_pulls[i][0][0], sh_pulls[i][0][1]), pull_top(i), 0]],
-   [for (i = [0 : 7]) [pull_top(i), mega_hole(sh_pulls[i][1]), 0]],
-   [for (a = sh_analog) [P(a[0][0], a[0][1]), mega_hole(["A", a[1]]), 0]],
-   // 5 V and GND over the mux ports to the direct ports' bridges, then to the Mega
-   [for (k = [1 : 3]) [P(k, 4), P(k + 1, 4), 1]],
-   [[P(6, 4), mega_hole(["5V", 0]), 1], [sh_rail[1], mega_hole(["5V", 0]), 1]],
-   [for (k = [1 : 3]) [P(k, 5), P(k + 1, 5), 2]],
-   [[P(6, 5), mega_hole(["GND", 0]), 2]],
-   // Servo power on the double header's other 5 V and GND
-   [[P(5, 1), mega_hole(["5V", 1]), 3], [P(5, 2), mega_hole(["GND", 1]), 3]]);
+sh_wires = [
+   [P(1, 7), line("SIG1")[4], 0, "SIG1"], [P(2, 7), line("SIG2")[4], 0, "SIG2"],
+   [P(3, 7), line("SIG3")[4], 0, "SIG3"],
+   [P(4, 7), line("P4 C")[4], 0, "P4 C"], [P(5, 7), line("P5 C")[4], 0, "P5 C"],
+   [P(5, 3), hole_behind(["A", 11]), 0, "P5 A"],
+   [P(4, 5), [17, 8], 2, "GND"], [P(5, 5), [18, 8], 2, "GND"],
+   [[19, 21], mega_hole(["5V", 1]) + [0, 1], 3, "servo 5V"],
+   [[20, 21], mega_hole(["GND", 1]) - [0, 1], 3, "servo GND"]];
 sh_port_pins = [for (port = [1 : 6], p = [1 : 8]) sh_pin(port, p)];
-sh_res_holes = [for (r = sh_res) each [r[0], r[1]]];
+sh_res_holes = [for (r = sh_330) each [r[0], r[0] + [1, 0]]];
+sh_sip_holes = [for (k = [1 : sip_pins]) sip_pin(k)];
+function run_holes(r) = [for (c = [min(r[0].x, r[1].x) : max(r[0].x, r[1].x)],
+                              w = [min(r[0].y, r[1].y) : max(r[0].y, r[1].y)]) [c, w]];
+function net_holes(n) = [for (r = sh_runs) if (r[3] == n) each run_holes(r),
+                         for (w = sh_wires) if (w[3] == n) each [w[0], w[1]]];
 
 // --- Derived ---
 port_x0 = post + port_margin;
@@ -314,7 +384,7 @@ assert(inner_x - side_reach >= port_x(port_front - 1) + rj.x
 assert(port_x(port_front - 1) + rj.x <= inner_x - post, "Front ports run into the posts");
 assert(sh_z + sh_t + sh_header_h + dupont <= inner_h,
        "No room for the jumpers above the shield");
-assert(sh_z + sh_t + sh_res_h <= inner_h - 5, "Resistors on the shield reach the lid");
+assert(sh_z + sh_t + max(sh_res_h, sh_sip_h) <= inner_h - 5, "Resistors on the shield reach the lid");
 assert(mega_z + mega_pcb_t + mega_header_h + sh_solder <= sh_z,
        "The shield's solder joints touch the Mega's digital header");
 assert(sh_grid.x * pitch <= sh.x && sh_grid.y * pitch <= sh.y, "Hole grid does not fit the shield");
@@ -333,26 +403,71 @@ for (h = sh_holes) {
           "Shield post stands on the Mega");
    assert(row_y + y - sh_post_d / 2 >= rj_pin_y + dupont, "Shield post in the front ports' jumpers");
 }
-// Every hole has one use, the screw heads stay clear of the pins
-sh_used = concat(sh_port_pins, sh_stacked, sh_res_holes);
-// Nothing soldered above the ICSP header: no pin, resistor, Mega pin, bridge
-// or wire end, and the shield's solder joints clear its top
-sh_bridge_holes = [for (b = sh_bridges, c = [min(b[0].x, b[1].x) : max(b[0].x, b[1].x)],
-                        r = [min(b[0].y, b[1].y) : max(b[0].y, b[1].y)]) [c, r]];
+// Every component hole has one use, the screw heads stay clear of the pins
+sh_used = concat(sh_port_pins, sh_stacked, sh_res_holes, sh_sip_holes);
+sh_run_holes = [for (r = sh_runs) each run_holes(r)];
 sh_wire_ends = [for (w = sh_wires) each [w[0], w[1]]];
-for (u = concat(sh_used, sh_bridge_holes, sh_wire_ends)) {
+// Nothing soldered above the ICSP header: no pin, resistor, Mega pin, run
+// or wire end, and the shield's solder joints clear its top
+for (u = concat(sh_used, sh_run_holes, sh_wire_ends)) {
    d = sh_o + sh_hole(u.x, u.y) - mega_icsp;   // from its middle, on the Mega
    assert(abs(d.x) > mega_icsp_size.x / 2 + icsp_clear || abs(d.y) > mega_icsp_size.y / 2 + icsp_clear,
           str("Shield hole ", u, " above the Mega's ICSP header"));
+   assert(u.x >= 0 && u.x < sh_grid.x && u.y >= 0 && u.y < sh_grid.y, str("Shield hole ", u, " off the grid"));
+   for (h = sh_holes)
+      assert(norm(sh_hole(u.x, u.y) - h) >= sh_screw_head / 2 + 1.3, str("Shield hole ", u, " under a screw head"));
 }
 assert(mega_z + mega_pcb_t + mega_icsp_h + sh_solder <= sh_z,
        "The shield's solder joints touch the Mega's ICSP header");
 for (i = [0 : len(sh_used) - 1], j = [0 : len(sh_used) - 1])
    assert(i == j || sh_used[i] != sh_used[j], str("Shield hole ", sh_used[i], " used twice"));
-for (u = sh_used, h = sh_holes)
-   assert(norm(sh_hole(u.x, u.y) - h) >= sh_screw_head / 2 + 1.3, str("Shield hole ", u, " under a screw head"));
-for (u = concat(sh_used, [for (b = sh_bridges) each b]))
-   assert(u.x >= 0 && u.x < sh_grid.x && u.y >= 0 && u.y < sh_grid.y, "Shield layout runs off the grid");
+// Runs are straight; one on top only joins two neighbours, with no header
+// plastic, resistor body or network on that side; one on the back passes
+// no Mega pin (their pads there are under the plastic). Wires are on the
+// back, so they do not end on a Mega pin either.
+sh_top_blocked = concat(sh_port_pins, [for (r = sh_330) r[0]], sh_sip_holes);
+for (r = sh_runs) {
+   assert(r[0].x == r[1].x || r[0].y == r[1].y, str("Run ", r, " is not straight"));
+   for (h = run_holes(r))
+      if (r[2] == 1)
+         assert(norm(r[0] - r[1]) == 1 && !len([for (b = sh_top_blocked) if (b == h) 1]),
+                str("Bridge on top at ", h, " not possible"));
+      else
+         assert(!len([for (m = sh_stacked) if (m == h) 1]), str("Run on the back over Mega pin ", h));
+}
+for (u = sh_wire_ends) assert(!len([for (m = sh_stacked) if (m == u) 1]), str("Wire ends on Mega pin ", u));
+// Nets: no hole is on two of them, and each one is in one piece
+sh_net_holes = concat([for (r = sh_runs, h = run_holes(r)) [h, r[3]]],
+                      [for (w = sh_wires, h = [w[0], w[1]]) [h, w[3]]]);
+for (a = sh_net_holes) {
+   other = [for (b = sh_net_holes) if (b[0] == a[0] && b[1] != a[1]) b[1]];
+   assert(!len(other), str("Shield hole ", a[0], " on ", a[1], " and ", other[0]));
+}
+sh_nets = [for (l = sh_lines) each (l[2] == "330" ? [l[0], mega_net(l)] : [l[0]])];
+function touch(a, b) = len([for (x = a, y = b) if (x == y) 1]) > 0;
+function grow(segs, have) =
+   let (more = [for (i = [0 : len(segs) - 1])
+                   if (!len([for (h = have) if (h == i) 1]) && len([for (h = have) if (touch(segs[h], segs[i])) 1])) i])
+   len(more) ? grow(segs, concat(have, more)) : have;
+function has(n, h) = len([for (x = net_holes(n)) if (x == h) 1]) > 0;
+for (n = sh_nets) {
+   segs = concat([for (r = sh_runs) if (r[3] == n) run_holes(r)], [for (w = sh_wires) if (w[3] == n) [w[0], w[1]]]);
+   assert(len(segs) && len(grow(segs, [0])) == len(segs), str("Net ", n, " is not in one piece"));
+}
+for (n = concat([for (r = sh_runs) r[3]], [for (w = sh_wires) w[3]]))
+   assert(len([for (x = sh_nets) if (x == n) 1]), str("Unknown net ", n));
+// Every line reaches its port pins, its resistor and its Mega pin; each
+// pull-up row has one pin of the network, its common is on 5 V
+for (l = sh_lines) {
+   for (p = l[1]) assert(has(l[0], P(p[0], p[1])), str(l[0], " does not reach P", p[0], ".", p[1]));
+   assert(has(mega_net(l), mega_hole(l[3])), str(l[0], " does not reach its Mega pin"));
+   if (l[2] == "330")
+      assert(has(l[0], r330(l[0])) && has(mega_net(l), r330(l[0]) + [1, 0]), str(l[0], " misses its 330 Ohm"));
+   assert(len([for (k = [2 : sip_pins]) if (has(l[0], sip_pin(k))) 1]) == (l[2] == "4k7" ? 1 : 0),
+          str(l[0], l[2] == "4k7" ? " misses its pull-up" : " has a pull-up"));
+}
+assert(len([for (l = sh_lines) if (l[2] == "4k7") 1]) == sip_pins - 1 && has("5V", sip_pin(1)),
+       "The pull-up network does not fit its lines");
 
 // --- Box ---
 
@@ -508,7 +623,7 @@ module mega_part() {
 }
 
 // The shield, built: port headers on top, the Mega's header pins under it
-// (their plastic on the Mega's sockets), standing resistors
+// (their plastic on the Mega's sockets), standing resistors and network
 c_perf = "#d9c79a";
 c_330 = "#e08a2c";
 c_4k7 = "#2e86c1";
@@ -527,28 +642,34 @@ module shield_part() {
       color(c_black) translate([-1.27, -1.27, -sh_stack]) cube([2.54, 2.54, sh_stack]);
       color(c_pin) translate([-0.32, -0.32, -sh_stack - 6]) cube([0.64, 0.64, 6 + sh_t + 1]);
    }
-   for (r = sh_res) translate([0, 0, sh_t]) {
-      color(r[2] == "330" ? c_330 : c_4k7)
-         translate(sh_hole(r[0].x, r[0].y)) cylinder(d = 2.3, h = sh_res_h - 1.5, $fn = 12);
+   for (r = sh_330) translate([0, 0, sh_t]) {
+      b = sh_hole(r[0].x, r[0].y);
+      l = sh_hole(r[0].x + 1, r[0].y);
+      color(c_330) translate(b) cylinder(d = 2.3, h = sh_res_h - 1.5, $fn = 12);
       color(c_steel) hull() {
-         translate(concat(sh_hole(r[0].x, r[0].y), sh_res_h - 1)) sphere(d = 0.6, $fn = 6);
-         translate(concat(sh_hole(r[1].x, r[1].y), sh_res_h - 1)) sphere(d = 0.6, $fn = 6);
+         translate(concat(b, sh_res_h - 1)) sphere(d = 0.6, $fn = 6);
+         translate(concat(l, sh_res_h - 1)) sphere(d = 0.6, $fn = 6);
       }
-      color(c_steel) translate(sh_hole(r[1].x, r[1].y)) cylinder(d = 0.6, h = sh_res_h - 1, $fn = 6);
+      color(c_steel) translate(l) cylinder(d = 0.6, h = sh_res_h - 1, $fn = 6);
    }
+   color(c_4k7) hull() for (k = [1, sip_pins])
+      translate(concat(sh_hole(sip_pin(k).x, sip_pin(k).y), sh_t + 0.5))
+         translate([-1.25, -1.25, 0]) cube([2.5, 2.5, sh_sip_h - 0.5]);
 }
 
 // The shield drawing: the component side, the wiring of its back drawn
-// through it (straight lines, run them as you like), row 0 at the bottom
+// through it (the wires as straight lines, run them as you like), row 0 at
+// the bottom
 module shield_view() {
    lt = 0.05;  // layers, stacked so the preview shows the upper one
    module layer(n) translate([0, 0, n * lt]) linear_extrude(lt) children();
-   module label(t, size = 0.6, c = "#222222", ha = "left", va = "center", patch = false) {
-      color(c) layer(9) text(t, size = size, font = font, halign = ha, valign = va);
-      if (patch) color(c_perf) layer(7) offset(delta = 0.15) hull()
+   module label(t, size = 0.6, c = "#222222", ha = "left", va = "center", patch = false, l = 9) {
+      color(c) layer(l) text(t, size = size, font = font, halign = ha, valign = va);
+      if (patch) color(c_perf) layer(l - 1) offset(delta = 0.15) hull()
          text(t, size = size, font = font, halign = ha, valign = va);
    }
    function at(u) = sh_hole(u.x, u.y);
+   c_top = "#f1c40f";
    color(c_perf) layer(0) difference() {
       offset(r = 0.6) offset(delta = -0.6) square(sh);
       for (h = sh_holes) translate(h) circle(d = 3, $fn = 24);
@@ -562,62 +683,76 @@ module shield_view() {
       square(mega_icsp_size + [2, 2] * icsp_clear, center = true);
       square(mega_icsp_size + [2, 2] * icsp_clear - [0.5, 0.5], center = true);
    }
-   translate(mega_icsp - sh_o + [0, mega_icsp_size.y / 2 + icsp_clear + 0.4])
-      label("ICSP below: keep free", 0.5, "#e74c3c", "center", "bottom", true);
-   // The back: bridges, then the wires
+   translate(mega_icsp - sh_o + [-mega_icsp_size.x / 2 - icsp_clear - 0.4, 0])
+      label("ICSP below: keep free", 0.5, "#e74c3c", "right", "center", true);
+   // The back: runs, then the wires
    color("#7f8c8d") layer(3)
-      for (b = sh_bridges) hull() for (u = b) translate(at(u)) circle(d = 0.7, $fn = 12);
+      for (r = sh_runs) if (r[2] == 0) hull() for (u = [r[0], r[1]]) translate(at(u)) circle(d = 0.7, $fn = 12);
    for (w = sh_wires) color(c_wire[w[2]]) layer(4)
       hull() for (u = [w[0], w[1]]) translate(at(u)) circle(d = 0.22, $fn = 8);
    // The Mega's header pins under the shield: used ones red, the rest grey
-   used = [for (w = sh_wires) each [w[0], w[1]]];
+   used = [for (r = sh_runs) if (r[2] == 1) each [r[0], r[1]]];
    for (u = sh_stacked) translate(at(u)) {
       color(len([for (w = used) if (w == u) 1]) ? "#c0392b" : "#a0a0a0")
          layer(5) difference() { square(1.5, center = true); square(0.9, center = true); }
    }
-   // Resistors, standing: the body on the dot
-   for (r = sh_res) {
-      color("#555555") layer(5) hull() for (u = [r[0], r[1]]) translate(at(u)) circle(d = 0.15, $fn = 6);
-      color(r[2] == "330" ? c_330 : c_4k7) layer(6) translate(at(r[0])) circle(d = 1.35, $fn = 24);
-      color("#555555") layer(6) translate(at(r[1])) circle(d = 0.45, $fn = 12);
-      translate(at(r[1]) + [0, -1.0]) label(r[3], 0.5, r[2] == "330" ? c_330 : c_4k7, "center", "top", true);
+   // Solder bridges on top
+   color(c_top) layer(8)
+      for (r = sh_runs) if (r[2] == 1) hull() for (u = [r[0], r[1]]) translate(at(u)) circle(d = 0.6, $fn = 12);
+   // 330 Ohm resistors, standing: the body on the dot, the lead to the right
+   for (r = sh_330) {
+      color("#555555") layer(5) hull() for (u = [r[0], r[0] + [1, 0]]) translate(at(u)) circle(d = 0.15, $fn = 6);
+      color(c_330) layer(6) translate(at(r[0])) circle(d = 1.35, $fn = 24);
+      color("#555555") layer(6) translate(at(r[0] + [1, 0])) circle(d = 0.45, $fn = 12);
    }
-   // Port headers, their pin numbers below them, the port in front
+   // The pull-up network, pin 1 (the common) marked
+   color(c_4k7) layer(6) hull() for (k = [1, sip_pins]) translate(at(sip_pin(k))) square(1.3, center = true);
+   color("#ffffff") layer(7) translate(at(sip_pin(1))) circle(d = 0.6, $fn = 16);
+   color("#ffffff") layer(7) for (k = [2 : sip_pins]) translate(at(sip_pin(k))) circle(d = 0.3, $fn = 8);
+   // Port headers: the pin numbers on the pins, the port before pin 1
    for (port = [1 : 6]) {
       for (p = [1 : 8]) translate(at(sh_pin(port, p))) {
-         color(c_black) layer(6) square(1.2, center = true);
-         color("#e6c34a") layer(7) square(0.45, center = true);
-         translate([0, -0.95]) label(str(p), 0.5, "#444444", "center", "top", true);
+         color(p == 1 ? "#7b241c" : c_black) layer(6) square(1.4, center = true);
+         label(str(p), 0.75, "#f4d03f", "center", "center", l = 7);
       }
-      translate(at(sh_pin(port, 1)) + [-1.1, 0])
-         label(str("P", port), 0.85, port <= 3 ? "#c0392b" : "#2471a3", "right", patch = true);
+      d = sh_ports[port - 1][1];
+      translate(at(sh_pin(port, 1)) - d * 1.3)
+         label(str("P", port), 0.85, port <= 3 ? "#c0392b" : "#2471a3",
+               d.x ? "right" : "center", d.x ? "center" : "bottom", true);
    }
-   // Mega pin names: analog behind their row, the double header on its sides
-   for (n = [0 : 15]) translate(at(mega_hole(["A", n])) + [0, 0.95])
-      label(str("A", n), 0.45, "#666666", "center", "bottom", true);
-   for (n = [22 : 37]) translate(at(mega_hole(["D", n])) + [n % 2 ? 1.0 : -1.0, 0])
-      label(str("D", n), 0.5, "#666666", n % 2 ? "left" : "right", patch = true);
-   for (k = [0, 1]) {
-      translate(at(mega_hole(["5V", k])) + [k ? 1.0 : -1.0, 0])
-         label(k ? "5V servo" : "5V", 0.5, c_wire[1], k ? "left" : "right", patch = true);
-      translate(at(mega_hole(["GND", k])) + [k ? 1.0 : -1.0, 0])
-         label(k ? "GND servo" : "GND", 0.5, c_wire[2], k ? "left" : "right", patch = true);
+   // Mega pin names: analog in front of their row, the double header's rows
+   // (only the inner pins and the servo power on the outer ones are used) on
+   // the right with their lines
+   for (n = [0 : 15]) translate(at(mega_hole(["A", n])) - [0, 0.95])
+      label(str("A", n), 0.45, "#666666", "center", "top", true);
+   for (l = sh_lines) if (l[3][0] == "A")
+      translate(at(mega_hole(l[3])) - [0, 1.75]) label(l[0], 0.4, "#1e8449", "center", "top", true);
+   function line_at(m) = [for (l = sh_lines) if (l[3] == m) l[0]];
+   for (n = [22 : 2 : 52]) translate(at(mega_hole(["D", n + 1])) + [1.0, 0]) {
+      ln = line_at(["D", n]);
+      label(str("D", n, len(ln) ? str("  ", ln[0]) : ""), 0.5, len(ln) ? "#1e8449" : "#666666", "left", patch = true);
    }
+   translate(at(mega_hole(["5V", 1])) + [1.0, 0]) label("5V, servo 5V", 0.5, c_wire[1], "left", patch = true);
+   translate(at(mega_hole(["GND", 1])) + [1.0, 0]) label("GND, servo GND", 0.5, c_wire[2], "left", patch = true);
    translate([sh.x / 2, -2.2]) label("front wall side: ribbons from ports 1-3", 0.9, "#666666", "center");
    translate([sh.x + 1, sh.y + 1.6]) label("right wall side: ribbons from ports 4-6 ->", 0.9, "#666666", "right");
    // Legend
-   legend = [[0, "pin, ribbon from that port, RJ45 pin numbers below"],
+   legend = [[0, "port header pin (pin 1 dark red), ribbon from that port"],
              [1, "Mega header pin under the shield (red: wired)"],
-             [2, "330 Ohm in series, standing, body on the dot"],
-             [3, "4.7 kOhm pull-up, standing, the lead on the 5 V rail"],
-             [4, "bare tinned wire on the back"],
-             [5, "wire-wrap wire on the back: signal, 5 V, GND, servo power"]];
+             [2, "330 Ohm in series, standing, body on the dot, lead into the hole on its right"],
+             [3, "4.7 kOhm x 8 bussed network (SIP 9), pin 1 (common, 5 V) on the big dot"],
+             [4, "bare tinned wire on the back, soldered in every hole it passes"],
+             [5, "solder bridge on top: neighbour hole onto the Mega pin"],
+             [6, "wire-wrap wire on the back: signal, 5 V, GND, servo power"]];
    for (i = [0 : len(legend) - 1]) translate([2, -5.5 - i * 2.2]) {
       k = legend[i][0];
-      if (k == 0) { color(c_black) layer(6) square(1.2, center = true); color("#e6c34a") layer(7) square(0.45, center = true); }
+      if (k == 0) { color("#7b241c") layer(6) square(1.4, center = true); }
       else if (k == 1) color("#c0392b") layer(5) difference() { square(1.5, center = true); square(0.9, center = true); }
-      else if (k < 4) color(k == 2 ? c_330 : c_4k7) layer(6) circle(d = 1.35, $fn = 24);
+      else if (k == 2) color(c_330) layer(6) circle(d = 1.35, $fn = 24);
+      else if (k == 3) { color(c_4k7) layer(6) square([1.3, 2], center = true);
+                         color("#ffffff") layer(7) translate([0, 0.5]) circle(d = 0.6, $fn = 16); }
       else if (k == 4) color("#7f8c8d") layer(3) square([2, 0.7], center = true);
+      else if (k == 5) color(c_top) layer(8) square([2, 0.6], center = true);
       else for (j = [0 : 3]) color(c_wire[j]) layer(4) translate([-1, -0.45 + j * 0.3]) square([2, 0.22]);
       translate([2, 0]) label(legend[i][1], 0.9);
    }

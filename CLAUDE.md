@@ -86,14 +86,17 @@ its own top-level directory; new components should follow the same layout.
   without a mux (servos, encoders, pots). On the Mega sits the shield, a
   perfboard plugged onto its analog headers and double header (the
   digital header is off the grid) and screwed onto floor posts at its
-  corners, wired on its back on the bench (layout lists `sh_*`, drawn by
-  the `shield` view; the build checks that the Mega's pins land on its
-  grid and that every hole has one use): every RJ45 pin goes to it, each
+  corners, double sided and plated through, wired like a stripboard on
+  the bench (each line a tinned run along its own row on the back, a
+  solder bridge on top onto its Mega pin, a few wire-wrap wires; layout
+  lists `sh_*`, the lines in `sh_lines`, drawn by the `shield` view; the
+  build checks that the Mega's pins land on its grid, that every hole has
+  one use and is on one net, and that every line connects): every RJ45 pin goes to it, each
   port as one ribbon of female-female jumpers onto an 8 pin header in RJ45
   order, it joins 5 V and GND of all ports and S0..S3 of the mux ports
   and carries every resistor (330 Ohm in series with S0..S3 and the servo
   signals, 4.7 kOhm pull-ups on the mux SIG lines and the direct-port
-  switch/encoder lines; the components have none). No wire goes to the
+  switch/encoder lines, one bussed network; the components have none). No wire goes to the
   Mega, nothing is soldered in the box. Power for big loads is not the
   hub's job (an external PSU and 5 V bus, later). It stands on the
   frame's desk part behind the throttle box, its ears bolted into two
