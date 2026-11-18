@@ -89,12 +89,13 @@ its own top-level directory; new components should follow the same layout.
   corners, double sided and plated through, wired on the bench (each
   line to the Mega in its own row, its resistor or network pin beside the
   Mega pin with a solder bridge on top onto it; bridges only between
-  neighbouring used pins, everything else wire-wrap from pin to pin; layout
+  neighbouring used pins, no wires (`sh_wires` is empty); layout
   lists `sh_*`, the lines in `sh_lines`, drawn by the `shield` view; the
   build checks that the Mega's pins land on its grid, that every hole has
   one use and is on one net, and that every line connects): every RJ45 pin goes to it, each
   port as one ribbon of female-female jumpers onto an 8 pin header in RJ45
-  order, it joins 5 V and GND of all ports and S0..S3 of the mux ports
+  order (some peeled off to loose pins beside what they go to,
+  `sh_loose_pins`), it joins 5 V and GND of all ports and S0..S3 of the mux ports
   and carries every resistor (330 Ohm in series with S0..S3 and the servo
   signals, 4.7 kOhm pull-ups on the mux SIG lines and the direct-port
   switch/encoder lines, one bussed network; the components have none). No wire goes to the
