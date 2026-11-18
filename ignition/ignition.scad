@@ -53,7 +53,7 @@
 // - mailbox lock (file off its stop tab, see above), its M4 cam screw
 // - 6 mm steel ball + spring (detent_spring_*)
 // - spring for the START return (start_spring_*, measure its inner diameter)
-// - 5x5x5 mm cube magnet (magnet_*), 5x A3144 hall sensors (OFF is optional)
+// - 5x5x5 mm cube magnet (magnet_*), 5x A3144 hall sensors (OFF too: it is needed)
 // - prototype board (2.54 mm pitch), 5 pieces of 3 x board_rows holes,
 //   5x M2x6 screws to hold them on the holder
 // - M3 screws: 4x M3x30 for the cap and cover, 4x panel to housing, 1x M3x8 as the

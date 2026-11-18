@@ -32,7 +32,7 @@
 //   Mega (its USB and power jacks through the left wall) with the shield
 //   on it, left of the right ports' jumper strip.
 // - A lid with a locating lip is screwed onto four corner posts. Four ears
-//   on the floor screw the box onto the frame or under the desk.
+//   on the floor bolt the box into two crossbars of the frame.
 //
 // Coordinates: x along the front wall (port 1 on the left), y away from it,
 // z up; the inside of the front wall is at y=0, the floor top at z=0.
@@ -40,7 +40,7 @@
 //
 // Parts to buy (details in the README):
 // - Arduino Mega 2560
-// - 6 RJ45 breakout boards (34 x 28 mm, 8 pin angled header)
+// - 6 RJ45 breakout boards (34 x 28 mm, 9 pin angled header: 1-8 and SH)
 // - shield: 90 x 70 mm perfboard (31 x 26 holes), a 2 x 18 and eight 1 x 8
 //   male pin headers, 6 x 330 Ohm, 8 x 4.7 kOhm, wire-wrap and tinned wire
 // - 24 + 6 M3 x 6 self tapping screws (RJ45 boards, Mega), 4 x M3 x 8
