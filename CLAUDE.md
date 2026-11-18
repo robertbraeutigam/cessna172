@@ -81,21 +81,24 @@ its own top-level directory; new components should follow the same layout.
   (S0..S3, 5 V, GND, SIG, AUX), ports 4-6 direct ports (5 V and GND on
   the same pins 4 and 5, the other six wires are lines to their own Mega
   pins, a servo takes its power on the orange pair), for components
-  without a mux (servos, encoders, pots). Behind the Mega is the
-  distributor board, a perfboard with male pin headers soldered on the
-  bench (layout lists `pb_*`, drawn by the `board` view): it joins 5 V and
-  GND of all ports and S0..S3 of the mux ports and carries every resistor
-  (330 Ohm in series with S0..S3 and the servo signals, 4.7 kOhm pull-ups
-  on the mux SIG lines and the direct-port switch/encoder lines; the
-  components have none). Everything in the box is plugged Dupont jumpers
-  (female-female RJ45 to board, male-female to the Mega; AUX, pots and
-  servo power straight from the RJ45 pin to the Mega), nothing soldered
-  in the box. Left of the board is room for the power bus later. Every MobiFlight component connects to
+  without a mux (servos, encoders, pots). On the Mega sits the shield, a
+  perfboard plugged onto its analog headers and double header (the
+  digital header is off the grid) and screwed onto floor posts at its
+  corners, wired on its back on the bench (layout lists `sh_*`, drawn by
+  the `shield` view; the build checks that the Mega's pins land on its
+  grid and that every hole has one use): every RJ45 pin goes to it, each
+  port as one ribbon of female-female jumpers onto an 8 pin header in RJ45
+  order, it joins 5 V and GND of all ports and S0..S3 of the mux ports
+  and carries every resistor (330 Ohm in series with S0..S3 and the servo
+  signals, 4.7 kOhm pull-ups on the mux SIG lines and the direct-port
+  switch/encoder lines; the components have none). No wire goes to the
+  Mega, nothing is soldered in the box. Power for big loads is not the
+  hub's job (an external PSU and 5 V bus, later). Every MobiFlight component connects to
   its own numbered port with one Cat5 cable, RJ45 plug at the hub and
   soldered straight to the component (no connector there); the port
   pinouts and the port list are in the README's Connections section, keep
-  components and README in sync with them. The `rj_*` values
-  are guesses until the parts are measured.
+  components and README in sync with them. The `rj_*` and
+  shield board values are measured.
 
 - `yoke/` — `yoke.scad`: the hollow Cessna control wheel (trapezoid hub,
   bar with a sagging bottom, arms leaning inwards with block heads square
@@ -244,8 +247,8 @@ so a version can be embossed into a part. Files are rendered from the copy in
   computed from them; reuse the same names across files (e.g. `pin.scad`
   repeats the `big_pot_*` values from `throttle_box.scad`).
 - Hole clearances used so far: 3.2–3.3 mm for M3 screws, 2.8 mm for M3 self
-  tapping pilot holes, 2.1 mm for M2 pilot holes (only the ignition, built,
-  and the hub's perfboard, whose holes are 2 mm; use M3 for new parts), 4.2 mm for M4 / the USB cable, 5.3 mm for M5 (frame), 6.2 mm for the 6 mm rods, 11.2 mm for
+  tapping pilot holes, 2.1 mm for M2 pilot holes (only the ignition, built;
+  use M3 for new parts), 4.2 mm for M4 / the USB cable, 5.3 mm for M5 (frame), 6.2 mm for the 6 mm rods, 11.2 mm for
   the rod nuts.
 - The printer is an Anycubic Kobra 3 V2 with a 255 x 255 mm bed. Pieces must
   fit it; files with big parts check it with a `bed = [255, 255]` parameter.

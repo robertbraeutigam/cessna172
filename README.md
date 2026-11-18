@@ -268,7 +268,7 @@ what the direct ports are for.
 
 At the hub it is the RJ45 pin, at the component the wire color (the cable
 is soldered there). Pins 4 and 5 (the blue pair) are 5 V and GND on every
-port; at the hub they are joined on the distributor board (see
+port; at the hub they are joined on the shield (see
 [Hub wiring](#wiring)) for all 6 ports.
 
 **Mux ports (1-3):**
@@ -285,21 +285,21 @@ port; at the hub they are joined on the distributor board (see
 | 8 | brown | AUX | the port's own Mega pin: one analog input, a button or a servo |
 
 S0-S3 are shared by every mux (MobiFlight takes them once per board); at
-the hub pins 1, 2, 3 and 6 of ports 1-3 are joined on the distributor
-board (the mux bus). Every SIG line gets a 4.7 kOhm pull-up resistor to
+the hub pins 1, 2, 3 and 6 of ports 1-3 are joined on the shield (the
+mux bus). Every SIG line gets a 4.7 kOhm pull-up resistor to
 5 V there. MobiFlight turns on the Mega's internal pull-up, but that is
 weak (20-50 kOhm): on a long cable the line rises slowly after an open
 switch (the cable's capacitance) and picks up the S0-S3 edges next to it,
 so the mux could read a ghost input. MobiFlight's docs recommend an extra
 one for long wires. It does not matter at which end of the cable it sits,
-so it is on the hub's board and the components have no resistors.
+so it is on the hub's shield and the components have no resistors.
 
 **Direct ports (4-6):**
 
 | Pin | T568B color | Signal | At the hub |
 |-----|-------------|--------|------------|
-| 1 | white-orange | servo 5 V, or line E | a Mega 5 V pin of its own, or its own Mega pin |
-| 2 | orange | servo GND, or line F | a Mega GND pin of its own, or its own Mega pin |
+| 1 | white-orange | servo 5 V, or line E | the servo rail (a Mega 5 V pin of its own), or its own Mega pin |
+| 2 | orange | servo GND, or line F | the servo rail (a Mega GND pin of its own), or its own Mega pin |
 | 3 | white-green | line A | its own Mega pin |
 | 4 | blue | 5 V | all ports, Mega 5 V |
 | 5 | white-blue | GND | all ports, Mega GND |
@@ -312,21 +312,22 @@ pin), an encoder contact, a switch (any digital pin) or a servo signal.
 The rules:
 
 - **A servo** takes its power on the orange pair (pin 1 5 V, pin 2 GND) and
-  its signal on pin 7. At the hub they go to 5 V and GND pins of the Mega
-  of their own (see [Hub wiring](#wiring)), not to the blue pair: the
+  its signal on pin 7. At the hub they go to the double header's second
+  5 V and GND pins, wired on their own (see [Hub wiring](#wiring)), not to
+  the blue pair: the
   servo's current peaks then do not move the GND and 5 V that the pots
   and the logic on the same cable use. Without a servo, pins 1 and 2 are
   two more lines.
 - **Pots** go between 5 V and GND of the blue pair, the wiper on a line.
 - **Switches and encoders** go to GND (pin 5) like on a mux, active low,
-  with a 4.7 kOhm pull-up to 5 V on the hub's distributor board on each
+  with a 4.7 kOhm pull-up to 5 V on the hub's shield on each
   line (the same reason as the mux SIG pull-up). Pots get none: it would
   pull the wiper reading.
 
 **A wrong port does not damage anything**, it only mixes up the inputs in
 the sim until the cable is in its own port again (they are numbered). Every
 Mega output that goes into a cable has a 330 Ohm resistor in series at the
-hub (S0-S3 and each servo signal, on the distributor board), so a component
+hub (S0-S3 and each servo signal, on the shield), so a component
 in the wrong kind of port can not short a Mega output against a switch to
 GND or a pot at its end stop. The direct ports are on the hub's right
 wall, the mux ports on its front, so they are hard to mix up.
@@ -366,12 +367,15 @@ cable to length, or in half for two components:
 
 | Port | Component | Pin 3 (A) | Pin 6 (B) | Pin 7 (C) | Pin 8 (D) | Pins 1, 2 |
 |------|-----------|-----------|-----------|-----------|-----------|-----------|
-| 4 | pedestal: trim wheel, trim indicator, parking brake | D30, encoder A | D31, encoder B | D2, trim servo | D32, parking brake | servo power |
-| 5 | flaps: lever and indicator | A4, lever pot | D33 (free) | D3, flaps servo | D34 (free) | servo power |
+| 4 | pedestal: trim wheel, trim indicator, parking brake | D30, encoder A | D31, encoder B | D32, trim servo | D33, parking brake | servo power |
+| 5 | flaps: lever and indicator | A4, lever pot | D34 (free) | D35, flaps servo | D36 (free) | servo power |
 | 6 | throttle quadrant (if it moves to the hub, see below) | A5, throttle | A6, mixture | A7, carb heat | A8 (free) | A9, A10 (free) |
 
-The pins are suggestions: any free pin works (pots on analog pins), select
-it in the MobiFlight Connector. A component that needs more than a port
+The pins are where the shield wires them (see [Hub wiring](#wiring)):
+MobiFlight takes any pin for a button, encoder or servo, pots need analog
+ones. The shield only reaches the analog headers and the double header
+(D22-D53), not the digital header (D0-D21), whose pins 8-13 are off the
+2.54 mm grid. A component that needs more than a port
 gives gets a second port of the kind it needs.
 
 The direct ports leave room: a Mega has 16 analog and 54 digital pins, and
@@ -388,14 +392,14 @@ same S0-S3 bus.
   on pin 7 and the orange pair.
 - **Parking brake**: one switch, on line D of the pedestal port: two wires
   from the pedestal along the bottom bar to the brake under the yoke. A
-  *Button* on D32 in the Connector.
+  *Button* on D33 in the Connector.
 - **Flaps** (DIY, on the apron next to the pedestal): the lever pot on
   line A, the indicator servo (9 g) on pin 7 and the orange pair. Two lines
   are left (e.g. a switch at the flap detents, if the lever gets one).
 - **Throttle quadrant**: open. It is an ESP32 on USB today; on port 6 its
   three pots go on lines A-C, with no mux and no ESP32.
 - **Likely later**: panel light dimmers (pots, on free lines), steam gauges
-  (servos on a direct port, or steppers with a driver board in the hub),
+  (servos on a direct port, or steppers with a driver board),
   outputs (annunciator lights, avionics displays): MobiFlight drives them
   through 74HC595 shift registers or MAX7219 drivers with three lines each
   (data, clock, latch), which fit a direct port.
@@ -435,16 +439,15 @@ each extra mux costs only one Mega pin. The options:
 ### Power (later)
 
 USB only for now. With lighting, gauges or the FFB yoke comes one 24 V PSU
-with fused branches, buck converters for 5 V, a separate cut-off switch on
-the FFB motor power and one star ground at the PSU. The servos' orange
-pairs then go to a 5 V converter instead of the Mega 5 V (on a small board
-in the free part of the hub, its GND joined to the Mega GND), so the
-servos keep their orange pair in the Cat5. Bigger loads (backlighting, more servos in one component) get
-their current from a separate 2 wire 5 V bus with a 2 pin plug per
-component (e.g. JST-VH or a 5.08 mm screw terminal), not from the Cat5;
-its GND is tied to the Mega GND at one point in the hub. Leave room for
-that plug in components with loads; the hub has a hole for the bus in its
-back wall.
+with fused branches, a DC-DC converter to a 5 V bus, a separate cut-off
+switch on the FFB motor power and one star ground at the PSU. That is not
+in the hub. The servos then keep their orange pair in the Cat5, but the
+shield's servo rail is fed from the 5 V bus (a 2 wire lead into the hub,
+its GND joined to the Mega GND there) instead of the Mega's second 5 V
+pin. Bigger loads (backlighting, more servos in one component) get their
+current from the 5 V bus with a 2 pin plug per component (e.g. JST-VH or
+a 5.08 mm screw terminal), not from the Cat5. Leave room for that plug in
+components with loads.
 
 # Hub
 
@@ -453,7 +456,7 @@ back wall.
 [![Hub](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)
 
 `hub.scad` prints the box (`hub_box.stl`, floor down) and the lid
-(`hub_lid.stl`, top down). The box is 172 x 136 x 39 mm with the lid
+(`hub_lid.stl`, top down). The box is 172 x 135 x 53 mm with the lid
 (6 ports on two walls, `port_front` and `port_side`); the build checks that
 it fits the printer bed.
 
@@ -463,29 +466,33 @@ it fits the printer bed.
   wall, numbered from the front (see [Port pinout](#port-pinout)), so the
   two kinds can not be mixed up. The boards are screwed onto bosses on the
   floor with M3 self tapping screws from above. Their angled 8 pin headers
-  point into the box, each with a strip for the jumper plugs behind it
-  (17 mm behind the front ports).
+  point into the box, each with a strip for the jumper plugs behind it.
 - **Mega**: behind the front ports, left of the right ports' jumpers, on
   6 standoffs, its USB jack through the left wall (flush with the outside,
-  so any USB-B plug fits), with a cut-out in front of the power jack for
-  later.
-- **Distributor board**: a 30 x 70 mm perfboard behind the Mega, on 4
-  standoffs (M2 self tapping), soldered on the bench before it goes in.
-  It joins the shared lines and carries every resistor of the hub (see
-  [Wiring](#wiring)). Left of it is room for the power bus distribution
-  later; the hole for the power bus is in the back wall there.
-- The build checks the room for a plugged jumper (20 mm: a 14 mm Dupont
-  housing and the bent wire) behind the RJ45 pins and above the Mega and
-  the board.
+  so any USB-B plug fits), with a cut-out in front of the power jack.
+- **Shield**: a 90 x 70 mm perfboard plugged onto the Mega's analog
+  headers and its double header, and screwed down at its 4 corner holes
+  onto posts on the floor in front of and behind the Mega (M3 self
+  tapping), so pulling a jumper off does not lift it. Every RJ45 pin is
+  plugged onto it, it carries every resistor of the hub, and it is wired
+  on its back, on the bench (see [Wiring](#wiring)). It only uses the
+  analog headers and the double header: they are on one 2.54 mm grid,
+  the digital header is not (pins 8-13 are 1.5 mm off).
+- The build checks that every Mega pin the shield takes lands on a hole
+  of its grid, that the posts stand beside the Mega and behind the front
+  ports' jumpers, and the room for a plugged jumper (20 mm: a 14 mm
+  Dupont housing and the bent wire) behind the RJ45 pins and above the
+  shield.
 - The lid has a locating lip and is screwed onto four corner posts. Four
   ears on the floor (5.3 mm holes) screw the box onto the frame (M5 + T-nut)
   or under the desk.
 
-Nothing in the box is soldered, every wire is a plugged Dupont jumper: the
-Mega keeps its pins free and can be reused, and a port is rewired by
-moving jumpers. The MobiFlight firmware is flashed
-from the Connector through the Mega's USB jack in the left wall, with the
-lid on.
+Nothing in the box is soldered: each port is one 8 wire ribbon of
+female-female jumpers from its RJ45 pins to its header on the shield, in
+the same order, and no wire goes to the Mega. The shield comes off the
+Mega (4 screws), so the Mega can be reused. The MobiFlight firmware is
+flashed from the Connector through the Mega's USB jack in the left wall,
+with the lid on.
 
 ### Hardware
 
@@ -495,15 +502,16 @@ lid on.
 | 6 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
 | 24 | M3 x 6 self tapping screw | RJ45 boards, 4 each |
 | 6 | M3 x 6 self tapping screw | Mega |
-| 4 | M2 x 5 self tapping screw | distributor board (its holes are 2 mm) |
+| 4 | M3 x 8 self tapping screw | shield, through its 3 mm corner holes |
 | 4 | M3 x 10 self tapping screw | lid |
-| 1 | perfboard, 30 x 70 mm, 2.54 mm grid (10 x 24 holes) | distributor board |
-| 52 | male pin header, 2.54 mm, straight (break off strips) | distributor board |
+| 1 | perfboard, 90 x 70 mm, 2.54 mm grid (31 x 26 holes) | shield |
+| 1 | male pin header, 2 x 18, straight | shield onto the Mega's double header |
+| 2 | male pin header, 1 x 8, straight | shield onto the Mega's analog headers |
+| 6 | male pin header, 1 x 8, straight | the port headers on the shield |
 | 6 | 330 Ohm resistor | in series with S0-S3 and the 2 servo signals |
 | 8 | 4.7 kOhm resistor | pull-ups: 3 mux SIG lines, 5 direct-port switch/encoder lines |
-| - | tinned copper wire | the 5 V rails on the board's back |
-| ~34 | female-female jumper wire, 20 cm | RJ45 pins to the distributor board |
-| ~28 | male-female jumper wire, 20 cm | distributor board and RJ45 pins to the Mega |
+| - | wire-wrap wire, 30 AWG, a few colors; tinned copper wire | the wiring on the shield's back |
+| 48 | female-female jumper wire, 15 cm, as 8 wire ribbons | RJ45 pins to the shield, 8 per port |
 
 Per port used: a stranded copper Cat5 patch cable, soldered at the
 component end (see [Cables](#cables)).
@@ -513,64 +521,84 @@ The RJ45 boards (`rj_*`) are measured: 34 x 28 x 1.4 mm, 4 corner holes
 16 mm wide and 15 mm high in the middle, flush with the board edge, and
 one row of 9 angled pins (1-8 and SH; the header 7 mm from the edge on
 the pin 1 side, 4 mm from the other) 2 mm before the back edge, reaching
-4 mm past it. Which side pin 1 is on does not change the printed box.
+4 mm past it. Which side pin 1 is on does not change the printed box. If
+one of their holes is smaller than about 3.1 mm, drill it out, keeping
+clear of the traces around it.
 
-The perfboard (`pb`, `pb_holes`) is measured too: 30 x 70 mm, 24 x 10
-holes, 4 corner holes 2 mm from both edges, held with M2 self tapping
-screws (2.1 mm pilot holes in the standoffs). The other boards are
-screwed on with M3: if one of their holes is smaller than about 3.1 mm,
-drill it out, keeping clear of the traces around it. The Mega values are from the Arduino drawing.
+The perfboard (`sh`) is measured too: 90 x 70 mm, 31 x 26 holes, 4 corner
+holes of 3 mm, 3 mm from both edges. The Mega values, its header
+positions included (`mega_analog`, `mega_double`), are from the Arduino
+drawing.
 
 ### Wiring
 
-**Distributor board**: the lines that are shared or need a resistor go
-from their RJ45 pin to the board and from there to the Mega. It is a
-plain perfboard with straight male pin headers, built on the bench as in
-the drawing (component side, row 0 towards the Mega; `board` view of
-`hub.scad`, which also draws the board in the box from the same list):
+**The shield** is built on the bench as in the drawing (`shield` view of
+`hub.scad`, which also draws it in the box from the same lists,
+`sh_*`): the component side, the wiring of the back drawn through it as
+straight lines (run the wires as you like), the front edge (ports 1-3)
+at the bottom.
 
-[![Distributor board](https://robertbraeutigam.github.io/cessna172/hub/hub_board.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_board.png)
+[![Shield](https://robertbraeutigam.github.io/cessna172/hub/hub_shield.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_shield.png)
 
-- **S0-S3**: one column each: the pins from ports 1, 2, 3, a 330 Ohm
-  resistor, the pin to the Mega (D22-D25).
-- **Servo signals**: behind them, ports 4 and 5 pin 7 through a 330 Ohm
-  resistor to D2 and D3.
-- **GND, 5V**: a column of 8 pins each: ports 1-6, the Mega's 5 V and GND
-  pin (the power header), a spare.
-- **Pull-ups**: two 5 V rails (tinned wire on the back) run right from the
-  5V column. Each line has its pin from the port and its pin to the Mega
-  side by side, and a 4.7 kOhm resistor to the rail: the SIG of ports 1-3
-  (D26-D28), port 4 lines A, B (encoder, D30, D31) and D (parking brake,
-  D32), port 5 lines B and D (free, D33, D34), and two spares.
-- The resistors stand upright, the body on the marked hole and the lead
-  bent down into the next one, below the height of the plugs. Everything
-  else is joined on the back with solder bridges between neighbouring
-  holes. Check every column with a multimeter before it goes in: no line
-  may touch its neighbour or the 5 V rail except through its resistor.
+- **Mega side**: the 2 x 18 header under the double header and the two
+  1 x 8 headers under the analog headers, pushed in from below (their
+  plastic under the board, resting on the Mega's sockets) and soldered on
+  top. Solder all their pins, used or not: together they hold the shield.
+- **Port headers**: six 1 x 8 headers, P1-P3 side by side along the front
+  edge (their ribbons come from the front wall), P4-P6 on the right one
+  behind the other (theirs come from the right wall), each in RJ45 pin
+  order: plug each ribbon on the same way round as on its RJ45 board.
+- **Resistors**: two banks behind the direct ports, next to the double
+  header, standing (body on the marked hole, the lead bent down into the
+  next one): 4.7 kOhm pull-ups with their leads on a 5 V rail of tinned
+  wire, and the 330 Ohm series resistors.
+- **Back**: tinned wire where a straight run joins one net (5 V and GND
+  through P4-P6, the servo power of P4 and P5, the pull-up rail),
+  wire-wrap wire for everything else. Keep the joints flat: the shield
+  sits 2.5 mm above the Mega's digital header.
 
-Female-female jumpers go from the RJ45 pins to the board's port pins,
-male-female ones from its Mega pins to the Mega. The rest goes from the
-RJ45 pin straight to the Mega with a male-female jumper:
+Every line on the shield:
 
-| From | To |
-|------|----|
-| ports 1-3 pin 8 (AUX) | their Mega pins (see [Ports](#ports)) |
-| port 5 pin 3 (flaps lever pot), port 6 (throttle pots) | their analog Mega pins |
-| ports 4 and 5 pins 1, 2 (servo 5 V, GND) | the 5 V and GND pins at the end of the Mega's double header |
+| Line | From (port.pin) | Through | To the Mega |
+|------|-----------------|---------|-------------|
+| S0, S1, S2, S3 | P1.1-P2.1-P3.1, .2, .3, .6 (chained) | 330 Ohm | D22, D23, D24, D25 |
+| SIG | P1.7, P2.7, P3.7 | 4.7 kOhm to 5 V | D26, D27, D28 |
+| AUX | P1.8, P2.8, P3.8 | - | A1, A2, A3 |
+| port 4 | A P4.3, B P4.6, D P4.8 | 4.7 kOhm to 5 V | D30, D31, D33 |
+| port 4 servo | C P4.7 | 330 Ohm | D32 |
+| port 5 | A P5.3 (pot) | - | A4 |
+| port 5 | B P5.6, D P5.8 | 4.7 kOhm to 5 V | D34, D36 |
+| port 5 servo | C P5.7 | 330 Ohm | D35 |
+| port 6 | A P6.3, B P6.6, C P6.7, D P6.8, E P6.1, F P6.2 | - | A5, A6, A7, A8, A9, A10 |
+| 5 V | P1.4-P2.4-P3.4-P4.4 (chained), P4.4-P5.4-P6.4 (tinned), the pull-up rail | - | 5V (the double header's inner pin) |
+| GND | P1.5-P2.5-P3.5-P4.5 (chained), P4.5-P5.5-P6.5 (tinned) | - | GND (inner pin) |
+| servo power | P4.1-P5.1 and P4.2-P5.2 (tinned) | - | the other 5V and GND (outer pins) |
 
-The Dupont plugs hold well enough for good: tie each Cat5 cable to the box so a pull
-on it does not reach the jumpers, and once everything works a dab of hot
-glue across the housings keeps them in (it peels off).
+Check every line with a multimeter before the shield goes on: each port
+pin to its Mega pin (through its resistor), and no line to its neighbour,
+5 V or GND. The servo power has its own Mega pins, so the servos' current
+peaks do not move the 5 V and GND the pots read against.
 
-Add a Servo device on D2 and D3 in the Connector.
+**Ribbons**: peel 8 wires off a ribbon of jumper wires per port and keep
+them together, so the colors are in the same order at both ends. Tie each
+Cat5 cable to the box so a pull on it does not reach the jumpers; once
+everything works, a dab of hot glue across the plugs keeps them in (it
+peels off).
+
+Add a Servo device on D32 and D35 in the Connector.
 
 ### Assembly
 
-1. Solder the distributor board on the bench (see [Wiring](#wiring)) and
-   check it with a multimeter.
-2. Screw the RJ45 boards onto their bosses (M3 x 6).
-3. Screw the Mega and the distributor board onto their standoffs.
-4. Plug the jumpers as above and label them.
+1. Push a few loose header strips into the Mega's double header and
+   analog headers and lay the perfboard on them: it must drop onto all
+   the pins at once. Then build the shield on the bench (see
+   [Wiring](#wiring)), the Mega side headers soldered while plugged into
+   the Mega so they stay straight, and check it with a multimeter.
+2. Screw the RJ45 boards onto their bosses (M3 x 6) and the Mega onto its
+   standoffs.
+3. Plug the shield onto the Mega and screw it onto its posts (M3 x 8).
+4. Plug each port's ribbon from its RJ45 board onto its header on the
+   shield.
 5. Screw the lid on.
 
 # Throttle quadrant
@@ -910,7 +938,7 @@ there to the pins without any pull on them. The cable is 6 mm
 (`cable_d`, measured); **MEASURE** the tie (`tie`, 3.6 x 1.3 mm).
 
 The switches and the hall sensors have no pull-up resistors of their own:
-the 4.7 kOhm SIG pull-up on the hub's distributor board pulls whichever
+the 4.7 kOhm SIG pull-up on the hub's shield pulls whichever
 input is selected up (see [Port pinout](#port-pinout)). Test it on
 the bench with one switch on the mux before soldering all of them.
 
