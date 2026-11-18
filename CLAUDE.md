@@ -36,9 +36,9 @@ its own top-level directory; new components should follow the same layout.
     flange where the panels meet). The back goes through a hole in the
     frame's sheet, the flange is screwed onto it; `frame/frame.inc.scad`
     repeats these sizes.
-  - `primer.scad` — the primer: a small panel of its own above the left
-    end of the switch panels (own cut-out in the sheet, the ignition panel
-    is not changed), a push-pull knob with a twist lock (lug in a keyway
+  - `primer.scad` — the primer: a small panel of its own below the
+    switch panels, under the ignition key (own cut-out in the sheet, the
+    ignition panel is not changed), a push-pull knob with a twist lock (lug in a keyway
     in a tube on the panel back, quarter turn pocket at its end) and a
     bracket behind it with the 75 mm linear pot (the carb heat type),
     driven like the throttle's (rod, carrier over the slider ear, the
@@ -46,9 +46,11 @@ its own top-level directory; new components should follow the same layout.
     knob out when it is unlocked. The pot's wiper is on port 3's AUX
     wire. `panel.inc.scad` takes the back's height (`h`) for it.
   - `switches.scad` — a separate panel with the switch row: a red double
-    rocker for MASTER (ALT, BAT), M12 toggles in the middle (lights,
-    pitot heat, fuel pump) and a black double rocker for
-    AVIONICS (BUS 1, BUS 2), with the labels on its face. Above the
+    rocker for MASTER (ALT, BAT), M12 toggles in the middle (PITOT HEAT
+    and the LIGHTS group) and a black double rocker for
+    AVIONICS (BUS 1, BUS 2), with the labels on its face; the layout
+    copies the X-Plane 172N panel (rockers raised half way to the breakers,
+    OFF under the toggles, ON beside the rockers). Above the
     toggles is a row of printed dummy circuit breakers (`breakers`, for
     show only, glued into hex holes in the face). A CD74HC4067
     input mux collects all switches and the ignition, so one Cat5 cable

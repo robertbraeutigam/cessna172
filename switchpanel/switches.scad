@@ -1,8 +1,13 @@
 // Switch panel: master, lights, avionics
 //
-// The switch row, separate from the ignition: the red split MASTER (ALT,
-// BAT) on the left, toggle switches in the middle and the split AVIONICS
-// (BUS 1, BUS 2) on the right. Up is ON, like in the airplane.
+// The switch row, separate from the ignition, laid out like the 172N in
+// X-Plane: the red split MASTER (ALT, BAT) on the left, the toggle
+// switches in the middle (PITOT HEAT, then the LIGHTS group: BCN, LAND,
+// TAXI, NAV, STRB) and the split AVIONICS (BUS 1, BUS 2) on the right.
+// Up is ON, like in the airplane: the toggles have OFF under them, the
+// rockers ON beside their top half. The rockers sit higher than the
+// toggles, half way up to the breakers, with their name above them and
+// the two switch names below.
 //
 // - MASTER and AVIONICS are double rocker switches (two independent
 //   rockers in one housing, 6 pins). They snap into a cutout from the
@@ -12,8 +17,8 @@
 //   lever, about the size of the real ones. They go in from the back and
 //   a nut on the front clamps them. Their body sits in a shallow pocket in
 //   the back so they cannot turn.
-// - Above the toggles is a row of circuit breakers, like in the 172N, with
-//   their names above them. They are for show only: printed dummy
+// - Above the toggles is a row of circuit breakers, like in the 172N, one
+//   over each toggle, with their names above them. They are for show only: printed dummy
 //   push-to-reset buttons (hex nut, button with the rating on it), glued
 //   into hex holes in the face.
 // - The front is a separate thin face (face_t, panel.inc.scad) with the
@@ -34,21 +39,21 @@
 //   one) and a cable tie holds it on the block, so pulling the cable does
 //   not pull the solder joints. The carrier can be wired up on its own
 //   (ignition, cable) before the panel is made, and is then screwed onto
-//   two bosses on the panel back, in the strip behind the group labels.
+//   two bosses on the panel back, in the strip behind the breaker labels.
 //
 // Wiring: every switch closes one contact: one side to a common GND wire,
 // the other to a mux input (active low, like any switch to GND). ALT and
 // BAT are independent, there is no mechanical interlock between them.
-// Mux inputs C0.. are the switches in label order, then the ignition
-// positions (details in the README).
+// Mux inputs C0.. are the switches in label order, the ignition positions
+// are the last five (ignition_c0..; details in the README).
 //
 // Coordinates: the front of the panel is at z=0, +z points towards the
 // pilot, x to the pilot's right, y up. The panel starts at x=-margin_x, the
-// switch centers are at y=0. The face is in front of z=-face_t.
+// toggle centers are at y=0, the rocker centers at rk_y. The face is in front of z=-face_t.
 //
 // Parts to buy (details in the README):
 // - 1 red and 1 black double rocker switch, 6 pin
-// - 7 toggle switches, M12 neck (2 pin ON-OFF or 6 pin ON-ON)
+// - 6 toggle switches, M12 neck (2 pin ON-OFF or 6 pin ON-ON)
 // - mount_count x M3 screws to mount the panel
 // - CD74HC4067 16 channel mux breakout board
 // - 4 x M3 x 8 self tapping screws: mux onto the carrier, carrier onto the panel
@@ -70,7 +75,7 @@ $fn = 48;
 include <panel.inc.scad>
 
 // Preview: which switches are shown ON, in label order (missing ones are OFF)
-view_on = [1, 1, 0, 1, 0, 0, 1, 1, 0, 1, 1];
+view_on = [1, 1, 0, 1, 0, 0, 1, 1, 1, 1];
 
 // --- Printer ---
 bed = [255, 255];            // Kobra 3 V2
@@ -124,7 +129,8 @@ mux_pin_inset = 1.3;         // pin row to the board edge
 mux_pin_stub = 3;            // wire ends and solder below the board
 mux_channels = 16;
 mux_ctl_names = ["SIG", "S3", "S2", "S1", "S0", "EN", "VCC", "GND"];  // MEASURE: order on the board
-ignition_inputs = 5;         // OFF, R, L, BOTH, START, after the switches
+ignition_inputs = 5;         // OFF, R, L, BOTH, START
+ignition_c0 = 11;            // on C11..C15, the last five inputs (already wired, keep it)
 mux_x = 45;                  // board center; left half, the ignition is left of the panel
 mux_standoff_d = 6.5;
 mux_standoff_h = 5;          // carrier plate to the board
@@ -153,22 +159,25 @@ carrier_boss_h = 6;          // panel back to the plate
 carrier_pilot = 2.8;         // M3 self tapping, in the bosses
 
 // --- Layout ---
-// Groups from left to right: label above the group, type ("rocker2" or
-// "toggle"), switch labels (one list of lines each, top line first), color.
-// A rocker2 group is one double rocker, so it has exactly two switches.
+// Groups from left to right: group label, type ("rocker2" or "toggle"),
+// switch labels (one list of lines each, top line first), color. A rocker2
+// group is one double rocker, so it has exactly two switches; its label is
+// above it, the switch labels below. A toggle group's label is above its
+// switch labels, between two lines.
 groups = [
    ["MASTER", "rocker2", [["ALT"], ["BAT"]], "red"],
-   ["", "toggle", [["FUEL", "PUMP"], ["BEACON"], ["LAND"], ["TAXI"], ["NAV"], ["STROBE"], ["PITOT", "HEAT"]], "chrome"],
+   ["", "toggle", [["PITOT", "HEAT"]], "chrome"],
+   ["LIGHTS", "toggle", [["BCN"], ["LAND"], ["TAXI"], ["NAV"], ["STRB"]], "chrome"],
    ["AVIONICS", "rocker2", [["BUS", "1"], ["BUS", "2"]], "black"],
 ];
-group_space = 4;             // between two groups
+group_space = 6;             // between a rocker and the toggles; toggle groups are tg_pitch apart
 
 // --- Circuit breakers, for show ---
-// Name engraved above the breaker, rating (A) on its button. In a row over
-// the first toggle group, one above each toggle, from the left.
+// Name above the breaker (lines, top line first), rating (A) on its
+// button. In a row over the toggles, one above each, from the left.
 breakers = [
-   ["FUEL PUMP", 5], ["BCN", 5], ["LAND LT", 15], ["TAXI LT", 10],
-   ["NAV LT", 10], ["STROBE", 5], ["PITOT HT", 10]
+   [["FLAP"], 10], [["INST"], 5], [["AVN", "BUS 1"], 15], [["AVN", "BUS 2"], 15],
+   [["TURN", "COORD"], 5], [["INST", "LTS"], 5]
 ];
 cb_nut_af = 11;              // hex nut across flats
 cb_nut_t = 2.5;              // of which cb_pocket_depth sits in the panel
@@ -180,20 +189,24 @@ cb_button_chamfer = 0.5;
 cb_rating_size = 2.6;        // number engraved into the button
 cb_rating_depth = 0.4;
 cb_label_size = 2.2;
+cb_label_line = 3.1;         // line pitch of two-line breaker labels
 cb_label_gap = 1.5;          // nut to its label
 cb_gap = 2;                  // top of the toggle labels to the nuts
 cb_print_space = 3;          // between the breakers on the print bed
 
 // --- Panel (height, thickness, rim, mount holes, font: panel.inc.scad) ---
 margin_x = 11;               // panel end to the outer switches, room for the group labels
-margin_bottom = 12;          // at least, panel bottom to the rockers
+margin_bottom = 4;           // at least, panel bottom to the lowest label or pocket
 margin_top = 4;              // at least, panel top to the top label
 mount_center = true;         // also a hole in the middle of the top and bottom edge
 
 // --- Labels, standing out of the face ---
 label_line = 4.2;            // line pitch of two-line labels
-label_gap = 2.5;             // switch to the lowest label line
-group_line_w = 0.6;          // line under a group label, over its switches
+label_gap = 2.5;             // switch to its nearest label line
+group_line_w = 0.6;          // lines beside a toggle group's label
+group_line_gap = 2.5;        // group label to its lines
+on_gap = 1.5;                // rocker lip to its ON label
+rk_raise = 0.45;             // rocker center: this much of the way from the toggles up to the breakers
 
 // --- Derived ---
 rk_cutout_c = rk_cutout + 2 * [rk_cutout_clear, rk_cutout_clear];
@@ -207,7 +220,9 @@ tg_front_r = max(tg_washer_d, tg_nut_af / cos(30)) / 2;
 
 function count_before(g) = g == 0 ? 0 : count_before(g - 1) + len(groups[g - 1][2]);
 function group_w(g) = groups[g][1] == "rocker2" ? rk_bezel.x : len(groups[g][2]) * tg_pitch;
-function group_left(g) = g == 0 ? 0 : group_left(g - 1) + group_w(g - 1) + group_space;
+// Two toggle groups next to each other keep the toggle pitch
+function space_before(g) = groups[g - 1][1] == "toggle" && groups[g][1] == "toggle" ? 0 : group_space;
+function group_left(g) = g == 0 ? 0 : group_left(g - 1) + group_w(g - 1) + space_before(g);
 
 // One entry per switch unit: [x, type, labels, color, index of its first switch]
 units = [for (g = [0 : len(groups) - 1])
@@ -218,33 +233,50 @@ units = [for (g = [0 : len(groups) - 1])
 switch_count = count_before(len(groups));
 
 function is_rocker(u) = u[1] == "rocker2";
+function unit_y(u) = is_rocker(u) ? rk_y : 0;
 function unit_label_xs(u) = is_rocker(u) ? [u[0] - rk_dx, u[0] + rk_dx] : [u[0]];
 function unit_pocket(u) = is_rocker(u) ? rk_pocket : tg_pocket;
 function unit_front_w(u) = is_rocker(u) ? rk_bezel.x : 2 * tg_front_r;
+tg_xs = [for (u = units) if (!is_rocker(u)) u[0]];
+function text_w(str, size) = len(str) * size * 0.75;   // estimate, for the checks and the group lines
 
-rk_label_y = rk_bezel.y / 2 + label_gap;
+// Toggles: their labels above (tg_label_y is the lowest line), OFF below,
+// a group label one line above the group's labels
 tg_label_y = tg_front_r + label_gap;
-function unit_label_y(u) = is_rocker(u) ? rk_label_y : tg_label_y;
-group_line_y = rk_label_y + label_line + label_size + 1;
-group_label_y = group_line_y + group_line_w + 1.5;
+off_y = -tg_front_r - label_gap - label_size;
+function group_lines(g) = max([for (l = groups[g][2]) len(l)]);
+function tg_group_label_y(g) = tg_label_y + group_lines(g) * label_line;
+tg_label_top = max([for (g = [0 : len(groups) - 1]) if (groups[g][1] == "toggle")
+                       groups[g][0] == "" ? tg_label_y + (group_lines(g) - 1) * label_line + label_size
+                                          : tg_group_label_y(g) + group_label_size]);
 
-// Breakers: centered over the first toggle group, at the toggle pitch
-cb_group = [for (g = [0 : len(groups) - 1]) if (groups[g][1] == "toggle") g][0];
+// Breakers: one over each toggle from the left
 cb_r = cb_nut_af / cos(30) / 2;                    // nut corner radius
-cb_xs = [for (i = [0 : len(breakers) - 1])
-            group_left(cb_group) + (i + 0.5 + (len(groups[cb_group][2]) - len(breakers)) / 2) * tg_pitch];
-tg_label_top = tg_label_y + (max([for (u = units) if (!is_rocker(u)) len(u[2][0])]) - 1) * label_line + label_size;
+cb_xs = [for (i = [0 : len(breakers) - 1]) tg_xs[i]];
 cb_y = tg_label_top + cb_gap + cb_r;
-cb_label_y = cb_y + cb_r + cb_label_gap;
-cb_label_top = cb_label_y + cb_label_size;
-function cb_label_w(i) = len(breakers[i][0]) * cb_label_size * 0.75;  // estimate, for the checks
+cb_label_y = cb_y + cb_r + cb_label_gap;           // lowest line
+cb_label_top = cb_label_y + (max([for (b = breakers) len(b[0])]) - 1) * cb_label_line + cb_label_size;
+function cb_label_w(i) = max([for (l = breakers[i][0]) text_w(l, cb_label_size)]);
+
+// Rockers: rk_raise of the way up to the breakers, the group label above,
+// the switch labels below (rk_label_y is the top line), ON beside the top
+// half on the side towards the toggles
+rk_y = rk_raise * cb_y;
+rk_group_label_y = rk_y + rk_bezel.y / 2 + label_gap;
+rk_label_y = rk_y - rk_bezel.y / 2 - label_gap - label_size;
+rk_label_bottom = rk_label_y - (max([for (u = units) if (is_rocker(u)) for (l = u[2]) len(l)]) - 1) * label_line;
+on_y = rk_y + rk_window.y / 4;                     // middle of the ON label
+on_w = text_w("ON", label_size);
+function on_dir(u) = u[0] < tg_xs[0] ? 1 : -1;
+function on_x(u) = u[0] + on_dir(u) * (rk_bezel.x / 2 + on_gap);   // its inner end
+function on_box_c(u) = [on_x(u) + on_dir(u) * on_w / 2, on_y];
 
 panel_x0 = -margin_x;
 panel_x1 = group_left(len(groups) - 1) + group_w(len(groups) - 1) + margin_x;
 // The panel is panel_h high, like the ignition panel next to it. The room
 // left over goes half below and half above the switches.
-content_y0 = -rk_bezel.y / 2 - margin_bottom;
-content_y1 = max(group_label_y + group_label_size, len(breakers) > 0 ? cb_label_top : 0) + margin_top;
+content_y0 = min(off_y, rk_label_bottom, rk_y - rk_pocket.y / 2, -tg_pocket.y / 2) - margin_bottom;
+content_y1 = max(rk_group_label_y + group_label_size, tg_label_top, len(breakers) > 0 ? cb_label_top : 0) + margin_top;
 panel_y0 = content_y0 - (panel_h - (content_y1 - content_y0)) / 2;
 panel_y1 = panel_y0 + panel_h;
 panel_size = [panel_x1 - panel_x0, panel_y1 - panel_y0];   // the back
@@ -271,7 +303,7 @@ carrier_z = -panel_t - carrier_boss_h;
 carrier_pilot_len = carrier_boss_h + panel_t - face_t - 1;   // stops 1 mm before the face
 // The mux board's panel side is at mux_z
 mux_z = carrier_z - carrier_t - mux_standoff_h;
-mux_switch_y = max(rk_cutout_c.y, tg_pocket.y) / 2;  // the switches reach up to here behind the panel
+mux_switch_y = max(rk_y + rk_pocket.y / 2, tg_pocket.y / 2);  // the switches reach up to here behind the panel
 function mux_ch_pin(i) = [mux_x + (i - 7.5) * 2.54, mux_y - mux_board.y / 2 + mux_pin_inset];
 function mux_ctl_pin(name) = [mux_x + (search([name], mux_ctl_names)[0] - 3.5) * 2.54,
                               mux_y + mux_board.y / 2 - mux_pin_inset];
@@ -291,9 +323,22 @@ mount_head_r = 2.8;          // pan head on the front
 // Mount screw heads to the breaker nuts and labels
 min_cb_mount_dist = len(breakers) == 0 ? 99 : min([for (h = mount_holes, i = [0 : len(breakers) - 1])
                   min(norm(h - [cb_xs[i], cb_y]) - cb_r,
-                      box_dist(h, [cb_xs[i], cb_label_y + cb_label_size / 2], [cb_label_w(i), cb_label_size]))]) - mount_head_r;
+                      box_dist(h, [cb_xs[i], (cb_label_y + cb_label_top) / 2], [cb_label_w(i), cb_label_top - cb_label_y]))]) - mount_head_r;
+// ON labels to the toggles' nuts and labels and the breakers
+function box_gap(c1, s1, c2, s2) = box_dist(c1, c2, s1 + s2);   // between two centered boxes
+function tg_labels_box(t) = let(n = len(t[2][0]))
+   [[t[0], tg_label_y + ((n - 1) * label_line + label_size) / 2],
+    [max([for (l = t[2][0]) text_w(l, label_size)]), (n - 1) * label_line + label_size]];
+min_on_dist = min([for (u = units) if (is_rocker(u)) for (t = units) if (!is_rocker(t)) each [
+                  box_dist([t[0], 0], on_box_c(u), [on_w, label_size]) - tg_front_r,
+                  box_gap(on_box_c(u), [on_w, label_size], tg_labels_box(t)[0], tg_labels_box(t)[1])]]);
+min_on_cb_dist = min([for (u = units) if (is_rocker(u)) for (x = cb_xs)
+                  box_dist([x, cb_y], on_box_c(u), [on_w, label_size]) - cb_r]);
+// Breakers to the rocker lips
+min_cb_rk_dist = min([for (u = units) if (is_rocker(u)) for (x = cb_xs)
+                  box_dist([x, cb_y], [u[0], rk_y], rk_bezel) - cb_r]);
 
-echo(panel_size = panel_size, face_size = face_size, switches = switch_count, mux_inputs = switch_count + ignition_inputs, breakers = len(breakers));
+echo(panel_size = panel_size, face_size = face_size, switches = switch_count, mux_inputs = switch_count + ignition_inputs, breakers = len(breakers), rk_y = rk_y);
 
 // --- Sanity checks ---
 assert(face_size.x <= bed.x && face_size.y <= bed.y, "Panel does not fit the printer bed");
@@ -308,9 +353,9 @@ assert(tg_pocket_depth <= panel_t - face_t - 0.8, "Toggle body pocket too deep")
 assert(norm(tg_body) >= tg_pocket.x + 1, "Toggle body could turn in its square pocket");
 assert(min_front_gap >= 1, "Switches too close to each other, increase tg_pitch or group_space");
 assert(min_web >= 1.2, "Too thin a wall between two pockets, increase tg_pitch or group_space");
-assert(panel_y0 + rim_w + 0.5 <= -max(rk_pocket.y, tg_pocket.y) / 2, "Rim runs into a switch pocket, increase margin_bottom");
+assert(panel_y0 + rim_w + 0.5 <= min(rk_y - rk_pocket.y / 2, -tg_pocket.y / 2), "Rim runs into a switch pocket, increase margin_bottom");
 assert(len(view_on) <= switch_count, "view_on has more entries than there are switches");
-assert(switch_count + ignition_inputs <= mux_channels, "More switches than mux inputs");
+assert(switch_count <= ignition_c0 && ignition_c0 + ignition_inputs <= mux_channels, "More switches than mux inputs");
 assert(mux_y - carrier_size.y / 2 >= mux_switch_y + mux_clear, "Mux carrier runs into the switches, increase margin_top");
 assert(mux_x + carrier_x0 >= panel_x0 + rim_w + mux_clear && mux_x + carrier_x0 + carrier_size.x <= panel_x1 - rim_w - mux_clear,
        "Mux carrier does not fit inside the rim, move mux_x");
@@ -327,7 +372,10 @@ assert(carrier_screw_len - carrier_t >= 4 && carrier_screw_len - carrier_t <= ca
 assert(tie_block.y >= cable_d + 2 * tie_slot.y + 2, "Cable tie block too narrow for the cable");
 assert(tie_block.z - tie_groove - tie_slot.y >= 2, "Cable tie block too thin above the slot");
 assert(tie_block.x >= tie_slot.x + 4, "Cable tie block too short for the slot");
-assert(len(breakers) <= len(groups[cb_group][2]), "More breakers than toggles below them");
+assert(len(breakers) <= len(tg_xs), "More breakers than toggles below them");
+assert(min_on_dist >= 1 && min_on_cb_dist >= 1, "A rocker's ON label runs into a toggle or a breaker, increase group_space");
+assert(min_cb_rk_dist >= 1, "A breaker runs into a rocker, increase group_space or lower rk_raise");
+assert(rk_label_bottom - label_line >= panel_y0 + rim_w, "Rocker labels too low");
 assert(tg_pitch >= 2 * cb_r + 1.5 && tg_pitch >= max([for (i = [0 : len(breakers) - 1]) cb_label_w(i)]) + 1, "Breakers too close to each other, increase tg_pitch");
 assert(cb_pocket_depth < cb_nut_t, "Breaker nut sunk completely into the panel");
 assert(min_cb_mount_dist >= 0.5, "A mount screw runs into a breaker or its label");
@@ -345,22 +393,44 @@ module labels_2d() {
       for (j = [0 : len(xs) - 1]) {
          lines = u[2][j];
          for (i = [0 : len(lines) - 1])
-            translate([xs[j], unit_label_y(u) + i * label_line])
-               text(lines[len(lines) - 1 - i], size = label_size, font = font, halign = "center");
+            if (is_rocker(u))
+               translate([xs[j], rk_label_y - i * label_line])
+                  text(lines[i], size = label_size, font = font, halign = "center");
+            else
+               translate([xs[j], tg_label_y + i * label_line])
+                  text(lines[len(lines) - 1 - i], size = label_size, font = font, halign = "center");
       }
+      if (is_rocker(u))
+         translate([on_x(u), on_y])
+            text("ON", size = label_size, font = font, halign = on_dir(u) > 0 ? "left" : "right", valign = "center");
+      else
+         translate([u[0], off_y])
+            text("OFF", size = label_size, font = font, halign = "center");
    }
    for (g = [0 : len(groups) - 1])
       if (groups[g][0] != "") {
          x0 = group_left(g);
          x1 = x0 + group_w(g);
-         translate([(x0 + x1) / 2, group_label_y])
-            text(groups[g][0], size = group_label_size, font = font, halign = "center");
-         translate([x0, group_line_y])
-            square([x1 - x0, group_line_w]);
+         cx = (x0 + x1) / 2;
+         if (groups[g][1] == "rocker2")
+            translate([cx, rk_group_label_y])
+               text(groups[g][0], size = group_label_size, font = font, halign = "center");
+         else {
+            y = tg_group_label_y(g);
+            hw = text_w(groups[g][0], group_label_size) / 2 + group_line_gap;
+            translate([cx, y])
+               text(groups[g][0], size = group_label_size, font = font, halign = "center");
+            for (l = [[x0 + group_line_gap, cx - hw], [cx + hw, x1 - group_line_gap]])
+               translate([l[0], y + (group_label_size - group_line_w) / 2])
+                  square([l[1] - l[0], group_line_w]);
+         }
       }
-   for (i = [0 : len(breakers) - 1])
-      translate([cb_xs[i], cb_label_y])
-         text(breakers[i][0], size = cb_label_size, font = font, halign = "center");
+   for (i = [0 : len(breakers) - 1]) {
+      lines = breakers[i][0];
+      for (k = [0 : len(lines) - 1])
+         translate([cb_xs[i], cb_label_y + k * cb_label_line])
+            text(lines[len(lines) - 1 - k], size = cb_label_size, font = font, halign = "center");
+   }
 }
 
 module cb_rating_2d(amps) {
@@ -384,7 +454,7 @@ module panel() {
          translate([mux_x + h.x, mux_y + h.y, carrier_z - 1])
             cylinder(d = carrier_pilot, h = carrier_pilot_len + 1);
       for (u = units)
-         translate([u[0], 0, 0])
+         translate([u[0], unit_y(u), 0])
             if (is_rocker(u)) {
                translate([0, 0, -panel_t - 1])
                   linear_extrude(panel_t + 2)
@@ -424,7 +494,7 @@ module face() {
          difference() {
             panel_face_2d(panel_x0, panel_x1, panel_y0, round0 = false);
             for (u = units)
-               translate([u[0], 0])
+               translate([u[0], unit_y(u)])
                   if (is_rocker(u))
                      square(rk_cutout_c, center = true);
                   else
@@ -686,7 +756,7 @@ module carrier_part() {
 }
 
 module unit_part(u, cut = false, nuts = true) {
-   translate([u[0], 0, 0])
+   translate([u[0], unit_y(u), 0])
       if (is_rocker(u))
          rocker2_part(u[3], [is_on(u[4]), is_on(u[4] + 1)], cut);
       else {
@@ -757,14 +827,14 @@ module wire(points, c) {
 function wire_tabs() = [for (u = units)
    for (p = is_rocker(u) ? [[-rk_dx, 0], [rk_dx, 0]] : [[-tg_pin_pitch.x / 2, 0]])
       is_rocker(u)
-         ? [[u[0] + p.x, rk_pin_pitch, -rk_body_depth - rk_tab.z], [u[0] + p.x, 0, -rk_body_depth - rk_tab.z]]
+         ? [[u[0] + p.x, rk_y + rk_pin_pitch, -rk_body_depth - rk_tab.z], [u[0] + p.x, rk_y, -rk_body_depth - rk_tab.z]]
          : [[u[0] + p.x, 0, tg_body_z - tg_body_depth - tg_tab.z], [u[0] + p.x, -tg_pin_pitch.y, tg_body_z - tg_body_depth - tg_tab.z]]];
 
 mux_joint_z = mux_z - mux_board_t - 0.3;   // solder joints on the outer face of the mux
 
 // GND daisy chained over the switches to the mux GND, a signal wire from
 // every switch to its mux input, and the cable (cable_part). The ignition
-// cable (C11..C15, VCC, GND) is not shown.
+// cable (ignition_c0.., VCC, GND) is not shown.
 module wires_part() {
    t = wire_tabs();
    z = min([for (w = t) w[0].z]) - 2;
@@ -867,7 +937,7 @@ module exploded_view(e = 30) {
    translate([0, 0, 0.5 * e])
       face_part();
    for (u = units)
-      translate([u[0], 0, 0])
+      translate([u[0], unit_y(u), 0])
          if (is_rocker(u)) {
             dashed_line(0, e - rk_body_depth);
             translate([0, 0, e])

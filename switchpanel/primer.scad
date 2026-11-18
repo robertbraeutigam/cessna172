@@ -1,8 +1,8 @@
 // Primer: push-pull plunger with a twist lock
 //
-// A small panel of its own, above the left end of the switch panels (the
-// ignition side), with its own cut-out in the cockpit sheet (frame/). It
-// does not touch the ignition panel. The knob pulls out (stroke), pushes
+// A small panel of its own, below the switch panels under the ignition
+// key (like in the X-Plane 172N), with its own cut-out in the cockpit
+// sheet (frame/). It does not touch the ignition panel. The knob pulls out (stroke), pushes
 // back in and, only when it is fully in, turns a quarter turn clockwise
 // (seen from the front) to lock, like the real one. Turned back, a spring
 // pops it part way out (pop).

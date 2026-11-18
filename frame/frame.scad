@@ -249,10 +249,10 @@ module switch_panel_part() {
          cube([switch_cut[2] - switch_cut[0] - 8, switch_depth, switch_cut[3] - switch_cut[1] - 8]);
    // key, rockers and toggles on the face
    color("#b9c0c8") translate([x_sw0 + f + 38.5, y_face, z_back + 40]) rotate([90, 0, 0]) cylinder(d = 24, h = 4);
-   color("#c0392b") translate([x_sw0 + f + 92, y_face - 4, z_back + 22]) cube([24, 4, 31]);
-   color("#222") translate([x_sw1 - f - 32, y_face - 4, z_back + 22]) cube([24, 4, 31]);
-   for (i = [0 : 6])
-      color("#d0d4da") translate([x_sw0 + f + 132 + i * 18, y_face, z_back + 36])
+   color("#c0392b") translate([x_sw0 + f + 88, y_face - 4, z_back + 23]) cube([24, 4, 31]);
+   color("#222") translate([x_sw1 - f - 35, y_face - 4, z_back + 23]) cube([24, 4, 31]);
+   for (i = [0 : 5])
+      color("#d0d4da") translate([x_sw0 + f + 128 + i * 19, y_face, z_back + 27])
          rotate([90, 0, 0]) cylinder(d = 4, h = 18);
 }
 

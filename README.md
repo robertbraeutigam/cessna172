@@ -10,7 +10,7 @@ Each cockpit component has its own directory:
 | Directory | Component |
 |-----------|-----------|
 | [`throttle/`](throttle) | throttle quadrant: throttle, mixture and carb heat |
-| [`switchpanel/`](switchpanel) | the 172N lower left switch panel: master, lights, avionics; the primer above it |
+| [`switchpanel/`](switchpanel) | the 172N lower left switch panel: master, lights, avionics; the primer below it |
 | [`ignition/`](ignition) | the ignition key switch, the left end of the switch panel |
 | [`frame/`](frame) | the aluminium frame and panel sheet that everything mounts on |
 | [`hub/`](hub) | the box with the MobiFlight Mega and the Cat5 ports |
@@ -96,7 +96,7 @@ The throttle box face reaches 80 mm above the desk (it stands on the
 20 mm of sheet to the radio panel's cut-out, the radio panel's 84 mm front
 (from about 88 to 172 mm), 20 mm of sheet and the top bar. The yoke notch is 135 mm high,
 for a future 130 mm force feedback yoke (`ffb_h`; the Saitek yoke is about
-100 mm), and on the left the primer above the switch panel needs 185 mm
+100 mm), and on the left the switch panel above the primer needs 185 mm
 (the switch panel alone 136 mm). The
 build computes the height from these and rounds the uprights up to a
 stock length (200 mm), so the panel top is 220 mm above the desk; it
@@ -211,8 +211,8 @@ the panel height the monitor allows (`sheet_h_max`).
 
 The switch panel's two backs go through one hole, 1 mm larger than the
 backs all round; drill its M3 mount holes through the panel's own holes,
-with the panels in place. The primer has its own, smaller hole above the
-left end of it, 1 mm larger than its square back, and its four flange
+with the panels in place. The primer has its own, smaller hole below it,
+under the ignition key, 1 mm larger than its square back, and its four flange
 holes are drilled the same way. The same goes for the throttle box: its cut-out
 is 1 mm larger than the box at the sides and the top, with 40 mm of
 sheet left under it (it starts at the rail top), and its
@@ -766,11 +766,11 @@ hole in the cockpit sheet ([frame](#cockpit-frame)); a 10 mm face flange
 (`flange_w`) on the top, the bottom and the outer end sits on the sheet
 and is screwed to it with M3 screws, nuts behind the sheet. Where the two
 panels meet there is no flange and the corners are square, so together
-they look like the one piece panel of the airplane (about 309 x 100 mm,
+they look like the one piece panel of the airplane (about 294 x 100 mm,
 the face 3 mm in front of the sheet).
 
-The [primer](#primer) is a third, small panel of its own above the left
-end (`primer.scad`), with its own hole in the sheet. `panel.inc.scad`
+The [primer](#primer) is a third, small panel of its own below them,
+under the ignition key (`primer.scad`), with its own hole in the sheet. `panel.inc.scad`
 takes the height of the back as a parameter for it.
 
 ## Primer
@@ -778,9 +778,9 @@ takes the height of the back as a parameter for it.
 [![Primer](https://robertbraeutigam.github.io/cessna172/switchpanel/primer_montage.png)](https://robertbraeutigam.github.io/cessna172/switchpanel/primer_montage.png)
 
 `primer.scad`: the push-pull primer with its twist lock, read by a linear
-pot. It is a separate 47 x 47 mm panel above the left end of the switch
-panels, flush with their left edge, in its own cut-out in the sheet, so
-the ignition panel stays as it is. The knob pulls out 45 mm (`stroke`,
+pot. It is a separate 47 x 47 mm panel below the switch panels, centered
+under the ignition key like in the X-Plane 172N, in its own cut-out in the
+sheet, so the ignition panel stays as it is. The knob pulls out 45 mm (`stroke`,
 about the 1¾" of a panel plunger primer) and pushes back in; fully in, it
 turns a quarter turn clockwise to lock, and only then. Turned back
 (counterclockwise), a spring pops it 5 mm out (`pop`), like the real one.
@@ -814,7 +814,7 @@ over the pot's slider ear. The pot is the 75 mm one used for the carb heat.
 The bracket is beside the rod towards the pilot's right, about 49 x 26 mm
 across (it reaches about 38 mm to the side of the rod, its walls 11 mm to
 the other side over the tube), and with the knob in, the rod ends about 193 mm behind the panel,
-over the switch panel and clear of the frame's upright and brace. The
+under the switch panel and clear of the frame's upright and brace. The
 bracket is wider than the cut-out, so it goes on from behind the sheet.
 
 ### Hardware
@@ -875,23 +875,25 @@ primer with DataRefTool while working the primer in the virtual cockpit.
 
 [![Switch panel](https://robertbraeutigam.github.io/cessna172/switchpanel/switches_montage.png)](https://robertbraeutigam.github.io/cessna172/switchpanel/switches_montage.png)
 
-`switches.scad`: the switch row. The red split MASTER (ALT, BAT) on the
-left, toggle switches in the middle (FUEL PUMP, BEACON, LAND, TAXI, NAV,
-STROBE, PITOT HEAT) and the split AVIONICS (BUS 1, BUS 2) on the right.
-Up is ON, like in the airplane. Above the toggles is a
-row of circuit breakers, like on the real panel; they are for show only.
+`switches.scad`: the switch row, laid out like the panel of the X-Plane
+172N (which differs from a real one, e.g. in the split AVIONICS). The
+red split MASTER (ALT, BAT) on the left, toggle switches in the middle
+(PITOT HEAT, then the LIGHTS group: BCN, LAND, TAXI, NAV, STRB) and the
+black split AVIONICS (BUS 1, BUS 2) on the right; the panel ends there.
+Up is ON, like in the airplane: every toggle has OFF under it, the rockers
+ON beside their top half, towards the toggles. The rockers have their name
+above and the two switch names below them, and sit higher than the
+toggles, about half way up to the breakers (`rk_raise`). Above the toggles
+is a row of circuit breakers, as in the X-Plane panel; they are for show
+only.
 
-The switch list (`groups` in the source) drives the layout; it follows the
-X-Plane 172 SP. A real 172N differs more: it has no FUEL PUMP switch and
-a single AVIONICS POWER switch instead of the split AVIONICS (BUS 1, BUS 2);
-the switches of the 172N X-Plane model this panel is for are still to be
-matched. The
-panel is 221.6 x 100 mm (the back 211.6 x 80 mm). Like the ignition, its
+The switch list (`groups` in the source) drives the layout. The
+panel is 206.6 x 100 mm (the back 196.6 x 80 mm). Like the ignition, its
 front is a separate 1 mm face with the labels standing 0.8 mm out of it,
 for a white paint pen; the face is printed front side up
 (`switches_face.stl`), the panel front side down, so neither needs
 supports, and together they are 3 mm thick. The toggle nuts, the rocker
-lips and the mount screws clamp the face on. The switches and labels need about 68 mm of the back's height, the
+lips and the mount screws clamp the face on. The switches and labels need about 61 mm of the back's height, the
 rest is split between above and below them. The rim on the back stiffens
 it.
 
@@ -901,11 +903,11 @@ it.
 |-----|------|-----|
 | 1 | double rocker switch, 6 pin, red | MASTER: ALT, BAT |
 | 1 | double rocker switch, 6 pin, black (there is no white one) | AVIONICS: BUS 1, BUS 2 |
-| 7 | toggle switch, M12 neck, 18 mm lever | FUEL PUMP, BEACON, LAND, TAXI, NAV, STROBE, PITOT HEAT |
+| 6 | toggle switch, M12 neck, 18 mm lever | PITOT HEAT, BCN, LAND, TAXI, NAV, STRB |
 | 6 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet (`mount_count`) |
 | 1 | CD74HC4067 16 channel mux breakout board | all inputs, see [Multiplexer](#multiplexer) |
 | 4 | M3 x 8 self tapping screw | mux onto its standoffs on the carrier, carrier (`switches_carrier.stl`) onto the panel |
-| 7 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
+| 6 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
 | 1 | Cat5 patch cable, stranded copper (see [Cables](#cables)) | to hub port 3, soldered to the mux |
 | 1 | cable tie, up to 3.6 mm wide | the cable onto its block (`tie`) |
 | 1 | 7 pin Dupont or JST connector (optional) | ignition cable, so the panels can be separated, see [Wiring](#wiring-1) |
@@ -973,8 +975,11 @@ straight; nothing goes through the panel. Print them in black and paint the
 nut silver and the rating white, or print the nut and the button in
 different colors.
 
-The list (`breakers` in the source, name and rating) is placed over the
-toggles, one above each, from the left; the build checks that the row
+They are the ones of the X-Plane 172N's row over the toggles: FLAP 10,
+INST 5, AVN BUS 1 15, AVN BUS 2 15, TURN COORD 5, INST LTS 5 (its ALT
+FLD and WARN breakers right of AVIONICS are left out, the panel ends at
+the AVIONICS switch). The list (`breakers` in the source, name lines and
+rating) is placed over the toggles, one above each, from the left; the build checks that the row
 still fits the panel height, and the top middle mount screw moves between
 two breakers. Real breakers
 (e.g. Klixon push-to-reset) would need a bigger hole and room behind the
@@ -993,7 +998,7 @@ The board sits on two standoffs on a small printed carrier plate
 the cable tie. The carrier is a part of its own, so the mux, the Cat5 cable
 and the ignition can be wired up before the switch panel is printed; it is
 then screwed with two M3 x 8 self tapping screws onto two bosses on the
-panel back, in the strip behind the group labels, on the left (pilot side)
+panel back, in the strip behind the breaker labels, on the left (pilot side)
 half, where the ignition cable comes in. Mount the mux with the chip
 outwards, so the solder joints face you; `assert`s check that the carrier
 clears the switches and fits inside the rim.
@@ -1011,22 +1016,22 @@ it.
 
 | Mux | Input | Mux | Input |
 |-----|-------|-----|-------|
-| C0 | MASTER ALT | C8 | PITOT HEAT |
-| C1 | MASTER BAT | C9 | AVIONICS BUS 1 |
-| C2 | FUEL PUMP | C10 | AVIONICS BUS 2 |
-| C3 | BEACON | C11 | ignition OFF |
+| C0 | MASTER ALT | C8 | AVIONICS BUS 1 |
+| C1 | MASTER BAT | C9 | AVIONICS BUS 2 |
+| C2 | PITOT HEAT | C10 | free |
+| C3 | BCN | C11 | ignition OFF |
 | C4 | LAND | C12 | ignition R |
 | C5 | TAXI | C13 | ignition L |
 | C6 | NAV | C14 | ignition BOTH |
-| C7 | STROBE | C15 | ignition START |
+| C7 | STRB | C15 | ignition START |
 
-That is all 16. The switches are in label order (the `groups` order), and
-the ignition positions are consecutive. In the MobiFlight Connector every
+The switches are in label order (the `groups` order), and the ignition
+positions are the last five (`ignition_c0`), where they were when the
+ignition was wired; C10 is free. In the MobiFlight Connector every
 channel is a button: a toggle or rocker sets its dataref to 1 on press and
 to 0 on release, an ignition position sets the key position on press, and
 START holds the starter while it is pressed through a FlyWithLua script
-(see [In X-Plane](#in-x-plane)). Without FUEL PUMP (172N) one input
-stays free. The OFF hall sensor is needed: a position is only set on press,
+(see [In X-Plane](#in-x-plane)). The OFF hall sensor is needed: a position is only set on press,
 so without it the key would stay on R in the sim when it is turned to OFF.
 
 #### Cable to the hub
@@ -1071,7 +1076,7 @@ Every input is wired like a switch to GND (active low, as MobiFlight expects):
 - **Primer:** the pot's ends to the mux VCC and GND, its wiper to the Cat5
   cable's brown AUX wire (not to the mux).
 
-So on the switch panel: one GND wire daisy chained over all 11 switches to
+So on the switch panel: one GND wire daisy chained over all 10 switches to
 the mux GND, and one signal wire from each switch to its C pin, soldered
 straight into the board. The ignition cable (5 signals, 5 V, GND) is
 soldered to the mux too; to be able to separate the two panels later, put
