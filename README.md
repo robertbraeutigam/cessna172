@@ -209,12 +209,12 @@ sheet: 310 mm wide with the wheel), the force feedback yoke's height
 from Logitech's "Construction dimensions for Flight Panels" drawing) and
 the panel height the monitor allows (`sheet_h_max`).
 
-The switch panel's two backs go through one stepped hole, 1 mm larger
-than the backs all round: the ignition's part is 49 mm higher
-(`switch_ign_rise`) than the switches' part, and the two overlap at the
-joint. Drill the M3 mount holes through the panels' own holes, with the
-panels in place. The primer has its own, smaller hole under the
-ignition key, 20 mm of sheet below the ignition's part, 1 mm larger than its square back, and its four flange
+The ignition and the switch row each have their own hole, 1 mm larger
+than their back all round, with 20 mm of sheet between them; the
+ignition's is 49 mm higher (`switch_ign_rise`). Drill the M3 mount holes
+through the panels' own holes, with the panels in place. The primer has
+its own, smaller hole under the ignition key, 20 mm of sheet below the
+ignition's, 1 mm larger than its square back, and its four flange
 holes are drilled the same way. The same goes for the throttle box: its cut-out
 is 1 mm larger than the box at the sides and the top, with 40 mm of
 sheet left under it (it starts at the rail top), and its
@@ -765,21 +765,15 @@ in both directories (keep the copies identical): both are 3 mm thick,
 with the same rim, flange, mount holes and lettering. The back of each
 panel is 80 mm high (`panel_h`), closed by an 8 mm rim, and goes through a
 hole in the cockpit sheet ([frame](#cockpit-frame)); a 10 mm face flange
-(`flange_w`) on the top, the bottom and the outer end sits on the sheet
-and is screwed to it with M3 screws, nuts behind the sheet. Where the two
-panels meet there is no flange and the corners are square, so together
-they look like one panel, the face 3 mm in front of the sheet.
+(`flange_w`) all round sits on the sheet and is screwed to it with M3
+screws, nuts behind the sheet; the face is 3 mm in front of the sheet.
 
-The ignition sits 49 mm higher than the switch row (`ign_rise`, the
-frame's `switch_ign_rise`), to make room for the [primer](#primer) under
-its key, like in the X-Plane 172N: a third, small panel of its own
-(`primer.scad`) with its own hole in the sheet. So the backs only meet
-along the lower part of the ignition, and the ignition (already built)
-has no flange on its right end. The switch row's face fills the step: a
-10 mm strip goes up beside the ignition to its top, and a 10 mm flange
-along its left end under the ignition, each with a mount hole in its
-corner, so the stepped hole in the sheet is covered all round. Together
-the faces are about 294 x 149 mm. `panel.inc.scad`
+The ignition sits 49 mm higher than the switch row (the frame's
+`switch_ign_rise`), to make room for the [primer](#primer) under its
+key, like in the X-Plane 172N: a third, small panel of its own
+(`primer.scad`) with its own hole in the sheet. So the two panels are
+separate, each with its own hole and its flange all round, their faces
+2 mm apart (20 mm of sheet between the holes). `panel.inc.scad`
 takes the height of the back as a parameter for it.
 
 ## Primer
@@ -897,9 +891,7 @@ is a row of circuit breakers, as in the X-Plane panel; they are for show
 only.
 
 The switch list (`groups` in the source) drives the layout. The
-panel is 206.6 x 100 mm (the back 196.6 x 80 mm), 216.6 x 149 mm with
-the strip and the flange that fill the step to the raised ignition (see
-[Switch panel](#switch-panel)). Like the ignition, its
+panel is 216.6 x 100 mm (the back 196.6 x 80 mm). Like the ignition, its
 front is a separate 1 mm face with the labels standing 0.8 mm out of it,
 for a white paint pen; the face is printed front side up
 (`switches_face.stl`), the panel front side down, so neither needs
@@ -1191,7 +1183,9 @@ closed by a cover:
 Printed parts: face, panel, housing, rotor, shoe, cover, holder, cap,
 cable clamp.
 
-The panel is 87 x 100 mm (the back 77 x 80 mm). Its front is a separate
+The panel is 97 x 100 mm (the back 77 x 80 mm), with the flange all
+round; it used to have none on its right end, where it met the switch
+row, so print the panel and its face again. Its front is a separate
 1 mm face with the position labels, tick marks and MAGNETOS standing 0.8 mm
 out of it around the key, to be painted with a white acrylic paint pen.
 The face is printed front side up (the STL is already flipped), the panel

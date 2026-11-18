@@ -233,35 +233,26 @@ module switch_panel_part() {
    y_face = -sheet_t - 3;           // panel_t, the face on the sheet
    z_ign = ign_z + f;               // backs' bottoms
    z_sw = switch_z + f;
-   w_sw = switch_back.x - switch_ign_w;
-   color(c_sheet) {
-      // ignition face; the switch face with its strip up beside the
-      // ignition and its flange under it
-      translate([x_sw0, y_face, ign_z])
-         cube([f + switch_ign_w - 0.3, 3, switch_panel.y]);
-      translate([x_ign1, y_face, switch_z])
-         cube([w_sw + f, 3, switch_panel.y]);
-      translate([x_ign1, y_face, switch_z])
-         cube([f, 3, switch_panel.y + switch_ign_rise]);
-      translate([x_ign1 - f, y_face, switch_z])
-         cube([f, 3, switch_ign_rise - 0.3]);
-      // rims, through the sheet
-      for (p = [[x_sw0 + f, z_ign, switch_ign_w - 0.3], [x_ign1, z_sw, w_sw]])
+   // [back x0, back z0, back width] of the ignition and the switches
+   backs = [[x_sw0 + f, z_ign, switch_ign_w], [x_s0, z_sw, switch_back.x]];
+   color(c_sheet)
+      for (p = backs) {
+         translate([p[0] - f, y_face, p[1] - f]) cube([p[2] + 2 * f, 3, switch_back.y + 2 * f]);
+         // rim, through the sheet
          difference() {
             translate([p[0], y_face + 3, p[1]]) cube([p[2], 8, switch_back.y]);
             translate([p[0] + 2.5, y_face, p[1] + 2.5]) cube([p[2] - 5, 20, switch_back.y - 5]);
          }
-   }
-   color(c_switch) {
-      translate([x_sw0 + f + 4, 5, z_ign + 4]) cube([switch_ign_w - 8, switch_depth, switch_back.y - 8]);
-      translate([x_ign1 + 4, 5, z_sw + 4]) cube([w_sw - 8, switch_depth, switch_back.y - 8]);
-   }
+      }
+   color(c_switch)
+      for (p = backs)
+         translate([p[0] + 4, 5, p[1] + 4]) cube([p[2] - 8, switch_depth, switch_back.y - 8]);
    // key, rockers and toggles on the face
    color("#b9c0c8") translate([x_sw0 + f + 38.5, y_face, z_ign + 40]) rotate([90, 0, 0]) cylinder(d = 24, h = 4);
-   color("#c0392b") translate([x_ign1 + 11, y_face - 4, z_sw + 23]) cube([24, 4, 31]);
+   color("#c0392b") translate([x_s0 + 11, y_face - 4, z_sw + 23]) cube([24, 4, 31]);
    color("#222") translate([x_sw1 - f - 35, y_face - 4, z_sw + 23]) cube([24, 4, 31]);
    for (i = [0 : 5])
-      color("#d0d4da") translate([x_ign1 + 51 + i * 19, y_face, z_sw + 27])
+      color("#d0d4da") translate([x_s0 + 51 + i * 19, y_face, z_sw + 27])
          rotate([90, 0, 0]) cylinder(d = 4, h = 18);
 }
 

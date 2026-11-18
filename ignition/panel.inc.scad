@@ -1,8 +1,8 @@
 // Panel basics, shared by the ignition and the switch panel
 //
 // The two panels are printed separately and mounted side by side, the
-// ignition on the left (seen from the front), like the one piece lower left
-// panel of the 172N. So they share their height, thickness, rim, flange,
+// ignition on the left (seen from the front) and higher, with the primer
+// under its key, like the X-Plane 172N. So they share their height, thickness, rim, flange,
 // mount holes, corners and lettering. The ignition is a component of its
 // own (ignition/), so this file is in both ignition/ and switchpanel/;
 // keep the two copies identical. The panels "include" it.
@@ -10,8 +10,8 @@
 // They mount on the cockpit sheet (frame/): the back of a panel, panel_h
 // high and closed by the rim, goes through a hole in the sheet, and the
 // face flange around it is screwed onto the sheet (M3, nuts behind the
-// sheet). The flange is on the top, the bottom and the outer end; where
-// the two panels meet there is none, so their backs go through one hole.
+// sheet). The flange goes all round, each panel has its own hole. (round0 /
+// round1 = false leave the flange off an end, for panels that would meet.)
 //
 // The panels are modeled in their own coordinates, so the shared geometry
 // here is in print orientation: front at z=0, back towards +z. x and y are

@@ -61,7 +61,8 @@
 //
 // The panel is printed as well. It has the same height, rim, mount holes and
 // lettering as the switch panel (panel.inc.scad, a copy of the one in
-// switchpanel/) and mounts to its left.
+// switchpanel/) and mounts to its left, a bit higher, with a flange all
+// round (it is a panel of its own, the primer is under it).
 // Its front is a separate thin face (face_t) with the position labels
 // standing out of it (label_raise), to be painted with a white paint pen.
 // The face is printed front side up and the panel front side down, so
@@ -218,7 +219,7 @@ clamp_z0 = board_z + board_t + 2;  // block underside (the wire row) above the c
 clamp_len = 8;               // block and bar, out of the wall
 clamp_bar_t = 6;
 clamp_screw_len = 10;        // M3 x 10, through the block into the bar
-clamp_room = 10;             // room past the panel's back towards the switch panel (its MASTER rocker body starts about 12 mm in)
+clamp_room = 10;             // room past the panel's back towards the switch panel (its back is 22 mm away, frame/)
 
 // --- Derived ---
 function arc_deg(len, r) = len / r * 180 / PI;
@@ -278,11 +279,12 @@ holder_a1 = lug_angle + sweep + max(0, board_screw_a) + arc_deg(holder_post_d / 
 holder_ears = [[-screw_xy, screw_xy], [-screw_xy, -screw_xy]];
 
 // Panel back, centered on the key, as wide as the housing needs inside
-// the rim. Its pilot's right side (-x) meets the switch panel; the flange
-// is on the other three sides.
+// the rim. The flange is all round: the panel sits higher than the switch
+// panel on its right (pilot's right is -x), with the primer under it
+// (frame/), so it is a panel of its own.
 panel_w = 2 * (half + rim_w + 0.5);
-face_w = panel_w + flange_w;
-mount_holes = panel_corner_holes(-panel_w / 2, panel_w / 2, -panel_h / 2, round0 = false);
+face_w = panel_w + 2 * flange_w;
+mount_holes = panel_corner_holes(-panel_w / 2, panel_w / 2, -panel_h / 2);
 function label_pos(i) = label_r * [cos(key_off_angle + pos_angle(i)), sin(key_off_angle + pos_angle(i))];
 title_y = max([for (i = [0 : 4]) label_pos(i).y]) + label_size / 2 + title_gap;
 
@@ -628,9 +630,8 @@ module labels_2d() {
 // on its back at z=0
 module panel() {
    difference() {
-      // Square corners on the right (-x), where the switch panel is
       translate([0, 0, -panel_t])
-         panel_blank(-panel_w / 2, panel_w / 2, -panel_h / 2, mount_holes, round0 = false);
+         panel_blank(-panel_w / 2, panel_w / 2, -panel_h / 2, mount_holes);
       // Lock body, its flats keep the lock and the housing from turning
       translate([0, 0, -panel_t - 1])
          linear_extrude(panel_t + 2)
@@ -641,7 +642,7 @@ module panel() {
       translate([0, 0, -panel_t - 1])
          linear_extrude(face_t + 1)
             offset(delta = 1)
-               panel_face_2d(-panel_w / 2, panel_w / 2, -panel_h / 2, round0 = false);
+               panel_face_2d(-panel_w / 2, panel_w / 2, -panel_h / 2);
       // Version on the back of the flange
       translate([panel_w / 2 + flange_w / 2, 0, -gitrev_depth])
          linear_extrude(gitrev_depth + 1)
@@ -659,7 +660,7 @@ module face() {
    translate([0, 0, -panel_t])
       linear_extrude(face_t)
          difference() {
-            panel_face_2d(-panel_w / 2, panel_w / 2, -panel_h / 2, round0 = false);
+            panel_face_2d(-panel_w / 2, panel_w / 2, -panel_h / 2);
             lock_body_profile(0.2);
             for (h = mount_holes)
                translate(h)
