@@ -244,8 +244,8 @@ so a version can be embossed into a part. Files are rendered from the copy in
   computed from them; reuse the same names across files (e.g. `pin.scad`
   repeats the `big_pot_*` values from `throttle_box.scad`).
 - Hole clearances used so far: 3.2–3.3 mm for M3 screws, 2.8 mm for M3 self
-  tapping pilot holes, 2.1 mm for M2 pilot holes (only the ignition, built;
-  use M3 for new parts), 4.2 mm for M4 / the USB cable, 5.3 mm for M5 (frame), 6.2 mm for the 6 mm rods, 11.2 mm for
+  tapping pilot holes, 2.1 mm for M2 pilot holes (only the ignition, built,
+  and the hub's perfboard, whose holes are 2 mm; use M3 for new parts), 4.2 mm for M4 / the USB cable, 5.3 mm for M5 (frame), 6.2 mm for the 6 mm rods, 11.2 mm for
   the rod nuts.
 - The printer is an Anycubic Kobra 3 V2 with a 255 x 255 mm bed. Pieces must
   fit it; files with big parts check it with a `bed = [255, 255]` parameter.

@@ -45,8 +45,8 @@
 // - 6 RJ45 breakout boards (34 x 28 mm, 8 pin angled header)
 // - distributor board: 30 x 70 mm perfboard, 52 male pin headers (2.54 mm),
 //   6 x 330 Ohm, 8 x 4.7 kOhm, tinned wire
-// - 24 M3 x 6 self tapping screws (RJ45 boards), 6 + 4 x M3 x 6 self
-//   tapping screws (Mega, board), 4 x M3 x 10 (lid)
+// - 24 + 6 M3 x 6 self tapping screws (RJ45 boards, Mega), 4 x M2 x 5
+//   self tapping (distributor board), 4 x M3 x 10 (lid)
 // - about 34 female-female and 28 male-female jumper wires, 20 cm
 //
 // Assembly: solder the distributor board on the bench, screw the RJ45
@@ -74,15 +74,15 @@ ear_t = 4;
 ear_hole = 5.3;              // M5 (frame T-nut), or a wood screw into the desk
 round_r = 2;                 // outer vertical edges
 
-// --- RJ45 breakout board (MEASURE: from the listing, holes are guesses) ---
+// --- RJ45 breakout board (measured) ---
 port_front = 3;              // ports 1-3 on the front wall (the mux ports)
 port_side = 3;               // ports 4-6 on the right wall (the direct ports)
 port_cols = port_front + port_side;
 rj = [34, 28];               // PCB, along the wall x depth; the jack is on the 34 edge
-rj_pcb_t = 1.4;
-rj_jack = [16, 16, 13.5];    // width x depth x height (height MEASURE)
-rj_jack_x = 7;               // PCB left edge to the jack (MEASURE)
-rj_jack_inset = 0.5;         // PCB front edge to the jack face (MEASURE)
+rj_pcb_t = 1.4;              // (measured)
+rj_jack = [16, 16, 15];      // width x depth x height (width, height measured)
+rj_jack_x = (rj.x - rj_jack.x) / 2;  // centred on the board (measured)
+rj_jack_inset = 0;           // PCB front edge to the jack face: flush (measured)
 rj_hole_pitch = [28, 11];    // 4 corner holes, centre to centre (measured)
 rj_hole_y = 5;               // PCB front edge to the front holes' centres (measured, 4.5-5)
 // Centred along the board, from the PCB front left corner
@@ -92,10 +92,10 @@ rj_screw_hole = 2.8;         // M3 self tapping, in the floor boss
 rj_screw_depth = 5.5;        // into the boss and the floor, for an M3 x 6
 rj_standoff = [6, 4];        // floor boss, diameter x height
 rj_solder = 1.5;             // solder joints under a PCB
-rj_pins = 8;
-rj_pin_x = 9.5;              // PCB left edge to pin 1 (MEASURE)
-rj_pin_y = 19;               // PCB front edge to the header (MEASURE)
-rj_pin_reach = 8;            // angled pins, past the header towards the back
+rj_pins = 9;                 // pins 1-8 and SH (shield), one row, 2.54 mm
+rj_pin_x = 7 + 1.27;         // PCB left edge to the header, to pin 1's centre (measured)
+rj_pin_y = rj.y - 2 - 1;     // header 2 mm wide, 2 mm before the back edge (measured)
+rj_pin_reach = rj.y + 4 - rj_pin_y;  // angled pins, 4 mm past the back edge (measured)
 port_gap = 4;                // between the boards
 port_margin = 2;             // between a corner post and the first board
 jack_clear = 0.4;            // around the jack in the wall cut-out
@@ -105,7 +105,7 @@ font = "Liberation Sans:style=Bold";
 
 // --- Jumper wires and spacing ---
 dupont = 20;                 // a plugged jumper: housing (14) + bent wire, past its pin
-cable_gap = 15;              // strip behind the RJ45 boards, for the jumper plugs
+cable_gap = rj_pin_y + dupont - rj.y;  // strip behind the RJ45 boards, for the jumper plugs
 
 // --- Arduino Mega 2560 (from the Arduino drawing) ---
 mega = [101.6, 53.34];
@@ -120,14 +120,15 @@ mega_usb = [31.75, 43.75, 10.9, 6.2];
 mega_power = [3.3, 12.2, 11, 1.8];
 jack_cut_clear = 0.6;
 
-// --- Distributor board (MEASURE: a 30 x 70 mm perfboard, 2.54 mm grid) ---
+// --- Distributor board (measured: a 30 x 70 mm perfboard, 2.54 mm grid) ---
 pb = [70, 30];               // along the back wall x depth
 pb_t = 1.6;
 pitch = 2.54;
 pb_grid = [24, 10];          // holes along x, along y; row 0 faces the Mega
-pb_holes = [[2.5, 2.5], [67.5, 2.5], [2.5, 27.5], [67.5, 27.5]];  // MEASURE: corner holes
-pb_standoff = [5, 5];        // diameter x height
-pb_screw_hole = 2.8;         // M3 self tapping
+pb_hole_edge = 2;            // corner holes' centres from both edges (measured)
+pb_holes = [for (x = [pb_hole_edge, pb.x - pb_hole_edge], y = [pb_hole_edge, pb.y - pb_hole_edge]) [x, y]];
+pb_standoff = [4.5, 5];      // diameter x height, it may stick out past the board edge
+pb_screw_hole = 2.1;         // M2 self tapping: the board's holes are too small for M3
 pb_header_h = 8.5;           // a male pin header above the board
 pb_res_h = 11;               // a resistor standing upright
 pb_gap = 2;                  // between the Mega and the board
@@ -203,7 +204,8 @@ mega_z = mega_standoff[1];
 // front ports and the Mega
 side_reach = rj_pin_y + dupont;
 inner_x = max(port_x(port_front - 1) + rj.x, mega_x + mega.x) + side_reach + 2;
-inner_y = max(row_y + mega.y + post + 1, port_x(port_side - 1) + rj.x + port_x0);
+inner_y = max(row_y + mega.y + post + 1, row_y + mega.y + pb_gap + pb.y,
+              port_x(port_side - 1) + rj.x + port_x0);
 // Port c in its wall's frame: x along the wall (left to right from outside),
 // y into the box from the inside of the wall, z up from the floor top
 module at_port(c) {
@@ -263,9 +265,8 @@ assert(pb_grid.x * pitch <= pb.x && pb_grid.y * pitch <= pb.y, "Hole grid does n
 for (h = pb_holes)
    assert(abs(h.x - pb_hole(1, 0).x) >= pb_standoff[0] / 2 + 1
           && abs(h.x - pb_hole(pb_grid.x - 2, 0).x) >= pb_standoff[0] / 2 + 1
-          && h.x - pb_standoff[0] / 2 >= 0 && h.x + pb_standoff[0] / 2 <= pb.x
-          && h.y - pb_standoff[0] / 2 >= 0 && h.y + pb_standoff[0] / 2 <= pb.y,
-          "Distributor board standoff under a used hole or outside the board");
+          && h.x > 0 && h.x < pb.x && h.y > 0 && h.y < pb.y,
+          "Distributor board standoff under a used hole or off the board");
 for (p = pb_pins, r = pb_res, l = pb_links)
    assert(p[0] > 0 && p[0] < pb_grid.x - 1 && p[1] >= 0 && p[1] < pb_grid.y
           && r[0] > 0 && r[0] < pb_grid.x - 1 && max(r[1], r[2]) < pb_grid.y
@@ -432,7 +433,7 @@ module pb_part() {
    color(c_perf)
       difference() {
          cube([pb.x, pb.y, pb_t]);
-         for (h = pb_holes) translate([h.x, h.y, -1]) cylinder(d = 3, h = pb_t + 2);
+         for (h = pb_holes) translate([h.x, h.y, -1]) cylinder(d = 2, h = pb_t + 2);
       }
    translate([0, 0, pb_t]) {
       for (p = pb_pins) translate(pb_hole(p[0], p[1])) {
