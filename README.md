@@ -508,11 +508,12 @@ lid on.
 Per port used: a stranded copper Cat5 patch cable, soldered at the
 component end (see [Cables](#cables)).
 
-**MEASURE when they arrive**: the RJ45 boards (`rj_*`): the jack's height
-and its position on the board and the header position (guessed from the
-listing picture; the build checks that the bosses stay on the board and
-clear of the jack). The board size and its 4 corner holes (28 x 11 mm
-apart, the front ones 4.5-5 mm from the jack edge) are measured. And the perfboard (`pb`,
+**MEASURE when they arrive**: the RJ45 boards (`rj_*`): the jack's width,
+how far its face is from the board edge, and the header position (guessed
+from the listing picture; the build checks that the bosses stay on the
+board and clear of the jack). The board size, its 4 corner holes (28 x 11
+mm apart, the front ones 4.5-5 mm from the jack edge) and the jack (in the
+middle, 15 mm high) are measured. And the perfboard (`pb`,
 `pb_holes`: its size and corner holes, the hole grid is centered on it).
 All boards are screwed on with M3: if a hole is smaller than about 3.1 mm,
 drill it out, keeping clear of the traces around it. The Mega values are from the Arduino drawing.
