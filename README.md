@@ -453,7 +453,7 @@ back wall.
 [![Hub](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)
 
 `hub.scad` prints the box (`hub_box.stl`, floor down) and the lid
-(`hub_lid.stl`, top down). The box is 166 x 135 x 39 mm with the lid
+(`hub_lid.stl`, top down). The box is 172 x 136 x 39 mm with the lid
 (6 ports on two walls, `port_front` and `port_side`); the build checks that
 it fits the printer bed.
 
@@ -464,7 +464,7 @@ it fits the printer bed.
   two kinds can not be mixed up. The boards are screwed onto bosses on the
   floor with M3 self tapping screws from above. Their angled 8 pin headers
   point into the box, each with a strip for the jumper plugs behind it
-  (15 mm behind the front ports).
+  (17 mm behind the front ports).
 - **Mega**: behind the front ports, left of the right ports' jumpers, on
   6 standoffs, its USB jack through the left wall (flush with the outside,
   so any USB-B plug fits), with a cut-out in front of the power jack for
@@ -508,13 +508,15 @@ lid on.
 Per port used: a stranded copper Cat5 patch cable, soldered at the
 component end (see [Cables](#cables)).
 
-**MEASURE when they arrive**: the RJ45 boards (`rj_*`): the jack's width,
-how far its face is from the board edge, and the header position (guessed
-from the listing picture; the build checks that the bosses stay on the
-board and clear of the jack). The board size, its 4 corner holes (28 x 11
-mm apart, the front ones 4.5-5 mm from the jack edge) and the jack (in the
-middle, 15 mm high) are measured. And the perfboard (`pb`,
-`pb_holes`: its size and corner holes, the hole grid is centered on it).
+The RJ45 boards (`rj_*`) are measured: 34 x 28 x 1.4 mm, 4 corner holes
+28 x 11 mm apart (the front ones 4.5-5 mm from the jack edge), the jack
+16 mm wide and 15 mm high in the middle, flush with the board edge, and
+one row of 9 angled pins (1-8 and SH; the header 7 mm from the edge on
+the pin 1 side, 4 mm from the other) 2 mm before the back edge, reaching
+4 mm past it. Which side pin 1 is on does not change the printed box.
+
+**MEASURE when it arrives**: the perfboard (`pb`, `pb_holes`: its size and
+corner holes, the hole grid is centered on it).
 All boards are screwed on with M3: if a hole is smaller than about 3.1 mm,
 drill it out, keeping clear of the traces around it. The Mega values are from the Arduino drawing.
 

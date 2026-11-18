@@ -74,15 +74,15 @@ ear_t = 4;
 ear_hole = 5.3;              // M5 (frame T-nut), or a wood screw into the desk
 round_r = 2;                 // outer vertical edges
 
-// --- RJ45 breakout board (MEASURE: from the listing, holes are guesses) ---
+// --- RJ45 breakout board (measured) ---
 port_front = 3;              // ports 1-3 on the front wall (the mux ports)
 port_side = 3;               // ports 4-6 on the right wall (the direct ports)
 port_cols = port_front + port_side;
 rj = [34, 28];               // PCB, along the wall x depth; the jack is on the 34 edge
-rj_pcb_t = 1.4;
-rj_jack = [16, 16, 15];      // width x depth x height (height measured, width MEASURE)
+rj_pcb_t = 1.4;              // (measured)
+rj_jack = [16, 16, 15];      // width x depth x height (width, height measured)
 rj_jack_x = (rj.x - rj_jack.x) / 2;  // centred on the board (measured)
-rj_jack_inset = 0.5;         // PCB front edge to the jack face (MEASURE)
+rj_jack_inset = 0;           // PCB front edge to the jack face: flush (measured)
 rj_hole_pitch = [28, 11];    // 4 corner holes, centre to centre (measured)
 rj_hole_y = 5;               // PCB front edge to the front holes' centres (measured, 4.5-5)
 // Centred along the board, from the PCB front left corner
@@ -92,10 +92,10 @@ rj_screw_hole = 2.8;         // M3 self tapping, in the floor boss
 rj_screw_depth = 5.5;        // into the boss and the floor, for an M3 x 6
 rj_standoff = [6, 4];        // floor boss, diameter x height
 rj_solder = 1.5;             // solder joints under a PCB
-rj_pins = 8;
-rj_pin_x = 9.5;              // PCB left edge to pin 1 (MEASURE)
-rj_pin_y = 19;               // PCB front edge to the header (MEASURE)
-rj_pin_reach = 8;            // angled pins, past the header towards the back
+rj_pins = 9;                 // pins 1-8 and SH (shield), one row, 2.54 mm
+rj_pin_x = 7 + 1.27;         // PCB left edge to the header, to pin 1's centre (measured)
+rj_pin_y = rj.y - 2 - 1;     // header 2 mm wide, 2 mm before the back edge (measured)
+rj_pin_reach = rj.y + 4 - rj_pin_y;  // angled pins, 4 mm past the back edge (measured)
 port_gap = 4;                // between the boards
 port_margin = 2;             // between a corner post and the first board
 jack_clear = 0.4;            // around the jack in the wall cut-out
@@ -105,7 +105,7 @@ font = "Liberation Sans:style=Bold";
 
 // --- Jumper wires and spacing ---
 dupont = 20;                 // a plugged jumper: housing (14) + bent wire, past its pin
-cable_gap = 15;              // strip behind the RJ45 boards, for the jumper plugs
+cable_gap = rj_pin_y + dupont - rj.y;  // strip behind the RJ45 boards, for the jumper plugs
 
 // --- Arduino Mega 2560 (from the Arduino drawing) ---
 mega = [101.6, 53.34];
@@ -203,7 +203,8 @@ mega_z = mega_standoff[1];
 // front ports and the Mega
 side_reach = rj_pin_y + dupont;
 inner_x = max(port_x(port_front - 1) + rj.x, mega_x + mega.x) + side_reach + 2;
-inner_y = max(row_y + mega.y + post + 1, port_x(port_side - 1) + rj.x + port_x0);
+inner_y = max(row_y + mega.y + post + 1, row_y + mega.y + pb_gap + pb.y,
+              port_x(port_side - 1) + rj.x + port_x0);
 // Port c in its wall's frame: x along the wall (left to right from outside),
 // y into the box from the inside of the wall, z up from the floor top
 module at_port(c) {
