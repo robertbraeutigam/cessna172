@@ -19,8 +19,8 @@
 //   headers and its double header (they share a 2.54 mm grid, the digital
 //   header does not) and screwed onto four posts at its corner holes. Every
 //   RJ45 pin goes to it, each port as one 8 wire ribbon of female-female
-//   jumpers onto a header in RJ45 order (the pins with a pull-up peeled
-//   off to a strip next to the pull-up network); it joins the shared lines (5 V and
+//   jumpers onto a header in RJ45 order (some peeled off to loose pins
+//   beside what they go to, all of ports 4 and 5); it joins the shared lines (5 V and
 //   GND of all ports, S0-S3 of the mux ports) and carries every resistor
 //   of the hub (330 Ohm in series with S0-S3 and the two servo signals, a
 //   4.7 kOhm x 8 bussed network for the pull-ups to 5 V on the mux SIG
@@ -190,14 +190,23 @@ sh_ana_row = 3;
 // by side behind them, their shared pins neighbours.
 sh_ports = [[[23, 12], [0, -1]], [[24, 12], [0, -1]], [[25, 12], [0, -1]],
             [[24, 20], [0, -1]], [[25, 20], [0, -1]], [[11, 5], [1, 0]]];
-// Except the pins with a pull-up: each is a line of its own, so they are one
-// strip next to the pull-up network, each pin beside its network pin (the
-// jumper peeled off its port's ribbon), and pulled out of its port's
-// header: [[port, pin], hole]
-sh_pullup_pins = [[[1, 7], [26, 20]], [[2, 7], [26, 19]], [[4, 3], [26, 18]], [[3, 7], [26, 17]],
-                  [[5, 8], [26, 16]], [[4, 6], [26, 15]], [[5, 6], [26, 14]], [[4, 8], [26, 13]]];
+// Except the loose pins: a line of its own (or the servo power), each pulled
+// out of its port's header and set beside what it goes to, its jumper
+// peeled off the port's ribbon: the pins with a pull-up in one strip next
+// to the pull-up network, each beside its network pin, the servo signals
+// beside their 330 Ohm, port 5's pot two holes behind a free analog pin,
+// the servo power beside the double header's outer 5 V and GND pins,
+// the 5 V and GND of ports 4 and 5 beside the Mega's, port 6's beside the
+// mux ports' (ports 4 and 5 have no header left): [[port, pin], hole]
+sh_loose_pins = [[[1, 7], [26, 20]], [[2, 7], [26, 19]], [[4, 3], [26, 18]], [[3, 7], [26, 17]],
+                 [[5, 8], [26, 16]], [[4, 6], [26, 15]], [[5, 6], [26, 14]], [[4, 8], [26, 13]],
+                 [[4, 7], [26, 9]], [[5, 7], [26, 8]], [[5, 3], [22, 5]],
+                 [[4, 1], [30, 23]], [[5, 1], [30, 24]], [[4, 2], [30, 2]], [[5, 2], [30, 1]],
+                 [[4, 4], [27, 22]], [[5, 4], [28, 22]], [[4, 5], [28, 3]], [[5, 5], [28, 2]],
+                 [[6, 4], [22, 9]], [[6, 5], [22, 8]]];
+function loose(port, p) = len([for (x = sh_loose_pins) if (x[0] == [port, p]) 1]) > 0;
 function sh_pin(port, p) =
-   let (m = [for (x = sh_pullup_pins) if (x[0] == [port, p]) x[1]])
+   let (m = [for (x = sh_loose_pins) if (x[0] == [port, p]) x[1]])
    len(m) ? m[0] : sh_ports[port - 1][0] + (p - 1) * sh_ports[port - 1][1];
 function P(port, p) = sh_pin(port, p);
 // Mega pins: ["D", n], ["A", n], ["5V", 0 logic / 1 servo], ["GND", 0 / 1]
@@ -235,7 +244,7 @@ sh_lines = [
    ["P4 B", [[4, 6]], "4k7", ["D", 32]],
    ["P4 C", [[4, 7]], "330", ["D", 44]],
    ["P4 D", [[4, 8]], "4k7", ["D", 36]],
-   ["P5 A", [[5, 3]], "", ["A", 14]],
+   ["P5 A", [[5, 3]], "", ["A", 10]],
    ["P5 B", [[5, 6]], "4k7", ["D", 34]],
    ["P5 C", [[5, 7]], "330", ["D", 46]],
    ["P5 D", [[5, 8]], "4k7", ["D", 30]],
@@ -275,11 +284,10 @@ sh_links = concat(
    // From each line's (last) port pin to its resistor or network pin
    [for (l = sh_lines) if (l[2] != "") let (p = l[1][len(l[1]) - 1])
       [P(p[0], p[1]), l[2] == "330" ? r330(l[0]) : sip_in_row(mega_hole(l[3]).y), 0, l[0]]],
-   [[P(5, 3), hole_behind(["A", 14]), 0, "P5 A"],
-    // 5 V: port 6 to the mux ports, on to ports 4 and 5, from there to the Mega
-    [P(6, 4), P(1, 4), 1, "5V"], [P(3, 4), P(5, 4), 1, "5V"], [P(4, 4), hole_before(["5V", 0]), 1, "5V"],
+   [// 5 V: port 6 onto the mux ports, ports 4 and 5 onto the Mega, a wire between
+    [P(6, 4), P(1, 4), 1, "5V"], [P(5, 4), hole_before(["5V", 0]), 1, "5V"], [P(3, 4), P(4, 4), 1, "5V"],
     // GND the same way
-    [P(6, 5), P(1, 5), 2, "GND"], [P(3, 5), P(5, 5), 2, "GND"], [P(3, 5), hole_before(["GND", 0]), 2, "GND"],
+    [P(6, 5), P(1, 5), 2, "GND"], [P(4, 5), hole_before(["GND", 0]), 2, "GND"], [P(3, 5), P(4, 5), 2, "GND"],
     // Servo power
     [P(4, 1), mega_hole(["5V", 1]) + [0, 1], 3, "servo 5V"],
     [P(4, 2), mega_hole(["GND", 1]) - [0, 1], 3, "servo GND"]]);
@@ -741,15 +749,15 @@ module shield_view() {
    // Port headers: the pin numbers on the pins, the port before pin 1
    for (port = [1 : 6]) {
       for (p = [1 : 8]) translate(at(sh_pin(port, p))) {
-         moved = len([for (x = sh_pullup_pins) if (x[0] == [port, p]) 1]);
-         color(p == 1 ? "#7b241c" : moved ? "#1a5276" : c_black) layer(6) square(1.4, center = true);
+         moved = loose(port, p);
+         color(moved ? "#1a5276" : p == 1 ? "#7b241c" : c_black) layer(6) square(1.4, center = true);
          label(moved ? str(port, ".", p) : str(p), moved ? 0.42 : 0.75, "#f4d03f", "center", "center", l = 7);
       }
       // The mux ports side by side: one label left of them
       d = sh_ports[port - 1][1];
       if (port == 1)
          translate(at(sh_pin(1, 1)) - [1.1, 0]) label("P1 P2 P3", 0.85, "#c0392b", "right", "center", true);
-      else if (port > 3)
+      else if (port > 3 && !loose(port, 1))
          translate(at(sh_pin(port, 1)) - d * 1.3)
             label(str("P", port), 0.85, "#2471a3", d.x ? "right" : "center", d.x ? "center" : "bottom", true);
    }
@@ -770,7 +778,7 @@ module shield_view() {
    translate([sh.x / 2, -2.2]) label("front wall side: ribbons from ports 1-3", 0.9, "#666666", "center");
    translate([sh.x + 1, sh.y + 1.6]) label("right wall side: ribbons from ports 4-6 ->", 0.9, "#666666", "right");
    // Legend
-   legend = [[0, "port header pin (pin 1 dark red), ribbon from that port; blue: port.pin, a pin with a pull-up"],
+   legend = [[0, "port header pin (pin 1 dark red), ribbon from that port; blue: port.pin, a loose pin"],
              [1, "Mega header pin under the shield (red: wired)"],
              [2, "330 Ohm in series, standing, body on the dot, lead into the hole beside the Mega pin"],
              [3, "4.7 kOhm x 8 bussed network (SIP 9), pin 1 (common, 5 V) on the big dot"],
