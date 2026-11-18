@@ -125,6 +125,14 @@ jack_cut_clear = 0.6;
 mega_analog = [[50.8, 2.54], [73.66, 2.54]];  // A0 and A8, the first pin of each 8 pin header
 mega_double = [96.52, 5.08]; // double header: the even column (inside), the GND row
 mega_double_rows = 18;       // GND, 52/53 ... 22/23, 5V from the front
+// The 2 x 3 ICSP header in the middle of the Mega, under the shield: nothing
+// on the shield may stick out above it (measured: the middle between its
+// two rows 33 mm from the double header's outer edge, its middle pin
+// 27 mm from the analog headers' outer edge)
+mega_icsp = [mega_double.x + 2.54 * 1.5 - 33, mega_analog[0].y - 2.54 / 2 + 27];
+mega_icsp_size = [2 * 2.54, 3 * 2.54];  // its plastic, along x and y
+mega_icsp_h = mega_header_h;  // as high as the other headers
+icsp_clear = 1;              // around it, kept free on the shield
 
 // --- Shield (measured: a 90 x 70 mm perfboard, 2.54 mm grid) ---
 // Plugged onto the Mega's analog headers and double header, screwed onto
@@ -313,6 +321,18 @@ for (h = sh_holes) {
 }
 // Every hole has one use, the screw heads stay clear of the pins
 sh_used = concat(sh_port_pins, sh_stacked, sh_res_holes);
+// Nothing soldered above the ICSP header: no pin, resistor, Mega pin, bridge
+// or wire end, and the shield's solder joints clear its top
+sh_bridge_holes = [for (b = sh_bridges, c = [min(b[0].x, b[1].x) : max(b[0].x, b[1].x)],
+                        r = [min(b[0].y, b[1].y) : max(b[0].y, b[1].y)]) [c, r]];
+sh_wire_ends = [for (w = sh_wires) each [w[0], w[1]]];
+for (u = concat(sh_used, sh_bridge_holes, sh_wire_ends)) {
+   d = sh_o + sh_hole(u.x, u.y) - mega_icsp;   // from its middle, on the Mega
+   assert(abs(d.x) > mega_icsp_size.x / 2 + icsp_clear || abs(d.y) > mega_icsp_size.y / 2 + icsp_clear,
+          str("Shield hole ", u, " above the Mega's ICSP header"));
+}
+assert(mega_z + mega_pcb_t + mega_icsp_h + sh_solder <= sh_z,
+       "The shield's solder joints touch the Mega's ICSP header");
 for (i = [0 : len(sh_used) - 1], j = [0 : len(sh_used) - 1])
    assert(i == j || sh_used[i] != sh_used[j], str("Shield hole ", sh_used[i], " used twice"));
 for (u = sh_used, h = sh_holes)
@@ -467,6 +487,7 @@ module mega_part() {
          for (a = mega_analog) translate(a - [1.27, 1.27]) cube([8 * 2.54, 2.54, mega_header_h]);
          translate(mega_double - [1.27, 1.27]) cube([5.08, mega_double_rows * 2.54, mega_header_h]);
          translate([18, mega.y - 3.2, 0]) cube([72, 2.54, mega_header_h]);
+         translate(mega_icsp - mega_icsp_size / 2) cube(concat(mega_icsp_size, mega_icsp_h));
          translate([36, 20, 0]) rotate([0, 0, 45]) cube([14, 14, 1.2]);
       }
    }
@@ -522,6 +543,13 @@ module shield_view() {
       for (c = [0 : sh_grid.x - 1], r = [0 : sh_grid.y - 1]) translate(sh_hole(c, r)) circle(d = 0.75, $fn = 12);
    color("#3a2f1a") layer(2)
       for (c = [0 : sh_grid.x - 1], r = [0 : sh_grid.y - 1]) translate(sh_hole(c, r)) circle(d = 0.3, $fn = 8);
+   // The Mega's ICSP header under the shield: keep its area free
+   color("#e74c3c") layer(1) translate(mega_icsp - sh_o) difference() {
+      square(mega_icsp_size + [2, 2] * icsp_clear, center = true);
+      square(mega_icsp_size + [2, 2] * icsp_clear - [0.5, 0.5], center = true);
+   }
+   translate(mega_icsp - sh_o + [0, mega_icsp_size.y / 2 + icsp_clear + 0.4])
+      label("ICSP below: keep free", 0.5, "#e74c3c", "center", "bottom", true);
    // The back: bridges, then the wires
    color("#7f8c8d") layer(3)
       for (b = sh_bridges) hull() for (u = b) translate(at(u)) circle(d = 0.7, $fn = 12);
