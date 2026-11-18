@@ -146,7 +146,7 @@ primer_flange = 10;          // flange_w
 primer_face = primer_back + 2 * primer_flange;
 primer_depth = 193;          // behind the panel with the knob in (view only)
 primer_tube = 50.5;          // tube_len (view only)
-primer_bracket = [41, 26, 95.2];   // beside the rod towards the pilot's right, height, length (view only)
+primer_bracket = [38.1, 26, 95.2];   // beside the rod towards the pilot's right, height, length (view only)
 
 // --- Under-desk controls ---
 // Pedestal (trim wheel and trim indicator), a future component, same rule
