@@ -45,8 +45,8 @@
 // - 6 RJ45 breakout boards (34 x 28 mm, 8 pin angled header)
 // - distributor board: 30 x 70 mm perfboard, 52 male pin headers (2.54 mm),
 //   6 x 330 Ohm, 8 x 4.7 kOhm, tinned wire
-// - 24 M3 x 6 self tapping screws (RJ45 boards), 6 + 4 x M3 x 6 self
-//   tapping screws (Mega, board), 4 x M3 x 10 (lid)
+// - 24 + 6 M3 x 6 self tapping screws (RJ45 boards, Mega), 4 x M2 x 5
+//   self tapping (distributor board), 4 x M3 x 10 (lid)
 // - about 34 female-female and 28 male-female jumper wires, 20 cm
 //
 // Assembly: solder the distributor board on the bench, screw the RJ45
@@ -120,14 +120,15 @@ mega_usb = [31.75, 43.75, 10.9, 6.2];
 mega_power = [3.3, 12.2, 11, 1.8];
 jack_cut_clear = 0.6;
 
-// --- Distributor board (MEASURE: a 30 x 70 mm perfboard, 2.54 mm grid) ---
+// --- Distributor board (measured: a 30 x 70 mm perfboard, 2.54 mm grid) ---
 pb = [70, 30];               // along the back wall x depth
 pb_t = 1.6;
 pitch = 2.54;
 pb_grid = [24, 10];          // holes along x, along y; row 0 faces the Mega
-pb_holes = [[2.5, 2.5], [67.5, 2.5], [2.5, 27.5], [67.5, 27.5]];  // MEASURE: corner holes
-pb_standoff = [5, 5];        // diameter x height
-pb_screw_hole = 2.8;         // M3 self tapping
+pb_hole_edge = 2;            // corner holes' centres from both edges (measured)
+pb_holes = [for (x = [pb_hole_edge, pb.x - pb_hole_edge], y = [pb_hole_edge, pb.y - pb_hole_edge]) [x, y]];
+pb_standoff = [4.5, 5];      // diameter x height, it may stick out past the board edge
+pb_screw_hole = 2.1;         // M2 self tapping: the board's holes are too small for M3
 pb_header_h = 8.5;           // a male pin header above the board
 pb_res_h = 11;               // a resistor standing upright
 pb_gap = 2;                  // between the Mega and the board
@@ -264,9 +265,8 @@ assert(pb_grid.x * pitch <= pb.x && pb_grid.y * pitch <= pb.y, "Hole grid does n
 for (h = pb_holes)
    assert(abs(h.x - pb_hole(1, 0).x) >= pb_standoff[0] / 2 + 1
           && abs(h.x - pb_hole(pb_grid.x - 2, 0).x) >= pb_standoff[0] / 2 + 1
-          && h.x - pb_standoff[0] / 2 >= 0 && h.x + pb_standoff[0] / 2 <= pb.x
-          && h.y - pb_standoff[0] / 2 >= 0 && h.y + pb_standoff[0] / 2 <= pb.y,
-          "Distributor board standoff under a used hole or outside the board");
+          && h.x > 0 && h.x < pb.x && h.y > 0 && h.y < pb.y,
+          "Distributor board standoff under a used hole or off the board");
 for (p = pb_pins, r = pb_res, l = pb_links)
    assert(p[0] > 0 && p[0] < pb_grid.x - 1 && p[1] >= 0 && p[1] < pb_grid.y
           && r[0] > 0 && r[0] < pb_grid.x - 1 && max(r[1], r[2]) < pb_grid.y
@@ -433,7 +433,7 @@ module pb_part() {
    color(c_perf)
       difference() {
          cube([pb.x, pb.y, pb_t]);
-         for (h = pb_holes) translate([h.x, h.y, -1]) cylinder(d = 3, h = pb_t + 2);
+         for (h = pb_holes) translate([h.x, h.y, -1]) cylinder(d = 2, h = pb_t + 2);
       }
    translate([0, 0, pb_t]) {
       for (p = pb_pins) translate(pb_hole(p[0], p[1])) {

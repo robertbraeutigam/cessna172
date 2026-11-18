@@ -470,7 +470,7 @@ it fits the printer bed.
   so any USB-B plug fits), with a cut-out in front of the power jack for
   later.
 - **Distributor board**: a 30 x 70 mm perfboard behind the Mega, on 4
-  standoffs (M3 self tapping), soldered on the bench before it goes in.
+  standoffs (M2 self tapping), soldered on the bench before it goes in.
   It joins the shared lines and carries every resistor of the hub (see
   [Wiring](#wiring)). Left of it is room for the power bus distribution
   later; the hole for the power bus is in the back wall there.
@@ -495,7 +495,7 @@ lid on.
 | 6 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
 | 24 | M3 x 6 self tapping screw | RJ45 boards, 4 each |
 | 6 | M3 x 6 self tapping screw | Mega |
-| 4 | M3 x 6 self tapping screw | distributor board |
+| 4 | M2 x 5 self tapping screw | distributor board (its holes are 2 mm) |
 | 4 | M3 x 10 self tapping screw | lid |
 | 1 | perfboard, 30 x 70 mm, 2.54 mm grid (10 x 24 holes) | distributor board |
 | 52 | male pin header, 2.54 mm, straight (break off strips) | distributor board |
@@ -515,9 +515,10 @@ one row of 9 angled pins (1-8 and SH; the header 7 mm from the edge on
 the pin 1 side, 4 mm from the other) 2 mm before the back edge, reaching
 4 mm past it. Which side pin 1 is on does not change the printed box.
 
-**MEASURE when it arrives**: the perfboard (`pb`, `pb_holes`: its size and
-corner holes, the hole grid is centered on it).
-All boards are screwed on with M3: if a hole is smaller than about 3.1 mm,
+The perfboard (`pb`, `pb_holes`) is measured too: 30 x 70 mm, 24 x 10
+holes, 4 corner holes 2 mm from both edges, held with M2 self tapping
+screws (2.1 mm pilot holes in the standoffs). The other boards are
+screwed on with M3: if one of their holes is smaller than about 3.1 mm,
 drill it out, keeping clear of the traces around it. The Mega values are from the Arduino drawing.
 
 ### Wiring
