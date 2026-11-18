@@ -8,13 +8,15 @@ its own top-level directory; new components should follow the same layout.
 
 - `throttle/` — throttle quadrant: throttle, mixture and carb heat controls.
   - `throttle_box.scad` — the main box. Linear potentiometers sit on stands
-    inside, 6 mm rods (one per control) exit the front, an ESP32 sits on a
-    pedestal at the back. It is printed in one piece and has no lid: it goes
+    inside, 6 mm rods (one per control) exit the front. The pots are read
+    by MobiFlight on hub port 6 (direct port, lines A-C): one Cat5 cable
+    through the back wall, clamped in a cable cradle and soldered straight
+    to the pots, no board in the box. It is printed in one piece and has no lid: it goes
     through a cut-out in the frame's sheet, its front wall is the face with
     a flange (top and sides, `flange_w`) screwed onto the sheet, and two M5
     bolts through the floor go into the frame's front rail; `frame/frame.inc.scad`
     repeats these sizes.
-    Its views show the pots, rods with knobs, clamps, pins, ESP32 and wiring
+    Its views show the pots, rods with knobs, clamps, pins, cable and wiring
     as view-only parts; the knob, clamp and pin shapes there are copies of
     the other files, keep them in sync.
   - `carb_heat_knob.scad`, `clamp.scad`, `pin.scad` — small parts (knob,
@@ -209,8 +211,8 @@ box_lid(); // Make module lid
   every marker line, then uncomments one at a time. **A leading `//` on a Make
   module line does not disable it in the build**; it only hides it from the
   OpenSCAD GUI preview. To stop building a module, remove the marker.
-- `// Ignore module` — never rendered. Used for reference geometry (pots, rods,
-  ESP32 board) that is shown with `#` in the preview while designing.
+- `// Ignore module` — never rendered. Used for reference geometry (pots, rods)
+  that is shown with `#` in the preview while designing.
 - Files without any `Make module` marker are rendered whole to
   `target/<file>.stl`, unless they have `Make view` markers: then they
   only make views (their asserts are still checked), like `frame.scad`.

@@ -3,7 +3,7 @@
 A home cockpit of the Cessna 172 for the X-Plane flight simulator. The parts
 are designed in [OpenSCAD](https://openscad.org/) and 3D printed, and the
 controls are read by [MobiFlight](https://www.mobiflight.com/) on an
-Arduino Mega (the throttle quadrant uses its own ESP32).
+Arduino Mega.
 
 Each cockpit component has its own directory:
 
@@ -231,7 +231,7 @@ flange holes are drilled with the box in place.
 
 - The **hub** (see [Hub](#hub)) holds the Arduino Mega with the MobiFlight
   firmware and 6 RJ45 ports. A powered USB hub next to it takes the USB
-  cables (Mega, throttle ESP32, Saitek yoke, Saitek radio panel, later the
+  cables (Mega, Saitek yoke, Saitek radio panel, later the
   FFB yoke), so one USB cable runs to the PC.
 - Every MobiFlight component connects to its own hub port with one
   straight Cat5 patch cable, soldered straight to the component (see
@@ -376,7 +376,7 @@ cable to length, or in half for two components:
 |------|-----------|-----------|-----------|-----------|-----------|-----------|
 | 4 | pedestal: trim wheel, trim indicator, parking brake | D30, encoder A | D31, encoder B | D32, trim servo | D33, parking brake | servo power |
 | 5 | flaps: lever and indicator | A4, lever pot | D34 (free) | D35, flaps servo | D36 (free) | servo power |
-| 6 | throttle quadrant (if it moves to the hub, see below) | A5, throttle | A6, mixture | A7, carb heat | A8 (free) | A9, A10 (free) |
+| 6 | [throttle quadrant](#throttle-quadrant) | A5, throttle | A6, mixture | A7, carb heat | A8 (free) | A9, A10 (free) |
 
 The pins are where the shield wires them (see [Hub wiring](#wiring)):
 MobiFlight takes any pin for a button, encoder or servo, pots need analog
@@ -403,8 +403,10 @@ same S0-S3 bus.
 - **Flaps** (DIY, on the apron next to the pedestal): the lever pot on
   line A, the indicator servo (9 g) on pin 7 and the orange pair. Two lines
   are left (e.g. a switch at the flap detents, if the lever gets one).
-- **Throttle quadrant**: open. It is an ESP32 on USB today; on port 6 its
-  three pots go on lines A-C, with no mux and no ESP32.
+- **Throttle quadrant**: its three pots on lines A-C, between the blue
+  pair (see [Cable to hub port 6](#cable-to-hub-port-6)); an *Analog input* per
+  pot in the Connector. Line D and pins 1 and 2 are free (e.g. a pot for a
+  fourth control).
 - **Likely later**: panel light dimmers (pots, on free lines), steam gauges
   (servos on a direct port, or steppers with a driver board),
   outputs (annunciator lights, avionics displays): MobiFlight drives them
@@ -440,7 +442,7 @@ each extra mux costs only one Mega pin. The options:
   and our own firmware at both ends; MobiFlight does not speak them. The
   MobiFlight way to do that is a small board per component that runs
   MobiFlight itself (e.g. an Arduino Pro Micro, on its own USB cable to the
-  powered USB hub), like the throttle's ESP32: fine for one or two
+  powered USB hub): fine for one or two
   components, but each is one more board to flash and one more USB device.
 
 ### Power (later)
@@ -627,8 +629,8 @@ the slider of a linear potentiometer inside: long pots (130 mm) for the
 throttle and mixture, a short one (75 mm) for the carb heat. The pots sit on
 stands and are held down by printed pins. A printed clamp on each rod has a
 slot that takes the pot's slider ear, so pulling the knob moves the slider.
-An ESP32 on a pedestal at the back reads them and connects to the simulator
-over USB.
+MobiFlight on the [hub](#hub) reads them: one Cat5 cable to direct port 6,
+soldered straight to the pots, with no board in the box.
 
 The box mounts in the [cockpit frame](#cockpit-frame) and has no lid: it
 goes through a cut-out in the panel sheet and stands on the frame's front rail. Its
@@ -640,7 +642,7 @@ front rail's top slot, so pulling a knob does not load the sheet alone.
 
 | File | Parts |
 |------|-------|
-| `throttle_box.scad` | the box with its face flange (printed in one piece), pot holder, cable cradle |
+| `throttle_box.scad` | the box with its face flange (printed in one piece), pot holder, cable cradle top |
 | `carb_heat_knob.scad` | carb heat knob and button |
 | `clamp.scad` | rod clamps for the pot sliders |
 | `pin.scad` | pot hold-down pins |
@@ -652,10 +654,33 @@ front rail's top slot, so pulling a knob does not load the sheet alone.
 | 2 | linear potentiometer, 130 mm | throttle, mixture |
 | 1 | linear potentiometer, 75 mm | carb heat |
 | 3 | 6 mm rod, with nuts | one per control |
-| 1 | ESP32 board | reads the pots, USB to the PC |
+| 1 | Cat5 patch cable, stranded, pure copper (see [Cables](#cables)) | to hub port 6 |
 | - | M3 screws | pot hold-downs, cable cradle |
 | 5 | M3 x 10 pan head screw + nut | face flange onto the cockpit sheet |
 | 2 | M5 x 10 button head screw + washer + T-nut | floor into the front rail (counted in the frame) |
+
+## Cable to hub port 6
+
+The Cat5 cable to [hub port 6](#ports) comes in through the hole at the
+left of the back wall and is clamped in the cable cradle (its printed top
+screwed onto the block on the floor, `cable_d` is the jacket, measure it),
+so pulling the cable does not pull the solder joints. Behind the box it
+runs through the gap to the hub's right wall. Colors are T568B (see
+[Port pinout](#port-pinout)):
+
+| Wire | Signal | To |
+|------|--------|----|
+| blue | 5 V | carb heat pot, end tab |
+| white-blue | GND | carb heat pot, other end tab |
+| white-green | line A (A5) | throttle pot wiper |
+| green | line B (A6) | mixture pot wiper |
+| white-brown | line C (A7) | carb heat pot wiper |
+| white-orange, orange, brown | - | cut short, insulate |
+
+Two short wires take 5 V and GND on from the carb heat pot to the same end
+tabs of the throttle and the mixture pot, the same end of every pot to
+5 V, so all three read the same way. If a control reads backwards, swap
+its pot's two end tabs (or invert it in the Connector).
 
 # Switch panel
 

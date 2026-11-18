@@ -7,6 +7,18 @@
 // with the box in place). Two M5 bolts through the floor go into T-nuts in
 // the front rail's top slot. The box is behind the sheet, so it needs no
 // lid; its top stays open.
+//
+// Read by MobiFlight on the hub's Mega (hub/), direct port 6: one Cat5
+// cable, RJ45 plug at the hub, soldered straight to the pots here (no board
+// in the box). It comes in through the back wall at the left and is tied
+// into the cable cradle. Wires (T568B colors, see the README's port pinout):
+// - blue (5 V) and white-blue (GND) to the carb heat pot's end tabs, then
+//   on with two short wires to the same tabs of the throttle and the
+//   mixture pot (the same end of each pot to 5 V, so all read the same way)
+// - white-green (line A, A5): throttle wiper
+// - green (line B, A6): mixture wiper
+// - white-brown (line C, A7): carb heat wiper
+// - white-orange, orange and brown are not used: cut short, insulate
 
 $fn = 30;
 
@@ -58,6 +70,18 @@ big_pot_full_width = 16;
 big_pot_module_height = 6;
 big_pot_full_length = 130;
 
+// Cat5 cable to the hub, MEASURE its jacket
+cable_d = 6;
+cradle_z = 15;               // cradle top, the cable lies on it
+cable_z = cradle_z + cable_d / 2;
+cable_x = roundness + end_gap + 10;
+cradle_top_t = 5;
+cradle_top_z = cable_z + 1;  // underside of the cradle top, clear of the base for tightening
+cradle_groove_d = cable_d - 0.5;  // squeezes the jacket
+assert(cable_z + cradle_groove_d / 2 - cradle_top_z <= cradle_top_t - 1.5,
+       "Cable groove too deep for the cradle top");
+assert(cable_z + cable_d / 2 + 2 <= height, "Cable hole too high for the back wall");
+
 // Small linear pot dimensions
 small_pot_stand_distance = 60;
 small_pot_stand_thickness = 5;
@@ -93,8 +117,6 @@ module box_underside() {
          face();
          // Rod supports
          rod_supports();
-         // CPU pedestal
-         cpu_pedestal();
          // Cable cradle
          cable_cradle();
       }
@@ -115,10 +137,10 @@ module box_underside() {
       translate([roundness+end_gap+2*control_gap, wall_thickness*2, wall_thickness+big_pot_stand_height+big_pot_module_height+15+7])
          rotate([90, 0, 0])
             cylinder(d=11.2, h=wall_thickness*2);
-      // USB power cable hole
-      translate([roundness+end_gap+10, wall_thickness+depth+roundness*2, 15])
+      // Cat5 cable hole
+      translate([cable_x, wall_thickness+depth+roundness*2, cable_z])
          rotate([90, 0, 0])
-            cylinder(d=4.2, h=50);
+            cylinder(d=cable_d+0.5, h=50);
    }
    // Linear pot stands
    translate([roundness+end_gap+control_gap, 55, 0])
@@ -155,9 +177,9 @@ module face() {
 }
 
 module cable_cradle() {
-   translate([roundness+end_gap-20/2+10, depth, wall_thickness]) {
+   translate([cable_x-20/2, depth, wall_thickness]) {
       difference() {
-         cube([20, 20, 15-wall_thickness]);
+         cube([20, 20, cradle_z-wall_thickness]);
          translate([4, 10, 0])
             cylinder(d=3.2, h=13);
          translate([16, 10, 0])
@@ -167,43 +189,20 @@ module cable_cradle() {
 }
 
 module cable_cradle_top() {
-   translate([roundness+end_gap-20/2+10, depth, 20]) {
+   translate([cable_x-20/2, depth, cradle_top_z]) {
       difference() {
-         cube([20, 20-wall_thickness, 5]);
+         cube([20, 20-wall_thickness, cradle_top_t]);
          translate([4, 10, -1])
             cylinder(d=3.2, h=10);
          translate([16, 10, -1])
             cylinder(d=3.2, h=10);
-         translate([20/2, 20, -1])
+         translate([20/2, 20, cable_z-cradle_top_z])
             rotate([90, 0, 0])
-               cylinder(d=4.2, h=21);
+               cylinder(d=cradle_groove_d, h=21);
       }
    }
 }
 
-
-cpu_pedestal_height = 18;
-
-module cpu_pedestal() {
-   translate([wall_thickness+5, depth-40, wall_thickness]) {
-      translate([-10/2-1, -0.5, 0])
-         difference() {
-            cube([10, 30, cpu_pedestal_height]);
-            translate([7.75, 2.25, 1])
-               cylinder(d=2.1, h=cpu_pedestal_height);
-            translate([7.75, 27-1.25, 1])
-               cylinder(d=2.1, h=cpu_pedestal_height);
-         }
-      translate([55-2*1.75-10/2-1, -0.5, 0])
-         difference() {
-            cube([10, 30, cpu_pedestal_height]);
-            translate([7.75, 2.25, 1])
-               cylinder(d=2.1, h=cpu_pedestal_height);
-            translate([7.75, 27-1.25, 1])
-               cylinder(d=2.1, h=cpu_pedestal_height);
-         }
-   }
-}
 
 module big_pot_stand() {
    translate([0, 0, wall_thickness]) {
@@ -328,21 +327,6 @@ module throttle_rod() {
          cylinder(d=6.2, h=depth+roundness*2+10);
 }
 
-module esp32() {
-   translate([wall_thickness+5, depth-40, wall_thickness+cpu_pedestal_height])
-      difference() {
-         cube([55, 27, 5]);
-         translate([1.75, 1.75, 0])
-            cylinder(d=2, h=6);
-         translate([55-1.75, 1.75, 0])
-            cylinder(d=2, h=6);
-         translate([1.75, 27-1.75, 0])
-            cylinder(d=2, h=6);
-         translate([55-1.75, 27-1.75, 0])
-            cylinder(d=2, h=6);
-      }
-}
-
 module small_pot_holder() {
    translate([roundness+end_gap, 55, 20]) {
       translate([-small_pot_full_width, -10, 0])
@@ -381,9 +365,6 @@ function ear_y(i) = pot_mid_y(i) - view_travel[i];
 
 rod_front = 45;       // rod length in front of the box at travel 0
 rod_tail = 15;        // rod length behind the clamp
-esp32_pos = [wall_thickness + 5, depth - 40, wall_thickness + cpu_pedestal_height];
-esp32_size = [55, 27, 1.6];
-usb_cable_d = 4;
 wire_d = 1.2;
 
 c_box = "#3d7bd9";
@@ -399,7 +380,11 @@ c_mixture = "#c62828";
 c_pcb = "#1d1f22";
 c_gold = "#d9b24a";
 c_cable = "#26282b";
-wire_colors = ["#e8433a", "#1d1f22", "#f2d03b"]; // VCC, GND, wiper
+wire_colors = ["#e8433a", "#1d1f22"]; // 5 V, GND between the pots
+// Cat5 wires, T568B: blue, white-blue, wipers of carb heat, throttle, mixture
+c_blue = "#2563c9";
+c_white_blue = "#a9c4ee";
+wiper_colors = ["#c9a98f", "#a8d5a0", "#2e8b3a"]; // white-brown, white-green, green
 
 module wire(points, c, d = wire_d) {
    color(c)
@@ -576,61 +561,37 @@ module holders_part(lift = 0) {
       }
 }
 
-module esp32_part() {
-   translate(esp32_pos) {
-      color(c_pcb)
-         difference() {
-            cube(esp32_size);
-            for (x = [1.75, esp32_size.x - 1.75], y = [1.75, esp32_size.y - 1.75])
-               translate([x, y, -1]) cylinder(d = 2, h = 4);
-         }
-      // WROOM module with its antenna towards the wall
-      color("#2f3237")
-         translate([1, 4.5, esp32_size.z]) cube([25.5, 18, 0.8]);
-      color(c_chrome)
-         translate([7, 5.5, esp32_size.z + 0.8]) cube([18, 16, 2.4]);
-      // Micro USB
-      color(c_chrome)
-         translate([esp32_size.x - 5, esp32_size.y / 2 - 4, esp32_size.z]) cube([6, 8, 3]);
-      // Buttons
-      color("#3a3d42")
-         for (y = [3, esp32_size.y - 7])
-            translate([esp32_size.x - 9, y, esp32_size.z]) cube([3, 4, 1.5]);
-      // Header pins
-      color(c_gold)
-         for (k = [0 : 14], y = [1.3, esp32_size.y - 1.3])
-            translate([12 + k * 2.54, y, esp32_size.z])
-               cube([0.64, 0.64, 2.5], center = false);
-   }
+
+// Solder tab j of pot i (0 = 5 V, 1 = GND, 2 = wiper)
+function pot_tab(i, j) =
+   let(big = i > 0, w = big ? big_pot_full_width : small_pot_full_width)
+   [rod_x(i) + (j - 1) * w / 4,
+    (big ? 51 + big_pot_full_length : 49 + small_pot_full_length) + 3,
+    wall_thickness + 2 * big_pot_stand_height - 4];
+
+// A wire from a up to height zr, across and down to b
+module route(a, b, zr, c) {
+   wire([a, [a.x, a.y, zr], [b.x, b.y, zr], b], c);
 }
 
-// Pin k of the header row along the front (low y) edge
-function esp32_pin(k) = esp32_pos + [12.3 + k * 2.54, 1.6, esp32_size.z + 2.5];
+// Where the Cat5 jacket ends and the wires fan out
+cable_end = [cable_x, depth - 4, cable_z];
 
 module wires_part() {
-   // Pot tabs to the ESP32 header: VCC, GND, wiper
-   for (i = [0 : 2]) {
-      big = i > 0;
-      w = big ? big_pot_full_width : small_pot_full_width;
-      y_end = (big ? 51 + big_pot_full_length : 49 + small_pot_full_length) + 3;
-      z_tab = wall_thickness + 2 * big_pot_stand_height - 4;
-      for (j = [0 : 2]) {
-         s = [rod_x(i) + (j - 1) * w / 4, y_end, z_tab];
-         h = esp32_pin(1 + i * 4 + j);
-         zr = 30 + i * 2.5 + j * 1.2;
-         wire([s, s + [0, 4, 0], [s.x, y_end + 4, zr], [h.x, y_end + 4, zr], [h.x, h.y - 3, zr], [h.x, h.y - 3, h.z + 2], [h.x, h.y, h.z]],
-              wire_colors[j]);
-      }
-   }
-   // USB cable through the cradle and out of the back wall
-   u = esp32_pos + [esp32_size.x + 1, esp32_size.y / 2, esp32_size.z + 1.5];
-   zc = 15 + usb_cable_d / 2;
-   cx = roundness + end_gap + 10;
-   color(c_chrome)
-      translate(u + [-1, -3.5, -1.5]) cube([8, 7, 3]);
-   wire([u + [7, 0, 0], u + [16, 0, 0], [u.x + 16, depth - 12, zc + 2], [cx + 14, depth + 2, zc],
-         [cx, depth + 10, zc], [cx, depth + 2 * roundness + 40, zc]],
-        c_cable, usb_cable_d);
+   // Cat5 wires: 5 V and GND to the carb heat pot, each wiper to its pot
+   e = cable_end;
+   route(e + [-1.5, 0, 0], pot_tab(0, 0), 24, c_blue);
+   route(e + [-0.5, 0, 0], pot_tab(0, 1), 25.5, c_white_blue);
+   for (i = [0 : 2])
+      route(e + [0.5 + i, 0, 0], pot_tab(i, 2), 27 + 1.5 * i, wiper_colors[i]);
+   // 5 V and GND on from pot to pot
+   for (i = [0 : 1], j = [0 : 1])
+      route(pot_tab(i, j), pot_tab(i + 1, j), 32 + 1.5 * j, wire_colors[j]);
+   // The cable through the cradle and out of the back wall
+   color(c_cable)
+      translate([cable_x, cable_end.y, cable_z])
+         rotate([-90, 0, 0])
+            cylinder(d = cable_d, h = 2 * roundness + 4 + 40);
 }
 
 module underside_part() {
@@ -666,7 +627,6 @@ module inside_parts() {
    controls_part();
    pins_part();
    holders_part();
-   esp32_part();
    wires_part();
 }
 
@@ -696,7 +656,6 @@ module exploded_view(e = 35) {
    }
    translate([0, 0, 2 * e]) pins_part();
    translate([0, 0, 2 * e]) small_pot_holder_part();
-   translate([0, 0, e]) esp32_part();
    translate([0, 0, 2 * e]) color(c_print) cable_cradle_top();
 }
 
@@ -715,8 +674,6 @@ box_underside(); // Make module underside
 //#small_pot(); // Ignore module
 
 //#throttle_rods(); // Ignore module
-
-//#esp32(); // Ignore module
 
 //inside_view(); // Make view main 55,0,-35
 //mounted_view(); // Make view mounted 60,0,-30
