@@ -66,7 +66,7 @@ echo(front_part_2020 = [["top bar", frame_w], ["bottom bar", frame_w], ["4 uprig
 echo(desk_part_2020 = [["front rail left", rails[0][1] - rails[0][0]], ["front rail right", rails[1][1] - rails[1][0]],
                        ["rear rail", frame_w], ["5 crossbars", crossbar_len], ["4 braces, cut square", brace_len]]);
 echo(sheet = [frame_w, sheet_h + ext], screws = len(sheet_screws));
-echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut,
+echo(ign_cut = ign_cut, switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut,
      primer_cut = primer_cut);
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
 echo(apron_sheet = [apron[1] - apron[0], apron_h - ext], apron_screws = len(apron_screws));
@@ -231,28 +231,37 @@ module radio_part() {
 module switch_panel_part() {
    f = switch_flange;
    y_face = -sheet_t - 3;           // panel_t, the face on the sheet
-   z_back = switch_z + f;
+   z_ign = ign_z + f;               // backs' bottoms
+   z_sw = switch_z + f;
+   w_sw = switch_back.x - switch_ign_w;
    color(c_sheet) {
-      translate([x_sw0, y_face, switch_z])
+      // ignition face; the switch face with its strip up beside the
+      // ignition and its flange under it
+      translate([x_sw0, y_face, ign_z])
          cube([f + switch_ign_w - 0.3, 3, switch_panel.y]);
-      translate([x_sw0 + f + switch_ign_w, y_face, switch_z])
-         cube([switch_panel.x - f - switch_ign_w, 3, switch_panel.y]);
+      translate([x_ign1, y_face, switch_z])
+         cube([w_sw + f, 3, switch_panel.y]);
+      translate([x_ign1, y_face, switch_z])
+         cube([f, 3, switch_panel.y + switch_ign_rise]);
+      translate([x_ign1 - f, y_face, switch_z])
+         cube([f, 3, switch_ign_rise - 0.3]);
       // rims, through the sheet
-      for (p = [[x_sw0 + f, switch_ign_w - 0.3], [x_sw0 + f + switch_ign_w, switch_back.x - switch_ign_w]])
+      for (p = [[x_sw0 + f, z_ign, switch_ign_w - 0.3], [x_ign1, z_sw, w_sw]])
          difference() {
-            translate([p[0], y_face + 3, z_back]) cube([p[1], 8, switch_back.y]);
-            translate([p[0] + 2.5, y_face, z_back + 2.5]) cube([p[1] - 5, 20, switch_back.y - 5]);
+            translate([p[0], y_face + 3, p[1]]) cube([p[2], 8, switch_back.y]);
+            translate([p[0] + 2.5, y_face, p[1] + 2.5]) cube([p[2] - 5, 20, switch_back.y - 5]);
          }
    }
-   color(c_switch)
-      translate([switch_cut[0] + 4, 5, switch_cut[1] + 4])
-         cube([switch_cut[2] - switch_cut[0] - 8, switch_depth, switch_cut[3] - switch_cut[1] - 8]);
+   color(c_switch) {
+      translate([x_sw0 + f + 4, 5, z_ign + 4]) cube([switch_ign_w - 8, switch_depth, switch_back.y - 8]);
+      translate([x_ign1 + 4, 5, z_sw + 4]) cube([w_sw - 8, switch_depth, switch_back.y - 8]);
+   }
    // key, rockers and toggles on the face
-   color("#b9c0c8") translate([x_sw0 + f + 38.5, y_face, z_back + 40]) rotate([90, 0, 0]) cylinder(d = 24, h = 4);
-   color("#c0392b") translate([x_sw0 + f + 88, y_face - 4, z_back + 23]) cube([24, 4, 31]);
-   color("#222") translate([x_sw1 - f - 35, y_face - 4, z_back + 23]) cube([24, 4, 31]);
+   color("#b9c0c8") translate([x_sw0 + f + 38.5, y_face, z_ign + 40]) rotate([90, 0, 0]) cylinder(d = 24, h = 4);
+   color("#c0392b") translate([x_ign1 + 11, y_face - 4, z_sw + 23]) cube([24, 4, 31]);
+   color("#222") translate([x_sw1 - f - 35, y_face - 4, z_sw + 23]) cube([24, 4, 31]);
    for (i = [0 : 5])
-      color("#d0d4da") translate([x_sw0 + f + 128 + i * 19, y_face, z_back + 27])
+      color("#d0d4da") translate([x_ign1 + 51 + i * 19, y_face, z_sw + 27])
          rotate([90, 0, 0]) cylinder(d = 4, h = 18);
 }
 

@@ -96,8 +96,8 @@ The throttle box face reaches 80 mm above the desk (it stands on the
 20 mm of sheet to the radio panel's cut-out, the radio panel's 84 mm front
 (from about 88 to 172 mm), 20 mm of sheet and the top bar. The yoke notch is 135 mm high,
 for a future 130 mm force feedback yoke (`ffb_h`; the Saitek yoke is about
-100 mm), and on the left the switch panel above the primer needs 185 mm
-(the switch panel alone 136 mm). The
+100 mm), and on the left the ignition above the primer needs 185 mm
+(the switch panel beside it 136 mm). The
 build computes the height from these and rounds the uprights up to a
 stock length (200 mm), so the panel top is 220 mm above the desk; it
 checks that it stays under `sheet_h_max` (260 mm, the monitor).
@@ -209,10 +209,12 @@ sheet: 310 mm wide with the wheel), the force feedback yoke's height
 from Logitech's "Construction dimensions for Flight Panels" drawing) and
 the panel height the monitor allows (`sheet_h_max`).
 
-The switch panel's two backs go through one hole, 1 mm larger than the
-backs all round; drill its M3 mount holes through the panel's own holes,
-with the panels in place. The primer has its own, smaller hole below it,
-under the ignition key, 1 mm larger than its square back, and its four flange
+The switch panel's two backs go through one stepped hole, 1 mm larger
+than the backs all round: the ignition's part is 49 mm higher
+(`switch_ign_rise`) than the switches' part, and the two overlap at the
+joint. Drill the M3 mount holes through the panels' own holes, with the
+panels in place. The primer has its own, smaller hole under the
+ignition key, 20 mm of sheet below the ignition's part, 1 mm larger than its square back, and its four flange
 holes are drilled the same way. The same goes for the throttle box: its cut-out
 is 1 mm larger than the box at the sides and the top, with 40 mm of
 sheet left under it (it starts at the rail top), and its
@@ -766,11 +768,18 @@ hole in the cockpit sheet ([frame](#cockpit-frame)); a 10 mm face flange
 (`flange_w`) on the top, the bottom and the outer end sits on the sheet
 and is screwed to it with M3 screws, nuts behind the sheet. Where the two
 panels meet there is no flange and the corners are square, so together
-they look like the one piece panel of the airplane (about 294 x 100 mm,
-the face 3 mm in front of the sheet).
+they look like one panel, the face 3 mm in front of the sheet.
 
-The [primer](#primer) is a third, small panel of its own below them,
-under the ignition key (`primer.scad`), with its own hole in the sheet. `panel.inc.scad`
+The ignition sits 49 mm higher than the switch row (`ign_rise`, the
+frame's `switch_ign_rise`), to make room for the [primer](#primer) under
+its key, like in the X-Plane 172N: a third, small panel of its own
+(`primer.scad`) with its own hole in the sheet. So the backs only meet
+along the lower part of the ignition, and the ignition (already built)
+has no flange on its right end. The switch row's face fills the step: a
+10 mm strip goes up beside the ignition to its top, and a 10 mm flange
+along its left end under the ignition, each with a mount hole in its
+corner, so the stepped hole in the sheet is covered all round. Together
+the faces are about 294 x 149 mm. `panel.inc.scad`
 takes the height of the back as a parameter for it.
 
 ## Primer
@@ -778,9 +787,9 @@ takes the height of the back as a parameter for it.
 [![Primer](https://robertbraeutigam.github.io/cessna172/switchpanel/primer_montage.png)](https://robertbraeutigam.github.io/cessna172/switchpanel/primer_montage.png)
 
 `primer.scad`: the push-pull primer with its twist lock, read by a linear
-pot. It is a separate 47 x 47 mm panel below the switch panels, centered
-under the ignition key like in the X-Plane 172N, in its own cut-out in the
-sheet, so the ignition panel stays as it is. The knob pulls out 45 mm (`stroke`,
+pot. It is a separate 47 x 47 mm panel under the ignition, centered
+under its key like in the X-Plane 172N, left of the switch row and as low
+as it, in its own cut-out in the sheet, so the ignition panel stays as it is. The knob pulls out 45 mm (`stroke`,
 about the 1¾" of a panel plunger primer) and pushes back in; fully in, it
 turns a quarter turn clockwise to lock, and only then. Turned back
 (counterclockwise), a spring pops it 5 mm out (`pop`), like the real one.
@@ -814,7 +823,7 @@ over the pot's slider ear. The pot is the 75 mm one used for the carb heat.
 The bracket is beside the rod towards the pilot's right, about 49 x 26 mm
 across (it reaches about 38 mm to the side of the rod, its walls 11 mm to
 the other side over the tube), and with the knob in, the rod ends about 193 mm behind the panel,
-under the switch panel and clear of the frame's upright and brace. The
+under the ignition and clear of the frame's upright and brace. The
 bracket is wider than the cut-out, so it goes on from behind the sheet.
 
 ### Hardware
@@ -888,7 +897,9 @@ is a row of circuit breakers, as in the X-Plane panel; they are for show
 only.
 
 The switch list (`groups` in the source) drives the layout. The
-panel is 206.6 x 100 mm (the back 196.6 x 80 mm). Like the ignition, its
+panel is 206.6 x 100 mm (the back 196.6 x 80 mm), 216.6 x 149 mm with
+the strip and the flange that fill the step to the raised ignition (see
+[Switch panel](#switch-panel)). Like the ignition, its
 front is a separate 1 mm face with the labels standing 0.8 mm out of it,
 for a white paint pen; the face is printed front side up
 (`switches_face.stl`), the panel front side down, so neither needs

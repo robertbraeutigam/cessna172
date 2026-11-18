@@ -31,6 +31,12 @@
 //   the sheet. It mounts to the right of the ignition panel (ignition/)
 //   and has the same height, rim, flange and mount holes (panel.inc.scad);
 //   its left corners are square and without a flange where they meet.
+// - The ignition sits ign_rise higher than this panel, to make room for
+//   the primer under its key (frame/), so their backs only meet along part
+//   of the joint and the ignition's right end has no flange of its own.
+//   This face fills the step: a strip goes up beside the ignition to its
+//   top (`ign_strip`) and a flange on the left goes along under it, so
+//   the stepped hole in the sheet is covered all round.
 // - A CD74HC4067 input multiplexer board sits on two standoffs on a
 //   separate carrier plate (`mux_carrier`), with a block for a cable tie
 //   next to it. All switches (and the ignition) are soldered to the mux, so
@@ -199,6 +205,7 @@ margin_x = 11;               // panel end to the outer switches, room for the gr
 margin_bottom = 4;           // at least, panel bottom to the lowest label or pocket
 margin_top = 4;              // at least, panel top to the top label
 mount_center = true;         // also a hole in the middle of the top and bottom edge
+ign_rise = 49;               // the ignition panel's back above this one's (frame/frame.inc.scad switch_ign_rise)
 
 // --- Labels, standing out of the face ---
 label_line = 4.2;            // line pitch of two-line labels
@@ -280,14 +287,19 @@ content_y1 = max(rk_group_label_y + group_label_size, tg_label_top, len(breakers
 panel_y0 = content_y0 - (panel_h - (content_y1 - content_y0)) / 2;
 panel_y1 = panel_y0 + panel_h;
 panel_size = [panel_x1 - panel_x0, panel_y1 - panel_y0];   // the back
-face_size = panel_size + [flange_w, 2 * flange_w];             // flange on the top, bottom and right
+face_size = panel_size + [(ign_rise > 0 ? 2 : 1) * flange_w, 2 * flange_w + ign_rise];  // the flange all round, and the strip
 panel_cx = (panel_x0 + panel_x1) / 2;
 
 // The top middle hole goes between the two breakers nearest the middle
 function closest(v, x) = [for (a = v) if (abs(a - x) == min([for (b = v) abs(b - x)])) a][0];
 mount_top_cx = len(breakers) > 1 ? closest([for (i = [1 : len(cb_xs) - 1]) (cb_xs[i - 1] + cb_xs[i]) / 2], panel_cx) : panel_cx;
+// Beside the ignition: the strip's top corner and the left flange's bottom
+// corner take the holes of the panel's left corners
+ign_holes = [[panel_x0 - flange_w + mount_inset, panel_mount_y0(panel_y0)],
+             [panel_x0 + flange_w - mount_inset, panel_mount_y1(panel_y0) + ign_rise]];
+corner_holes = panel_corner_holes(panel_x0, panel_x1, panel_y0, round0 = false);
 mount_holes = concat(
-   panel_corner_holes(panel_x0, panel_x1, panel_y0, round0 = false),
+   ign_rise > 0 ? concat(ign_holes, [corner_holes[1], corner_holes[2], corner_holes[3]]) : corner_holes,
    mount_center ? [[panel_cx, panel_mount_y0(panel_y0)], [mount_top_cx, panel_mount_y1(panel_y0)]] : []);
 mount_count = len(mount_holes);
 
@@ -342,6 +354,7 @@ echo(panel_size = panel_size, face_size = face_size, switches = switch_count, mu
 
 // --- Sanity checks ---
 assert(face_size.x <= bed.x && face_size.y <= bed.y, "Panel does not fit the printer bed");
+assert(ign_rise >= 0 && ign_rise <= panel_h - 2 * panel_corner_r, "The ignition panel no longer meets this one, its right end would be open");
 assert(content_y1 - content_y0 <= panel_h, "Switches and labels do not fit panel_h, make it higher or the margins smaller");
 assert([for (g = groups) if (g[1] == "rocker2" && len(g[2]) != 2) g] == [], "A rocker2 group needs exactly two switches");
 assert(panel_t - rk_grip >= 1, "Rocker pockets too shallow, make panel_t thicker or rk_grip thinner");
@@ -433,6 +446,36 @@ module labels_2d() {
    }
 }
 
+// Rectangle with round corners where round[i] is set: [bottom left,
+// bottom right, top right, top left]
+module corner_rect(x0, y0, x1, y1, round) {
+   r = panel_corner_r;
+   hull()
+      for (i = [0 : 3]) {
+         c = [[x0 + r, y0 + r], [x1 - r, y0 + r], [x1 - r, y1 - r], [x0 + r, y1 - r]][i];
+         translate(c)
+            if (round[i]) circle(r = r);
+            else square(2 * r, center = true);
+      }
+}
+
+// Fills the step to the raised ignition panel: a strip up beside it, a
+// flange on the left under it
+module ign_strip_2d() {
+   if (ign_rise > 0) {
+      top = panel_y1 + flange_w;
+      bottom = panel_y0 - flange_w;
+      corner_rect(panel_x0, top - 2 * panel_corner_r, panel_x0 + flange_w, top + ign_rise, [false, false, true, false]);
+      corner_rect(panel_x0 - flange_w, bottom, panel_x0 + 2 * panel_corner_r, bottom + ign_rise, [true, false, false, false]);
+   }
+}
+
+// The whole face: the panel's own and the strip
+module face_2d() {
+   panel_face_2d(panel_x0, panel_x1, panel_y0, round0 = false);
+   ign_strip_2d();
+}
+
 module cb_rating_2d(amps) {
    text(str(amps), size = cb_rating_size, font = font, halign = "center", valign = "center");
 }
@@ -444,11 +487,18 @@ module panel() {
          // Square corners on the left, where the ignition panel is
          mirror([0, 0, 1])
             panel_blank(panel_x0, panel_x1, panel_y0, mount_holes, round0 = false);
+         translate([0, 0, -panel_t])
+            linear_extrude(panel_t)
+               ign_strip_2d();
          // Bosses for the mux carrier
          for (h = carrier_holes)
             translate([mux_x + h.x, mux_y + h.y, carrier_z])
                cylinder(d = carrier_boss_d, h = carrier_boss_h + 0.01);
       }
+      // Mount holes, also through the strip
+      for (h = mount_holes)
+         translate([h.x, h.y, -panel_t - 1])
+            cylinder(d = mount_d, h = panel_t + 2);
       // Carrier screw holes, not through the front
       for (h = carrier_holes)
          translate([mux_x + h.x, mux_y + h.y, carrier_z - 1])
@@ -475,7 +525,7 @@ module panel() {
       translate([0, 0, -face_t])
          linear_extrude(face_t + 1)
             offset(delta = 1)
-               panel_face_2d(panel_x0, panel_x1, panel_y0, round0 = false);
+               face_2d();
       // Version on the back, mirrored so it reads from behind
       translate([panel_x1 - 30, panel_y1 + flange_w / 2, -panel_t - 1])
          linear_extrude(gitrev_depth + 1)
@@ -492,7 +542,7 @@ module face() {
    translate([0, 0, -face_t])
       linear_extrude(face_t)
          difference() {
-            panel_face_2d(panel_x0, panel_x1, panel_y0, round0 = false);
+            face_2d();
             for (u = units)
                translate([u[0], unit_y(u)])
                   if (is_rocker(u))

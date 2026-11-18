@@ -125,20 +125,23 @@ hub_cable_room = 50;         // throttle box back to the hub's front: port 3's p
 
 // --- Switch panel, from ignition/ and switchpanel/ ---
 // The backs of the ignition (77) and the switches (196.6), panel_h high,
-// go through one hole in the sheet; the face flange (flange_w, on the top,
-// the bottom and the two outer ends) is screwed onto the sheet with M3
-// (drill through the panel's holes).
+// go through one stepped hole in the sheet: the ignition sits
+// switch_ign_rise higher, with the primer under it. The face flange
+// (flange_w, on the top, the bottom and the two outer ends) is screwed onto
+// the sheet with M3 (drill through the panel's holes); the switch panel's
+// face fills the step (a strip up beside the ignition, a flange under it).
 switch_ign_w = 77;
 switch_back = [switch_ign_w + 196.6, 80];  // panel_h
+switch_ign_rise = 49;        // ign_rise in switches.scad: as little as the primer under the ignition allows
 switch_flange = 10;          // flange_w
 switch_cut_clear = 1;        // sheet_cut_clear
 switch_panel = switch_back + 2 * [switch_flange, switch_flange];   // the face
 switch_depth = 40;           // switches behind the sheet (view only)
-// face bottom above the desk: sheet_web over the primer's cut-out (below)
+switch_z = ext + 5;          // face bottom above the desk; the ignition's is switch_ign_rise higher
 
 // Primer, from switchpanel/primer.scad: its own small panel below the
 // ignition key (in the middle of the ignition panel), like in the X-Plane
-// 172N, as low as the switch panel was before (primer_z0). The square back
+// 172N, as low as the switch panel (primer_z0). The square back
 // (primer_back, the tube for the knob) goes through its own cut-out, the
 // face flange (all round) is screwed onto the sheet; the bracket with the
 // pot behind it is wider than the cut-out and goes on from behind.
@@ -148,7 +151,7 @@ primer_face = primer_back + 2 * primer_flange;
 primer_depth = 193;          // behind the panel with the knob in (view only)
 primer_tube = 50.5;          // tube_len (view only)
 primer_bracket = [38.1, 26, 95.2];   // beside the rod towards the pilot's right, height, length (view only)
-primer_z0 = ext + 5;         // face bottom above the desk: the back clear of the front rail behind the sheet
+primer_z0 = switch_z;        // face bottom above the desk: the back clear of the front rail behind the sheet
 
 // --- Under-desk controls ---
 // Pedestal (trim wheel and trim indicator), a future component, same rule
@@ -222,22 +225,26 @@ throttle_face = [throttle_x0 - throttle_flange, ext,
 radio_cut = [x_rc - radio_body.x / 2 - 0.5, throttle_cut[3] + sheet_web,
              x_rc + radio_body.x / 2 + 0.5, throttle_cut[3] + sheet_web + radio_body.y + 1];
 radio_front_z0 = radio_cut[1] + 0.5 - (radio_front.y - radio_body.y) / 2;
-// primer: under the ignition key, at the bottom; the switch panel above it
+// primer: under the ignition key, at the bottom; the ignition above it
 primer_x = x_sw0 + switch_flange + switch_ign_w / 2;    // rod axis
 primer_z = primer_z0 + primer_flange + primer_back / 2;
 primer_cut = [primer_x - primer_back / 2 - switch_cut_clear, primer_z - primer_back / 2 - switch_cut_clear,
               primer_x + primer_back / 2 + switch_cut_clear, primer_z + primer_back / 2 + switch_cut_clear];
 primer_face_r = [primer_x - primer_face / 2, primer_z - primer_face / 2,
                  primer_x + primer_face / 2, primer_z + primer_face / 2];
-switch_z = primer_cut[3] + sheet_web + switch_cut_clear - switch_flange;
-switch_cut = [x_sw0 + switch_flange - switch_cut_clear, switch_z + switch_flange - switch_cut_clear,
+ign_z = switch_z + switch_ign_rise;          // the ignition's face bottom
+x_ign1 = x_sw0 + switch_flange + switch_ign_w;   // where the two backs meet
+// one stepped hole, as two rectangles that overlap at the joint
+ign_cut = [x_sw0 + switch_flange - switch_cut_clear, ign_z + switch_flange - switch_cut_clear,
+           x_ign1 + switch_cut_clear, ign_z + switch_flange + switch_back.y + switch_cut_clear];
+switch_cut = [x_ign1 - switch_cut_clear, switch_z + switch_flange - switch_cut_clear,
               x_sw1 - switch_flange + switch_cut_clear, switch_z + switch_flange + switch_back.y + switch_cut_clear];
 bay_cut = [x_bay0, 0, x_bay1, max(yoke_housing.z, ffb_h) + yoke_play];
-cuts = [switch_cut, bay_cut, throttle_cut, radio_cut, primer_cut];   // [x0, z0, x1, z1] on the sheet
+cuts = [ign_cut, switch_cut, bay_cut, throttle_cut, radio_cut, primer_cut];   // [x0, z0, x1, z1] on the sheet
 
 // Height: sheet_web over the highest cut-out (or the radio front), then the
 // top bar; the uprights (on the bottom bar, under the top bar) a stock length
-upright_len = ceil((max(radio_front_z0 + radio_front.y, bay_cut[3], switch_cut[3], primer_cut[3]) + sheet_web) / round_d) * round_d;
+upright_len = ceil((max(radio_front_z0 + radio_front.y, bay_cut[3], ign_cut[3], switch_cut[3], primer_cut[3]) + sheet_web) / round_d) * round_d;
 sheet_h = upright_len + ext;                 // panel height above the desk (the sheet also covers the bottom bar, ext more)
 
 // desk part: the front rail behind the front part, cut at the bay
@@ -331,9 +338,13 @@ assert(radio_front_z0 >= throttle_face[3] + 2, "Radio front runs into the thrott
 assert(sheet_h <= sheet_h_max, "Panel too high for the monitor");
 assert(radio_front_z0 + radio_front.y <= sheet_h - ext - sheet_web, "Radio panel too high for the sheet");
 assert(bay_cut[3] <= sheet_h - ext - sheet_web, "Yoke notch too high for the sheet");
-assert(switch_cut[3] <= sheet_h - ext - sheet_web, "Switch panel too high for the sheet");
+assert(max(switch_cut[3], ign_cut[3]) <= sheet_h - ext - sheet_web, "Switch panel too high for the sheet");
+assert(switch_ign_rise > 0 && switch_ign_rise <= switch_back.y - 8, "The ignition no longer meets the switch panel");
 assert(primer_cut[3] <= sheet_h - ext - sheet_web, "Primer too high for the sheet");
-assert(primer_face_r[3] + 1 <= switch_z, "Primer face runs into the switch panel face");
+assert(ign_cut[1] >= primer_cut[3] + sheet_web, "Primer too close under the ignition, raise switch_ign_rise");
+assert(primer_face_r[3] + 1 <= ign_z, "Primer face runs into the ignition face");
+assert(primer_face_r[2] + 1 <= x_ign1 - switch_flange, "Primer face runs into the switch panel's flange under the ignition");
+assert(switch_cut[0] - primer_cut[2] >= sheet_web, "Primer too close to the switch panel's cut-out");
 assert(primer_cut[1] >= ext, "Primer cut-out runs into the bottom of the sheet");
 assert(primer_cut[0] >= sheet_edge, "Primer cut-out too close to the sheet edge");
 assert(primer_x - primer_back / 2 >= ext + 3 && primer_x + primer_bracket.x <= x_bay0 - ext - 3,

@@ -26,7 +26,10 @@ its own top-level directory; new components should follow the same layout.
   Similar in function to the Saitek Switch Panel, but it should look as close to the real 172N panel as possible, and every
   switch position is a raw output wire for MobiFlight (active low, like a switch
   to GND). It is two panels printed separately and mounted side by side,
-  ignition (`ignition/`) on the left.
+  ignition (`ignition/`) on the left, raised (`ign_rise`, the frame's
+  `switch_ign_rise`) for the primer under its key; the switch row's face
+  fills the step (`ign_strip_2d`: a strip up beside the ignition, a flange
+  under it), since the ignition has no flange on its right end.
   - `panel.inc.scad` — included by both (`ignition/` has an identical
     copy, keep them the same): back height (`panel_h`, the same
     for both), thickness, rim, face flange (`flange_w`) with the mount
@@ -36,8 +39,8 @@ its own top-level directory; new components should follow the same layout.
     flange where the panels meet). The back goes through a hole in the
     frame's sheet, the flange is screwed onto it; `frame/frame.inc.scad`
     repeats these sizes.
-  - `primer.scad` — the primer: a small panel of its own below the
-    switch panels, under the ignition key (own cut-out in the sheet, the
+  - `primer.scad` — the primer: a small panel of its own under the
+    ignition key, beside and as low as the switch row (own cut-out in the sheet, the
     ignition panel is not changed), a push-pull knob with a twist lock (lug in a keyway
     in a tube on the panel back, quarter turn pocket at its end) and a
     bracket behind it with the 75 mm linear pot (the carb heat type),
