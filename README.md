@@ -493,7 +493,7 @@ lid on.
 |-----|------|-----|
 | 1 | Arduino Mega 2560 | MobiFlight board |
 | 6 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
-| 18 | M3 x 6 self tapping screw | RJ45 boards |
+| 24 | M3 x 6 self tapping screw | RJ45 boards, 4 each |
 | 6 | M3 x 6 self tapping screw | Mega |
 | 4 | M3 x 6 self tapping screw | distributor board |
 | 4 | M3 x 10 self tapping screw | lid |
@@ -509,9 +509,10 @@ Per port used: a stranded copper Cat5 patch cable, soldered at the
 component end (see [Cables](#cables)).
 
 **MEASURE when they arrive**: the RJ45 boards (`rj_*`): the jack's height
-and its position on the board, the header position and the mounting holes
-(guessed from the listing picture; fix `rj_holes` before printing, the
-build checks that the bosses stay on the board) and the perfboard (`pb`,
+and its position on the board and the header position (guessed from the
+listing picture; the build checks that the bosses stay on the board and
+clear of the jack). The board size and its 4 corner holes (28 x 11 mm
+apart, the front ones 4.5-5 mm from the jack edge) are measured. And the perfboard (`pb`,
 `pb_holes`: its size and corner holes, the hole grid is centered on it).
 All boards are screwed on with M3: if a hole is smaller than about 3.1 mm,
 drill it out, keeping clear of the traces around it. The Mega values are from the Arduino drawing.

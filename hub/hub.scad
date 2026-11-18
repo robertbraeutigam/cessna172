@@ -45,7 +45,7 @@
 // - 6 RJ45 breakout boards (34 x 28 mm, 8 pin angled header)
 // - distributor board: 30 x 70 mm perfboard, 52 male pin headers (2.54 mm),
 //   6 x 330 Ohm, 8 x 4.7 kOhm, tinned wire
-// - 18 M3 x 6 self tapping screws (RJ45 boards), 6 + 4 x M3 x 6 self
+// - 24 M3 x 6 self tapping screws (RJ45 boards), 6 + 4 x M3 x 6 self
 //   tapping screws (Mega, board), 4 x M3 x 10 (lid)
 // - about 34 female-female and 28 male-female jumper wires, 20 cm
 //
@@ -83,10 +83,14 @@ rj_pcb_t = 1.4;
 rj_jack = [16, 16, 13.5];    // width x depth x height (height MEASURE)
 rj_jack_x = 7;               // PCB left edge to the jack (MEASURE)
 rj_jack_inset = 0.5;         // PCB front edge to the jack face (MEASURE)
-rj_holes = [[3.5, 8], [29.5, 5], [30, 15]];  // MEASURE: PCB front left corner
+rj_hole_pitch = [28, 11];    // 4 corner holes, centre to centre (measured)
+rj_hole_y = 5;               // PCB front edge to the front holes' centres (measured, 4.5-5)
+// Centred along the board, from the PCB front left corner
+rj_holes = [for (i = [0, 1], j = [0, 1])
+   [(rj.x - rj_hole_pitch.x) / 2 + i * rj_hole_pitch.x, rj_hole_y + j * rj_hole_pitch.y]];
 rj_screw_hole = 2.8;         // M3 self tapping, in the floor boss
 rj_screw_depth = 5.5;        // into the boss and the floor, for an M3 x 6
-rj_standoff = [6.5, 4];      // floor boss, diameter x height
+rj_standoff = [6, 4];        // floor boss, diameter x height
 rj_solder = 1.5;             // solder joints under a PCB
 rj_pins = 8;
 rj_pin_x = 9.5;              // PCB left edge to pin 1 (MEASURE)
@@ -225,6 +229,9 @@ for (h = rj_holes) {
    assert(h.x - rj_standoff[0] / 2 >= 0 && h.x + rj_standoff[0] / 2 <= rj.x
           && h.y - rj_standoff[0] / 2 >= 0 && h.y + rj_standoff[0] / 2 <= rj.y,
           "RJ45 standoff sticks out of its board");
+   assert(h.x + rj_standoff[0] / 2 <= rj_jack_x || h.x - rj_standoff[0] / 2 >= rj_jack_x + rj_jack.x
+          || h.y - rj_standoff[0] / 2 >= rj_jack_inset + rj_jack.y,
+          "RJ45 standoff under the jack");
 }
 assert(rj_standoff[1] >= rj_solder, "Floor bosses lower than the solder joints");
 assert(rj_screw_depth <= floor_t + rj_standoff[1] - 0.8, "RJ45 screw holes go through the floor");
