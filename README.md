@@ -92,10 +92,12 @@ parts, each built on its own and then bolted together:
 
 The panel is as low as the parts on it allow: the right stack sets it.
 The throttle box face reaches 80 mm above the desk (it stands on the
-20 mm rail, 50 mm box and a 10 mm flange), then 20 mm of sheet, the radio
-panel's 84 mm front (to 172 mm), 20 mm of sheet and the top bar. The yoke
-notch is 135 mm high, for a future 130 mm force feedback yoke (`ffb_h`;
-the Saitek yoke is about 100 mm), and the switch panel needs 136 mm. The
+20 mm rail, 50 mm box and a 10 mm flange; its cut-out ends at 71 mm), then
+20 mm of sheet to the radio panel's cut-out, the radio panel's 84 mm front
+(from about 88 to 172 mm), 20 mm of sheet and the top bar. The yoke notch is 135 mm high,
+for a future 130 mm force feedback yoke (`ffb_h`; the Saitek yoke is about
+100 mm), and on the left the primer above the switch panel needs 185 mm
+(the switch panel alone 136 mm). The
 build computes the height from these and rounds the uprights up to a
 stock length (200 mm), so the panel top is 220 mm above the desk; it
 checks that it stays under `sheet_h_max` (260 mm, the monitor).
@@ -103,8 +105,8 @@ checks that it stays under `sheet_h_max` (260 mm, the monitor).
 Seen from the pilot, left to right:
 
 - **Switch panel** (ignition + switches), low on the left.
-- **Yoke bay**: the Saitek yoke stands on the desk, 20 mm out so its
-  front sits on the bottom bar, its housing in a notch in the sheet. Its
+- **Yoke bay**: the Saitek yoke stands on the desk, its front at the
+  frame front (22 mm out from the desk edge) so it sits on the bottom bar, its housing in a notch in the sheet. Its
   own clamps go around the bottom bar and the desk (the desk is thicker
   than the bar).
   A future force feedback yoke bolts to a crossbar in the bay instead.
@@ -212,18 +214,19 @@ backs all round; drill its M3 mount holes through the panel's own holes,
 with the panels in place. The primer has its own, smaller hole above the
 left end of it, 1 mm larger than its square back, and its four flange
 holes are drilled the same way. The same goes for the throttle box: its cut-out
-is 1 mm larger than the box, open at the bottom, and its
+is 1 mm larger than the box at the sides and the top, with 40 mm of
+sheet left under it (it starts at the rail top), and its
 flange holes are drilled with the box in place.
 
 ## Hardware
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 22 | 2020 extrusion, 6 mm slot | front part: top bar, bottom bar, 4 uprights, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 5 crossbars, 4 braces (cut square) |
+| 21 | 2020 extrusion, 6 mm slot | front part: top bar, bottom bar, 4 uprights, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 5 crossbars, 4 braces (cut square) |
 | 8 | 45 degree connector for 2020 | brace ends |
 | - | corner brackets, M5 screws, M5 T-nuts | frame joints, and the front part onto the front rail |
 | 2 | 3 mm ACM sheet | panel, cut to frame_w x (sheet_h + 20); the apron sheet |
-| 47 | M5 button head screw + T-nut | sheets, throttle box, pedestal, parking brake and hub |
+| 47 | M5 button head screw + T-nut (+ washer at the throttle box floor) | sheets, throttle box, pedestal, parking brake and hub |
 | 2 | screw clamp with rubber jaws, 50 mm opening | rail ends onto the desk |
 | 3 | felt pad | on the bottom bar's back, against the desk edge |
 
@@ -239,7 +242,8 @@ flange holes are drilled with the box in place.
   at the hub is the only separation point.
 - There are two kinds of port (see [Port pinout](#port-pinout)): a **mux
   port** for a component with many switches (one CD74HC4067 mux), and a
-  **direct port**, whose six signal wires each go to their own Mega pin,
+  **direct port**, whose signal wires each go to their own Mega pin
+  (four lines and the servo power on ports 4 and 5, six lines on port 6),
   for servos, encoders, pots and a few switches. Only 5 V and GND are the
   same on both, so one cable carries everything a component like the
   pedestal or the flaps needs.
@@ -289,7 +293,7 @@ port; at the hub they are joined on the shield (see
 | 5 | white-blue | GND | all ports, Mega GND |
 | 6 | green | S3 | mux bus, Mega pin 25 |
 | 7 | white-brown | SIG | the port's own Mega pin (the mux output) |
-| 8 | brown | AUX | the port's own Mega pin: one analog input, a button or a servo |
+| 8 | brown | AUX | the port's own analog Mega pin (A1-A3): one analog input |
 
 S0-S3 are shared by every mux (MobiFlight takes them once per board); at
 the hub pins 1, 2, 3 and 6 of ports 1-3 are joined on the shield (the
@@ -301,17 +305,22 @@ so the mux could read a ghost input. MobiFlight's docs recommend an extra
 one for long wires. It does not matter at which end of the cable it sits,
 so it is on the hub's shield and the components have no resistors.
 
+AUX goes straight to its analog pin, with no resistor on the shield: it is
+meant for a pot. A button on it would need a 4.7 kOhm pull-up and a servo
+a 330 Ohm in series (and power, which a mux port does not have) added on
+the shield first.
+
 **Direct ports (4-6):**
 
 | Pin | T568B color | Signal | At the hub |
 |-----|-------------|--------|------------|
-| 1 | white-orange | servo 5 V, or line E | the servo rail (a Mega 5 V pin of its own), or its own Mega pin |
-| 2 | orange | servo GND, or line F | the servo rail (a Mega GND pin of its own), or its own Mega pin |
+| 1 | white-orange | servo 5 V (ports 4, 5), or line E (port 6) | the servo rail (the double header's other 5 V pin), or its own Mega pin |
+| 2 | orange | servo GND (ports 4, 5), or line F (port 6) | the servo rail (the double header's other GND pin), or its own Mega pin |
 | 3 | white-green | line A | its own Mega pin |
 | 4 | blue | 5 V | all ports, Mega 5 V |
 | 5 | white-blue | GND | all ports, Mega GND |
 | 6 | green | line B | its own Mega pin |
-| 7 | white-brown | line C | its own Mega pin (a servo signal through 330 Ohm) |
+| 7 | white-brown | line C | its own Mega pin (on ports 4 and 5 a servo signal through 330 Ohm) |
 | 8 | brown | line D | its own Mega pin |
 
 Each line is whatever the component needs: a pot wiper (analog Mega
@@ -321,23 +330,30 @@ The rules:
 - **A servo** takes its power on the orange pair (pin 1 5 V, pin 2 GND) and
   its signal on pin 7. At the hub they go to the double header's second
   5 V and GND pins, wired on their own (see [Hub wiring](#wiring)), not to
-  the blue pair: the
-  servo's current peaks then do not move the GND and 5 V that the pots
-  and the logic on the same cable use. Without a servo, pins 1 and 2 are
-  two more lines.
+  the blue pair. These are the same nets as the first pins on the Mega
+  board, but the servo's current peaks then flow in their own wires and do
+  not move the GND and 5 V of the blue pair that the pots and the logic on
+  the same cable use. On ports 4 and 5 pins 1 and 2 are always the servo
+  power (bridged on the shield); only on port 6 they are two more lines (E
+  and F).
 - **Pots** go between 5 V and GND of the blue pair, the wiper on a line.
 - **Switches and encoders** go to GND (pin 5) like on a mux, active low,
   with a 4.7 kOhm pull-up to 5 V on the hub's shield on each
   line (the same reason as the mux SIG pull-up). Pots get none: it would
   pull the wiper reading.
 
-**A wrong port does not damage anything**, it only mixes up the inputs in
-the sim until the cable is in its own port again (they are numbered). Every
-Mega output that goes into a cable has a 330 Ohm resistor in series at the
-hub (S0-S3 and each servo signal, on the shield), so a component
-in the wrong kind of port can not short a Mega output against a switch to
-GND or a pot at its end stop. The direct ports are on the hub's right
-wall, the mux ports on its front, so they are hard to mix up.
+**A wrong port does not damage the Mega**: every Mega output that goes
+into a cable has a 330 Ohm resistor in series at the hub (S0-S3 and each
+servo signal, on the shield), so a component in the wrong kind of port can
+not short a Mega output against a switch to GND or a pot at its end stop;
+mostly it only mixes up the inputs in the sim until the cable is in its own
+port again (they are numbered). It is not impossible to short the supply,
+though: pins 1 and 2 of ports 4 and 5 are the servo 5 V and GND, without a
+resistor. A component that uses pins 1 and 2 as lines (only possible on
+port 6), plugged into port 4 or 5, can join them to its other wires, e.g.
+a pot wiper on pin 1 at its GND end stop shorts 5 V to GND through the
+wiper. The direct ports are on the hub's right wall, the mux ports on its
+front, so they are hard to mix up.
 
 ### Cables
 
@@ -387,7 +403,7 @@ gives gets a second port of the kind it needs.
 
 The direct ports leave room: a Mega has 16 analog and 54 digital pins, and
 MobiFlight takes at most 6 multiplexers on one (`MaxInputMultiplexer` in its
-board file), of which this hub uses 3. More components than the 6 ports get
+board file); this hub has 3 mux ports, 2 of them used. More components than the 6 ports get
 a second hub with its own Mega, on its own USB cable to the powered USB
 hub; the Connector shows it as a second board. Two Megas can not drive the
 same S0-S3 bus.
@@ -406,15 +422,18 @@ same S0-S3 bus.
 - **Throttle quadrant**: its three pots on lines A-C, between the blue
   pair (see [Cable to hub port 6](#cable-to-hub-port-6)); an *Analog input* per
   pot in the Connector. Line D and pins 1 and 2 are free (e.g. a pot for a
-  fourth control).
+  fourth control; see the wrong port warning in
+  [Port pinout](#port-pinout) before using pins 1 and 2).
 - **Likely later**: panel light dimmers (pots, on free lines), steam gauges
   (servos on a direct port, or steppers with a driver board),
   outputs (annunciator lights, avionics displays): MobiFlight drives them
   through 74HC595 shift registers or MAX7219 drivers with three lines each
-  (data, clock, latch), which fit a direct port.
+  (data, clock, latch), which fit a direct port once their lines get a
+  330 Ohm in series on the shield like the other Mega outputs.
 
 **Logic only** on the blue pair: the muxes, pots, encoders and hall
-sensors draw a few mA. The servos take their current on their own orange
+sensors draw some tens of mA in all (the ignition's five hall sensors
+the most). The servos take their current on their own orange
 pair from the Mega 5 V for now (see [Power](#power-later)); put a 470 uF capacitor across the supply
 at each servo. A 9 g servo draws about 0.15-0.3 A when it moves and up to
 0.7 A stalled, about 0.2 V drop on 2 m of the 24 AWG pair. Two of them on
@@ -513,7 +532,7 @@ with the lid on.
 | Qty | Part | Use |
 |-----|------|-----|
 | 1 | Arduino Mega 2560 | MobiFlight board |
-| 6 | RJ45 breakout board, 34 x 28 mm, angled 8 pin header | the ports |
+| 6 | RJ45 breakout board, 34 x 28 mm, angled 9 pin header (1-8 and SH) | the ports |
 | 24 | M3 x 6 self tapping screw | RJ45 boards, 4 each |
 | 6 | M3 x 6 self tapping screw | Mega |
 | 4 | M3 x 8 self tapping screw | shield, through its 3 mm corner holes |
@@ -593,8 +612,9 @@ Every line on the shield:
 
 Check every line with a multimeter before the shield goes on: each port
 pin to its Mega pin (through its resistor), and no line to its neighbour,
-5 V or GND. The servo power has its own Mega pins, so the servos' current
-peaks do not move the 5 V and GND the pots read against.
+5 V or GND. The servo power has its own wires to the Mega's second 5 V
+and GND pins (the same nets on the Mega board), so the servos' current
+peaks do not move the 5 V and GND wires the pots read against.
 
 **Ribbons**: peel 8 wires off a ribbon of jumper wires per port and keep
 them together, so the colors are in the same order at both ends. Tie each
@@ -655,7 +675,8 @@ front rail's top slot, so pulling a knob does not load the sheet alone.
 | 1 | linear potentiometer, 75 mm | carb heat |
 | 3 | 6 mm rod, with nuts | one per control |
 | 1 | Cat5 patch cable, stranded, pure copper (see [Cables](#cables)) | to hub port 6 |
-| - | M3 screws | pot hold-downs, cable cradle |
+| - | M3 screws | pot hold-downs, cable cradle, one in each rod clamp (M3 x 10) |
+| 2 | throttle and mixture knob, printed from other sources (not in this repo; the views only show them) | on the throttle and mixture rods |
 | 5 | M3 x 10 pan head screw + nut | face flange onto the cockpit sheet |
 | 2 | M5 x 10 button head screw + washer + T-nut | floor into the front rail (counted in the frame) |
 
@@ -745,8 +766,9 @@ over the pot's slider ear. The pot is the 75 mm one used for the carb heat.
   is in, so the locked lug holds it compressed, and unlocking pops the knob
   out that far; the rest of the stroke is free.
 
-The bracket is beside the rod towards the pilot's right, about 41 x 26 mm
-across, and with the knob in, the rod ends about 193 mm behind the panel,
+The bracket is beside the rod towards the pilot's right, about 49 x 26 mm
+across (it reaches about 38 mm to the side of the rod, its walls 11 mm to
+the other side over the tube), and with the knob in, the rod ends about 193 mm behind the panel,
 over the switch panel and clear of the frame's upright and brace. The
 bracket is wider than the cut-out, so it goes on from behind the sheet.
 
@@ -815,7 +837,10 @@ Up is ON, like in the airplane. Above the toggles is a
 row of circuit breakers, like on the real panel; they are for show only.
 
 The switch list (`groups` in the source) drives the layout; it follows the
-X-Plane 172 SP. For a 172N remove FUEL PUMP and the panel gets shorter. The
+X-Plane 172 SP. A real 172N differs more: it has no FUEL PUMP switch and
+a single AVIONICS POWER switch instead of the split AVIONICS (BUS 1, BUS 2);
+the switches of the 172N X-Plane model this panel is for are still to be
+matched. The
 panel is 221.6 x 100 mm (the back 211.6 x 80 mm). Like the ignition, its
 front is a separate 1 mm face with the labels standing 0.8 mm out of it,
 for a white paint pen; the face is printed front side up
@@ -838,7 +863,8 @@ it.
 | 7 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
 | 1 | Cat5 patch cable, stranded copper (see [Cables](#cables)) | to hub port 3, soldered to the mux |
 | 1 | cable tie, up to 3.6 mm wide | the cable onto its block (`tie`) |
-| - | wire, heat shrink | see [Wiring](#wiring) |
+| 1 | 7 pin Dupont or JST connector (optional) | ignition cable, so the panels can be separated, see [Wiring](#wiring-1) |
+| - | wire, heat shrink | see [Wiring](#wiring-1) |
 
 ### Double rocker switches
 
@@ -927,13 +953,14 @@ half, where the ignition cable comes in. Mount the mux with the chip
 outwards, so the solder joints face you; `assert`s check that the carrier
 clears the switches and fits inside the rim.
 
-**MEASURE when it arrives** (`mux_*`): the board is 41 x 18 mm (measured). The mounting holes (`mux_holes`, guessed
-on the center line 17.5 mm from the middle) and the order of the control
-pins (`mux_ctl_names`) are guesses. If the board turns out bigger the build
-fails; then increase `margin_top`. It is screwed on with M3: its holes must
-be at least about 3.1 mm (`mux_hole_min`), drill them out if they are
-smaller. If it has no mounting holes, glue it onto the standoffs. The carrier is printed from the same values, so measure the
-board before printing it.
+**MEASURE** (`mux_*`): the board size (41 x 18 mm) is measured; the
+mounting holes (`mux_holes`, guessed on the center line 17.5 mm from the
+middle) and the order of the control pins (`mux_ctl_names`) are still
+guesses. It is screwed on with M3: its holes must be at least about 3.1 mm
+(`mux_hole_min`), drill them out if they are smaller. If it has no
+mounting holes, glue it onto the standoffs. The carrier is printed from
+the same values, so check the hole positions on the board before printing
+it.
 
 #### Inputs
 
@@ -953,8 +980,9 @@ the ignition positions are consecutive. In the MobiFlight Connector every
 channel is a button: a toggle or rocker sets its dataref to 1 on press and
 to 0 on release, an ignition position sets the key position on press, and
 START holds the starter while it is pressed through a FlyWithLua script
-(see [In X-Plane](#in-x-plane)). Without FUEL PUMP (172N) or
-the OFF hall sensor, one input stays free.
+(see [In X-Plane](#in-x-plane)). Without FUEL PUMP (172N) one input
+stays free. The OFF hall sensor is needed: a position is only set on press,
+so without it the key would stay on R in the sim when it is turned to OFF.
 
 #### Cable to the hub
 
@@ -1000,17 +1028,17 @@ Every input is wired like a switch to GND (active low, as MobiFlight expects):
 
 So on the switch panel: one GND wire daisy chained over all 11 switches to
 the mux GND, and one signal wire from each switch to its C pin, soldered
-straight into the board. The ignition cable (5 signals, 5 V, GND) is best
-plugged in with a 7 pin Dupont or JST connector, so the two panels can be
-separated. GND and VCC get several wires (switch chain, EN bridge,
+straight into the board. The ignition cable (5 signals, 5 V, GND) is
+soldered to the mux too; to be able to separate the two panels later, put
+a 7 pin Dupont or JST connector into it. GND and VCC get several wires (switch chain, EN bridge,
 ignition, primer, Cat5 cable): join the extra wires into one before the pin, with
 solder and heat shrink.
 
 ### Assembly
 
 1. Screw the mux onto the carrier's standoffs, solder the Cat5 cable to
-   the mux control row and tie it onto its block. The ignition (and the
-   EN bridge) can be soldered on now as well; the carrier
+   the mux control row and tie it onto its block. The ignition cable (or
+   its connector) and the EN bridge can be soldered on now as well; the carrier
    does not need the panel yet.
 2. Solder the wires to the switches; the rockers are hard to get out
    again once snapped in.
@@ -1119,11 +1147,11 @@ between the rims. The cutout is turned so the key points at OFF
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 1 | mailbox / cabinet cam lock | key and spindle (`lock_*`: 18 mm thread, 17 mm body, 25 x 4 mm nut, 7 mm square spindle, its M4 x 5 cam screw with a 12 mm head holds the rotor) |
+| 1 | mailbox / cabinet cam lock | key and spindle (`lock_*`: 18 mm thread, 17 mm body, 25 x 4 mm nut, 8 mm square spindle, its M4 x 5 cam screw with a 12 mm head holds the rotor) |
 | 1 | 6 mm steel ball + spring | detent (`detent_spring_*`, spring OD below 6 mm) |
 | 1 | spring, 5 mm OD, about 3.8 mm ID, 15 mm | START return (`start_spring_*`, measure the ID: the shoe spigot goes inside) |
 | 1 | cube magnet, 5 x 5 x 5 mm | position sensing (`magnet_*`) |
-| 5 | A3144 hall sensor | one per position (OFF is optional) |
+| 5 | A3144 hall sensor | one per position (OFF included: it is needed, see [In X-Plane](#in-x-plane)) |
 | 1 | prototype board, 2.54 mm pitch | 5 pieces of 3 x 4 holes, one on each sensor's legs |
 | 5 | M2 x 6 screw | sensor boards onto the holder |
 | 4 | M3 x 30 screw | cap and cover (M3 x 10 to test without the cap) |
