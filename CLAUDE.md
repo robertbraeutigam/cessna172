@@ -86,9 +86,10 @@ its own top-level directory; new components should follow the same layout.
   without a mux (servos, encoders, pots). On the Mega sits the shield, a
   perfboard plugged onto its analog headers and double header (the
   digital header is off the grid) and screwed onto floor posts at its
-  corners, double sided and plated through, wired like a stripboard on
-  the bench (each line a tinned run along its own row on the back, a
-  solder bridge on top onto its Mega pin, a few wire-wrap wires; layout
+  corners, double sided and plated through, wired on the bench (each
+  line to the Mega in its own row, its resistor or network pin beside the
+  Mega pin with a solder bridge on top onto it; bridges only between
+  neighbouring used pins, everything else wire-wrap from pin to pin; layout
   lists `sh_*`, the lines in `sh_lines`, drawn by the `shield` view; the
   build checks that the Mega's pins land on its grid, that every hole has
   one use and is on one net, and that every line connects): every RJ45 pin goes to it, each

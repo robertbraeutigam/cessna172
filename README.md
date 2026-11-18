@@ -503,15 +503,15 @@ it fits the printer bed.
   onto posts on the floor in front of and behind the Mega (M3 self
   tapping), so pulling a jumper off does not lift it. Every RJ45 pin is
   plugged onto it, it carries every resistor of the hub, and it is wired
-  like a stripboard, on the bench (see [Wiring](#wiring)). It only uses the
+  on the bench (see [Wiring](#wiring)). It only uses the
   analog headers and the double header: they are on one 2.54 mm grid,
   the digital header is not (pins 8-13 are 1.5 mm off).
 - The build checks that every Mega pin the shield takes lands on a hole
   of its grid, that nothing is soldered above the Mega's ICSP header in
   the middle (measured, `mega_icsp`), that the shield's wiring is sound
   (no hole on two lines, every line in one piece from its port pins
-  through its resistor to its Mega pin, bridges on top only where that
-  side is free), that the posts stand beside the Mega and behind the front
+  through its resistor to its Mega pin, bridges only between neighbouring
+  used holes and on top only where that side is free), that the posts stand beside the Mega and behind the front
   ports' jumpers, and the room for a plugged jumper (20 mm: a 14 mm
   Dupont housing and the bent wire) behind the RJ45 pins and above the
   shield.
@@ -546,7 +546,7 @@ with the lid on.
 | 6 | male pin header, 1 x 8, straight | the port headers on the shield |
 | 6 | 330 Ohm resistor | in series with S0-S3 and the 2 servo signals |
 | 1 | resistor network, 4.7 kOhm x 8, bussed, SIP 9 (marked A09-472, e.g. Bourns 4609X-101-472LF) | pull-ups: 3 mux SIG lines, 5 direct-port switch/encoder lines |
-| - | tinned copper wire, about 0.5 mm; wire-wrap wire, 30 AWG, a few colors | the runs on the shield's back; its 10 wires |
+| - | wire-wrap wire, 30 AWG, a few colors; a bit of tinned copper wire | the shield's 23 wires; bridges between neighbouring pins |
 | 48 | female-female jumper wire, 15 cm, as 8 wire ribbons | RJ45 pins to the shield, 8 per port |
 
 Per port used: a stranded copper Cat5 patch cable, soldered at the
@@ -577,18 +577,18 @@ boards are): a hole joins its pads on both sides.
 
 [![Shield](https://robertbraeutigam.github.io/cessna172/hub/hub_shield.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_shield.png)
 
-It is wired like a stripboard: every line that goes to the double
-header has a row of its own. On the back, a bare tinned wire runs along
-the row from the line's port pin (or the end of its wire) to the hole
-just before the Mega pin, soldered in every hole it passes, with the
-line's resistor standing in it. On top, a solder bridge joins that last
-hole to the Mega pin: the Mega pins' pads on the back are under their
-header's plastic, so they can only be soldered on top, and nothing else
-is joined to them. An analog line is the same, turned: from its port pin
-on the back to the hole behind the analog pin, a bridge on top onto it.
-The rows of the double header's inner (even) column are the lines; its
-outer column has no free hole beside it and only gives the servo power
-(its 5 V and GND pins, at the ends).
+Every line that goes to the double header has a row of its own: its 330
+Ohm resistor's lead, or its pin of the pull-up network, is in the hole
+beside the Mega pin, and a solder bridge on top joins that hole to the
+pin. The Mega pins' pads on the back are under their header's plastic, so
+they can only be soldered on top, and nothing else is joined to them. An
+analog line goes from its port pin on the back to the hole behind the
+analog pin, a bridge on top onto it. The rows of the double header's
+inner (even) column are the lines; its outer column has no free hole
+beside it and only gives the servo power (its 5 V and GND pins, at the
+ends). Apart from these, a solder bridge only joins two neighbouring pins
+that belong together, and everything else is a wire-wrap wire from pin to
+pin.
 
 - **Mega side**: the 2 x 18 header under the double header and the two
   1 x 8 headers under the analog headers, pushed in from below (their
@@ -599,48 +599,46 @@ outer column has no free hole beside it and only gives the servo power
 - **Port headers**: six 1 x 8 headers in RJ45 pin order (pin 1 dark red
   in the drawing; plug each ribbon on the same way round as on its RJ45
   board). The mux ports P1-P3 stand side by side over the analog header,
-  pin 8 (AUX) at the front, so their pins 1-6 are in one row each: the
-  mux bus (S0-S3, 5 V and GND) is a run across the three. Port 6 lies
-  along the analog header, each of its line pins two holes behind its
-  analog pin. Port 5 stands left of the rows, its lines B and D starting
-  theirs; port 4 lies behind the rows, its lines A, B and D running down
-  to theirs.
+  pin 8 (AUX) at the front: their pins 1-6 are neighbours, bridged into
+  the mux bus (S0-S3, 5 V and GND), and each AUX pin is two holes behind
+  its analog pin. Port 6 lies along the analog header the same way. Ports
+  4 and 5 stand side by side in front of the pull-up network, their power
+  pins (1, 2, 4, 5) bridged.
 - **Resistors**: each 330 Ohm resistor stands in its row, the body on the
-  marked hole, the lead bent down into the next hole towards the Mega;
-  the run stops on both sides of it, so the resistor joins the two halves.
-  The pull-ups are one bussed network (a row of 8 resistors with one
-  common pin), standing across the 8 pull-up rows next to the Mega, its
-  common pin 1 (the dot) in the 5 V row above them, which goes onto the
-  Mega's 5 V pin: each pull-up line has its own resistor to the one 5 V
-  pin.
-- **Back**: the runs are bare tinned wire, soldered in every hole they
-  pass: the rows, and a few columns (5 V and GND around the board, port
-  4's lines down to their rows, the servo power). Ten links can not be a
-  run and are wire-wrap wire (the thin lines in the drawing): the three
-  mux SIG lines and the two servo signals to their rows, port 5's pot to
-  A11, the GND of ports 4 and 5, and the servo 5 V and GND to the double
-  header's outer pins. Keep the joints flat and each run on its row: the
-  shield sits 2.5 mm above the Mega's digital header and its 2 x 3 ICSP
-  header in the middle. Nothing is soldered above the ICSP header (the
-  red frame in the drawing: the build checks it); run the wires around it
-  or flat over it.
+  marked hole, the lead bent down into the hole beside the Mega pin;
+  every other one stands a hole further left, its lead over the free hole
+  between, so the bodies of neighbouring rows do not touch. The pull-ups
+  are one bussed network (a row of 8 resistors with one common pin),
+  standing across the 8 pull-up rows two holes before the Mega pins, each
+  pin bridged to the hole beside its Mega pin, its common pin 1 (the dot)
+  in the 5 V row above them: each pull-up line has its own resistor to
+  the one 5 V pin.
+- **Back**: the bridges between neighbouring pins (a blob, or a short
+  piece of tinned wire), and 23 wire-wrap wires from pin to pin (the thin
+  lines in the drawing): from each line's port pin to its resistor or
+  network pin, port 5's pot to A11, 5 V and GND from port to port and onto
+  the Mega pins, and the servo 5 V and GND to the double header's outer
+  pins. Keep the joints flat: the shield sits 2.5 mm above the Mega's
+  digital header and its 2 x 3 ICSP header in the middle. Nothing is
+  soldered above the ICSP header (the red frame in the drawing: the build
+  checks it); run the wires around it or flat over it.
 
 Every line on the shield:
 
 | Line | From (port.pin) | Through | To the Mega |
 |------|-----------------|---------|-------------|
-| S0, S1, S2, S3 | P1.1-P2.1-P3.1, .2, .3, .6 (one row each) | 330 Ohm | D38, D40, D42, D48 |
-| SIG | P1.7, P2.7, P3.7 (wires to their rows) | 4.7 kOhm to 5 V | D28, D30, D34 |
+| S0, S1, S2, S3 | P1.1-P2.1-P3.1, .2, .3, .6 (bridged) | 330 Ohm | D38, D40, D42, D48 |
+| SIG | P1.7, P2.7, P3.7 | 4.7 kOhm to 5 V | D28, D30, D34 |
 | AUX | P1.8, P2.8, P3.8 | - | A8, A9, A10 |
 | port 4 | A P4.3, B P4.6, D P4.8 | 4.7 kOhm to 5 V | D26, D24, D22 |
-| port 4 servo | C P4.7 (wire to its row) | 330 Ohm | D44 |
-| port 5 | A P5.3 (pot, wire) | - | A11 |
+| port 4 servo | C P4.7 | 330 Ohm | D44 |
+| port 5 | A P5.3 (pot) | - | A11 |
 | port 5 | B P5.6, D P5.8 | 4.7 kOhm to 5 V | D32, D36 |
-| port 5 servo | C P5.7 (wire to its row) | 330 Ohm | D46 |
+| port 5 servo | C P5.7 | 330 Ohm | D46 |
 | port 6 | E P6.1, F P6.2, A P6.3, B P6.6, C P6.7, D P6.8 | - | A0, A1, A2, A5, A6, A7 |
-| 5 V | P1.4-P2.4-P3.4, P4.4, P5.4, P6.4, the network's pin 1 | - | 5V (the double header's inner pin) |
-| GND | P1.5-P2.5-P3.5, P6.5, P4.5 and P5.5 (wires) | - | GND (inner pin) |
-| servo power | P4.1-P5.1 and P4.2-P5.2 (wires to the Mega) | - | the other 5V and GND (outer pins) |
+| 5 V | P6.4, P1.4-P2.4-P3.4, P4.4-P5.4, the network's pin 1 | - | 5V (the double header's inner pin) |
+| GND | P6.5, P1.5-P2.5-P3.5, P4.5-P5.5 | - | GND (inner pin) |
+| servo power | P4.1-P5.1 and P4.2-P5.2 | - | the other 5V and GND (outer pins) |
 
 D50 and D52 are free rows, and A3, A4 and A12-A15 are free analog pins
 (each has a free hole behind it).
