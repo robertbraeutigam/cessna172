@@ -15,9 +15,9 @@
 // - blue (5 V) and white-blue (GND) to the carb heat pot's end tabs, then
 //   on with two short wires to the same tabs of the throttle and the
 //   mixture pot (the same end of each pot to 5 V, so all read the same way)
-// - white-green (line A, A5): throttle wiper
-// - green (line B, A6): mixture wiper
-// - white-brown (line C, A7): carb heat wiper
+// - white-green (line A, A2): throttle wiper
+// - green (line B, A5): mixture wiper
+// - white-brown (line C, A6): carb heat wiper
 // - white-orange, orange and brown are not used: cut short, insulate
 
 $fn = 30;
