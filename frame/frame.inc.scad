@@ -30,7 +30,8 @@
 //   bolted to its front rail, and a 45 degree brace from each upright down
 //   to a crossbar stops it from rocking: a stock length, cut square, held
 //   by a bought 45 degree connector at each end. The throttle box stands on the
-//   front rail and the crossbar under its middle.
+//   front rail and the crossbar under its middle; the hub stands behind
+//   it, bolted into that crossbar and the yoke bay's right one.
 //
 // The front rail runs past the sheet at both ends (ear_len): there a
 // bought screw clamp (rubber jaws) on each end clamps the rail onto the
@@ -105,6 +106,22 @@ throttle_flange = 10;        // flange_w
 throttle_play = 1;           // box to its cut-out, sheet_cut_clear
 throttle_bolt_xs = [47.5, 102.5]; // floor_bolt_xs
 throttle_bolt_y = 36;        // floor_bolt_y, from the face front
+
+// --- Hub, from hub/hub.scad ---
+// The box with the MobiFlight Mega and the RJ45 ports stands on the desk
+// part behind the throttle box, across the yoke bay's right crossbar and
+// the throttle's crossbar: the two ears on its left wall are bolted into
+// the first one's top slot, the ears on its front and back walls into the
+// second one's (M5, T-nuts). Its front ports (1-3) face the pilot, port 3
+// behind the throttle box (hub_cable_room for its plug), its right ports
+// (4-6) face right and its USB jack left, behind the yoke.
+hub_size = [172, 135, 53];   // outer, with the lid
+hub_ear_out = 12;            // ear.y: how far the ears stand out, their holes in the middle
+hub_ear_slot_dx = 156.5;     // ear_slot_dx: the left ears' holes to the front and back ears'
+hub_ear_left_ys = [9, 126];  // the left ears' holes from the box's front (round_r + ear.x / 2 from its ends)
+hub_jacks = [29.5, 67.5, 105.5];   // the 3 jacks' middles along the front and the right wall (view only)
+hub_usb_y = 88;              // its USB jack from the box's front (wall + row_y + mega_usb)
+hub_cable_room = 50;         // throttle box back to the hub's front: port 3's plug and cable
 
 // --- Switch panel, from ignition/ and switchpanel/ ---
 // The backs of the ignition (77) and the switches (211.6), panel_h high,
@@ -222,7 +239,16 @@ sheet_h = upright_len + ext;                 // panel height above the desk (the
 
 // desk part: the front rail behind the front part, cut at the bay
 crossbar_xs = concat(upright_xs, [x_rc - ext / 2]);      // the last one carries the throttle box
-crossbar_len = ceil((max(yoke_front_y + yoke_housing.y, throttle_y0 + throttle_size.y) - ext) / round_d) * round_d;
+// Hub behind the throttle box, its left ears over the bay crossbar's slot,
+// the front and back ears over the throttle crossbar's slot
+hub_slot_x = [x_bay1 + ext / 2, x_rc];
+hub_x0 = hub_slot_x[0] + hub_ear_out / 2;                    // outer left wall
+hub_y0 = throttle_y0 + throttle_size.y + hub_cable_room;     // outer front wall
+// M5 through its ears into T-nuts in the crossbars' top slots, [x, y]
+hub_bolts = concat([for (y = hub_ear_left_ys) [hub_slot_x[0], hub_y0 + y]],
+                   [for (y = [-hub_ear_out / 2, hub_size.y + hub_ear_out / 2]) [hub_slot_x[0] + hub_ear_slot_dx, hub_y0 + y]]);
+crossbar_len = ceil(max(max(yoke_front_y + yoke_housing.y, throttle_y0 + throttle_size.y) - ext,
+                        hub_bolts[3].y + m5_head_d / 2 - 2 * ext) / round_d) * round_d;
 rear_y = 2 * ext + crossbar_len;
 frame_d = rear_y + ext;
 // front rail left and right, [x0, x1]: at least ear_len past the sheet, rounded up
@@ -309,6 +335,14 @@ assert(primer_cut[0] >= sheet_edge, "Primer cut-out too close to the sheet edge"
 assert(primer_x - primer_back / 2 >= ext + 3 && primer_x + primer_bracket.x <= x_bay0 - ext - 3,
        "Primer runs into the uprights behind the sheet");
 assert(abs(throttle_y0 + throttle_bolt_y - ext * 3 / 2) < 0.01, "Throttle floor bolts miss the front rail slot");
+assert(abs(hub_slot_x[0] + hub_ear_slot_dx - hub_slot_x[1]) < 0.01,
+       "Hub's front and back ears miss the throttle crossbar's slot (ear_slot_dx in hub.scad)");
+assert(hub_x0 >= x_bay1 && hub_x0 + hub_size.x + hub_ear_out <= frame_w - ext,
+       "Hub not between the yoke bay and the right crossbar");
+assert(hub_y0 + hub_ear_left_ys[0] - 7 >= ext + brace_rise + ext * sqrt(2) + 5,
+       "Hub's left ears run into the bay brace's foot");
+assert(hub_bolts[3].y + m5_head_d / 2 <= rear_y, "Hub's back ear is off the crossbar");
+assert(hub_y0 + hub_usb_y >= yoke_front_y + yoke_housing.y + 5, "Hub's USB plug runs into the yoke");
 assert(ext + brace_rise + ext / sqrt(2) <= rear_y, "Braces do not land on the crossbars");
 assert(brace_top + brace_room <= sheet_h - ext, "Braces too long: no room for the connector on the upright");
 assert(brace_top + ext / sqrt(2) <= sheet_h, "Braces stick out over the top bar");
