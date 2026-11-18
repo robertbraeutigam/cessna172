@@ -132,7 +132,7 @@ pb_gap = 2;                  // between the Mega and the board
 // Holes by [column, row]: columns from the left, row 0 towards the Mega.
 // P<port>.<RJ45 pin> is a pin with a female-female jumper from that RJ45
 // pin, D<n> one with a male-female jumper to that Mega pin.
-pb_s_cols = [1, 3, 5, 7];        // S0-S3; below them the servo signals
+pb_s_cols = [1, 3, 5, 7];        // S0-S3; behind them the servo signals
 pb_gnd_col = 10;
 pb_5v_col = 12;
 pb_rails = [3, 6];               // 5 V rails from the 5V column to the right

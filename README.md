@@ -528,7 +528,7 @@ the drawing (component side, row 0 towards the Mega; `board` view of
 
 - **S0-S3**: one column each: the pins from ports 1, 2, 3, a 330 Ohm
   resistor, the pin to the Mega (D22-D25).
-- **Servo signals**: below them, ports 4 and 5 pin 7 through a 330 Ohm
+- **Servo signals**: behind them, ports 4 and 5 pin 7 through a 330 Ohm
   resistor to D2 and D3.
 - **GND, 5V**: a column of 8 pins each: ports 1-6, the Mega's 5 V and GND
   pin (the power header), a spare.
