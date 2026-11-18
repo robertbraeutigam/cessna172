@@ -67,9 +67,14 @@ lid_hole = 3.3;              // M3
 lip_h = 3;                   // locating lip under the lid, inside the walls
 lip_w = 1.5;
 lip_clear = 0.4;
-ear = [14, 12];              // mount ears on the floor, x along the wall x out
+// Mount ears on the floor, M5 into T-nuts in the frame's crossbars behind
+// the throttle box (frame/frame.inc.scad places the hub and checks them):
+// two on the left wall into the yoke bay's crossbar, one on the front and
+// one on the back wall into the throttle's crossbar
+ear = [14, 12];              // along the wall x out
 ear_t = 4;
-ear_hole = 5.3;              // M5 (frame T-nut), or a wood screw into the desk
+ear_hole = 5.3;              // M5
+ear_slot_dx = 156.5;         // frame: the bay crossbar's slot to the throttle crossbar's slot
 round_r = 2;                 // outer vertical edges
 
 // --- RJ45 breakout board (measured) ---
@@ -264,10 +269,19 @@ sh_x = mega_x + sh_o.x;
 sh_y = row_y + sh_o.y;
 sh_z = mega_z + mega_pcb_t + mega_header_h + sh_stack;
 outer = [inner_x + 2 * wall, inner_y + 2 * wall, floor_t + inner_h];
-ear_xs = [0, inner_x - ear.x];
+// Ear holes [x, y] (box coordinates) and the wall they stand out of:
+// [-1, 0] left, [0, -1] front, [0, 1] back
+ear_left_x = -wall - ear.y / 2;              // the left ears' holes, over the bay crossbar's slot
+ears = [[[ear_left_x, -wall + round_r + ear.x / 2], [-1, 0]],
+        [[ear_left_x, inner_y + wall - round_r - ear.x / 2], [-1, 0]],
+        [[ear_left_x + ear_slot_dx, -wall - ear.y / 2], [0, -1]],
+        [[ear_left_x + ear_slot_dx, inner_y + wall + ear.y / 2], [0, 1]]];
 
 // --- Checks ---
-assert(outer.x <= bed.x && outer.y + 2 * ear.y <= bed.y,
+assert(ears[2][0].x - ear.x / 2 >= port_x(port_front - 1) + rj_jack_x + rj_jack.x + jack_clear + 2
+       && ears[2][0].x + ear.x / 2 <= inner_x + wall - round_r,
+       "Front ear in front of a jack or off the front wall");
+assert(outer.x + ear.y <= bed.x && outer.y + 2 * ear.y <= bed.y,
        "Box does not fit the printer bed");
 assert(outer.x <= bed.x && outer.y <= bed.y, "Lid does not fit the printer bed");
 assert(rj_jack_x + rj_jack.x <= rj.x && rj_jack_inset + rj_jack.y < rj_pin_y,
@@ -353,16 +367,16 @@ module box() {
          translate([-wall, -wall, -floor_t])
             linear_extrude(outer.z) rounded_rect([outer.x, outer.y], round_r);
          // Ears on the floor, front and back
-         for (x = ear_xs, side = [0, 1])
-            translate([x, side ? inner_y + wall : -wall - ear.y, -floor_t])
-               cube([ear.x, ear.y, ear_t]);
+         for (e = ears)
+            translate(concat(e[0] - e[1] * ear.y / 4, -floor_t))
+               linear_extrude(ear_t)
+                  square(e[1].x ? [ear.y * 1.5, ear.x] : [ear.x, ear.y * 1.5], center = true);
       }
       // Inside
       cube([inner_x, inner_y, inner_h + 1]);
       // Ear holes
-      for (x = ear_xs, side = [0, 1])
-         translate([x + ear.x / 2, side ? inner_y + wall + ear.y / 2 : -wall - ear.y / 2, -floor_t - 1])
-            cylinder(d = ear_hole, h = ear_t + 2);
+      for (e = ears)
+         translate(concat(e[0], -floor_t - 1)) cylinder(d = ear_hole, h = ear_t + 2);
       // Jack cut-outs and port numbers in the walls
       for (c = [0 : port_cols - 1]) at_port(c) {
          x = rj_jack_x;

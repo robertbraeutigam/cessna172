@@ -93,7 +93,9 @@ its own top-level directory; new components should follow the same layout.
   signals, 4.7 kOhm pull-ups on the mux SIG lines and the direct-port
   switch/encoder lines; the components have none). No wire goes to the
   Mega, nothing is soldered in the box. Power for big loads is not the
-  hub's job (an external PSU and 5 V bus, later). Every MobiFlight component connects to
+  hub's job (an external PSU and 5 V bus, later). It stands on the
+  frame's desk part behind the throttle box, its ears bolted into two
+  crossbars (`ear_slot_dx`; `frame/frame.inc.scad` repeats its sizes). Every MobiFlight component connects to
   its own numbered port with one Cat5 cable, RJ45 plug at the hub and
   soldered straight to the component (no connector there); the port
   pinouts and the port list are in the README's Connections section, keep
@@ -139,7 +141,9 @@ its own top-level directory; new components should follow the same layout.
   runs past the sheet at both ends (`ear_len`), where two bought screw
   clamps clamp it onto the desk (no printed parts in the load path: they
   creep under constant load). `knee_w` around the yoke stays open for the
-  legs.
+  legs. The hub stands on the desk part behind the throttle box (its ears
+  in the slots of the yoke bay's right crossbar and the throttle's
+  crossbar); the crossbars are as long as it needs.
 
 ## Documentation
 

@@ -162,7 +162,14 @@ pulled components also stand on the frame: the throttle box sits on the
 front rail and the crossbar under its middle (its front overhangs the
 front part), its face flange is screwed onto the sheet like the switch
 panel's and two M5 bolts through its floor go into the front rail.
-The pedestal does the same on the apron's lower bar.
+The pedestal does the same on the apron's lower bar. The [hub](#hub)
+stands on the desk part behind the throttle box, across the yoke bay's
+right crossbar and the throttle's crossbar: the two ears on its left wall
+are bolted into the first one's top slot, the ears on its front and back
+walls into the second one's (M5, T-nuts). Its front ports face the pilot
+(port 3 is behind the throttle box, `hub_cable_room` (50 mm) leaves room
+for the plug), its right ports face right and its USB jack left, behind
+the yoke; the crossbars are as long as the hub needs.
 The extrusion carries the
 loads, the sheet only covers the front, so cut-outs do not weaken it.
 Keep at least 25 mm of sheet to the edge and 20 mm between cut-outs, and
@@ -174,7 +181,7 @@ computed from the component sizes, and the build prints the cut list
 (`echo`). Lengths are rounded to stock lengths: the width to 100 mm
 (`round_w`), the other bars to 50 mm (`round_d`). Only the apron's lower
 bar (between the leg room and the pedestal, `round_cut`) is cut to an odd
-length. With the current guesses the frame is 1000 x 360 mm and 220 mm
+length. With the current guesses the frame is 1000 x 410 mm and 220 mm
 high above the desk, the sheet 1000 x 240 mm (it also covers the bottom
 bar), the apron sheet
 250 x 220 mm. With the ears the frame takes 1143 mm of the desk width.
@@ -182,7 +189,7 @@ bar), the apron sheet
 | Part | 2020 bars |
 |------|-----------|
 | front part | top bar 1000, bottom bar 1000, 4 uprights 200, 2 apron hangers 200, lower bar 210 |
-| desk part | front rail left 450, front rail right 400, rear rail 1000, 5 crossbars 300, 4 braces 200 (cut square) |
+| desk part | front rail left 450, front rail right 400, rear rail 1000, 5 crossbars 350, 4 braces 200 (cut square) |
 
 | File | Parts |
 |------|-------|
@@ -216,7 +223,7 @@ flange holes are drilled with the box in place.
 | 8 | 45 degree connector for 2020 | brace ends |
 | - | corner brackets, M5 screws, M5 T-nuts | frame joints, and the front part onto the front rail |
 | 2 | 3 mm ACM sheet | panel, cut to frame_w x (sheet_h + 20); the apron sheet |
-| 43 | M5 button head screw + T-nut | sheets, throttle box, pedestal and parking brake |
+| 47 | M5 button head screw + T-nut | sheets, throttle box, pedestal, parking brake and hub |
 | 2 | screw clamp with rubber jaws, 50 mm opening | rail ends onto the desk |
 | 3 | felt pad | on the bottom bar's back, against the desk edge |
 
@@ -485,8 +492,12 @@ it fits the printer bed.
   Dupont housing and the bent wire) behind the RJ45 pins and above the
   shield.
 - The lid has a locating lip and is screwed onto four corner posts. Four
-  ears on the floor (5.3 mm holes) screw the box onto the frame (M5 + T-nut)
-  or under the desk.
+  ears on the floor (5.3 mm holes, M5 + T-nut) bolt the box onto the
+  frame's desk part behind the throttle box (see [Cockpit
+  frame](#cockpit-frame)): two on the left wall into the yoke bay's right
+  crossbar, one on the front and one on the back wall into the throttle's
+  crossbar. Their spacing (`ear_slot_dx`) is the frame's, and
+  `frame.inc.scad` checks it.
 
 Nothing in the box is soldered: each port is one 8 wire ribbon of
 female-female jumpers from its RJ45 pins to its header on the shield, in

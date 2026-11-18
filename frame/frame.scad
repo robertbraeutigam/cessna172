@@ -12,7 +12,8 @@
 // - 2020 extrusion, front part: top bar, bottom bar, 4 uprights,
 //   2 apron hangers, lower bar
 // - 2020 extrusion, desk part: front rail left, front rail right, rear
-//   rail, 5 crossbars, 4 braces (cut square)
+//   rail, 5 crossbars, 4 braces (cut square); the hub stands on two of
+//   the crossbars
 // - 8 45 degree connectors for 2020, one at each brace end
 // - corner brackets, M5 screws and T-nuts (6 mm slot)
 // - 3 mm ACM sheet, frame_w x (sheet_h + ext), and the apron sheet
@@ -41,6 +42,9 @@
 //    its flange holes and screw the flange on (M3, nuts behind the sheet).
 //    The pedestal goes in the same way onto the lower bar, the parking
 //    brake under the bottom bar, when they exist.
+// 6. Put the hub behind the throttle box, its left ears on the yoke bay's
+//    right crossbar, its front and back ears on the throttle's crossbar,
+//    and bolt them into T-nuts in the crossbars' top slots (hub_bolts).
 
 include <frame.inc.scad>
 
@@ -67,7 +71,8 @@ echo(switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, ra
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
 echo(apron_sheet = [apron[1] - apron[0], apron_h - ext], apron_screws = len(apron_screws));
 echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts, flaps_cut = flaps_cut);
-echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2, desk_clamps = len(clamp_xs), clamp_y = clamp_y);
+echo(hub = [hub_x0, hub_y0], hub_bolts = hub_bolts);
+echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2 + len(hub_bolts), desk_clamps = len(clamp_xs), clamp_y = clamp_y);
 
 // --- Frame ---
 
@@ -356,7 +361,27 @@ module park_part(set = false) {
                cylinder(d = 10, h = park_handle, center = !set);
 }
 
+// Hub on the desk part: the box with its lid, the ears on the crossbars,
+// the jacks in its front and right walls, the USB jack in its left wall
+module hub_part() {
+   translate([hub_x0, hub_y0, ext]) {
+      color(c_box) {
+         translate([2, 2, 0]) minkowski() { cube(hub_size - [4, 4, 1]); cylinder(r = 2, h = 1); }
+         for (y = hub_ear_left_ys) translate([-hub_ear_out, y - 7, 0]) cube([hub_ear_out + 1, 14, 4]);
+         for (y = [-hub_ear_out, hub_size.y - 1]) translate([hub_ear_slot_dx - hub_ear_out / 2 - 7, y, 0]) cube([14, hub_ear_out + 1, 4]);
+      }
+      color("#111") {
+         for (x = hub_jacks) translate([x - 8, -0.5, 8]) cube([16, 1, 15]);
+         for (y = hub_jacks) translate([hub_size.x - 0.5, y - 8, 8]) cube([1, 16, 15]);
+         translate([-0.5, hub_usb_y, 8]) cube([1, 12, 11]);
+      }
+      color("#b9c0c8")
+         for (b = hub_bolts) translate([b.x - hub_x0, b.y - hub_y0, 4]) cylinder(d = m5_head_d, h = 3);
+   }
+}
+
 module components() {
+   hub_part();
    yoke_part();
    radio_part();
    switch_panel_part();
