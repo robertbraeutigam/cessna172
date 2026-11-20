@@ -40,8 +40,10 @@
 //    middle crossbar until its face is on the sheet, bolt its floor into
 //    the rail (throttle_bolts), drill the sheet through
 //    its flange holes and screw the flange on (M3, nuts behind the sheet).
-//    The pedestal goes in the same way onto the lower bar, the parking
-//    brake under the bottom bar, when they exist.
+//    The flaps panel goes through its cut-out right of it onto the rail,
+//    its plate screwed onto the sheet; the pedestal goes in like the
+//    throttle box onto the lower bar, the parking brake under the bottom
+//    bar, when they exist.
 // 6. Put the hub behind the throttle box, its left ears on the yoke bay's
 //    right crossbar, its front and back ears on the throttle's crossbar,
 //    and bolt them into T-nuts in the crossbars' top slots (hub_bolts).
@@ -67,10 +69,10 @@ echo(desk_part_2020 = [["front rail left", rails[0][1] - rails[0][0]], ["front r
                        ["rear rail", frame_w], ["5 crossbars", crossbar_len], ["4 braces, cut square", brace_len]]);
 echo(sheet = [frame_w, sheet_h + ext], screws = len(sheet_screws));
 echo(ign_cut = ign_cut, switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut,
-     primer_cut = primer_cut);
+     primer_cut = primer_cut, flaps_cut = flaps_cut);
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
 echo(apron_sheet = [apron[1] - apron[0], apron_h - ext], apron_screws = len(apron_screws));
-echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts, flaps_cut = flaps_cut);
+echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts);
 echo(hub = [hub_x0, hub_y0], hub_bolts = hub_bolts);
 echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2 + len(hub_bolts), desk_clamps = len(clamp_xs), clamp_y = clamp_y);
 
@@ -174,7 +176,6 @@ module apron_2d() {
    difference() {
       translate([apron[0], -apron_h]) square([apron[1] - apron[0], apron_h - ext]);
       rect(pedestal_cut);
-      rect(flaps_cut);
       for (p = apron_screws)
          translate(p) circle(d = m5_d);
    }
@@ -325,8 +326,8 @@ module pedestal_part() {
       translate([pedestal_x - 4, under_y0 - 0.5, apron_bar_z + 12]) cube([8, 1, 28]);
 }
 
-// DIY flaps panel (placeholder): front plate on the apron sheet, body behind it,
-// lever and indicator on the plate
+// DIY flaps panel (placeholder): front plate on the sheet right of the
+// throttle box, body behind it on the front rail, lever and indicator on the plate
 module flaps_part() {
    y = -sheet_t;
    color(c_device) {
@@ -414,7 +415,6 @@ module under_view() {
          frame_part();
          sheet_part();
          pedestal_part();
-         flaps_part();
          park_part(set = true);
          clamps_part();
          throttle_part();
@@ -444,8 +444,9 @@ module throttle_view() {
          frame_part();
          sheet_part();
          throttle_part();
+         flaps_part();
       }
-      translate([throttle_x0 - 40, -100, -1]) cube([throttle_size.x + 80, 400, 120]);
+      translate([throttle_x0 - 40, -100, -1]) cube([flaps_face[2] - throttle_x0 + 80, 400, 120]);
    }
 }
 

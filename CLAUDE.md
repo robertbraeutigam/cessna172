@@ -173,8 +173,9 @@ its own top-level directory; new components should follow the same layout.
   sheet; heavy or pulled ones also stand on the frame. The frame is two
   parts bolted together: the vertical front part in front of the desk
   edge (a rectangle with the uprights, its bottom bar just under the desk
-  top, and the apron hanging under the throttle for the trim wheel
-  pedestal and the DIY flaps panel (not designed yet); the thin parking
+  top, the DIY flaps panel (not designed yet) on the sheet right of the
+  throttle box, and the apron hanging under the throttle for the trim wheel
+  pedestal; the thin parking
   brake hangs under the bottom bar below the yoke), and the desk part (a
   ladder on the desk, its front rail cut at the yoke), with 45 degree
   braces between them (stock bars cut square, bought 45 degree

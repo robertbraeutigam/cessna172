@@ -93,9 +93,10 @@ parts, each built on its own and then bolted together:
 
 The panel is as low as the parts on it allow: the right stack sets it.
 The throttle box face reaches 80 mm above the desk (it stands on the
-20 mm rail, 50 mm box and a 10 mm flange; its cut-out ends at 71 mm), then
+20 mm rail, 50 mm box and a 10 mm flange; its cut-out ends at 71 mm), the
+flaps panel's cut-out beside it at 78 mm, then
 20 mm of sheet to the radio panel's cut-out, the radio panel's 84 mm front
-(from about 88 to 172 mm), 20 mm of sheet and the top bar. The yoke notch is 135 mm high,
+(from about 95 to 179 mm), 20 mm of sheet and the top bar. The yoke notch is 135 mm high,
 for a future 130 mm force feedback yoke (`ffb_h`; the Saitek yoke is about
 100 mm), and on the left the ignition above the primer needs 185 mm
 (the switch panel beside it 136 mm). The
@@ -111,7 +112,14 @@ Seen from the pilot, left to right:
   own clamps go around the bottom bar and the desk (the desk is thicker
   than the bar).
   A future force feedback yoke bolts to a crossbar in the bay instead.
-- **Saitek radio panel**, with the **throttle box** under it.
+- **Saitek radio panel**, with the **throttle box** under it and the
+  DIY **flaps panel** right of the mixture, as in the 172N (lever pot and
+  indicator servo, on hub port 5; not designed yet, so its 50 x 63 mm
+  front plate and 64 mm depth are placeholders): its body goes through a
+  cut-out in the sheet (`flaps_body`, 3 mm smaller than the plate all
+  round, follows the panel once it is designed) and rests on the front
+  rail, its plate is screwed onto the sheet, 10 mm (`flaps_gap`) right of
+  the throttle box face.
 
 The frame overhangs the desk edge by 22 mm (`frame_overhang`: a 2020 and
 a 2 mm felt pad), so the sheet is 22 mm in front of the desk edge; the
@@ -138,12 +146,7 @@ Below the desk top:
   sheet flush under the main sheet. It carries the **pedestal** with the
   trim wheel and the trim indicator (75 x 150 mm front), centered under
   the throttle, which stands on the lower bar like the throttle box on the
-  front rail, and to its right the DIY **flaps panel** (lever pot and
-  indicator servo, on hub port 5; not designed yet, so its 50 x 63 mm front
-  plate and 64 mm depth are placeholders), as high as the desk allows: its
-  body goes through a cut-out in the apron sheet and its plate is screwed
-  onto the sheet. The cut-out (`flaps_body`, 3 mm smaller than the plate
-  all round) follows the panel once it is designed.
+  front rail.
 - **Parking brake**, under the bottom bar in the yoke bay, directly below
   the yoke: a thin body (22 mm) under the desk top, two M5 into the bar's
   bottom slot, and the T-handle just in front of the bar. Released, it is
@@ -423,7 +426,7 @@ same S0-S3 bus.
 - **Parking brake**: one switch, on line D of the pedestal port: two wires
   from the pedestal along the bottom bar to the brake under the yoke. A
   *Button* on D36 in the Connector.
-- **Flaps** (DIY, on the apron next to the pedestal): the lever pot on
+- **Flaps** (DIY, on the sheet right of the throttle box): the lever pot on
   line A, the indicator servo (9 g) on pin 7 and the orange pair. Two lines
   are left (e.g. a switch at the flap detents, if the lever gets one).
 - **Throttle quadrant**: its three pots on lines A-C, between the blue
