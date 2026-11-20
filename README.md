@@ -15,6 +15,7 @@ Each cockpit component has its own directory:
 | [`frame/`](frame) | the aluminium frame and panel sheet that everything mounts on |
 | [`hub/`](hub) | the box with the MobiFlight Mega and the Cat5 ports |
 | [`yoke/`](yoke) | the hollow control wheel: PTT, trim rocker, a mux inside |
+| [`radio/`](radio) | the radio stack: two KX155 NAV/COMs (the transponder later), on their own Mega |
 
 The pictures below are rendered from the current `master` by the
 [Build](.github/workflows/build.yml) workflow and published, together with
@@ -249,6 +250,10 @@ flange holes are drilled with the box in place.
   for servos, encoders, pots and a few switches. Only 5 V and GND are the
   same on both, so one cable carries everything a component like the
   pedestal or the flaps needs.
+- The **radio stack** (see [Radio stack](#radio-stack)) does not use the
+  hub: its 8 encoders and 8 displays per pair of radios need more pins
+  than the ports have, so it has a second Mega of its own, on its own USB
+  cable to the powered USB hub.
 
 ### MobiFlight
 
@@ -1396,3 +1401,128 @@ board's holes (`mux_*`, as on the switch panel).
 7. In the MobiFlight Connector, the mux on port 1 (SIG D22) is a
    Multiplexer device; C0 and C3 are buttons for the PTT, C1 and C2 for the
    trim.
+
+# Radio stack
+
+[`radio/`](radio): two KX155 NAV/COM radios (COM1/NAV1 on top, COM2/NAV2
+under it), the transponder later, stacked in one cut-out of the panel
+sheet like the real stack, read and driven by a second Arduino Mega of
+their own.
+
+[![KX155](https://robertbraeutigam.github.io/cessna172/radio/kx155_montage.png)](https://robertbraeutigam.github.io/cessna172/radio/kx155_montage.png)
+
+| File | Parts |
+|------|-------|
+| `radio.inc.scad` | the stack's standard: unit height, face, end flanges and mount holes, the 7 segment digit sizes, lettering |
+| `kx155.scad` | the KX155: body (printed in one piece), front face, outer and inner frequency knob, volume knob, flip-flop button |
+
+## KX155
+
+The face copies the KX155: the four frequency windows along the top (COM
+USE and STBY, NAV USE and STBY, labeled above), and along the bottom, for
+COM and then for NAV, the volume knob, the flip-flop button (USE <->
+STBY) and the dual concentric frequency knob: the big outer knob sets the
+MHz, the small inner one the kHz. Turning a volume knob fully left
+switches that radio off (a pot with a switch).
+
+- **European frequencies**: COM shows 6 digits with three decimals, so
+  the 8.33 kHz channels fit (118.005); NAV shows 5 (108.00).
+- **Digits**: red 0.28" 7 segment LEDs (3 digit modules, two per
+  frequency; NAV leaves the first digit off, behind the face) behind a
+  red acrylic filter in each window. Each frequency has its own MAX7219
+  driver. These digits are 7.5 mm apart, wider than the real ones, so
+  the unit is 224 mm wide instead of the real 159 mm (6.25"). The height
+  (50.8 mm, 2.00") and the layout are the real ones.
+- **Mounting**: the body goes through the sheet's radio cut-out; the face
+  has a 9 mm flange at its left and right ends only, with two M3 screws in
+  each (nuts behind the sheet). There is none at the top and bottom, so
+  the units stack without a gap and the cut-out is as high as the stack.
+- **Inside**: the digits are soldered on two perfboards (COM, NAV),
+  screwed onto bosses on the back of the face plate, pressing the digits
+  against the filters. The encoders and pots are nutted through the face
+  (the nuts sit under the knob skirts). Each flip button presses a 6 x 6
+  mm tactile switch on a small perfboard on two bosses behind it. The four
+  MAX7219s are the cheap 8x8 matrix kit boards with the matrix left off,
+  slid into rails on the floor from the open back and wired to the digit
+  boards with jumpers from their matrix sockets. The cable leaves through
+  the open back, tied onto the tie block.
+- **Knobs**: printed, ribbed like the real ones, pressed on: the outer and
+  volume knobs onto round shafts (crush ribs in the bore), the inner knob
+  onto the D shaft. Print them on their front.
+
+The encoder, pot, tactile switch, digit and driver board sizes are
+MEASURE values in `kx155.scad` (the encoder bushing is a guess). The
+`assert`s check that the knobs, buttons and parts behind the face do not
+collide and that the knobs hold enough of their shafts.
+
+The frame (`frame/`) still has the Saitek radio panel's cut-out; it
+changes to the stack once the transponder is designed.
+
+### Hardware
+
+Per KX155:
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 2 | dual concentric encoder with push switch, 6 mm outer / 3.5 mm D inner shaft (Alps EC11EBB24C03 type) | COM and NAV frequency |
+| 2 | 10 kOhm linear pot with switch, 6 mm shaft | COM and NAV volume, on/off |
+| 2 | tactile switch, 6 x 6 mm, 5 mm high | flip-flop buttons |
+| 8 | 7 segment module, 0.28", 3 digits, common cathode, red (e.g. Lumex LDT-N2804RI) | the four frequencies |
+| 4 | MAX7219 8x8 dot matrix kit board (without the matrix) | digit drivers |
+| 4 | red transparent acrylic, 2 mm, cut to the window plus 1.5 mm all round | display filters |
+| - | perfboard | 2 digit boards, 2 flip switch boards |
+| 4 | M3 x 10 pan head screw + nut | face flanges onto the sheet |
+| 8 | M3 x 8 self tapping screw | boards onto the bosses |
+
+For the stack: 1 Arduino Mega (the radio stack's MobiFlight board) and a
+USB cable to the powered USB hub.
+
+### Wiring
+
+Every unit has its own cable to the stack's Mega (its box and the cable
+type come with the transponder). Per unit, all inputs go to GND when
+active, like everywhere in the cockpit:
+
+| Signal | Wires | MobiFlight device |
+|--------|-------|-------------------|
+| 5 V, GND | 2 | |
+| MAX7219 DIN, CLK, CS | 3 | *LED Module*, 4 modules in the chain |
+| COM encoder outer A, B; inner A, B | 4 | 2 *Encoders* |
+| NAV encoder outer A, B; inner A, B | 4 | 2 *Encoders* |
+| COM and NAV encoder push | 2 | 2 *Buttons* |
+| COM and NAV flip button | 2 | 2 *Buttons* |
+| COM and NAV pot switch | 2 | 2 *Buttons* |
+| COM and NAV pot wiper | 2 | 2 *Analog inputs* (analog Mega pins) |
+
+That is 21 wires, 19 Mega pins per unit; the Mega has room for both units
+and the transponder (it takes 20 encoders and 6 LED Modules). The four
+MAX7219s are chained DOUT to DIN, in the order COM USE, COM STBY, NAV USE,
+NAV STBY. On each digit board, wire digit 0 of a MAX7219 to the leftmost
+digit of its frequency. The pots go between 5 V and GND, the wiper to the
+Mega.
+
+The MAX7219s take their current from the Mega's USB 5 V: keep the
+brightness low in the Connector (the real displays are not bright
+either). If the Mega resets, feed the digits from a separate 5 V supply,
+its GND joined to the Mega's.
+
+### In X-Plane
+
+The Connector configs for COM1/NAV1 (the second unit: `com2`, `nav2`).
+Check the names in DataRefTool, and that the aircraft's radios use 8.33
+kHz spacing:
+
+| Control | Dataref / command |
+|---------|-------------------|
+| COM USE, STBY (6 digits, point after the 3rd) | `sim/cockpit2/radios/actuators/com1_frequency_hz_833`, `com1_standby_frequency_hz_833` (kHz) |
+| NAV USE, STBY (5 digits, point after the 3rd, on the last 5 of the 6) | `sim/cockpit2/radios/actuators/nav1_frequency_hz`, `nav1_standby_frequency_hz` (10 kHz) |
+| COM outer knob | `sim/radios/stby_com1_coarse_up` / `_down` |
+| COM inner knob | `sim/radios/stby_com1_fine_up_833` / `_down_833` |
+| NAV outer knob | `sim/radios/stby_nav1_coarse_up` / `_down` |
+| NAV inner knob | `sim/radios/stby_nav1_fine_up` / `_down` |
+| COM, NAV flip | `sim/radios/com1_standy_flip`, `sim/radios/nav1_standy_flip` |
+| COM, NAV volume | `sim/cockpit2/radios/actuators/audio_volume_com1`, `audio_volume_nav1` |
+| COM, NAV on/off (pot switch) | `sim/cockpit2/radios/actuators/com1_power`, `nav1_power` |
+
+Set the encoder type in the Connector so one detent is one step, and the
+displays blank while the radio's power is off.
