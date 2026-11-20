@@ -15,7 +15,7 @@ Each cockpit component has its own directory:
 | [`frame/`](frame) | the aluminium frame and panel sheet that everything mounts on |
 | [`hub/`](hub) | the box with the MobiFlight Mega and the Cat5 ports |
 | [`yoke/`](yoke) | the hollow control wheel: PTT, trim rocker, a mux inside |
-| [`radio/`](radio) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, on their own Mega (the audio panel on its own Pro Micro) |
+| [`radio/`](radio) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, on their own Mega (the audio panel on its own Nano) |
 
 The pictures below are rendered from the current `master` by the
 [Build](.github/workflows/build.yml) workflow and published, together with
@@ -256,7 +256,7 @@ flange holes are drilled with the box in place.
 - The **hub** (see [Hub](#hub)) holds the Arduino Mega with the MobiFlight
   firmware and 6 RJ45 ports. A powered USB hub next to it takes the USB
   cables (Mega, Saitek yoke, Saitek radio panel, later the
-  FFB yoke, the radio stack's Mega and the audio panel's Pro Micro), so
+  FFB yoke, the radio stack's Mega and the audio panel's Nano), so
   one USB cable runs to the PC.
 - Every MobiFlight component connects to its own hub port with one
   straight Cat5 patch cable, soldered straight to the component (see
@@ -273,7 +273,7 @@ flange holes are drilled with the box in place.
   hub: its encoders, displays and buttons need more pins than the ports
   have, so it has a second Mega of its own, on its own USB cable to the
   powered USB hub. Its audio panel did not fit on that Mega any more and
-  has an Arduino Pro Micro of its own, on a third USB cable.
+  has an Arduino Nano of its own, on a third USB cable.
 
 ### MobiFlight
 
@@ -1428,7 +1428,7 @@ board's holes (`mux_*`, as on the switch panel).
 radios (COM1/NAV1, then COM2/NAV2) and the KT 76C transponder at the
 bottom, stacked in one cut-out of the panel sheet like the real stack.
 The KX155s and the KT 76C are read and driven by a second Arduino Mega of
-their own, the audio panel by its own Arduino Pro Micro (see
+their own, the audio panel by its own Arduino Nano (see
 [KMA 26](#kma-26)). All units are 224 mm wide (`unit_w`, the KX155's
 width), each has its real height: the stack is 33 + 2 x 50.8 + 41.9 =
 176.5 mm high.
@@ -1481,16 +1481,16 @@ maker's logo.
   in rails on the floor like the KX155's driver boards, the logic board.
 - **Its own board**: the KX155s and the KT 76C leave only 5 pins of the
   stack's Mega, and the audio panel needs 20 inputs, 13 lamps and a pot.
-  So it runs MobiFlight on an Arduino Pro Micro on the logic board, with a
+  So it runs MobiFlight on an Arduino Nano on the logic board, with a
   CD74HC4067 mux for 15 of the inputs and two chained 74HC595 shift
   registers for the lamps; its USB cable leaves through the open back,
   tied onto the tie block, to the powered USB hub. The Connector shows it
   as a board of its own.
-- **Size**: 224 x 33 mm (the real 1.30"), 69 mm deep; mounted like the
+- **Size**: 224 x 33 mm (the real 1.30"), 75 mm deep; mounted like the
   KX155s with two M3 screws in each end flange, on top of the stack.
 
-The toggle, pot, rectangular LED and Pro Micro sizes (`tg_*`, `vol_*`,
-`bar_led`, `pm_*`) are MEASURE values (guesses until bought), the rotary
+The toggle, pot, rectangular LED and Nano sizes (`tg_*`, `vol_*`,
+`bar_led`, `nano_*`) are MEASURE values (guesses until bought), the rotary
 switch is the KT 76C's (`rot_*` in `radio.inc.scad`). The `assert`s check
 that the lettering stays off the buttons, knobs, nuts and screws, and that
 the buttons, lamp cells, boards, switches and knobs do not collide.
@@ -1499,7 +1499,7 @@ the buttons, lamp cells, boards, switches and knobs do not collide.
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 1 | Arduino Pro Micro (ATmega32U4, 5 V), female headers, USB cable | MobiFlight board of the audio panel |
+| 1 | Arduino Nano (ATmega328P, 5 V), female headers, USB cable | MobiFlight board of the audio panel |
 | 1 | CD74HC4067 16 channel mux breakout | inputs |
 | 2 | 74HC595 + DIP 16 socket | lamp outputs |
 | 1 | rotary switch, 1 pole 12 way, 6 mm shaft, with stop washer (Lorlin CK type) | MIC selector |
@@ -1530,16 +1530,16 @@ the INTERCOM knob. Into the sheet over the KX155s.
 
 ### Wiring
 
-Everything goes to the Pro Micro on the logic board; switches to GND
+Everything goes to the Nano on the logic board; switches to GND
 when active, like everywhere in the cockpit:
 
-| Signal | Pro Micro pin | MobiFlight device |
+| Signal | Nano pin | MobiFlight device |
 |--------|---------------|-------------------|
-| mux S0..S3 | 2, 3, 4, 5 | *Multiplexer* |
-| mux SIG | 6 | (its data pin) |
-| MIC EMG, C1, C2, C3, PA (the rotary switch's common to GND) | 7, 8, 9, 10, 16 | 5 *Buttons* |
-| 74HC595 DATA, CLOCK, LATCH | 14, 15, A0 | *Shift Register*, 2 chained |
-| INTERCOM pot wiper (pot between 5 V and GND) | A3 | *Analog input* |
+| mux S0..S3 | D2, D3, D4, D5 | *Multiplexer* |
+| mux SIG | D6 | (its data pin) |
+| MIC EMG, C1, C2, C3, PA (the rotary switch's common to GND) | D7, D8, D9, D10, D11 | 5 *Buttons* |
+| 74HC595 DATA, CLOCK, LATCH | D12, D13, A0 | *Shift Register*, 2 chained |
+| INTERCOM pot wiper (pot between 5 V and GND) | A7 (analog only) | *Analog input* |
 
 Mux channels: C0..C9 the buttons COM1, COM2, COM3, NAV1, NAV2, MKR, DME,
 ADF, AUX, MONI; C10 MKR MUTE; C11 HI SENS, C12 TEST; C13 PILOT, C14 ALL
@@ -1549,6 +1549,11 @@ second's Q0..Q4 the bars of AUX and MONI and the lamps O, M, I; Q5..Q7
 are free. Each LED's anode goes through its 1 kOhm resistor to its 595
 output, the cathode to GND. White and blue LEDs are dim on 1 kOhm: go
 down to 470 Ohm, not lower (a 595 gives about 70 mA in all).
+
+D0 and D1 are the Nano's USB serial, A1..A6 are free (A6 and A7 are
+analog only). In the Connector, flash the Nano with the MobiFlight
+firmware like the Megas; Nano clones with the old bootloader may need the
+old bootloader setting to take it.
 
 ### In X-Plane
 

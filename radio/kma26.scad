@@ -30,7 +30,7 @@
 //   board (lamp LEDs, MKR MUTE switch) and the button board (10 switches,
 //   10 LEDs), every LED with its resistor beside it. The radio stack's Mega
 //   has only 5 pins left, so the audio panel has its own MobiFlight board:
-//   an Arduino Pro Micro on the logic board, a perfboard in rails on the
+//   an Arduino Nano on the logic board, a perfboard in rails on the
 //   floor (like the KX155's driver boards) with a CD74HC4067 mux for the
 //   inputs and two 74HC595 shift registers for the 13 lamps. Its USB
 //   cable runs out of the open back to the powered USB hub, tied onto
@@ -43,7 +43,7 @@
 // front side down.
 //
 // Parts to buy:
-// - 1 Arduino Pro Micro (ATmega32U4, 5 V) and its USB cable (pm_*)
+// - 1 Arduino Nano (ATmega328P, 5 V) and its USB cable (nano_*)
 // - 1 CD74HC4067 mux breakout (mux_board), 2 74HC595 + DIP 16 sockets
 // - 1 rotary switch, 1 pole 12 way, 6 mm shaft, with stop washer (rot_*)
 // - 1 pot 10 kOhm linear, 6 mm shaft (vol_*)
@@ -91,15 +91,15 @@ vol_shaft = [6, 15];         // diameter, length from the mounting face
 // --- Rectangular LED for the annunciator bars, MEASURE ---
 bar_led = [5, 2, 7];         // x, z, height over the board
 
-// --- Arduino Pro Micro, MEASURE ---
-pm_board = [18, 33];         // x, y (the USB jack at the back end)
-pm_high = 13;                // over the logic board: female header, board, USB jack
+// --- Arduino Nano, MEASURE ---
+nano_board = [18, 45];       // x, y (the USB jack at the back end)
+nano_high = 14;              // over the logic board: female header, board, USB jack
 
 // --- CD74HC4067 breakout (switchpanel/switches.scad) ---
 mux_board = [41, 18];
 
 // --- Logic board ---
-lg_board = [72, 44];         // perfboard in the rails: x, y
+lg_board = [72, 50];         // perfboard in the rails: x, y
 lg_high = 14;                // the parts on it, above the board
 lg_cx = 131;                 // its middle
 
@@ -332,8 +332,8 @@ assert(rot_bush[1] - plate_t - face_t >= rot_nut[1] + 1, "Rotary switch bushing 
 assert(len(mics) * rot_step <= 360 && len(mics) <= 12, "Too many mic positions for the rotary switch");
 // Logic board
 assert(lg_x >= x_in0 + 0.5 && lg_x + lg_pitch + rail.x <= x_in1 - 0.5, "Logic board does not fit");
-assert(lg_board_z + board_t + max(lg_high, pm_high) <= ap_h - wall - 0.5, "Parts on the logic board hit the top");
-assert(pm_board.x + mux_board.x + 6 <= lg_board.x && pm_board.y + 4 <= lg_board.y, "Pro Micro and mux do not fit the logic board");
+assert(lg_board_z + board_t + max(lg_high, nano_high) <= ap_h - wall - 0.5, "Parts on the logic board hit the top");
+assert(nano_board.x + mux_board.x + 6 <= lg_board.x && nano_board.y + 4 <= lg_board.y, "Nano and mux do not fit the logic board");
 assert(tie_x + tie_block.x <= x_in1 - 0.5 && (tie_x >= lg_x + lg_pitch + rail.x + 1 || tie_x + tie_block.x <= lg_x - 1), "Tie block does not fit beside the rails");
 // Inputs: 10 buttons, MUTE, 2 per toggle on the mux
 assert(len(buttons) + 1 + 4 <= 16, "More inputs than the mux has");
@@ -611,16 +611,16 @@ module boards_part() {
             }
 }
 
-// Logic board: Pro Micro at the back right (USB jack at the back edge),
+// Logic board: Nano at the back right (USB jack at the back edge),
 // mux at the front left, the two shift registers behind it
 module logic_part() {
    translate([lg_board_x0, lg_y0, lg_board_z]) {
       color(c_board) cube([lg_board.x, lg_board.y, board_t]);
       translate([0, 0, board_t]) {
-         translate([lg_board.x - 3 - pm_board.x, lg_board.y - pm_board.y, 0]) {
-            color("#202020") for (dx = [0.5, pm_board.x - 3]) translate([dx, 1, 0]) cube([2.5, pm_board.y - 2, pm_high - 4.6]);
-            color("#1d4fa0") translate([0, 0, pm_high - 4.6]) cube([pm_board.x, pm_board.y, 1.6]);
-            color(c_steel) translate([pm_board.x / 2 - 4, pm_board.y - 5, pm_high - 3]) cube([8, 5.5, 3]);
+         translate([lg_board.x - 3 - nano_board.x, lg_board.y - nano_board.y, 0]) {
+            color("#202020") for (dx = [0.5, nano_board.x - 3]) translate([dx, 1, 0]) cube([2.5, nano_board.y - 2, nano_high - 4.6]);
+            color("#1d4fa0") translate([0, 0, nano_high - 4.6]) cube([nano_board.x, nano_board.y, 1.6]);
+            color(c_steel) translate([nano_board.x / 2 - 4, nano_board.y - 5, nano_high - 3]) cube([8, 5.5, 3]);
          }
          translate([3, 3, 0]) {
             color("#202020") for (dy = [0.5, mux_board.y - 3]) translate([1, dy, 0]) cube([mux_board.x - 2, 2.5, 2.5]);

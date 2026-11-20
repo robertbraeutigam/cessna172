@@ -136,7 +136,7 @@ its own top-level directory; new components should follow the same layout.
   and the KT 76C transponder (top to bottom) stacked without gaps in one
   cut-out of the sheet; the KX155s and KT 76C on a second Mega of their
   own (not the hub: too many encoders and displays), the audio panel on
-  its own Pro Micro (that Mega has 5 pins left).
+  its own Arduino Nano (that Mega has 5 pins left).
   - `radio.inc.scad` — the stack's standard, included by every unit:
     unit width (`unit_w`, the KX155's, which checks it; every unit is as
     wide), the KX155's height (`unit_h`, 2.00"; each unit has its real
@@ -170,10 +170,10 @@ its own top-level directory; new components should follow the same layout.
     a channel in the cap), MIC selector on the KT 76C's rotary switch (5
     positions); the concentric knob pairs are one stepped knob each.
     Marker board and button board on bosses; a logic board in floor rails
-    with an Arduino Pro Micro running MobiFlight, a CD74HC4067 mux
+    with an Arduino Nano running MobiFlight, a CD74HC4067 mux
     (inputs) and two 74HC595 (lamps), USB out the back. `labels` drives
     the face lettering (asserts keep it off everything else). The `tg_*`,
-    `vol_*`, `bar_led`, `pm_*` values are MEASURE (guesses).
+    `vol_*`, `bar_led`, `nano_*` values are MEASURE (guesses).
     The frame still has the Saitek radio panel, but its right part is
     already as high as the whole stack needs (`stack_units_h` in
     `frame/frame.inc.scad`).
