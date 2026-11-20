@@ -1551,9 +1551,14 @@ output, the cathode to GND. White and blue LEDs are dim on 1 kOhm: go
 down to 470 Ohm, not lower (a 595 gives about 70 mA in all).
 
 D0 and D1 are the Nano's USB serial, A1..A6 are free (A6 and A7 are
-analog only). In the Connector, flash the Nano with the MobiFlight
-firmware like the Megas; Nano clones with the old bootloader may need the
-old bootloader setting to take it.
+analog only; the Connector numbers A0..A7 as 14..21). D13 also drives the
+Nano's own LED, which flickers with the shift register clock. In the
+Connector, flash the Nano with the MobiFlight firmware like the Megas (it
+tries both bootloader speeds, so old bootloader clones work too). The
+Nano firmware takes up to 18 buttons, 6 multiplexers, 6 shift registers
+and 8 analog inputs, but has little memory for the configuration: keep
+the device names short (EMG, C1, VOL, LAMPS, MUX); the panel then uses
+about a third of it.
 
 ### In X-Plane
 
