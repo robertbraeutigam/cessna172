@@ -63,16 +63,6 @@ explode = 30;
 // --- Unit ---
 xp_h = 41.9;                 // KT 76C face height, 1.65" (the KT 76A's, which it replaces)
 
-// --- Rotary switch, MEASURE (1 pole 12 way, Lorlin CK type; all guesses) ---
-rot_bush = [9.5, 9];         // threaded bushing (3/8"): diameter, length from the mounting face
-rot_nut = [14, 2.4];         // its nut: across flats, thickness
-rot_body = [26, 16];         // body: diameter, depth behind the mounting face (with the lugs)
-rot_shaft = [6, 18];         // diameter, length from the mounting face
-rot_step = 30;               // degrees per position
-
-// --- 3 mm LED, MEASURE ---
-led = [3, 3.8, 5.3];         // diameter, flange diameter, height over the board
-
 // --- Function selector ---
 modes = ["OFF", "SBY", "TST", "ON", "ALT"];
 mode_a0 = -135;              // OFF, degrees clockwise from up

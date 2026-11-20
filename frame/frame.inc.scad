@@ -103,8 +103,8 @@ radio_depth = 55;            // behind the sheet
 stack_w = 224;               // unit_w
 stack_flange = 9;            // flange_w
 stack_cut_clear = 1;         // sheet_cut_clear
-// unit heights, top to bottom: audio panel (not designed yet, a placeholder:
-// the KMA 26's 1.30"), KX155 (unit_h) twice, KT 76C (xp_h)
+// unit heights, top to bottom: KMA 26 audio panel (ap_h), KX155 (unit_h)
+// twice, KT 76C (xp_h)
 stack_units_h = [33, 50.8, 50.8, 41.9];
 stack_h = stack_units_h[0] + stack_units_h[1] + stack_units_h[2] + stack_units_h[3];
 
