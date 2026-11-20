@@ -15,7 +15,7 @@ Each cockpit component has its own directory:
 | [`frame/`](frame) | the aluminium frame and panel sheet that everything mounts on |
 | [`hub/`](hub) | the box with the MobiFlight Mega and the Cat5 ports |
 | [`yoke/`](yoke) | the hollow control wheel: PTT, trim rocker, a mux inside |
-| [`radio/`](radio) | the radio stack: two KX155 NAV/COMs and the KT 76C transponder, on their own Mega |
+| [`radio/`](radio) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, on their own Mega (the audio panel on its own Pro Micro) |
 
 The pictures below are rendered from the current `master` by the
 [Build](.github/workflows/build.yml) workflow and published, together with
@@ -103,9 +103,8 @@ stack sets it: the throttle box face reaches 80 mm above the desk (it stands on 
 flaps panel's cut-out beside it at 78 mm, then
 20 mm of sheet to the radio panel's cut-out, the radio panel's 84 mm front
 (from about 95 to 179 mm). The right part is already as high as the DIY
-[radio stack](#radio-stack) needs from the same place: an audio panel
-(not designed yet; 33 mm reserved, the KMA 26's 1.30"), the two KX155s and
-the KT 76C, 176.5 mm in all (`stack_units_h`), so its cut-out would end at
+[radio stack](#radio-stack) needs from the same place: the KMA 26 audio
+panel (33 mm, 1.30"), the two KX155s and the KT 76C, 176.5 mm in all (`stack_units_h`), so its cut-out would end at
 about 275 mm; then 20 mm of sheet and the top bar. That is 300 mm uprights
 and the right part's top 320 mm above the desk, checked against
 `sheet_h_r_max` (330 mm): it covers the monitor's bottom right corner,
@@ -257,7 +256,8 @@ flange holes are drilled with the box in place.
 - The **hub** (see [Hub](#hub)) holds the Arduino Mega with the MobiFlight
   firmware and 6 RJ45 ports. A powered USB hub next to it takes the USB
   cables (Mega, Saitek yoke, Saitek radio panel, later the
-  FFB yoke), so one USB cable runs to the PC.
+  FFB yoke, the radio stack's Mega and the audio panel's Pro Micro), so
+  one USB cable runs to the PC.
 - Every MobiFlight component connects to its own hub port with one
   straight Cat5 patch cable, soldered straight to the component (see
   [Cables](#cables)): everything inside a component is soldered, the plug
@@ -272,7 +272,8 @@ flange holes are drilled with the box in place.
 - The **radio stack** (see [Radio stack](#radio-stack)) does not use the
   hub: its encoders, displays and buttons need more pins than the ports
   have, so it has a second Mega of its own, on its own USB cable to the
-  powered USB hub.
+  powered USB hub. Its audio panel did not fit on that Mega any more and
+  has an Arduino Pro Micro of its own, on a third USB cable.
 
 ### MobiFlight
 
@@ -1423,12 +1424,16 @@ board's holes (`mux_*`, as on the switch panel).
 
 # Radio stack
 
-[`radio/`](radio): two KX155 NAV/COM radios (COM1/NAV1 on top, COM2/NAV2
-under it) and the KT 76C transponder at the bottom, stacked in one
-cut-out of the panel sheet like the real stack, read and driven by a
-second Arduino Mega of their own. All units are 224 mm wide (`unit_w`,
-the KX155's width), each has its real height: the stack is 2 x 50.8 +
-41.9 = 143.5 mm high.
+[`radio/`](radio): the KMA 26 audio panel at the top, two KX155 NAV/COM
+radios (COM1/NAV1, then COM2/NAV2) and the KT 76C transponder at the
+bottom, stacked in one cut-out of the panel sheet like the real stack.
+The KX155s and the KT 76C are read and driven by a second Arduino Mega of
+their own, the audio panel by its own Arduino Pro Micro (see
+[KMA 26](#kma-26)). All units are 224 mm wide (`unit_w`, the KX155's
+width), each has its real height: the stack is 33 + 2 x 50.8 + 41.9 =
+176.5 mm high.
+
+[![KMA 26](https://robertbraeutigam.github.io/cessna172/radio/kma26_montage.png)](https://robertbraeutigam.github.io/cessna172/radio/kma26_montage.png)
 
 [![KX155](https://robertbraeutigam.github.io/cessna172/radio/kx155_montage.png)](https://robertbraeutigam.github.io/cessna172/radio/kx155_montage.png)
 
@@ -1436,9 +1441,134 @@ the KX155's width), each has its real height: the stack is 2 x 50.8 +
 
 | File | Parts |
 |------|-------|
-| `radio.inc.scad` | the stack's standard: unit width, KX155 height, face, end flanges and mount holes, the 7 segment digit sizes, lettering; the parts both units use (tactile switch, MAX7219 board, bosses, knob shapes) |
+| `radio.inc.scad` | the stack's standard: unit width, KX155 height, face, end flanges and mount holes, the 7 segment digit sizes, lettering; the parts the units share (tactile switch, MAX7219 board, rotary switch, 3 mm LED, bosses, knob shapes) |
+| `kma26.scad` | the KMA 26: body (printed in one piece), front face, the 10 button caps (one print), MKR MUTE cap, marker lamp lenses, volume and mic knobs |
 | `kx155.scad` | the KX155: body (printed in one piece), front face, outer and inner frequency knob, volume knob, flip-flop button |
 | `kt76c.scad` | the KT 76C: body (printed in one piece), front face, display mask, the 11 button caps (one print), function selector knob |
+
+## KMA 26
+
+The face copies the KMA 26, spread out to the stack's width: at the left
+the marker beacon lamps O (blue), M (amber) and I (white), the photocell
+(a dummy hole) and the MKR MUTE button; the marker sensitivity toggle
+(HI SENS, LO SENS, TEST) and the intercom toggle (PILOT, CREW, ALL); the
+INTERCOM knob; the 10 audio select buttons COM1 COM2 COM3 NAV1 NAV2 / MKR
+DME ADF AUX MONI, each with its annunciator bar; at the right the MIC
+selector (EMG, C1, C2, C3, PA). The model name is lettered, not the
+maker's logo.
+
+- **Buttons**: printed gray caps (labels engraved, filled with white
+  paint) through the face, held behind the plate by their flange; a post
+  presses a 6 x 6 mm tactile switch. The annunciator bar is a slot through
+  the cap: a 2 x 5 mm rectangular LED on the board reaches into a channel
+  in the cap's back and lights it, so the bar shows which audio is on.
+- **Marker lamps**: printed lenses in natural (translucent) filament, the
+  letter engraved into their front (fill it with black paint; tint the
+  lens with glass paint if you like). Their ears sit in a pocket in the
+  plate front, clamped by the face, 1 mm behind the face front like a
+  bezel. Behind each is a 3 mm LED of its color in its own cell.
+- **Knobs**: the real ones are dual concentric (VOL and CREW/PASS; the mic
+  selector and PUSH SPKR). X-Plane has no use for the second knob, so
+  each is one printed stepped knob shaped like the pair: the INTERCOM knob
+  on a 10 kOhm pot (the radio volume), the MIC knob on the KT 76C's 1 pole
+  12 way rotary switch, set to 5 positions, every position on its own pin.
+- **Toggles**: mini toggle switches with a 6 mm bushing, nutted onto the
+  face: ON-OFF-(ON) for HI/LO/TEST (TEST springs back), ON-OFF-ON for
+  PILOT/CREW/ALL. The middle position is the one with no contact.
+- **Inside**: two front perfboards on bosses on the plate back: the
+  marker board (the lamp LEDs, the MUTE switch) and the button board (10
+  switches, 10 LEDs), each LED with its resistor beside it. Behind them,
+  in rails on the floor like the KX155's driver boards, the logic board.
+- **Its own board**: the KX155s and the KT 76C leave only 5 pins of the
+  stack's Mega, and the audio panel needs 20 inputs, 13 lamps and a pot.
+  So it runs MobiFlight on an Arduino Pro Micro on the logic board, with a
+  CD74HC4067 mux for 15 of the inputs and two chained 74HC595 shift
+  registers for the lamps; its USB cable leaves through the open back,
+  tied onto the tie block, to the powered USB hub. The Connector shows it
+  as a board of its own.
+- **Size**: 224 x 33 mm (the real 1.30"), 69 mm deep; mounted like the
+  KX155s with two M3 screws in each end flange, on top of the stack.
+
+The toggle, pot, rectangular LED and Pro Micro sizes (`tg_*`, `vol_*`,
+`bar_led`, `pm_*`) are MEASURE values (guesses until bought), the rotary
+switch is the KT 76C's (`rot_*` in `radio.inc.scad`). The `assert`s check
+that the lettering stays off the buttons, knobs, nuts and screws, and that
+the buttons, lamp cells, boards, switches and knobs do not collide.
+
+### Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 1 | Arduino Pro Micro (ATmega32U4, 5 V), female headers, USB cable | MobiFlight board of the audio panel |
+| 1 | CD74HC4067 16 channel mux breakout | inputs |
+| 2 | 74HC595 + DIP 16 socket | lamp outputs |
+| 1 | rotary switch, 1 pole 12 way, 6 mm shaft, with stop washer (Lorlin CK type) | MIC selector |
+| 1 | pot 10 kOhm linear, 6 mm shaft | INTERCOM volume |
+| 1 | mini toggle switch ON-OFF-(ON), 6 mm bushing | HI SENS / LO SENS / TEST |
+| 1 | mini toggle switch ON-OFF-ON, 6 mm bushing | PILOT / CREW / ALL |
+| 11 | tactile switch, 6 x 6 mm, 5 mm high | 10 buttons, MKR MUTE |
+| 10 | rectangular LED 2 x 5 mm, white | annunciator bars |
+| 3 | LED 3 mm: blue, amber, white | marker lamps O, M, I |
+| 13 | resistor 1 kOhm | one per LED |
+| - | perfboard | marker board, button board, logic board |
+| 4 | M3 x 10 pan head screw + nut | face flanges onto the sheet |
+| 4 | M3 x 8 self tapping screw | front boards onto the bosses |
+
+Print the caps in gray, the MUTE cap in white, the lenses in natural
+filament front side down, the knobs on their front.
+
+### Assembly
+
+Lenses into their pockets in the plate front, then the face on (it
+clamps them). Button caps and the MUTE cap in from the back. Solder the
+switches, LEDs (standing on the board) and resistors onto the front
+boards and screw them onto their bosses. Toggles, pot and rotary switch
+through plate and face from the back, nuts on the front. Logic board into
+its rails, wiring, USB cable tied onto the tie block. Turn the rotary
+switch fully left (EMG) and press the MIC knob on pointing at EMG, then
+the INTERCOM knob. Into the sheet over the KX155s.
+
+### Wiring
+
+Everything goes to the Pro Micro on the logic board; switches to GND
+when active, like everywhere in the cockpit:
+
+| Signal | Pro Micro pin | MobiFlight device |
+|--------|---------------|-------------------|
+| mux S0..S3 | 2, 3, 4, 5 | *Multiplexer* |
+| mux SIG | 6 | (its data pin) |
+| MIC EMG, C1, C2, C3, PA (the rotary switch's common to GND) | 7, 8, 9, 10, 16 | 5 *Buttons* |
+| 74HC595 DATA, CLOCK, LATCH | 14, 15, A0 | *Shift Register*, 2 chained |
+| INTERCOM pot wiper (pot between 5 V and GND) | A3 | *Analog input* |
+
+Mux channels: C0..C9 the buttons COM1, COM2, COM3, NAV1, NAV2, MKR, DME,
+ADF, AUX, MONI; C10 MKR MUTE; C11 HI SENS, C12 TEST; C13 PILOT, C14 ALL
+(LO SENS and CREW are the middle positions, no contact); C15 free. Shift
+register outputs: the first chip's Q0..Q7 are the bars of COM1..ADF, the
+second's Q0..Q4 the bars of AUX and MONI and the lamps O, M, I; Q5..Q7
+are free. Each LED's anode goes through its 1 kOhm resistor to its 595
+output, the cathode to GND. White and blue LEDs are dim on 1 kOhm: go
+down to 470 Ohm, not lower (a 595 gives about 70 mA in all).
+
+### In X-Plane
+
+Check the names in DataRefTool; the audio panel datarefs are among
+`sim/cockpit2/radios/actuators/`:
+
+| Control | Dataref / command |
+|---------|-------------------|
+| COM1, COM2, NAV1, NAV2, ADF, DME, MKR buttons | `sim/audio_panel/monitor_audio_com1`, `_com2`, `_nav1`, `_nav2`, `_adf1`, `_dme`, `_mkr` (toggle) |
+| Their bars | `audio_selection_com1`, `_com2`, `_nav1`, `_nav2`, `_adf1`, `audio_dme_enabled`, `audio_marker_enabled` |
+| MIC EMG, C1 / C2 | `audio_com_selection` = 6 (COM1) / 7 (COM2); EMG is COM1 like in the real one |
+| Lamps O, M, I | `sim/cockpit2/radios/indicators/outer_marker_lit`, `middle_marker_lit`, `inner_marker_lit`, or the TEST input pressed |
+| HI / LO SENS | X-Plane's marker sensitivity, if your version has it |
+| INTERCOM VOL | `sim/operation/sound/radio_volume_ratio`, transform `$/1023` |
+| COM3, AUX, MONI, MKR MUTE, PILOT/CREW/ALL, C3, PA | nothing in the 172; COM3, AUX and MONI can toggle a MobiFlight variable that lights their bar |
+
+For TEST, the button sets a MobiFlight variable while it is held, and
+each lamp's output shows the lit dataref or that variable (a config
+reference). Blank the bars and lamps while the avionics are off
+(`sim/cockpit2/switches/avionics_power_on`, a precondition).
 
 ## KX155
 
@@ -1480,7 +1610,7 @@ MEASURE values in `kx155.scad` (the encoder bushing is a guess). The
 collide and that the knobs hold enough of their shafts.
 
 The frame (`frame/`) still has the Saitek radio panel's cut-out, but its
-right part is already as high as the stack with an audio panel on top
+right part is already as high as the stack with the audio panel on top
 needs (`stack_units_h`); when the stack replaces the Saitek panel, the
 right sheet is cut again (the Saitek's cut-out is wider than the stack's
 faces).
@@ -1523,7 +1653,8 @@ unit, all inputs go to GND when active, like everywhere in the cockpit:
 
 That is 21 wires, 19 Mega pins per unit. With the KT 76C's 25 (see its
 Wiring section) the stack takes 63 of the Mega's 68 free
-pins (54 digital and 16 analog, without 0 and 1, the USB serial). The four
+pins (54 digital and 16 analog, without 0 and 1, the USB serial); the
+KMA 26 has its own board. The four
 MAX7219s are chained DOUT to DIN, in the order COM USE, COM STBY, NAV USE,
 NAV STBY. On each digit board, wire digit 0 of a MAX7219 to the leftmost
 digit of its frequency. The pots go between 5 V and GND, the wiper to the

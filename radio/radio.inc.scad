@@ -1,7 +1,8 @@
 // Radio stack basics, shared by the units of the radio stack
 //
-// The stack is two KX155 NAV/COM units (kx155.scad) and the KT 76C
-// transponder (kt76c.scad), stacked without gaps like in the real panel.
+// The stack is the KMA 26 audio panel (kma26.scad), two KX155 NAV/COM
+// units (kx155.scad) and the KT 76C transponder (kt76c.scad), top to
+// bottom, stacked without gaps like in the real panel.
 // All units are unit_w wide, as wide as the KX155 has to be for its 7
 // segment digits; each has its real height. They go through
 // one cut-out in the cockpit sheet (frame/). Each unit's face has a flange on
@@ -41,6 +42,17 @@ board_t = 1.6;               // perfboard
 tact = [6, 3.5, 1.5];        // tactile switch 6 x 6: body square, body height, button above the body
 drv_board = [32, 32];        // MAX7219 8x8 matrix kit board: x, y (lying on the floor)
 drv_high = 14;               // the parts on it, above the board
+
+// --- Rotary switch, MEASURE (1 pole 12 way, Lorlin CK type; all guesses) ---
+// KT 76C function selector, KMA 26 mic selector
+rot_bush = [9.5, 9];         // threaded bushing (3/8"): diameter, length from the mounting face
+rot_nut = [14, 2.4];         // its nut: across flats, thickness
+rot_body = [26, 16];         // body: diameter, depth behind the mounting face (with the lugs)
+rot_shaft = [6, 18];         // diameter, length from the mounting face
+rot_step = 30;               // degrees per position
+
+// --- 3 mm LED, MEASURE ---
+led = [3, 3.8, 5.3];         // diameter, flange diameter, height over the board
 
 // --- Printing ---
 fit = 0.3;

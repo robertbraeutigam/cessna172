@@ -132,9 +132,11 @@ its own top-level directory; new components should follow the same layout.
   standoffs in the hub (C0..C3, hub port 1) and a cable tie block. Only
   the wheel and the tube end, not the base the tube goes into.
 
-- `radio/` — the radio stack: two KX155 NAV/COMs and the KT 76C
-  transponder stacked without gaps in one cut-out of the sheet, on a
-  second Mega of their own (not the hub: too many encoders and displays).
+- `radio/` — the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs
+  and the KT 76C transponder (top to bottom) stacked without gaps in one
+  cut-out of the sheet; the KX155s and KT 76C on a second Mega of their
+  own (not the hub: too many encoders and displays), the audio panel on
+  its own Pro Micro (that Mega has 5 pins left).
   - `radio.inc.scad` — the stack's standard, included by every unit:
     unit width (`unit_w`, the KX155's, which checks it; every unit is as
     wide), the KX155's height (`unit_h`, 2.00"; each unit has its real
@@ -142,7 +144,7 @@ its own top-level directory; new components should follow the same layout.
     and plate, flanges on the left and right ends only with two M3 mount
     holes each, the 7 segment digit sizes (`dig_*`, MEASURE), and the
     parts and shapes the units share (tactile switch, MAX7219 board,
-    bosses, knob body, crush bore, 7 segment drawing). Installed
+    rotary switch `rot_*`, 3 mm LED `led`, bosses, knob body, crush bore, 7 segment drawing). Installed
     coordinates (x right, y back, z up).
   - `kx155.scad` — the KX155: COM USE/STBY with 6 digits (8.33 kHz,
     three decimals), NAV with 5, red 0.28" digits (two 3 digit modules per
@@ -160,9 +162,21 @@ its own top-level directory; new components should follow the same layout.
     caps on tactile switches), function selector on a 12 way rotary switch
     limited to 5 positions. One L shaped front board carries the digits,
     LEDs and switches. The `rot_*` values are MEASURE (guesses).
+  - `kma26.scad` — the KMA 26 audio panel, 1.30" high (`ap_h`): marker
+    lamps O, M, I (printed lenses, a 3 mm LED in a cell each), MKR MUTE,
+    two mini toggles (HI SENS/LO SENS/TEST, PILOT/CREW/ALL), INTERCOM
+    volume pot, 10 audio select buttons in two rows (printed caps on
+    tactile switches, the annunciator bar a slot lit by a 2 x 5 mm LED in
+    a channel in the cap), MIC selector on the KT 76C's rotary switch (5
+    positions); the concentric knob pairs are one stepped knob each.
+    Marker board and button board on bosses; a logic board in floor rails
+    with an Arduino Pro Micro running MobiFlight, a CD74HC4067 mux
+    (inputs) and two 74HC595 (lamps), USB out the back. `labels` drives
+    the face lettering (asserts keep it off everything else). The `tg_*`,
+    `vol_*`, `bar_led`, `pm_*` values are MEASURE (guesses).
     The frame still has the Saitek radio panel, but its right part is
-    already as high as the stack with an audio panel (not designed yet,
-    33 mm reserved) needs (`stack_units_h` in `frame/frame.inc.scad`).
+    already as high as the whole stack needs (`stack_units_h` in
+    `frame/frame.inc.scad`).
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheet over it, all 2020 profile. `frame.inc.scad` holds the
