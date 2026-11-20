@@ -1,8 +1,9 @@
 // Radio stack basics, shared by the units of the radio stack
 //
-// The stack is two KX155 NAV/COM units (kx155.scad) and, later, the
-// transponder, stacked without gaps like in the real panel. All units are
-// as wide as the KX155 has to be for its 7 segment digits, and they go through
+// The stack is two KX155 NAV/COM units (kx155.scad) and the KT 76C
+// transponder (kt76c.scad), stacked without gaps like in the real panel.
+// All units are unit_w wide, as wide as the KX155 has to be for its 7
+// segment digits; each has its real height. They go through
 // one cut-out in the cockpit sheet (frame/). Each unit's face has a flange on
 // its left and right ends only (none at the top and bottom, where the units
 // meet), with two M3 screws in each flange onto the sheet, nuts behind it.
@@ -12,9 +13,11 @@
 // the panel), z up. A unit's face plate starts at y=0 (its front) and is
 // plate_t thick, the separate thin front face is in front of it (y from
 // -face_t to 0), the body goes back from it. x goes from 0 (the face's left
-// end) to the unit's width, z from 0 (its bottom) to unit_h.
+// end) to unit_w, z from 0 (its bottom) to the unit's height (unit_h for
+// the KX155).
 
 // --- Unit ---
+unit_w = 224;                // every unit, the KX155's width (kx155.scad checks it)
 unit_h = 50.8;               // KX155 face height, 2.00"
 plate_t = 2;                 // printed plate behind the face
 face_t = 1;                  // separate front face, printed front side up
@@ -33,6 +36,23 @@ dig_mod = [22.5, 6.1, 10];   // module: width (x), depth (y, without pins), heig
 dig_char_h = 7;              // lit digit height (0.28")
 filter_t = 2;                // red transparent acrylic behind the windows
 board_t = 1.6;               // perfboard
+
+// --- Parts the units share, MEASURE ---
+tact = [6, 3.5, 1.5];        // tactile switch 6 x 6: body square, body height, button above the body
+drv_board = [32, 32];        // MAX7219 8x8 matrix kit board: x, y (lying on the floor)
+drv_high = 14;               // the parts on it, above the board
+
+// --- Printing ---
+fit = 0.3;
+pilot_d = 2.8;               // M3 self tapping
+boss_d = 5.6;
+rail = [3, 5, 1];            // driver board rails: width, height, groove depth
+drv_over = 1;                // driver board edge in the groove
+tie_block = [10, 6, 6];      // x, y, z
+rib_w = 0.8;                 // knob ribs
+rib_depth = 0.6;
+bore_play = 0.15;            // D bore
+crush = [0.3, 0.45];         // round bores: oversize, crush ribs reaching this far in
 
 // --- Lettering, standing out of the face for a white paint pen ---
 label_raise = 0.6;
@@ -56,14 +76,23 @@ assert(mount_inset + mount_nut_r + 0.3 <= flange_w - sheet_cut_clear,
 assert(mount_d / 2 + 1.2 <= mount_inset, "Mount holes too close to the face edge");
 assert(abs(dig_mod.x - dig_n * dig_pitch) < 0.5, "Digit modules do not butt into an even row");
 
-// Mount holes of a unit w wide: [x, z], two in each end flange
-function unit_holes(w) =
-   [for (x = [mount_inset, w - mount_inset], z = [mount_inset, unit_h - mount_inset]) [x, z]];
+// Mount holes of a unit w wide and h high: [x, z], two in each end flange
+function unit_holes(w, h = unit_h) =
+   [for (x = [mount_inset, w - mount_inset], z = [mount_inset, h - mount_inset]) [x, z]];
+
+// Nut across the flats -> across the corners
+function corners(af) = af / cos(30);
 
 // Face outline in x/z
-module unit_face_2d(w) {
+module unit_face_2d(w, h = unit_h) {
    offset(r = corner_r) offset(delta = -corner_r)
-      square([w, unit_h]);
+      square([w, h]);
+}
+
+module mount_holes_2d(w, h = unit_h) {
+   for (p = unit_holes(w, h))
+      translate(p)
+         circle(d = mount_d, $fn = 24);
 }
 
 // Extrudes a 2D shape in x/z (z as the 2D y) from y0 to y0 + t
@@ -81,4 +110,100 @@ module mount_screw(len) {
          translate([0, 0, -1.8]) cylinder(d = 5.6, h = 1.8, $fn = 24);
          cylinder(d = 3, h = len, $fn = 16);
       }
+}
+
+// Boss on the plate back, up to y1, with a pilot hole
+module boss(x, z, y1) {
+   translate([x, plate_t - 0.01, z])
+      rotate([-90, 0, 0])
+         difference() {
+            cylinder(d = boss_d, h = y1 - plate_t + 0.01, $fn = 32);
+            translate([0, 0, 2])
+               cylinder(d = pilot_d, h = y1, $fn = 24);
+         }
+}
+
+// Version, engraved into the back of the plate at x, z (on a flange)
+module gitrev_cut(x, z) {
+   translate([x, plate_t + 0.01, z])
+      rotate([90, 0, 0])
+         linear_extrude(gitrev_depth + 0.01)
+            mirror([1, 0])
+               rotate([0, 0, 90])
+                  text("{{gitrev}}", size = 3, halign = "center", valign = "center");
+}
+
+// Ribbed round knob body along +z, back at z=0, front chamfered
+module knob_body(d, len, ribs, skirt = [0, 0], ch = 1) {
+   difference() {
+      rotate_extrude($fn = 96)
+         polygon(concat(
+            skirt[0] > 0 ? [[0, 0], [skirt[0] / 2, 0], [skirt[0] / 2, skirt[1]], [d / 2, skirt[1] + (skirt[0] - d) / 2]]
+                         : [[0, 0], [d / 2, 0]],
+            [[d / 2, len - ch], [d / 2 - ch, len], [0, len]]));
+      for (i = [0 : ribs - 1])
+         rotate([0, 0, i * 360 / ribs])
+            translate([d / 2, 0, skirt[1] + (skirt[0] > 0 ? (skirt[0] - d) / 2 : 0) + 0.5])
+               rotate([0, 0, 45])
+                  cube([rib_w, rib_w, len], center = false);
+   }
+}
+
+// Round bore with three crush ribs, from z=z0, depth long
+module crush_bore(d, z0, depth) {
+   translate([0, 0, z0])
+      difference() {
+         cylinder(d = d + crush[0], h = depth, $fn = 48);
+         for (a = [0, 120, 240])
+            rotate([0, 0, a])
+               translate([d / 2 - crush[1] / 2 + crush[0] / 2, -0.4, -1])
+                  cube([crush[1] + 1, 0.8, depth + 2]);
+      }
+}
+
+// Recesses in a knob's back for the nut and the bushing
+module recesses(nut, bush) {
+   translate([0, 0, -1]) cylinder(d = nut[0], h = nut[1] + 1, $fn = 6);
+   translate([0, 0, -1]) cylinder(d = bush[0], h = bush[1] + 1, $fn = 48);
+}
+
+// --- View-only parts ---
+
+// One 7 segment digit, c is "0".."9" or " ", dp: the point after it
+seg_on = ["abcdef", "bc", "abdeg", "abcdg", "bcfg", "acdfg", "acdefg", "abc", "abcdefg", "abcdfg"];
+module digit_2d(c, dp = false) {
+   w = 3.8; h = dig_char_h; t = 0.9;
+   segs = c == " " ? "" : seg_on[ord(c) - ord("0")];
+   rects = [["a", [-w / 2, h / 2 - t, w, t]], ["d", [-w / 2, -h / 2, w, t]], ["g", [-w / 2, -t / 2, w, t]],
+            ["f", [-w / 2, 0.2, t, h / 2 - 0.2]], ["e", [-w / 2, -h / 2, t, h / 2 - 0.2]],
+            ["b", [w / 2 - t, 0.2, t, h / 2 - 0.2]], ["c", [w / 2 - t, -h / 2, t, h / 2 - 0.2]]];
+   multmatrix([[1, 0.1, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]]) {
+      for (r = rects)
+         if (len([for (k = segs) if (k == r[0]) 1]) > 0)
+            translate([r[1][0], r[1][1]]) square([r[1][2], r[1][3]]);
+      if (dp)
+         translate([w / 2 + 1, -h / 2 + 0.45]) circle(d = 0.9, $fn = 12);
+   }
+}
+
+// A 3 digit module's body, front at y=0, left end at x=0, centered on z=0
+module digit_module_part() {
+   color(c_part)
+      translate([0.1, 0, -dig_mod.z / 2])
+         cube([dig_mod.x - 0.2, dig_mod.y, dig_mod.z]);
+}
+
+// MAX7219 kit board without the matrix, board's bottom left front corner at 0
+module driver_board_part() {
+   color("#c23b30") cube([drv_board.x, drv_board.y, board_t]);
+   color(c_part) translate([drv_board.x / 2 - 7.6, 4, board_t]) cube([15.2, 31.8 - 8, 4]);
+   color("#202020")
+      for (dx = [3, drv_board.x - 5.5])
+         translate([dx, 4, board_t]) cube([2.5, 20.3, 8.5]);
+}
+
+// Tactile switch, the button's top at y=0, pressed along +y, centered on x/z
+module tact_part() {
+   color(c_part) translate([-tact.x / 2, tact.z, -tact.x / 2]) cube([tact.x, tact.y, tact.x]);
+   color("#3a3a3a") rotate([-90, 0, 0]) cylinder(d = 3.5, h = tact.z + 0.1, $fn = 24);
 }

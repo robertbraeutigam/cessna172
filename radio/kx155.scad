@@ -72,12 +72,7 @@ pot_nut = [10, 2];
 pot_body = [17, 16];         // diameter, depth behind the mounting face (with the switch)
 pot_shaft = [6, 15];         // diameter, length from the mounting face
 
-// --- Tactile switch, MEASURE (6 x 6, 5 mm high) ---
-tact = [6, 3.5, 1.5];        // body square, body height, button above the body
-
-// --- MAX7219 kit board, MEASURE ---
-drv_board = [32, 32];        // x, y (lying on the floor)
-drv_high = 14;               // the parts on it, above the board
+// --- MAX7219 kit boards (radio.inc.scad) ---
 drv_n = 4;
 
 // --- Display layout ---
@@ -93,7 +88,6 @@ win_h = 12;
 win_margin = 1.5;            // window beyond the shown digits
 filter_over = 1.5;           // filter beyond the window
 lip_w = 1;                   // frame around the filters
-fit = 0.3;
 
 // --- Bottom row ---
 row_z = 15.5;                // knobs
@@ -114,10 +108,6 @@ v_d = 12.5;                  // volume knob
 v_skirt = [14.5, 1.5];
 v_front = 1.5;
 v_ribs = 20;
-rib_w = 0.8;
-rib_depth = 0.6;
-bore_play = 0.15;            // D bore
-crush = [0.3, 0.45];         // round bores: oversize, crush ribs reaching this far in
 
 // --- Flip buttons ---
 flip_btn = [8, 4.5];         // x, z, at the face
@@ -129,11 +119,6 @@ flip_boss_dx = 9;
 
 // --- Body ---
 drv_y0 = 22;                 // driver boards from here back
-rail = [3, 5, 1];            // rails: width, height, groove depth
-drv_over = 1;                // driver board edge in the groove
-pilot_d = 2.8;               // M3 self tapping
-boss_d = 5.6;
-tie_block = [10, 6, 6];      // x, y, z
 
 // --- Calculated ---
 gw = dig_mods * dig_mod.x;
@@ -141,7 +126,6 @@ x_in0 = flange_w + wall;
 gx0 = x_in0 + dsp_margin;
 gx = [gx0, gx0 + gw + gap_use, gx0 + 2 * gw + gap_use + gap_half, gx0 + 3 * gw + 2 * gap_use + gap_half];
 x_in1 = gx[3] + gw + dsp_margin;
-unit_w = x_in1 + wall + flange_w;
 function hidden(i) = dig_mods * dig_n - groups[i][1];
 function vx(i) = gx[i] + hidden(i) * dig_pitch;
 function vw(i) = groups[i][1] * dig_pitch;
@@ -180,7 +164,6 @@ v_tip = pot_shaft[1] - plate_t;
 v_back = s_face + knob_gap;
 v_bore = v_tip - v_back;
 v_len = v_bore + v_front;
-function corners(af) = af / cos(30);
 o_nut_recess = [corners(enc_nut[0]) + 1, s_face + enc_nut[1] + nut_clear - o_back];
 o_bush_recess = [enc_bush[0] + 0.6, enc_bush[1] - plate_t + nut_clear - o_back];
 v_nut_recess = [corners(pot_nut[0]) + 0.9, s_face + pot_nut[1] + nut_clear - v_back];
@@ -198,6 +181,7 @@ unit_d = drv_y0 + drv_board.y + 4;
 bed = [255, 255];
 
 // --- Checks ---
+assert(abs(x_in1 + wall + flange_w - unit_w) < 0.01, "The KX155's layout is not unit_w wide, change unit_w in radio.inc.scad");
 assert(unit_w <= bed.x && unit_d <= bed.y, "Body does not fit the bed");
 assert(row_z + o_skirt[0] / 2 + 1 <= dig_z - win_h / 2, "Frequency knobs run into the windows");
 assert(row_z - o_skirt[0] / 2 >= 1.5, "Frequency knobs run off the face's bottom");
@@ -258,12 +242,6 @@ module bush_holes_2d(grow) {
             circle(d = (r[0] == k_freq ? enc_bush[0] : pot_bush[0]) + grow);
 }
 
-module mount_holes_2d() {
-   for (p = unit_holes(unit_w))
-      translate(p)
-         circle(d = mount_d, $fn = 24);
-}
-
 module labels_2d() {
    for (i = [0 : 3])
       translate([vx(i) + vw(i) / 2, dig_z + win_h / 2 + 1.3])
@@ -320,7 +298,7 @@ module unit_body() {
          union() {
             bush_holes_2d(0.4);
             flip_slots_2d(flip_play);
-            mount_holes_2d();
+            mount_holes_2d(unit_w);
          }
       // Grooves in the rails for the driver board edges
       for (i = [0 : drv_n])
@@ -330,24 +308,8 @@ module unit_body() {
       translate([x_in1 - tie_block.x - 5, unit_d - tie_block.y / 2 - 2, wall + 1.5])
          cube([tie_block.x + 2, 4, 2]);
       // Version on the back of the right flange
-      translate([unit_w - flange_w / 2, plate_t + 0.01, unit_h / 2])
-         rotate([90, 0, 0])
-            linear_extrude(gitrev_depth + 0.01)
-               mirror([1, 0])
-                  rotate([0, 0, 90])
-                     text("{{gitrev}}", size = 3, halign = "center", valign = "center");
+      gitrev_cut(unit_w - flange_w / 2, unit_h / 2);
    }
-}
-
-// Boss on the plate back, up to y1, with a pilot hole
-module boss(x, z, y1) {
-   translate([x, plate_t - 0.01, z])
-      rotate([-90, 0, 0])
-         difference() {
-            cylinder(d = boss_d, h = y1 - plate_t + 0.01, $fn = 32);
-            translate([0, 0, 2])
-               cylinder(d = pilot_d, h = y1, $fn = 24);
-         }
 }
 
 // The front face with the lettering standing out of it
@@ -360,42 +322,8 @@ module face() {
          windows_2d();
          bush_holes_2d(0.4);
          flip_slots_2d(flip_play);
-         mount_holes_2d();
+         mount_holes_2d(unit_w);
       }
-}
-
-// Ribbed round knob body along +z, back at z=0, front chamfered
-module knob_body(d, len, ribs, skirt = [0, 0], ch = 1) {
-   difference() {
-      rotate_extrude($fn = 96)
-         polygon(concat(
-            skirt[0] > 0 ? [[0, 0], [skirt[0] / 2, 0], [skirt[0] / 2, skirt[1]], [d / 2, skirt[1] + (skirt[0] - d) / 2]]
-                         : [[0, 0], [d / 2, 0]],
-            [[d / 2, len - ch], [d / 2 - ch, len], [0, len]]));
-      for (i = [0 : ribs - 1])
-         rotate([0, 0, i * 360 / ribs])
-            translate([d / 2, 0, skirt[1] + (skirt[0] > 0 ? (skirt[0] - d) / 2 : 0) + 0.5])
-               rotate([0, 0, 45])
-                  cube([rib_w, rib_w, len], center = false);
-   }
-}
-
-// Round bore with three crush ribs, from z=z0, depth long
-module crush_bore(d, z0, depth) {
-   translate([0, 0, z0])
-      difference() {
-         cylinder(d = d + crush[0], h = depth, $fn = 48);
-         for (a = [0, 120, 240])
-            rotate([0, 0, a])
-               translate([d / 2 - crush[1] / 2 + crush[0] / 2, -0.4, -1])
-                  cube([crush[1] + 1, 0.8, depth + 2]);
-      }
-}
-
-// Recesses in a knob's back for the nut and the bushing
-module recesses(nut, bush) {
-   translate([0, 0, -1]) cylinder(d = nut[0], h = nut[1] + 1, $fn = 6);
-   translate([0, 0, -1]) cylinder(d = bush[0], h = bush[1] + 1, $fn = 48);
 }
 
 module knob_outer() {
@@ -451,23 +379,6 @@ module arrows_2d() {
 
 // --- View-only parts ---
 
-// One 7 segment digit, c is "0".."9" or " ", dp: the point after it
-seg_on = ["abcdef", "bc", "abdeg", "abcdg", "bcfg", "acdfg", "acdefg", "abc", "abcdefg", "abcdfg"];
-module digit_2d(c, dp) {
-   w = 3.8; h = dig_char_h; t = 0.9;
-   segs = c == " " ? "" : seg_on[ord(c) - ord("0")];
-   rects = [["a", [-w / 2, h / 2 - t, w, t]], ["d", [-w / 2, -h / 2, w, t]], ["g", [-w / 2, -t / 2, w, t]],
-            ["f", [-w / 2, 0.2, t, h / 2 - 0.2]], ["e", [-w / 2, -h / 2, t, h / 2 - 0.2]],
-            ["b", [w / 2 - t, 0.2, t, h / 2 - 0.2]], ["c", [w / 2 - t, -h / 2, t, h / 2 - 0.2]]];
-   multmatrix([[1, 0.1, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0]]) {
-      for (r = rects)
-         if (len([for (k = segs) if (k == r[0]) 1]) > 0)
-            translate([r[1][0], r[1][1]]) square([r[1][2], r[1][3]]);
-      if (dp)
-         translate([w / 2 + 1, -h / 2 + 0.45]) circle(d = 0.9, $fn = 12);
-   }
-}
-
 // A frequency's digits, s without the point, the point after digit p
 module frequency_2d(i, s, p) {
    n = groups[i][1];
@@ -478,9 +389,8 @@ module frequency_2d(i, s, p) {
 
 module digits_part(freqs) {
    for (i = [0 : 3], m = [0 : dig_mods - 1])
-      color(c_part)
-         translate([gx[i] + m * dig_mod.x + 0.1, dig_y0, dig_z - dig_mod.z / 2])
-            cube([dig_mod.x - 0.2, dig_mod.y, dig_mod.z]);
+      translate([gx[i] + m * dig_mod.x, dig_y0, dig_z])
+         digit_module_part();
    color(c_lit)
       ext_y(dig_y0 - 0.05, 0.06)
          for (i = [0 : 3])
@@ -505,21 +415,14 @@ module boards_part() {
             cube([flip_board.x, board_t, flip_board.y]);
    }
    for (h = [0, 1])
-      translate([row_x(k_flip, h), flip_y1, flip_z]) {
-         color(c_part) translate([-tact.x / 2, tact.z, -tact.x / 2]) cube([tact.x, tact.y, tact.x]);
-         color("#3a3a3a") rotate([-90, 0, 0]) cylinder(d = 3.5, h = tact.z + 0.1, $fn = 24);
-      }
+      translate([row_x(k_flip, h), flip_y1, flip_z])
+         tact_part();
 }
 
 module drivers_part() {
    for (i = [0 : drv_n - 1])
-      translate([drv_x0 + rail.x + fit + i * drv_pitch - drv_over, drv_y0, wall + rail.y - 1.6 - board_t]) {
-         color("#c23b30") cube([drv_board.x, drv_board.y, board_t]);
-         color(c_part) translate([drv_board.x / 2 - 7.6, 4, board_t]) cube([15.2, 31.8 - 8, 4]);
-         color("#202020")
-            for (dx = [3, drv_board.x - 5.5])
-               translate([dx, 4, board_t]) cube([2.5, 20.3, 8.5]);
-      }
+      translate([drv_x0 + rail.x + fit + i * drv_pitch - drv_over, drv_y0, wall + rail.y - 1.6 - board_t])
+         driver_board_part();
 }
 
 // Encoder and its nut, mounting face at y=plate_t
