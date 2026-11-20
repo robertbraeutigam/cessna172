@@ -160,7 +160,9 @@ its own top-level directory; new components should follow the same layout.
     caps on tactile switches), function selector on a 12 way rotary switch
     limited to 5 positions. One L shaped front board carries the digits,
     LEDs and switches. The `rot_*` values are MEASURE (guesses).
-    The frame still has the Saitek radio panel.
+    The frame still has the Saitek radio panel, but its right part is
+    already as high as the stack with an audio panel (not designed yet,
+    33 mm reserved) needs (`stack_units_h` in `frame/frame.inc.scad`).
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheet over it, all 2020 profile. `frame.inc.scad` holds the
@@ -172,9 +174,11 @@ its own top-level directory; new components should follow the same layout.
   component brings its own front face and is screwed onto a cut-out in the
   sheet; heavy or pulled ones also stand on the frame. The frame is two
   parts bolted together: the vertical front part in front of the desk
-  edge (a rectangle with the uprights, its bottom bar just under the desk
-  top, and the apron hanging under the throttle for the trim wheel
-  pedestal and the DIY flaps panel (not designed yet); the thin parking
+  edge (a rectangle with the uprights, stepped up on the right for the
+  radio stack (two top bars, two sheets split at the yoke bay's right
+  edge), its bottom bar just under the desk top, the DIY flaps panel (not designed yet) on the sheet right of the
+  throttle box, and the apron hanging under the throttle for the trim wheel
+  pedestal; the thin parking
   brake hangs under the bottom bar below the yoke), and the desk part (a
   ladder on the desk, its front rail cut at the yoke), with 45 degree
   braces between them (stock bars cut square, bought 45 degree

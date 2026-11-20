@@ -78,10 +78,16 @@ parts, each built on its own and then bolted together:
 
 - **Front part**, vertical, in front of the desk edge: a rectangle (top
   bar, bottom bar, an upright at each end) with an upright on each side of
-  the yoke bay. The bottom bar lies just under the desk top, its top at
+  the yoke bay, stepped up over the radios: the two right uprights (the
+  bay's right one and the end one) are longer and carry their own top
+  bar, the left top bar ends against the side of the bay's right upright.
+  The bottom bar lies just under the desk top, its top at
   desk height and its back against the desk edge (felt pads), so pushing
-  the frame away hits a stop. One
-  3 mm aluminium composite (ACM) sheet is screwed onto its front slots.
+  the frame away hits a stop. Two
+  3 mm aluminium composite (ACM) sheets are screwed onto its front slots,
+  split at the yoke bay's right edge (`sheet_split`): the low left one and
+  the high right one, which can be cut again on its own when the radios
+  change.
 - **Desk part**, flat on the desk behind it: a ladder of a front rail, a
   rear rail and five crossbars. The front rail is cut at the yoke bay. The
   front part is bolted to the front rail with corner brackets, and a 45
@@ -91,16 +97,26 @@ parts, each built on its own and then bolted together:
   upright has 39 mm above the brace for it; a 250 mm brace would leave
   only 3 mm).
 
-The panel is as low as the parts on it allow: the right stack sets it.
-The throttle box face reaches 80 mm above the desk (it stands on the
-20 mm rail, 50 mm box and a 10 mm flange; its cut-out ends at 71 mm), then
+The panel is as low as the parts on it allow. On the right, the radio
+stack sets it: the throttle box face reaches 80 mm above the desk (it stands on the
+20 mm rail, 50 mm box and a 10 mm flange; its cut-out ends at 71 mm), the
+flaps panel's cut-out beside it at 78 mm, then
 20 mm of sheet to the radio panel's cut-out, the radio panel's 84 mm front
-(from about 88 to 172 mm), 20 mm of sheet and the top bar. The yoke notch is 135 mm high,
+(from about 95 to 179 mm). The right part is already as high as the DIY
+[radio stack](#radio-stack) needs from the same place: an audio panel
+(not designed yet; 33 mm reserved, the KMA 26's 1.30"), the two KX155s and
+the KT 76C, 176.5 mm in all (`stack_units_h`), so its cut-out would end at
+about 275 mm; then 20 mm of sheet and the top bar. That is 300 mm uprights
+and the right part's top 320 mm above the desk, checked against
+`sheet_h_r_max` (330 mm): it covers the monitor's bottom right corner,
+where X-Plane draws its own radios; set the view so the six-pack's
+right column stays visible. The `sheet` view outlines the stack's place.
+The left part: the yoke notch is 135 mm high,
 for a future 130 mm force feedback yoke (`ffb_h`; the Saitek yoke is about
 100 mm), and on the left the ignition above the primer needs 185 mm
 (the switch panel beside it 136 mm). The
 build computes the height from these and rounds the uprights up to a
-stock length (200 mm), so the panel top is 220 mm above the desk; it
+stock length (200 mm), so the left panel top is 220 mm above the desk; it
 checks that it stays under `sheet_h_max` (260 mm, the monitor).
 
 Seen from the pilot, left to right:
@@ -111,7 +127,14 @@ Seen from the pilot, left to right:
   own clamps go around the bottom bar and the desk (the desk is thicker
   than the bar).
   A future force feedback yoke bolts to a crossbar in the bay instead.
-- **Saitek radio panel**, with the **throttle box** under it.
+- **Saitek radio panel**, with the **throttle box** under it and the
+  DIY **flaps panel** right of the mixture, as in the 172N (lever pot and
+  indicator servo, on hub port 5; not designed yet, so its 50 x 63 mm
+  front plate and 64 mm depth are placeholders): its body goes through a
+  cut-out in the sheet (`flaps_body`, 3 mm smaller than the plate all
+  round, follows the panel once it is designed) and rests on the front
+  rail, its plate is screwed onto the sheet, 10 mm (`flaps_gap`) right of
+  the throttle box face.
 
 The frame overhangs the desk edge by 22 mm (`frame_overhang`: a 2020 and
 a 2 mm felt pad), so the sheet is 22 mm in front of the desk edge; the
@@ -138,12 +161,7 @@ Below the desk top:
   sheet flush under the main sheet. It carries the **pedestal** with the
   trim wheel and the trim indicator (75 x 150 mm front), centered under
   the throttle, which stands on the lower bar like the throttle box on the
-  front rail, and to its right the DIY **flaps panel** (lever pot and
-  indicator servo, on hub port 5; not designed yet, so its 50 x 63 mm front
-  plate and 64 mm depth are placeholders), as high as the desk allows: its
-  body goes through a cut-out in the apron sheet and its plate is screwed
-  onto the sheet. The cut-out (`flaps_body`, 3 mm smaller than the plate
-  all round) follows the panel once it is designed.
+  front rail.
 - **Parking brake**, under the bottom bar in the yoke bay, directly below
   the yoke: a thin body (22 mm) under the desk top, two M5 into the bar's
   bottom slot, and the T-handle just in front of the bar. Released, it is
@@ -183,15 +201,16 @@ All values are in `frame.inc.scad`; the layout (cut-outs, screw holes) is
 computed from the component sizes, and the build prints the cut list
 (`echo`). Lengths are rounded to stock lengths: the width to 100 mm
 (`round_w`), the other bars to 50 mm (`round_d`). Only the apron's lower
-bar (between the leg room and the pedestal, `round_cut`) is cut to an odd
-length. With the current guesses the frame is 1000 x 410 mm and 220 mm
-high above the desk, the sheet 1000 x 240 mm (it also covers the bottom
-bar), the apron sheet
+bar (between the leg room and the pedestal, `round_cut`) and the two top
+bars (they meet at the step) are cut to odd lengths. With the current
+guesses the frame is 1000 x 410 mm and 220 mm high above the desk (320 mm
+on the right), the left sheet 661 x 240 mm and the right one 339 x 340 mm
+(they also cover the bottom bar), the apron sheet
 250 x 220 mm. With the ears the frame takes 1143 mm of the desk width.
 
 | Part | 2020 bars |
 |------|-----------|
-| front part | top bar 1000, bottom bar 1000, 4 uprights 200, 2 apron hangers 200, lower bar 210 |
+| front part | top bar left 661 and right 339 (cut), bottom bar 1000, 2 uprights left 200, 2 uprights right 300, 2 apron hangers 200, lower bar 210 |
 | desk part | front rail left 450, front rail right 400, rear rail 1000, 5 crossbars 350, 4 braces 200 (cut square) |
 
 | File | Parts |
@@ -208,7 +227,7 @@ guessed 283 mm wide like the radio panel and about 100 mm high; spec
 sheet: 310 mm wide with the wheel), the force feedback yoke's height
 (`ffb_h`), the radio panel body that goes through the sheet (`radio_body`,
 from Logitech's "Construction dimensions for Flight Panels" drawing) and
-the panel height the monitor allows (`sheet_h_max`).
+the panel heights the monitor allows (`sheet_h_max`, `sheet_h_r_max`).
 
 The ignition and the switch row each have their own hole, 1 mm larger
 than their back all round, with 20 mm of sheet between them; the
@@ -225,11 +244,11 @@ flange holes are drilled with the box in place.
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 21 | 2020 extrusion, 6 mm slot | front part: top bar, bottom bar, 4 uprights, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 5 crossbars, 4 braces (cut square) |
+| 22 | 2020 extrusion, 6 mm slot | front part: top bar left and right, bottom bar, 4 uprights, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 5 crossbars, 4 braces (cut square) |
 | 8 | 45 degree connector for 2020 | brace ends |
 | - | corner brackets, M5 screws, M5 T-nuts | frame joints, and the front part onto the front rail |
-| 2 | 3 mm ACM sheet | panel, cut to frame_w x (sheet_h + 20); the apron sheet |
-| 47 | M5 button head screw + T-nut (+ washer at the throttle box floor) | sheets, throttle box, pedestal, parking brake and hub |
+| 3 | 3 mm ACM sheet | panel: left and right sheet (sheet_left, sheet_right in the echo); the apron sheet |
+| 53 | M5 button head screw + T-nut (+ washer at the throttle box floor) | sheets, throttle box, pedestal, parking brake and hub |
 | 2 | screw clamp with rubber jaws, 50 mm opening | rail ends onto the desk |
 | 3 | felt pad | on the bottom bar's back, against the desk edge |
 
@@ -423,7 +442,7 @@ same S0-S3 bus.
 - **Parking brake**: one switch, on line D of the pedestal port: two wires
   from the pedestal along the bottom bar to the brake under the yoke. A
   *Button* on D36 in the Connector.
-- **Flaps** (DIY, on the apron next to the pedestal): the lever pot on
+- **Flaps** (DIY, on the sheet right of the throttle box): the lever pot on
   line A, the indicator servo (9 g) on pin 7 and the orange pair. Two lines
   are left (e.g. a switch at the flap detents, if the lever gets one).
 - **Throttle quadrant**: its three pots on lines A-C, between the blue
@@ -1460,8 +1479,11 @@ MEASURE values in `kx155.scad` (the encoder bushing is a guess). The
 `assert`s check that the knobs, buttons and parts behind the face do not
 collide and that the knobs hold enough of their shafts.
 
-The frame (`frame/`) still has the Saitek radio panel's cut-out; it
-changes to the stack next.
+The frame (`frame/`) still has the Saitek radio panel's cut-out, but its
+right part is already as high as the stack with an audio panel on top
+needs (`stack_units_h`); when the stack replaces the Saitek panel, the
+right sheet is cut again (the Saitek's cut-out is wider than the stack's
+faces).
 
 ### Hardware
 

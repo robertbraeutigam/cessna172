@@ -1,29 +1,30 @@
 // Cockpit frame
 //
 // Two parts of 2020 extrusion: the front part (a vertical rectangle with
-// the uprights, in front of the desk edge, and the apron hanging under the
-// throttle) and the desk part (a ladder on the desk, cut at the yoke),
-// bolted together and braced at 45 degrees; one ACM sheet over the front
-// with a cut-out for every component. Values, layout and checks are in
+// the uprights, stepped up over the radios, in front of the desk edge, and
+// the apron hanging under the throttle) and the desk part (a ladder on the desk, cut at the yoke),
+// bolted together and braced at 45 degrees; two ACM sheets over the front
+// (left, and right over the radios) with a cut-out for every component. Values, layout and checks are in
 // frame.inc.scad; this file has the views and the cut list (echo). It has
 // no printed parts.
 //
 // Bought parts (lengths: see the echo of the build, or the README):
-// - 2020 extrusion, front part: top bar, bottom bar, 4 uprights,
-//   2 apron hangers, lower bar
+// - 2020 extrusion, front part: top bar left and right, bottom bar,
+//   2 uprights left, 2 uprights right (longer), 2 apron hangers, lower bar
 // - 2020 extrusion, desk part: front rail left, front rail right, rear
 //   rail, 5 crossbars, 4 braces (cut square); the hub stands on two of
 //   the crossbars
 // - 8 45 degree connectors for 2020, one at each brace end
 // - corner brackets, M5 screws and T-nuts (6 mm slot)
-// - 3 mm ACM sheet, frame_w x (sheet_h + ext), and the apron sheet
+// - 3 mm ACM sheet: the left and right sheets, and the apron sheet
 // - 2 screw clamps with rubber jaws, at least ext + desk.z opening
 //   (clamp_open, clamp_reach), to clamp the rail ends onto the desk
 // - felt pads on the bottom bar's back, against the desk edge
 //
 // Assembly:
 // 1. Front part, flat on the floor: the bottom bar, the uprights on it,
-//    the top bar on them, the two hangers under the bottom bar and the lower
+//    the right top bar on the two right ones, the left top bar on the two
+//    left ones and against the side of the bay's right upright, the two hangers under the bottom bar and the lower
 //    bar between their ends, all with corner brackets.
 // 2. Cut the sheets (cuts, sheet_screws, apron_screws in the echo, the
 //    "sheet" view), drill their screw holes, and screw them onto the front
@@ -40,8 +41,10 @@
 //    middle crossbar until its face is on the sheet, bolt its floor into
 //    the rail (throttle_bolts), drill the sheet through
 //    its flange holes and screw the flange on (M3, nuts behind the sheet).
-//    The pedestal goes in the same way onto the lower bar, the parking
-//    brake under the bottom bar, when they exist.
+//    The flaps panel goes through its cut-out right of it onto the rail,
+//    its plate screwed onto the sheet; the pedestal goes in like the
+//    throttle box onto the lower bar, the parking brake under the bottom
+//    bar, when they exist.
 // 6. Put the hub behind the throttle box, its left ears on the yoke bay's
 //    right crossbar, its front and back ears on the throttle's crossbar,
 //    and bolt them into T-nuts in the crossbars' top slots (hub_bolts).
@@ -59,18 +62,20 @@ c_display = "#c0392b";
 c_box = "#5b6f8a";
 c_switch = "#3a3d42";
 
-echo(frame = [frame_w, frame_d, sheet_h]);
-echo(front_part_2020 = [["top bar", frame_w], ["bottom bar", frame_w], ["4 uprights", upright_len],
+echo(frame = [frame_w, frame_d, sheet_h], right_part_h = sheet_h_r);
+echo(front_part_2020 = [["top bar left, cut", round(sheet_split)], ["top bar right, cut", round(frame_w - sheet_split)],
+                        ["bottom bar", frame_w], ["2 uprights left", upright_len], ["2 uprights right", upright_len_r],
                         ["2 hangers", hanger_len],
                         ["lower bar", apron_bar_len]]);
 echo(desk_part_2020 = [["front rail left", rails[0][1] - rails[0][0]], ["front rail right", rails[1][1] - rails[1][0]],
                        ["rear rail", frame_w], ["5 crossbars", crossbar_len], ["4 braces, cut square", brace_len]]);
-echo(sheet = [frame_w, sheet_h + ext], screws = len(sheet_screws));
+echo(sheet_left = [sheet_split, sheet_h + ext], sheet_right = [frame_w - sheet_split, sheet_h_r + ext],
+     screws = len(sheet_screws));
 echo(ign_cut = ign_cut, switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut,
-     primer_cut = primer_cut);
+     primer_cut = primer_cut, flaps_cut = flaps_cut, stack_cut_reserved = stack_cut);
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
 echo(apron_sheet = [apron[1] - apron[0], apron_h - ext], apron_screws = len(apron_screws));
-echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts, flaps_cut = flaps_cut);
+echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts);
 echo(hub = [hub_x0, hub_y0], hub_bolts = hub_bolts);
 echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2 + len(hub_bolts), desk_clamps = len(clamp_xs), clamp_y = clamp_y);
 
@@ -100,10 +105,11 @@ module brace(x) {
 }
 
 module front_part() {
-   bar([0, 0, sheet_h - ext], [frame_w, ext, ext]);
+   bar([0, 0, sheet_h - ext], [sheet_split, ext, ext]);
+   bar([sheet_split, 0, sheet_h_r - ext], [frame_w - sheet_split, ext, ext]);
    bar([0, 0, -ext], [frame_w, ext, ext]);
-   for (x = upright_xs)
-      bar([x, 0, 0], [ext, ext, upright_len]);
+   for (i = [0 : 3])
+      bar([upright_xs[i], 0, 0], [ext, ext, upright_lens[i]]);
    // apron
    for (x = hangers)
       bar([x, 0, -ext - hanger_len], [ext, ext, hanger_len]);
@@ -160,9 +166,13 @@ module rect(r) {
    translate([r[0], r[1]]) square([r[2] - r[0], r[3] - r[1]]);
 }
 
+// left and right sheet (a hairline apart in the views)
 module sheet_2d() {
    difference() {
-      translate([0, -ext]) square([frame_w, sheet_h + ext]);
+      union() {
+         translate([0, -ext]) square([sheet_split - 0.25, sheet_h + ext]);
+         translate([sheet_split + 0.25, -ext]) square([frame_w - sheet_split - 0.25, sheet_h_r + ext]);
+      }
       for (c = cuts) rect(c);
       for (p = sheet_screws)
          translate(p) circle(d = m5_d);
@@ -174,7 +184,6 @@ module apron_2d() {
    difference() {
       translate([apron[0], -apron_h]) square([apron[1] - apron[0], apron_h - ext]);
       rect(pedestal_cut);
-      rect(flaps_cut);
       for (p = apron_screws)
          translate(p) circle(d = m5_d);
    }
@@ -325,8 +334,8 @@ module pedestal_part() {
       translate([pedestal_x - 4, under_y0 - 0.5, apron_bar_z + 12]) cube([8, 1, 28]);
 }
 
-// DIY flaps panel (placeholder): front plate on the apron sheet, body behind it,
-// lever and indicator on the plate
+// DIY flaps panel (placeholder): front plate on the sheet right of the
+// throttle box, body behind it on the front rail, lever and indicator on the plate
 module flaps_part() {
    y = -sheet_t;
    color(c_device) {
@@ -400,10 +409,24 @@ module cockpit_view() {
    components();
 }
 
-// Sheet cutting view: the sheet with the frame behind it
+// The DIY radio stack's faces, reserved on the right sheet (outline, view only)
+module stack_outline() {
+   color("#e0b030")
+      translate([0, -sheet_t - 0.5, 0]) rotate([90, 0, 0]) linear_extrude(0.5)
+         for (i = [0 : len(stack_units_h) - 1])
+            let(z1 = stack_face[3] - (i == 0 ? 0 : stack_units_h[0] + (i > 1 ? stack_units_h[1] : 0) + (i > 2 ? stack_units_h[2] : 0)))
+               difference() {
+                  translate([stack_face[0], z1 - stack_units_h[i]]) square([stack_w, stack_units_h[i]]);
+                  translate([stack_face[0] + 1.5, z1 - stack_units_h[i] + 1.5]) square([stack_w - 3, stack_units_h[i] - 3]);
+               }
+}
+
+// Sheet cutting view: the sheets with the frame behind them, the DIY
+// stack's place outlined
 module sheet_view() {
    frame_part();
    sheet_part();
+   stack_outline();
 }
 
 // Below the desk top: the apron, under-desk components and the leg room
@@ -414,7 +437,6 @@ module under_view() {
          frame_part();
          sheet_part();
          pedestal_part();
-         flaps_part();
          park_part(set = true);
          clamps_part();
          throttle_part();
@@ -444,8 +466,9 @@ module throttle_view() {
          frame_part();
          sheet_part();
          throttle_part();
+         flaps_part();
       }
-      translate([throttle_x0 - 40, -100, -1]) cube([throttle_size.x + 80, 400, 120]);
+      translate([throttle_x0 - 40, -100, -1]) cube([flaps_face[2] - throttle_x0 + 80, 400, 120]);
    }
 }
 
