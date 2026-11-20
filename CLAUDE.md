@@ -132,14 +132,18 @@ its own top-level directory; new components should follow the same layout.
   standoffs in the hub (C0..C3, hub port 1) and a cable tie block. Only
   the wheel and the tube end, not the base the tube goes into.
 
-- `radio/` — the radio stack: two KX155 NAV/COMs (and later the
-  transponder) stacked without gaps in one cut-out of the sheet, on a
+- `radio/` — the radio stack: two KX155 NAV/COMs and the KT 76C
+  transponder stacked without gaps in one cut-out of the sheet, on a
   second Mega of their own (not the hub: too many encoders and displays).
   - `radio.inc.scad` — the stack's standard, included by every unit:
-    unit height (the KX155's 2.00"), front face (`face_t`, separate,
-    lettering for a paint pen) and plate, flanges on the left and right
-    ends only with two M3 mount holes each, the 7 segment digit sizes
-    (`dig_*`, MEASURE). Installed coordinates (x right, y back, z up).
+    unit width (`unit_w`, the KX155's, which checks it; every unit is as
+    wide), the KX155's height (`unit_h`, 2.00"; each unit has its real
+    height), front face (`face_t`, separate, lettering for a paint pen)
+    and plate, flanges on the left and right ends only with two M3 mount
+    holes each, the 7 segment digit sizes (`dig_*`, MEASURE), and the
+    parts and shapes the units share (tactile switch, MAX7219 board,
+    bosses, knob body, crush bore, 7 segment drawing). Installed
+    coordinates (x right, y back, z up).
   - `kx155.scad` — the KX155: COM USE/STBY with 6 digits (8.33 kHz,
     three decimals), NAV with 5, red 0.28" digits (two 3 digit modules per
     frequency, a MAX7219 kit board each, 4 chained), so it is wider than
@@ -147,7 +151,16 @@ its own top-level directory; new components should follow the same layout.
     printed outer, inner and volume knobs), volume pots with switch,
     flip buttons on tactile switches. `groups` drives the display layout,
     `row` the bottom row. The `enc_*`, `pot_*`, `tact`, `drv_*` values are
-    MEASURE. The frame still has the Saitek radio panel.
+    MEASURE.
+  - `kt76c.scad` — the KT 76C transponder, 1.65" high: IDT, display
+    (flight level from X-Plane's pressure altitude, 3 digits; code, 4
+    digits of two 3 digit modules; one MAX7219), annunciators R, FL, ALT,
+    ON, GND, SBY as stencil words cut through a printed black display
+    mask with a 3 mm LED cell each, code buttons 0..7, CLR, VFR (printed
+    caps on tactile switches), function selector on a 12 way rotary switch
+    limited to 5 positions. One L shaped front board carries the digits,
+    LEDs and switches. The `rot_*` values are MEASURE (guesses).
+    The frame still has the Saitek radio panel.
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheet over it, all 2020 profile. `frame.inc.scad` holds the
