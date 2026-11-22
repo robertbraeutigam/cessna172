@@ -73,74 +73,128 @@ the panel sheet over it.
 
 [![Cockpit frame](https://robertbraeutigam.github.io/cessna172/frame/frame_montage.png)](https://robertbraeutigam.github.io/cessna172/frame/frame_montage.png)
 
+The panel is laid out like the X-Plane 172N's (the `n172_*` values,
+measured off its panel and scaled by its 3 1/8" instruments), with the
+yoke on the desk and its column as the reference: the six-pack above the
+column with the two NAV indicators right of it and the RPM indicator
+beside the column, the radio stack right of those, and the lower panel
+(ignition with the primer, switch row, throttle, flaps) below the desk
+top, as far below the column as in the 172N or lower where the desk or
+the yoke's clamps are in the way. Lower the chair for it: the knees go
+under the lower panel. In stage 1 (now) the left part above the desk is
+only as high as the yoke column needs and the monitor behind it shows
+the instruments; in stage 2 physical instruments go into a full height
+left sheet without moving anything else (see below).
+
 The frame is all 2020 extrusion (one profile, M5 T-nuts everywhere) in two
 parts, each built on its own and then bolted together:
 
-- **Front part**, vertical, in front of the desk edge: a rectangle (top
-  bar, bottom bar, an upright at each end) with an upright on each side of
-  the yoke bay, stepped up over the radios: the two right uprights (the
-  bay's right one and the end one) are longer and carry their own top
-  bar, the left top bar ends against the side of the bay's right upright.
-  The bottom bar lies just under the desk top, its top at
-  desk height and its back against the desk edge (felt pads), so pushing
-  the frame away hits a stop. Two
-  3 mm aluminium composite (ACM) sheets are screwed onto its front slots,
-  split at the yoke bay's right edge (`sheet_split`): the low left one and
-  the high right one, which can be cut again on its own when the radios
-  change.
+- **Front part**, vertical, in front of the desk edge, from below the
+  lower panel up to the top bars: a bottom bar under the lower panel; four
+  uprights: the left end one, the split one between the switch panel and
+  the throttle box (from the bottom bar up to the waist bars), the step
+  one right of the NAV indicators (on the waist bars, up to the right top
+  bar) and the right end one; two waist bars, one on the other, just under
+  the desk top from the split upright to the right end (left of it the
+  yoke's clamps are there); a low left top bar between the left end and
+  the step upright, just over the yoke's shaft, and the right top bar over
+  the radios. The left end upright is as high as the right part already,
+  for its brace and the stage 2 top bar. Behind the split and right end
+  uprights, under the desk, the throttle bar carries the throttle box and
+  the flaps panel. The uprights' and waist bars' backs touch the desk edge
+  (felt pads), so pushing the frame away hits a stop. Its bars are cut to
+  length (`round_cut`), as its heights come from the parts on the sheet.
+  Three 3 mm aluminium composite (ACM) sheets are screwed onto its front
+  slots: the left one, L shaped (down to the bottom left, and above the
+  desk to the step upright), the lower right one (throttle, flaps) and the
+  upper right one (radios), which can be cut again on its own when the
+  radios change. The lower and upper sheets meet between the two waist
+  bars, each screwed onto one.
 - **Desk part**, flat on the desk behind it: a ladder of a front rail, a
-  rear rail and five crossbars. The front rail is cut at the yoke bay. The
-  front part is bolted to the front rail with corner brackets, and a 45
-  degree brace from each upright down to a crossbar stops it from rocking.
-  The braces are 200 mm stock bars cut square, held by a bought 45 degree
-  connector for 2020 at each end, in the obtuse angle (at the top the
-  upright has 39 mm above the brace for it; a 250 mm brace would leave
-  only 3 mm).
+  rear rail and four crossbars, stock lengths. The front rail is cut at
+  the yoke. The front part is bolted to the front rail with corner
+  brackets, and a 45 degree brace from the left end, step and right end
+  uprights down to a crossbar stops it from rocking. The braces are 200 mm
+  stock bars cut square, held by a bought 45 degree connector for 2020 at
+  each end, in the obtuse angle (at the top the upright needs 30 mm above
+  the brace for it).
 
-The panel is as low as the parts on it allow. On the right, the radio
-stack sets it: the throttle box face reaches 80 mm above the desk (it stands on the
-20 mm rail, 50 mm box and a 10 mm flange; its cut-out ends at 71 mm), the
-flaps panel's cut-out beside it at 78 mm, then
-20 mm of sheet to the radio panel's cut-out, the radio panel's 84 mm front
-(from about 95 to 179 mm). The right part is already as high as the DIY
-[radio stack](#radio-stack) needs from the same place: the KMA 26 audio
-panel (33 mm, 1.30"), the two KX155s and the KT 76C, 176.5 mm in all (`stack_units_h`), so its cut-out would end at
-about 275 mm; then 20 mm of sheet and the top bar. That is 300 mm uprights
-and the right part's top 320 mm above the desk, checked against
-`sheet_h_r_max` (330 mm): it covers the monitor's bottom right corner,
-where X-Plane draws its own radios; set the view so the six-pack's
-right column stays visible. The `sheet` view outlines the stack's place.
-The left part: the yoke notch is 135 mm high,
-for a future 130 mm force feedback yoke (`ffb_h`; the Saitek yoke is about
-100 mm), and on the left the ignition above the primer needs 185 mm
-(the switch panel beside it 136 mm). The
-build computes the height from these and rounds the uprights up to a
-stock length (200 mm), so the left panel top is 220 mm above the desk; it
-checks that it stays under `sheet_h_max` (260 mm, the monitor).
+**Yoke**: the Saitek yoke stands on the desk between the front rail's
+halves, its front on the desk edge, clamped on the edge with its own
+clamps, whose spines go down behind the sheet (no part of the front part
+is there). Its shaft comes through a round hole in the left sheet
+(`yoke_hole_d`, 28 mm), 65 mm above the desk (`yoke_shaft_z`) and 266 mm
+from the left edge; the left top bar is just over it, so the left sheet
+ends 100 mm above the desk. With the shaft in, the wheel is about 30 mm in
+front of the sheet (`yoke_reach`, checked). The stand-in for a future
+force feedback yoke (`ffb_h`, 130 mm) stands 30 mm over the left sheet.
 
-Seen from the pilot, left to right:
+**Lower panel**, below the desk top. The panels' backs reach behind the
+sheet under the desk, so they stay under its underside (28 mm, `desk`)
+and, where the yoke's clamps are, under those (`yoke_clamp_low`, 20 mm
+more): the switch row's face starts 141 mm below the desk top (in the
+172N it is 159 mm under the column, here 206 mm, because of the clamps),
+the ignition 20 mm higher (as high as the desk allows, `switch_ign_rise`),
+the primer under its key 20 mm of sheet under the ignition's hole, the
+throttle box with its rods 56 mm over the switch row's bottom like in the
+172N (85 mm below the desk top), its body under the desk on the throttle
+bar, and the flaps panel (lever pot and indicator servo, on hub port 5; not
+designed yet, so its 50 x 63 mm front plate and 64 mm depth are
+placeholders) 70 mm (`flaps_gap`) right of the throttle box face, its
+body on the throttle bar too. The **parking brake** sits on the bottom bar
+under the yoke column, its T-handle through a small hole under the switch
+row: released, it is almost flush and lies sideways; set, it is pulled
+out 50 mm and turned to point down. The bottom bar is just under the
+lowest hole (the primer's), so the lower panel ends 190 mm below the
+desk top, which the build checks against `knee_z` (the top of the knees
+with the chair lowered, MEASURE).
 
-- **Switch panel** (ignition + switches), low on the left.
-- **Yoke bay**: the Saitek yoke stands on the desk, its front at the
-  frame front (22 mm out from the desk edge) so it sits on the bottom bar, its housing in a notch in the sheet. Its
-  own clamps go around the bottom bar and the desk (the desk is thicker
-  than the bar).
-  A future force feedback yoke bolts to a crossbar in the bay instead.
-- **Saitek radio panel**, with the **throttle box** under it and the
-  DIY **flaps panel** right of the mixture, as in the 172N (lever pot and
-  indicator servo, on hub port 5; not designed yet, so its 50 x 63 mm
-  front plate and 64 mm depth are placeholders): its body goes through a
-  cut-out in the sheet (`flaps_body`, 3 mm smaller than the plate all
-  round, follows the panel once it is designed) and rests on the front
-  rail, its plate is screwed onto the sheet, 10 mm (`flaps_gap`) right of
-  the throttle box face.
+**Apron**, under the throttle: two hangers under the bottom bar (corner
+brackets; the left one right of the leg room, the right one under the
+end upright) and a lower bar between their ends, covered by a small ACM
+sheet. It carries the **pedestal** with the trim wheel and the trim
+indicator (75 x 150 mm front), as far left under the throttle box as the
+leg room (`knee_w`, 460 mm around the yoke column) allows, which stands
+on the lower bar like the throttle box on its bar. The pedestal and the
+parking brake are future components; their sizes (`pedestal_size`,
+`park_size`) reserve the space (the depths are guesses), and their holes
+are cut when they exist.
+
+**Right part**: the **Saitek radio panel**, at the bottom of the place of
+the DIY [radio stack](#radio-stack), right of the NAV indicators. The
+stack hangs from where the 172N's starts (`n172_stack_dz`, its top 289 mm
+above the desk): the KMA 26 audio panel (33 mm, 1.30"), the two KX155s and
+the KT 76C, 176.5 mm in all (`stack_units_h`). The right top bar is over
+the instruments' top row and at the 172N's glareshield, so the right part
+is 330 mm high, checked against `sheet_h_r_max` (330 mm): it covers the
+monitor's bottom right corner, where X-Plane draws its own radios. The
+`sheet` view outlines the stack's place. The frame ends 25 mm of sheet
+right of the radio panel (`frame_w` is computed, 850 mm).
+
+**Stage 2, physical instruments.** The instruments' places are reserved
+(`inst_c`, outlined in the `sheet` view): 81 mm holes (3 1/8"
+instruments) on 89 mm (3.5") centres, the six-pack in two rows 92 and
+180 mm over the yoke column, its middle column 9 mm left of it; NAV 1 and
+NAV 2 in a column 100 mm right of the six-pack's, in the same rows; the
+RPM indicator beside the column, under the altimeter. In stage 1 the
+six-pack and the NAV indicators are above the left sheet, where the
+monitor shows them; the RPM is mostly behind it. For stage 2 the left top
+bar moves up to the right one's height (the left end upright already
+reaches there), and a new left sheet, as high as the right part, is cut
+with all the left holes; the monitor goes up behind the glareshield. The
+build checks that the instruments stay on the left sheet, clear of each
+other, the yoke column hole and the split upright, and that the RPM's
+body fits in front of the yoke housing (`inst_body_d`, `inst_depth`: a
+DIY instrument behind the sheet, 15 mm deep, like a round display; a
+guess). The ADF's place in the 172N, under NAV 2 at the column's height,
+is free as well.
 
 The frame overhangs the desk edge by 22 mm (`frame_overhang`: a 2020 and
 a 2 mm felt pad), so the sheet is 22 mm in front of the desk edge; the
 front rail lies 18 mm on the desk.
 
 **Desk clamps**: the front rail runs at least 50 mm past the sheet at each
-end (`ear_len`, rounded so the rail halves are 450 and 400 mm). There a
+end (`ear_len`; its halves are 200 and 500 mm). There a
 bought screw clamp with rubber jaws clamps each
 rail end onto the desk (the `clamp` view): the fixed jaw on the rail, the
 spine in front of it beside the sheet, the screw jaw on the desk
@@ -152,104 +206,81 @@ load path (printed parts creep under constant load), and two clamps about
 1 m apart give well over 2 kN of grip, against 50-100 N of pulling on the
 controls.
 
-Below the desk top:
-
-- **Apron**, under the throttle: a small rectangle hanging from the bottom
-  bar, two 2020 hangers (corner brackets; the right one under the end
-  upright) and a lower bar between their ends, covered by a small ACM
-  sheet flush under the main sheet. It carries the **pedestal** with the
-  trim wheel and the trim indicator (75 x 150 mm front), centered under
-  the throttle, which stands on the lower bar like the throttle box on the
-  front rail.
-- **Parking brake**, under the bottom bar in the yoke bay, directly below
-  the yoke: a thin body (22 mm) under the desk top, two M5 into the bar's
-  bottom slot, and the T-handle just in front of the bar. Released, it is
-  almost flush and lies sideways; set, it is pulled out 50 mm and turned
-  to point down. It has no face. Its body goes between the yoke's own desk
-  clamps (`yoke_clamp_gap`).
-
-Apart from the bottom bar and the thin parking brake, `knee_w` (460 mm)
-around the yoke stays open for the legs. The pedestal and the parking
-brake are future components; their sizes (`pedestal_size`, `park_size`)
-reserve the space (the pedestal sets the apron height; its depth and the
-parking brake are guesses), and the pedestal's hole is cut when it
-exists. Their bodies must stay
-below the desk underside.
-
 The rule for every component: it brings its own front face, a hole is cut
 into the sheet for it and its face is screwed onto the sheet. Heavy or
 pulled components also stand on the frame: the throttle box sits on the
-front rail and the crossbar under its middle (its front overhangs the
-front part), its face flange is screwed onto the sheet like the switch
-panel's and two M5 bolts through its floor go into the front rail.
+throttle bar, its face flange is screwed onto the sheet like the switch
+panel's and two M5 bolts through its floor go into the bar.
 The pedestal does the same on the apron's lower bar. The [hub](#hub)
-stands on the desk part behind the throttle box, across the yoke bay's
-right crossbar and the throttle's crossbar: the two ears on its left wall
-are bolted into the first one's top slot, the ears on its front and back
-walls into the second one's (M5, T-nuts). Its front ports face the pilot
-(port 3 is behind the throttle box, `hub_cable_room` (50 mm) leaves room
-for the plug), its right ports face right and its USB jack left, behind
-the yoke; the crossbars are as long as the hub needs.
+stands on the desk part right of the yoke, across the step upright's
+crossbar and the hub crossbar right of it: the two ears on its left wall
+are bolted into the first one's top slot (behind the step upright's
+brace), the ears on its front and back walls into the second one's (M5,
+T-nuts). Its front ports face the pilot, its right ports face right and
+its USB jack left, towards the yoke (at least 40 mm room for the plug);
+the crossbars are as long as the hub and the yoke need.
 The extrusion carries the
 loads, the sheet only covers the front, so cut-outs do not weaken it.
-Keep at least 25 mm of sheet to the edge and 20 mm between cut-outs, and
+Keep at least 25 mm of sheet to the edge and 20 mm between cut-outs
+(between the instruments it is 8 mm, as in the 172N), and
 drill the corners of a cut-out before sawing it. Holes for future
 components are cut when they arrive.
 
 All values are in `frame.inc.scad`; the layout (cut-outs, screw holes) is
-computed from the component sizes, and the build prints the cut list
-(`echo`). Lengths are rounded to stock lengths: the width to 100 mm
-(`round_w`), the other bars to 50 mm (`round_d`). Only the apron's lower
-bar (between the leg room and the pedestal, `round_cut`) and the two top
-bars (they meet at the step) are cut to odd lengths. With the current
-guesses the frame is 1000 x 410 mm and 220 mm high above the desk (320 mm
-on the right), the left sheet 661 x 240 mm and the right one 339 x 340 mm
-(they also cover the bottom bar), the apron sheet
-250 x 220 mm. With the ears the frame takes 1143 mm of the desk width.
+computed from the component sizes and the 172N positions, and the build
+prints the cut list (`echo`). With the current guesses the frame is 850 x
+410 mm, the left part 100 mm and the right part 330 mm high above the
+desk, the lower panel 190 mm below it; the left sheet is 511.5 x 290 mm
+(396 mm wide under the waist), the lower right one 454 x 170 mm, the upper
+right one 338.5 x 350 mm, the apron sheet 350 x 220 mm. With the ears the
+frame takes 993 mm of the desk width.
 
 | Part | 2020 bars |
 |------|-----------|
-| front part | top bar left 661 and right 339 (cut), bottom bar 1000, 2 uprights left 200, 2 uprights right 300, 2 apron hangers 200, lower bar 210 |
-| desk part | front rail left 450, front rail right 400, rear rail 1000, 5 crossbars 350, 4 braces 200 (cut square) |
+| front part (cut) | bottom bar 850, uprights 480 (left end), 130 (split), 310 (step), 480 (right end), 2 waist bars 434, top bar left 491.5 and right 338.5, throttle bar 434, 2 apron hangers 200, lower bar 310 |
+| desk part | front rail left 200 and right 500, rear rail 850, 4 crossbars 350, 3 braces 200 (cut square) |
 
 | File | Parts |
 |------|-------|
-| `frame.inc.scad` | extrusion and sheet standard, component sizes, layout, checks |
+| `frame.inc.scad` | extrusion and sheet standard, component sizes, 172N layout, layout, checks |
 | `frame.scad` | views, cut list |
 
 **MEASURE:** the desk (`desk`, and `desk_skirt` if it has a frame or
-drawer under the top at the front edge), the leg room the pilot needs
-(`knee_w`), the desk clamps (`clamp_open`, `clamp_reach`, `clamp_w`,
-`clamp_pad_d`), the free width between the yoke's own desk clamps
-(`yoke_clamp_gap`), the Saitek yoke housing (`yoke_housing`,
-guessed 283 mm wide like the radio panel and about 100 mm high; spec
-sheet: 310 mm wide with the wheel), the force feedback yoke's height
-(`ffb_h`), the radio panel body that goes through the sheet (`radio_body`,
-from Logitech's "Construction dimensions for Flight Panels" drawing) and
-the panel heights the monitor allows (`sheet_h_max`, `sheet_h_r_max`).
+drawer under the top at the front edge), the pilot's leg room (`knee_w`)
+and knee height with the chair lowered (`knee_z`), the desk clamps
+(`clamp_open`, `clamp_reach`, `clamp_w`, `clamp_pad_d`), the Saitek yoke
+(`yoke_housing`, guessed 283 mm wide like the radio panel and about 100
+mm high; spec sheet: 310 mm wide with the wheel; its shaft height and
+diameter `yoke_shaft_z`, `yoke_shaft_d`, the wheel's reach `yoke_reach`,
+`yoke_wheel_t`, and its clamps `yoke_clamp_*`: where they are and how far
+below the desk they reach set how low the switch row goes), the force
+feedback yoke's height (`ffb_h`), how deep the switch panel reaches
+behind the sheet (`switch_depth`), the radio panel body that goes through
+the sheet (`radio_body`, from Logitech's "Construction dimensions for
+Flight Panels" drawing) and the panel heights the monitor allows
+(`sheet_h_max`, `sheet_h_r_max`).
 
 The ignition and the switch row each have their own hole, 1 mm larger
-than their back all round, with 20 mm of sheet between them; the
-ignition's is 49 mm higher (`switch_ign_rise`). Drill the M3 mount holes
-through the panels' own holes, with the panels in place. The primer has
-its own, smaller hole under the ignition key, 20 mm of sheet below the
-ignition's, 1 mm larger than its square back, and its four flange
-holes are drilled the same way. The same goes for the throttle box: its cut-out
-is 1 mm larger than the box at the sides and the top, with 40 mm of
-sheet left under it (it starts at the rail top), and its
-flange holes are drilled with the box in place.
+than their back all round, with 20 mm of sheet between them. Drill the M3
+mount holes through the panels' own holes, with the panels in place. The
+primer has its own, smaller hole under the ignition key, 20 mm of sheet
+below the ignition's, 1 mm larger than its square back, and its four
+flange holes are drilled the same way. The same goes for the throttle
+box: its cut-out is 1 mm larger than the box at the sides and the top,
+and starts at the throttle bar's top, and its flange holes are drilled
+with the box in place.
 
 ## Hardware
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 22 | 2020 extrusion, 6 mm slot | front part: top bar left and right, bottom bar, 4 uprights, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 5 crossbars, 4 braces (cut square) |
-| 8 | 45 degree connector for 2020 | brace ends |
+| 22 | 2020 extrusion, 6 mm slot | front part: bottom bar, 4 uprights, 2 waist bars, top bar left and right, throttle bar, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 4 crossbars, 3 braces (cut square) |
+| 6 | 45 degree connector for 2020 | brace ends |
 | - | corner brackets, M5 screws, M5 T-nuts | frame joints, and the front part onto the front rail |
-| 3 | 3 mm ACM sheet | panel: left and right sheet (sheet_left, sheet_right in the echo); the apron sheet |
-| 53 | M5 button head screw + T-nut (+ washer at the throttle box floor) | sheets, throttle box, pedestal, parking brake and hub |
+| 4 | 3 mm ACM sheet | panel: left (L shaped), lower right and upper right sheet (sheet_* in the echo); the apron sheet |
+| 59 | M5 button head screw + T-nut (+ washer at the throttle box floor) | sheets, throttle box, pedestal, parking brake and hub |
 | 2 | screw clamp with rubber jaws, 50 mm opening | rail ends onto the desk |
-| 3 | felt pad | on the bottom bar's back, against the desk edge |
+| 4 | felt pad | on the uprights' and the waist bars' backs, against the desk edge |
 
 ## Connections
 
@@ -544,10 +575,10 @@ it fits the printer bed.
   shield.
 - The lid has a locating lip and is screwed onto four corner posts. Four
   ears on the floor (5.3 mm holes, M5 + T-nut) bolt the box onto the
-  frame's desk part behind the throttle box (see [Cockpit
-  frame](#cockpit-frame)): two on the left wall into the yoke bay's right
-  crossbar, one on the front and one on the back wall into the throttle's
-  crossbar. Their spacing (`ear_slot_dx`) is the frame's, and
+  frame's desk part right of the yoke (see [Cockpit
+  frame](#cockpit-frame)): two on the left wall into the step upright's
+  crossbar, one on the front and one on the back wall into the hub
+  crossbar right of it. Their spacing (`ear_slot_dx`) is the frame's, and
   `frame.inc.scad` checks it.
 
 Nothing in the box is soldered: each port is one 8 wire ribbon of
@@ -725,12 +756,12 @@ MobiFlight on the [hub](#hub) reads them: one Cat5 cable to direct port 6,
 soldered straight to the pots, with no board in the box.
 
 The box mounts in the [cockpit frame](#cockpit-frame) and has no lid: it
-goes through a cut-out in the panel sheet and stands on the frame's front rail. Its
+goes through a cut-out in the panel sheet, under the desk top, and stands on the frame's throttle bar. Its
 front wall is the face, with a 10 mm flange on the top and the two sides
-(none at the bottom, where the box sits on the rail) that is screwed onto
+(none at the bottom, where the box sits on the bar) that is screwed onto
 the sheet with M3 screws, nuts behind the sheet. Two M5 bolts through the
 floor, at the front between the rod supports, go into T-nuts in the
-front rail's top slot, so pulling a knob does not load the sheet alone.
+throttle bar's top slot, so pulling a knob does not load the sheet alone.
 
 | File | Parts |
 |------|-------|
@@ -750,7 +781,7 @@ front rail's top slot, so pulling a knob does not load the sheet alone.
 | - | M3 screws | pot hold-downs, cable cradle, one in each rod clamp (M3 x 10) |
 | 2 | throttle and mixture knob, printed from other sources (not in this repo; the views only show them) | on the throttle and mixture rods |
 | 5 | M3 x 10 pan head screw + nut | face flange onto the cockpit sheet |
-| 2 | M5 x 10 button head screw + washer + T-nut | floor into the front rail (counted in the frame) |
+| 2 | M5 x 10 button head screw + washer + T-nut | floor into the throttle bar (counted in the frame) |
 
 ## Cable to hub port 6
 
@@ -793,8 +824,10 @@ hole in the cockpit sheet ([frame](#cockpit-frame)); a 10 mm face flange
 (`flange_w`) all round sits on the sheet and is screwed to it with M3
 screws, nuts behind the sheet; the face is 3 mm in front of the sheet.
 
-The ignition sits 49 mm higher than the switch row (the frame's
-`switch_ign_rise`), to make room for the [primer](#primer) under its
+The whole switch panel hangs below the desk top, in the frame's lower
+panel (see [Cockpit frame](#cockpit-frame)). The ignition sits 20 mm
+higher than the switch row (the frame's `switch_ign_rise`, as much as its
+back clears the desk's underside), with the [primer](#primer) under its
 key, like in the X-Plane 172N: a third, small panel of its own
 (`primer.scad`) with its own hole in the sheet. So the two panels are
 separate, each with its own hole and its flange all round, their faces
@@ -807,8 +840,9 @@ takes the height of the back as a parameter for it.
 
 `primer.scad`: the push-pull primer with its twist lock, read by a linear
 pot. It is a separate 47 x 47 mm panel under the ignition, centered
-under its key like in the X-Plane 172N, left of the switch row and as low
-as it, in its own cut-out in the sheet, so the ignition panel stays as it is. The knob pulls out 45 mm (`stroke`,
+under its key like in the X-Plane 172N, left of the switch row and a
+little lower, in its own cut-out in the sheet (20 mm of sheet under the
+ignition's), so the ignition panel stays as it is. The knob pulls out 45 mm (`stroke`,
 about the 1¾" of a panel plunger primer) and pushes back in; fully in, it
 turns a quarter turn clockwise to lock, and only then. Turned back
 (counterclockwise), a spring pops it 5 mm out (`pop`), like the real one.

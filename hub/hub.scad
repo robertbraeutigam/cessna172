@@ -75,14 +75,14 @@ lid_hole = 3.3;              // M3
 lip_h = 3;                   // locating lip under the lid, inside the walls
 lip_w = 1.5;
 lip_clear = 0.4;
-// Mount ears on the floor, M5 into T-nuts in the frame's crossbars behind
-// the throttle box (frame/frame.inc.scad places the hub and checks them):
-// two on the left wall into the yoke bay's crossbar, one on the front and
-// one on the back wall into the throttle's crossbar
+// Mount ears on the floor, M5 into T-nuts in the frame's crossbars right
+// of the yoke (frame/frame.inc.scad places the hub and checks them):
+// two on the left wall into the step upright's crossbar, one on the front
+// and one on the back wall into the hub crossbar right of it
 ear = [14, 12];              // along the wall x out
 ear_t = 4;
 ear_hole = 5.3;              // M5
-ear_slot_dx = 156.5;         // frame: the bay crossbar's slot to the throttle crossbar's slot
+ear_slot_dx = 156.5;         // frame: the step crossbar's slot to the hub crossbar's slot
 round_r = 2;                 // outer vertical edges
 
 // --- RJ45 breakout board (measured) ---
@@ -363,7 +363,7 @@ sh_z = mega_z + mega_pcb_t + mega_header_h + sh_stack;
 outer = [inner_x + 2 * wall, inner_y + 2 * wall, floor_t + inner_h];
 // Ear holes [x, y] (box coordinates) and the wall they stand out of:
 // [-1, 0] left, [0, -1] front, [0, 1] back
-ear_left_x = -wall - ear.y / 2;              // the left ears' holes, over the bay crossbar's slot
+ear_left_x = -wall - ear.y / 2;              // the left ears' holes, over the step crossbar's slot
 ears = [[[ear_left_x, -wall + round_r + ear.x / 2], [-1, 0]],
         [[ear_left_x, inner_y + wall - round_r - ear.x / 2], [-1, 0]],
         [[ear_left_x + ear_slot_dx, -wall - ear.y / 2], [0, -1]],
