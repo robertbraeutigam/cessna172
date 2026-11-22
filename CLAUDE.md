@@ -105,8 +105,8 @@ its own top-level directory; new components should follow the same layout.
   switch/encoder lines, one bussed network; the components have none). No wire goes to the
   Mega, nothing is soldered in the box. Power for big loads is not the
   hub's job (an external PSU and 5 V bus, later). It stands on the
-  frame's desk part behind the throttle box, its ears bolted into two
-  crossbars (`ear_slot_dx`; `frame/frame.inc.scad` repeats its sizes). Every MobiFlight component connects to
+  frame's desk part behind the throttle box, its ears bolted into the
+  throttle's and the hub crossbar (`ear_slot_dx`; `frame/frame.inc.scad` repeats its sizes). Every MobiFlight component connects to
   its own numbered port with one Cat5 cable, RJ45 plug at the hub and
   soldered straight to the component (no connector there); the port
   pinouts and the port list are in the README's Connections section, keep
@@ -186,23 +186,32 @@ its own top-level directory; new components should follow the same layout.
   keep them in sync), the layout and its checks; `frame.scad` has the
   views and the cut list (echo), no printed parts. Every
   component brings its own front face and is screwed onto a cut-out in the
-  sheet; heavy or pulled ones also stand on the frame. The frame is two
+  sheet; heavy or pulled ones also stand on the frame. The layout follows
+  the X-Plane 172N panel (`n172_*`, 1000 mm wide): switch row bottom
+  left, the yoke column above it, the six-pack above that, the radio stack
+  right of it over the throttle box and flaps. Stage 1 (now) is only as
+  high as its parts, the monitor shows the six-pack; stage 2 (physical
+  instruments) swaps the left and split uprights for longer ones and cuts
+  a full height left sheet with the reserved six-pack holes (`six_c`),
+  nothing else moves. The frame is two
   parts bolted together: the vertical front part in front of the desk
   edge (a rectangle with the uprights, stepped up on the right for the
-  radio stack (two top bars, two sheets split at the yoke bay's right
-  edge), its bottom bar just under the desk top, the DIY flaps panel (not designed yet) on the sheet right of the
+  radio stack (two top bars, two sheets split at `sheet_split` right of
+  the switch panel), its bottom bar just under the desk top, the DIY flaps panel (not designed yet) on the sheet right of the
   throttle box, and the apron hanging under the throttle for the trim wheel
   pedestal; the thin parking
-  brake hangs under the bottom bar below the yoke), and the desk part (a
-  ladder on the desk, its front rail cut at the yoke), with 45 degree
-  braces between them (stock bars cut square, bought 45 degree
-  connectors). Lengths are rounded to stock lengths (`round_*`). The front rail
+  brake hangs under the bottom bar below the yoke column), and the desk part (a
+  ladder on the desk), with 45 degree braces between them (stock bars cut
+  square, bought 45 degree connectors), and the yoke stand on two of its
+  crossbars (posts, side bars, cross bars): the Saitek yoke (clamps off,
+  their screws through the cross bars) stands on it behind the front
+  part, over the switch panel's back, its shaft through a round hole in
+  the sheet at the 172N column's height. Lengths are rounded to stock lengths (`round_*`). The front rail
   runs past the sheet at both ends (`ear_len`), where two bought screw
   clamps clamp it onto the desk (no printed parts in the load path: they
-  creep under constant load). `knee_w` around the yoke stays open for the
+  creep under constant load). `knee_w` around the yoke column stays open for the
   legs. The hub stands on the desk part behind the throttle box (its ears
-  in the slots of the yoke bay's right crossbar and the throttle's
-  crossbar); the crossbars are as long as it needs.
+  in the slots of the throttle's crossbar and the hub crossbar); the crossbars are as long as it needs.
 
 ## Documentation
 

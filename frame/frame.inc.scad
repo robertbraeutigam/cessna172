@@ -12,42 +12,58 @@
 // frame at desk height: the front part has its front face at y = 0, the
 // sheet is in front of it (y = -sheet_t .. 0).
 //
-//   left part           yoke bay           right part
-//   ignition+switches   Saitek yoke        Saitek radio panel
-//                       (on the desk)      throttle box and flaps under it
+// The layout follows the X-Plane 172N panel (the 172n_* values), so the
+// panel can grow into a full 172N panel later:
+//
+//   left sheet                              right sheet (higher)
+//   (six-pack, stage 2, over the monitor)   radio stack
+//   yoke column
+//   ignition + primer, switches             throttle box, flaps
+//
+// Stage 1 (now): the panel is only as high as the parts on it, the
+// monitor behind it shows the six-pack above the left sheet. Stage 2
+// (physical instruments): the left and the split upright are swapped for longer ones,
+// a full height left sheet gets the six-pack cut-outs (six_*, reserved,
+// outlined in the "sheet" view) and the monitor goes up over the
+// glareshield; nothing else moves. The left top bar stays as a mid bar
+// under the six-pack.
 //
 // - Front part, vertical, in front of the desk edge: a rectangle (top bar,
-//   bottom bar, an upright at each end) with an upright on each side of the
-//   yoke bay. The bottom bar lies just
+//   bottom bar, an upright at each end) with two more uprights, at the
+//   sheet split and right of the radios. The bottom bar lies just
 //   under the desk top (its top at desk height), its back against the desk
-//   edge (a felt pad); the yoke's front sits on it, the yoke's own clamps go
-//   around it and the desk. Under the throttle a smaller rectangle hangs
+//   edge (a felt pad). Under the throttle a smaller rectangle hangs
 //   from the bottom bar: the apron, two hangers and a lower bar, for the
 //   trim wheel pedestal. The parking brake hangs under the
-//   bottom bar in the bay, directly below the yoke.
+//   bottom bar, directly below the yoke column.
 // - Desk part, flat on the desk behind it: a ladder (front rail, rear rail,
-//   crossbars) with the front rail cut at the yoke bay. The front part is
+//   crossbars). The front part is
 //   bolted to its front rail, and a 45 degree brace from each upright down
 //   to a crossbar stops it from rocking: a stock length, cut square, held
 //   by a bought 45 degree connector at each end. The throttle box stands on the
 //   front rail and the crossbar under its middle; the hub stands behind
-//   it, bolted into that crossbar and the yoke bay's right one.
+//   it, bolted into that crossbar and the hub crossbar.
+// - Yoke stand, on two crossbars of the desk part: four posts, two side
+//   bars along y and two cross bars on them. The yoke housing stands on the
+//   cross bars right behind the front part, over the switch panel's back,
+//   and its shaft comes through a round hole in the sheet like the 172N's
+//   column. Its desk clamps are taken off and their screws hold it down
+//   through holes drilled in the cross bars.
 //
 // The front rail runs past the sheet at both ends (ear_len): there a
 // bought screw clamp (rubber jaws) on each end clamps the rail onto the
 // desk. All metal, printed parts creep under constant load.
-// knee_w around the yoke stays open for the legs; only the bottom bar and
+// knee_w around the yoke column stays open for the legs; only the bottom bar and
 // the thin parking brake are there, just under the desk top.
 //
 // Lengths are rounded to stock lengths (multiples of round_d), except the
-// apron's lower bar. The height is the lowest that the parts on the sheet
-// allow, with stock length uprights.
+// apron's lower bar and the stand's posts. The height is the lowest that
+// the parts on the sheet allow, with stock length uprights.
 
 // --- Extrusion: 2020 only, 6 mm slot, M5 T-nuts everywhere ---
 ext = 20;
-round_w = 100;               // frame width rounded up to this
 round_d = 50;                // the other bars rounded to this (stock lengths)
-round_cut = 10;              // the apron's lower bar: between the leg room and the pedestal, no stock length fits
+round_cut = 10;              // the apron's lower bar and the yoke stand's posts: no stock length fits
 brace_len = 200;             // a stock length, cut square
 slot_w = 6;
 m5_d = 5.3;                  // M5 clearance, sheet and printed parts
@@ -55,8 +71,8 @@ m5_head_d = 9.5;             // button head
 
 // --- Sheet ---
 sheet_t = 3;                 // ACM, the same as the printed panel_t
-sheet_h_max = 260;           // panel height above the desk at most, left of the radios; limited by the monitor
-                             // (sheet_h is computed from the parts on it)
+sheet_h_max = 260;           // stage 1: left panel height above the desk at most; the monitor shows the
+                             // six-pack over it (sheet_h is computed from the parts on it)
 sheet_h_r_max = 330;         // the right part's (sheet_h_r) at most: it may cover the monitor's bottom right
                              // corner, where X-Plane draws its own radios; check the six-pack stays visible
 sheet_edge = 25;             // sheet edge to a cut-out, at least
@@ -68,7 +84,7 @@ screw_step_upright = 100;
 // --- Desk, MEASURE ---
 desk = [1200, 700, 28];      // width, depth, thickness
 desk_skirt = 0;              // frame or drawer under the top at its front edge, height below the top
-knee_w = 460;                // kept open under the desk for the legs, centered on the yoke
+knee_w = 460;                // kept open under the desk for the legs, centered on the yoke column
 edge_play = 2;               // front part back to the desk edge: a felt pad, the front part stops the frame against the edge
 frame_overhang = ext + edge_play;     // frame front in front of the desk edge
 
@@ -77,10 +93,14 @@ frame_overhang = ext + edge_play;     // frame front in front of the desk edge
 // out. The housing is about 100 mm high and about as wide as the radio
 // panel that sat on it (from memory).
 yoke_housing = [283, 280, 100];   // housing body: width, depth, height
-ffb_h = 130;                 // the future force feedback yoke's height, the notch is made for it
-yoke_front_y = 0;            // housing front, on the bottom bar; its clamps go around the bar and the desk
-yoke_play = 5;               // housing to the bay sides and the notch top
-yoke_shaft_z = 65;           // shaft center above the desk (view only)
+ffb_h = 130;                 // the future force feedback yoke's height, the stand and the six-pack leave room for it
+yoke_shaft_z = 65;           // shaft center above the housing's bottom
+yoke_shaft_d = 22;           // the shaft through the sheet (the FFB yoke's may be thicker: the hole)
+yoke_hole_d = 28;            // its round hole in the sheet
+yoke_screw_y = [45, 230];    // its desk clamps' screw threads in the housing bottom, from its front
+                             // (the cross bars of the stand go under them)
+yoke_reach = 100;            // housing front to the wheel's front, shaft in (spec: 380 deep) (view only)
+yoke_wheel_t = 45;           // the wheel with its grips, front to back
 yoke_wheel_w = 310;          // view only
 
 // --- Saitek Pro Flight Radio Panel, MEASURE ---
@@ -132,16 +152,16 @@ throttle_bolt_y = 36;        // floor_bolt_y, from the face front
 flaps_plate = [50, 63];      // front plate, width x height
 flaps_body = [44, 57, 64];   // through the sheet (a guess: 3 mm smaller than the plate all round), depth behind it
 flaps_play = 0.5;            // body to its cut-out
-flaps_gap = 10;              // throttle box face to the flaps plate
+flaps_gap = 70;              // throttle box face to the flaps plate (172N)
 
 // --- Hub, from hub/hub.scad ---
 // The box with the MobiFlight Mega and the RJ45 ports stands on the desk
-// part behind the throttle box, across the yoke bay's right crossbar and
-// the throttle's crossbar: the two ears on its left wall are bolted into
+// part behind the throttle box, across the throttle's crossbar and the hub
+// crossbar right of it: the two ears on its left wall are bolted into
 // the first one's top slot, the ears on its front and back walls into the
 // second one's (M5, T-nuts). Its front ports (1-3) face the pilot, port 3
 // behind the throttle box (hub_cable_room for its plug), its right ports
-// (4-6) face right and its USB jack left, behind the yoke.
+// (4-6) face right and its USB jack left, towards the yoke stand.
 hub_size = [172, 135, 53];   // outer, with the lid
 hub_ear_out = 12;            // ear.y: how far the ears stand out, their holes in the middle
 hub_ear_slot_dx = 156.5;     // ear_slot_dx: the left ears' holes to the front and back ears'
@@ -163,7 +183,8 @@ switch_flange = 10;          // flange_w
 switch_cut_clear = 1;        // sheet_cut_clear
 switch_backs_gap = sheet_web + 2 * switch_cut_clear;   // ignition back to the switches' back
 switch_panel = [switch_ign_w + switch_backs_gap + switch_back.x, switch_back.y] + 2 * [switch_flange, switch_flange];   // both faces
-switch_depth = 40;           // switches behind the sheet (view only)
+switch_depth = 40;           // switches and the mux carrier behind the sheet's back (+ 5 mm), MEASURE
+switch_back_y = 5 + switch_depth;   // the switch panel's back ends here; the yoke stand stays behind it
 switch_z = ext + 5;          // the switches' face bottom above the desk; the ignition's is switch_ign_rise higher
 
 // Primer, from switchpanel/primer.scad: its own small panel below the
@@ -202,9 +223,6 @@ park_size = [40, 90, 22];
 park_bolt_dx = 12;           // bolts from its center, into the bottom bar's bottom slot
 park_pull = 50;              // handle travel
 park_handle = 60;            // T-handle length (view only)
-// MEASURE: the Saitek yoke's own desk clamps, the free width between them
-// at the desk edge; the parking brake body goes there
-yoke_clamp_gap = 120;
 
 // --- Desk clamps: bought screw clamps with rubber jaws, MEASURE ---
 // One on each front rail end (ear), beside the sheet: the fixed jaw on the
@@ -217,29 +235,34 @@ clamp_w = 25;                // MEASURE: across the clamp (x), the widest part
 clamp_pad_d = 20;            // MEASURE: rubber jaw diameter
 clamp_y = (frame_overhang + 2 * ext) / 2;  // screw axis from the frame front
 
-// --- Layout ---
-gap = 25;                    // between two parts; the bay uprights stand in it
-// Right part: the radio centered over the throttle box (x_rc), the flaps
-// right of the throttle box
-throttle_face_w = throttle_size.x + 2 * throttle_flange;
-right_l = max(radio_front.x, throttle_face_w) / 2;          // x_r0 to x_rc
-right_r = max(radio_front.x / 2, throttle_face_w / 2 + flaps_gap + flaps_plate.x);   // x_rc to x_r1
-right_w = right_l + right_r;
-bay_w = yoke_housing.x + 2 * yoke_play;
-parts_w = switch_panel.x + gap + bay_w + gap + right_w;
-frame_w = ceil((parts_w + 2 * sheet_edge) / round_w) * round_w;
-margin = (frame_w - parts_w) / 2;           // sheet edge to the outer cut-outs
+// --- 172N layout ---
+// Measured off the X-Plane 172N panel, scaled by its 3 1/8" instruments
+// (0.59 mm per pixel of a 1440 pixel wide screenshot), x from the switch
+// panel's left face edge, z above the desk with the switch row where it is
+// here. Some are moved a little so the parts fit (see each).
+frame_w = 1000;              // the 172N panel's width
+n172_col_dx = 235;           // yoke column (172N: 241)
+n172_col_z = 184;            // yoke column (shaft) height, the stand is built for it
+n172_six_dx = -15;           // six-pack's middle column from the yoke column (172N: -9; left for the sheet split)
+n172_six_dz = [92, 180];     // six-pack's rows above the yoke column
+n172_throttle_dx = 485;      // throttle rod, the throttle box's middle (172N: 472; right for the sheet split)
+n172_radio_dx = 105;         // radio stack's middle right of the throttle (172N: 106)
+n172_glare_z = 425;          // glareshield (the panel top) above the desk, stage 2
+// Six-pack (stage 2, reserved): 3 1/8" instruments on 3.5" centres
+six_step = 89;
+six_cut_d = 81;              // their hole
+inst_body_d = 50;            // a DIY instrument's body behind the sheet (round display or gauge), a guess
+inst_depth = 45;             // and its depth behind the sheet's back, a guess
 
-x_sw0 = margin;                              // switch panel
+// --- Layout ---
+x_sw0 = sheet_edge;                          // switch panel, left face edge
 x_sw1 = x_sw0 + switch_panel.x;
-x_bay0 = x_sw1 + gap;                        // yoke bay
-x_bay1 = x_bay0 + bay_w;
-x_r0 = x_bay1 + gap;                         // radio and throttle
-x_r1 = x_r0 + right_w;
-x_rc = x_r0 + right_l;                       // the throttle box's and the radio's middle
+col_x = x_sw0 + n172_col_dx;                 // yoke column
+x_rc = x_sw0 + n172_throttle_dx;             // the throttle box's middle
+radio_x = x_rc + n172_radio_dx;              // the radio's and the DIY stack's middle
+throttle_face_w = throttle_size.x + 2 * throttle_flange;
 
 // front part
-upright_xs = [0, x_bay0 - ext, x_bay1, frame_w - ext];   // left sides
 throttle_x0 = x_rc - throttle_size.x / 2;
 throttle_y0 = -sheet_t - throttle_face_t;    // face front, the face on the sheet
 
@@ -255,13 +278,13 @@ flaps_z = (flaps_cut[1] + flaps_cut[3]) / 2;           // center
 flaps_face = [flaps_x - flaps_plate.x / 2, flaps_z - flaps_plate.y / 2,
               flaps_x + flaps_plate.x / 2, flaps_z + flaps_plate.y / 2];
 radio_z0 = max(throttle_cut[3], flaps_cut[3]) + sheet_web;
-radio_cut = [x_rc - radio_body.x / 2 - 0.5, radio_z0,
-             x_rc + radio_body.x / 2 + 0.5, radio_z0 + radio_body.y + 1];
+radio_cut = [radio_x - radio_body.x / 2 - 0.5, radio_z0,
+             radio_x + radio_body.x / 2 + 0.5, radio_z0 + radio_body.y + 1];
 radio_front_z0 = radio_cut[1] + 0.5 - (radio_front.y - radio_body.y) / 2;
 // the DIY stack (reserved, not cut): its cut-out and its faces
-stack_cut = [x_rc - stack_w / 2 + stack_flange - stack_cut_clear, radio_z0,
-             x_rc + stack_w / 2 - stack_flange + stack_cut_clear, radio_z0 + stack_h];
-stack_face = [x_rc - stack_w / 2, radio_z0, x_rc + stack_w / 2, radio_z0 + stack_h];
+stack_cut = [radio_x - stack_w / 2 + stack_flange - stack_cut_clear, radio_z0,
+             radio_x + stack_w / 2 - stack_flange + stack_cut_clear, radio_z0 + stack_h];
+stack_face = [radio_x - stack_w / 2, radio_z0, radio_x + stack_w / 2, radio_z0 + stack_h];
 // primer: under the ignition key, at the bottom; the ignition above it
 primer_x = x_sw0 + switch_flange + switch_ign_w / 2;    // rod axis
 primer_z = primer_z0 + primer_flange + primer_back / 2;
@@ -276,44 +299,72 @@ ign_cut = [x_sw0 + switch_flange - switch_cut_clear, ign_z + switch_flange - swi
            x_ign1 + switch_cut_clear, ign_z + switch_flange + switch_back.y + switch_cut_clear];
 switch_cut = [x_s0 - switch_cut_clear, switch_z + switch_flange - switch_cut_clear,
               x_sw1 - switch_flange + switch_cut_clear, switch_z + switch_flange + switch_back.y + switch_cut_clear];
-bay_cut = [x_bay0, 0, x_bay1, max(yoke_housing.z, ffb_h) + yoke_play];
-cuts = [ign_cut, switch_cut, bay_cut, throttle_cut, radio_cut, primer_cut, flaps_cut];   // [x0, z0, x1, z1] on the sheet
+cuts = [ign_cut, switch_cut, throttle_cut, radio_cut, primer_cut, flaps_cut];   // [x0, z0, x1, z1] on the sheet
+
+// Six-pack (stage 2, reserved): centres [x, z], row by row
+six_x = col_x + n172_six_dx;
+six_c = [for (z = n172_six_dz, i = [-1 : 1]) [six_x + i * six_step, n172_col_z + z]];
+six_box = [six_x - six_step - six_cut_d / 2, n172_col_z + n172_six_dz[0] - six_cut_d / 2,
+           six_x + six_step + six_cut_d / 2, n172_col_z + n172_six_dz[1] + six_cut_d / 2];
+
+// The sheet split: as far right as the throttle box allows (the six-pack
+// needs the room on the left sheet in stage 2)
+sheet_split = throttle_cut[0] - sheet_edge;  // left sheet to the right sheet, x
+x_um = max(radio_cut[2], stack_cut[2], flaps_cut[2]) + sheet_edge;   // the upright right of the radios
+upright_xs = [0, sheet_split, x_um, frame_w - ext];   // left sides
 
 // Height: sheet_web over the highest cut-out (or the radio front), then the
 // top bar; the uprights (on the bottom bar, under the top bar) a stock
-// length. The front part is stepped: the right part (over the yoke bay's
-// right upright and the end upright, the radios) is as high as the DIY
-// stack needs, the left part (switches and yoke bay) as low as its parts
-// allow. Its top bar is cut in two: the left one ends against the side of
-// the bay's right upright, the right one sits on that upright and the end
-// upright. The sheet is cut in two at the bay's right edge (sheet_split),
-// so the right sheet can be cut again for the DIY stack on its own.
-upright_len = ceil((max(bay_cut[3], ign_cut[3], switch_cut[3], primer_cut[3]) + sheet_web) / round_d) * round_d;
+// length. The front part is stepped: the right part (the uprights at the
+// split, right of the radios and at the end) is as high as the DIY
+// stack needs, the left part as low as its parts allow (the yoke hole is
+// made to fit under its top bar). Its top bar ends against the side of
+// the split upright, the right one sits on the right uprights. The sheet
+// is cut in two at the split, so the right sheet can be cut again for the
+// DIY stack on its own.
+upright_len = ceil((max(ign_cut[3], switch_cut[3], primer_cut[3]) + sheet_web) / round_d) * round_d;
 upright_len_r = max(upright_len,
    ceil((max(radio_front_z0 + radio_front.y, stack_cut[3]) + sheet_web) / round_d) * round_d);
-upright_lens = [upright_len, upright_len, upright_len_r, upright_len_r];   // along upright_xs
+upright_lens = [upright_len, upright_len_r, upright_len_r, upright_len_r];   // along upright_xs
 sheet_h = upright_len + ext;                 // left panel height above the desk (the sheet also covers the bottom bar, ext more)
 sheet_h_r = upright_len_r + ext;             // right panel height
-sheet_split = x_bay1;                        // left sheet to the right sheet, x
+// stage 2: the uprights for the full panel (left ones swapped, right ones too if they are shorter)
+upright_len_full = ceil((max(six_box[3] + sheet_web, n172_glare_z) - ext) / round_d) * round_d;
 
-// desk part: the front rail behind the front part, cut at the bay
-crossbar_xs = concat(upright_xs, [x_rc - ext / 2]);      // the last one carries the throttle box
-// Hub behind the throttle box, its left ears over the bay crossbar's slot,
-// the front and back ears over the throttle crossbar's slot
-hub_slot_x = [x_bay1 + ext / 2, x_rc];
+// Yoke stand: posts on two crossbars, side bars along y on them, cross
+// bars across on those under the housing's clamp screws. Its housing
+// stands over the switch panel's back, right behind the front part.
+yoke_front_y = ext + 2;                      // housing front
+stand_w = floor((yoke_housing.x - ext) / round_d) * round_d;   // cross bar length, under the housing
+stand_xs = [col_x - stand_w / 2, col_x + stand_w / 2 - ext];   // side bars' (and their crossbars') left sides
+stand_bar_ys = [for (y = yoke_screw_y) yoke_front_y + y - ext / 2];   // cross bars' front sides
+stand_y0 = stand_bar_ys[0];                  // side bars' front
+stand_len = ceil((stand_bar_ys[1] + ext - stand_y0) / round_d) * round_d;   // side bars
+stand_post = round((n172_col_z - yoke_shaft_z - 3 * ext) / round_cut) * round_cut;
+yoke_z0 = 3 * ext + stand_post;              // housing bottom (crossbar, post, side bar, cross bar)
+col_z = yoke_z0 + yoke_shaft_z;              // shaft, the column
+col_cut = [col_x - yoke_hole_d / 2, col_z - yoke_hole_d / 2, col_x + yoke_hole_d / 2, col_z + yoke_hole_d / 2];
+yoke_top = yoke_z0 + max(yoke_housing.z, ffb_h);
+
+// desk part: the front rail behind the front part, at least ear_len past
+// the sheet at both ends
+// Hub behind the throttle box, its left ears over the throttle crossbar's slot,
+// the front and back ears over the hub crossbar's slot
+hub_slot_x = [x_rc, x_rc + hub_ear_slot_dx];
+// the uprights', the throttle's, the hub's and the stand's (left sides)
+crossbar_xs = concat(upright_xs, [x_rc - ext / 2, hub_slot_x[1] - ext / 2], stand_xs);
 hub_x0 = hub_slot_x[0] + hub_ear_out / 2;                    // outer left wall
 hub_y0 = throttle_y0 + throttle_size.y + hub_cable_room;     // outer front wall
 // M5 through its ears into T-nuts in the crossbars' top slots, [x, y]
 hub_bolts = concat([for (y = hub_ear_left_ys) [hub_slot_x[0], hub_y0 + y]],
-                   [for (y = [-hub_ear_out / 2, hub_size.y + hub_ear_out / 2]) [hub_slot_x[0] + hub_ear_slot_dx, hub_y0 + y]]);
-crossbar_len = ceil(max(max(yoke_front_y + yoke_housing.y, throttle_y0 + throttle_size.y) - ext,
+                   [for (y = [-hub_ear_out / 2, hub_size.y + hub_ear_out / 2]) [hub_slot_x[1], hub_y0 + y]]);
+crossbar_len = ceil(max(max(stand_y0 + stand_len, throttle_y0 + throttle_size.y) - ext,
                         hub_bolts[3].y + m5_head_d / 2 - 2 * ext) / round_d) * round_d;
 rear_y = 2 * ext + crossbar_len;
 frame_d = rear_y + ext;
-// front rail left and right, [x0, x1]: at least ear_len past the sheet, rounded up
-rails = [[x_bay0 - ceil((x_bay0 + ear_len) / round_d) * round_d, x_bay0],
-         [x_bay1, x_bay1 + ceil((frame_w - x_bay1 + ear_len) / round_d) * round_d]];
-clamp_xs = [rails[0][0] + ear_len / 2, rails[1][1] - ear_len / 2];   // desk clamps, on the rail ends
+rail_len = ceil((frame_w + 2 * ear_len) / round_d) * round_d;
+rail = [(frame_w - rail_len) / 2, (frame_w + rail_len) / 2];   // [x0, x1]
+clamp_xs = [rail[0] + ear_len / 2, rail[1] - ear_len / 2];   // desk clamps, on the rail ends
 brace_room = 30;             // upright above the brace, for the connector's leg
 // Brace: its inner edge (towards the corner) from the upright's back at
 // brace_top down to the crossbar top, brace_rise lower and further back;
@@ -323,8 +374,7 @@ brace_rise = brace_len / sqrt(2);
 brace_top = ext + brace_rise;
 
 // --- Below the desk top (z < 0) ---
-yoke_c = (x_bay0 + x_bay1) / 2;
-legs = [yoke_c - knee_w / 2, yoke_c + knee_w / 2];       // open for the legs
+legs = [col_x - knee_w / 2, col_x + knee_w / 2];       // open for the legs
 under_z = desk.z + desk_skirt + desk_clear;              // desk top to the top of the bodies
 // Apron: two hangers under the bottom bar (corner brackets), the right one
 // under the end upright, and the lower bar between their ends
@@ -335,10 +385,11 @@ apron_bar_len = floor((frame_w - 2 * ext - legs[1]) / round_cut) * round_cut;
 hangers = [frame_w - 2 * ext - apron_bar_len, frame_w - ext];   // left sides
 apron_bar = [hangers[0] + ext, hangers[1]];
 apron = [hangers[0], frame_w];                           // [x0, x1] of the apron sheet, z -apron_h .. -ext
-park_x = yoke_c;
+park_x = col_x;
 park_z = -under_z - park_size.z;                         // body bottom
-// pedestal cut-out and face, [x0, z0, x1, z1] on the apron sheet
-pedestal_x = x_rc;
+// pedestal cut-out and face, [x0, z0, x1, z1] on the apron sheet: under
+// the throttle box, as far left as the leg room allows
+pedestal_x = max(x_rc, apron_bar[0] + pedestal_size.x / 2 + under_flange);
 function under_cut(x, size) = [x - size.x / 2 - under_play, apron_bar_z,
                                x + size.x / 2 + under_play, apron_bar_z + size.z + under_play];
 function under_face(x, size) = [x - size.x / 2 - under_flange, apron_bar_z,
@@ -351,7 +402,7 @@ under_y0 = -sheet_t - under_face_t;                     // face front
 function spread(a, b, step) = let(n = max(1, ceil((b - a) / step))) [for (i = [0 : n]) a + (b - a) * i / n];
 function clear_of(p, rects, m) =
    len([for (r = rects) if (p.x > r[0] - m && p.x < r[2] + m && p.y > r[1] - m && p.y < r[3] + m) 1]) == 0;
-avoid = concat(cuts, [throttle_face, primer_face_r, flaps_face, stack_face]);
+avoid = concat(cuts, [col_cut, throttle_face, primer_face_r, flaps_face, stack_face]);
 sheet_screws = [for (p = concat(
       [for (i = [0 : 3], z = spread(20, upright_lens[i] - 20, screw_step_upright)) [upright_xs[i] + ext / 2, z]],
       [for (x = spread(ext / 2, sheet_split - ext / 2, screw_step)) [x, sheet_h - ext / 2]],
@@ -370,10 +421,16 @@ throttle_bolts = [for (x = throttle_bolt_xs) [throttle_x0 + x, throttle_y0 + thr
 pedestal_bolts = [for (s = [-1, 1]) [pedestal_x + s * pedestal_size.x / 4, under_y0 + under_bolt_y]];
 
 // --- Checks ---
-assert(gap >= ext + 3 && margin >= ext + 3, "No room for the uprights next to the cut-outs");
-assert(margin >= sheet_edge, "Cut-outs too close to the sheet edge");
+assert(x_sw0 >= ext + 3, "No room for the left upright next to the cut-outs");
+assert(ign_cut[0] >= sheet_edge && primer_cut[0] >= sheet_edge, "Cut-outs too close to the sheet edge");
+assert(sheet_split - max(switch_cut[2], col_cut[2]) >= sheet_edge, "Left part's cut-outs too close to the sheet split");
+assert(sheet_split - six_box[2] >= sheet_edge && six_box[0] >= sheet_edge,
+       "Six-pack (stage 2) too close to the left sheet's edges");
+assert(six_box[1] >= sheet_h + 3, "Six-pack (stage 2) runs into the left top bar (the mid bar then)");
+assert(x_um - max(radio_cut[2], stack_cut[2], flaps_cut[2]) >= sheet_edge && x_um + ext <= frame_w - ext - 3,
+       "No room for the upright right of the radios");
 assert(switch_cut[1] >= ext, "Switch panel cut-out runs into the bottom of the sheet");
-assert(throttle_x0 >= rails[1][0] && throttle_x0 + throttle_size.x <= frame_w, "Throttle box not on the front rail");
+assert(throttle_x0 >= sheet_split + ext + 3 && throttle_x0 + throttle_size.x <= x_um - 3, "Throttle box runs into the uprights");
 assert(throttle_y0 + throttle_size.y <= rear_y, "Throttle box does not fit on the frame");
 assert(yoke_front_y + yoke_housing.y <= rear_y, "Yoke housing runs into the rear rail");
 assert(radio_body.x <= radio_front.x - 6 && radio_body.y <= radio_front.y - 6,
@@ -385,7 +442,6 @@ assert(flaps_cut[0] - throttle_cut[2] >= sheet_web, "Flaps cut-out too close to 
 assert(flaps_face[0] >= throttle_face[2] + 2, "Flaps plate runs into the throttle box face");
 assert(flaps_cut[2] <= frame_w - sheet_edge && flaps_face[2] <= frame_w - screw_edge, "Flaps panel too close to the sheet edge");
 assert(flaps_cut[2] <= frame_w - ext - 3, "Flaps body runs into the end upright");
-assert(flaps_cut[0] >= rails[1][0], "Flaps body not over the front rail");
 assert(sheet_h <= sheet_h_max, "Panel too high for the monitor");
 assert(sheet_h_r <= sheet_h_r_max, "Right part of the panel too high for the monitor");
 assert(radio_front_z0 + radio_front.y <= sheet_h_r - ext - sheet_web, "Radio panel too high for the sheet");
@@ -398,7 +454,26 @@ assert(min(throttle_cut[0], radio_cut[0], stack_cut[0]) - sheet_split >= sheet_e
        "Right part's cut-outs too close to the sheet split");
 assert(frame_w - max(radio_cut[2], stack_cut[2], flaps_cut[2]) >= sheet_edge,
        "Right part's cut-outs too close to the sheet edge");
-assert(bay_cut[3] <= sheet_h - ext - sheet_web, "Yoke notch too high for the sheet");
+assert(col_cut[3] + sheet_web <= sheet_h, "Yoke column hole too close to the sheet top");
+assert(col_z + yoke_shaft_d / 2 <= sheet_h - ext - 3, "Yoke shaft runs into the left top bar");
+assert(yoke_hole_d >= yoke_shaft_d + 4, "Yoke column hole too tight");
+assert(abs(col_z - n172_col_z) <= 10, "Yoke column far from the 172N's height");
+assert(col_cut[1] - switch_cut[3] >= sheet_web || col_cut[1] >= switch_z + switch_panel.y + 3,
+       "Yoke column hole runs into the switch panel face");
+assert(yoke_z0 >= switch_cut[3] + 2, "Yoke housing runs into the switch panel's back");
+assert(stand_y0 >= switch_back_y + 3, "Yoke stand runs into the switch panel's back");
+assert(yoke_front_y >= ext + 2, "Yoke housing runs into the front part");
+assert(col_x - yoke_housing.x / 2 >= primer_x + primer_bracket.x + 3 || yoke_z0 >= primer_z + primer_bracket.y / 2 + 3,
+       "Yoke housing runs into the primer");
+assert(stand_xs[0] >= primer_x + primer_bracket.x + 3, "Yoke stand runs into the primer");
+assert(stand_xs[0] >= ext + 3 && col_x + yoke_housing.x / 2 <= sheet_split - 2,
+       "Yoke housing runs into the left or split upright and its brace");
+assert(stand_xs[1] + ext <= sheet_split - 3, "Yoke stand runs into the split upright's crossbar");
+assert(stand_w >= yoke_housing.x / 2, "Yoke stand too narrow for the housing");
+assert(stand_post >= ext, "Yoke stand posts too short for corner brackets");
+assert(yoke_front_y - yoke_reach + yoke_wheel_t <= -sheet_t - 15, "Yoke wheel too close to the sheet with the shaft in");
+assert(yoke_top <= six_box[1] + six_cut_d / 2 - inst_body_d / 2 || yoke_front_y >= inst_depth + 3,
+       "Yoke housing (FFB) in the way of the six-pack's bottom row (stage 2)");
 assert(max(switch_cut[3], ign_cut[3]) <= sheet_h - ext - sheet_web, "Switch panel too high for the sheet");
 assert(switch_cut[0] - ign_cut[2] >= sheet_web - 0.01, "Ignition and switch panel holes too close");
 assert(primer_cut[3] <= sheet_h - ext - sheet_web, "Primer too high for the sheet");
@@ -408,25 +483,21 @@ assert(primer_face_r[2] + 1 <= x_s0 - switch_flange, "Primer face runs into the 
 assert(switch_cut[0] - primer_cut[2] >= sheet_web, "Primer too close to the switch panel's cut-out");
 assert(primer_cut[1] >= ext, "Primer cut-out runs into the bottom of the sheet");
 assert(primer_cut[0] >= sheet_edge, "Primer cut-out too close to the sheet edge");
-assert(primer_x - primer_back / 2 >= ext + 3 && primer_x + primer_bracket.x <= x_bay0 - ext - 3,
-       "Primer runs into the uprights behind the sheet");
+assert(primer_x - primer_back / 2 >= ext + 3, "Primer runs into the left upright behind the sheet");
 assert(abs(throttle_y0 + throttle_bolt_y - ext * 3 / 2) < 0.01, "Throttle floor bolts miss the front rail slot");
 assert(abs(hub_slot_x[0] + hub_ear_slot_dx - hub_slot_x[1]) < 0.01,
        "Hub's front and back ears miss the throttle crossbar's slot (ear_slot_dx in hub.scad)");
-assert(hub_x0 >= x_bay1 && hub_x0 + hub_size.x + hub_ear_out <= frame_w - ext,
-       "Hub not between the yoke bay and the right crossbar");
-assert(hub_y0 + hub_ear_left_ys[0] - 7 >= ext + brace_rise + ext * sqrt(2) + 5,
-       "Hub's left ears run into the bay brace's foot");
+assert(hub_x0 - hub_ear_out >= sheet_split + ext + 40 && hub_x0 + hub_size.x + hub_ear_out <= x_um - 3,
+       "Hub not between the split crossbar (room for its USB plug) and the upright right of the radios");
 assert(hub_bolts[3].y + m5_head_d / 2 <= rear_y, "Hub's back ear is off the crossbar");
-assert(hub_y0 + hub_usb_y >= yoke_front_y + yoke_housing.y + 5, "Hub's USB plug runs into the yoke");
+assert(hub_x0 - 40 >= col_x + yoke_housing.x / 2, "Hub's USB plug runs into the yoke");
 assert(ext + brace_rise + ext / sqrt(2) <= rear_y, "Braces do not land on the crossbars");
 assert(brace_top + brace_room <= sheet_h - ext, "Braces too long: no room for the connector on the upright");
 assert(brace_top + ext / sqrt(2) <= sheet_h, "Braces stick out over the top bar");
-assert(rails[1][1] - rails[0][0] <= desk.x && frame_d <= frame_overhang + desk.y, "Frame does not fit on the desk");
+assert(rail_len <= desk.x && frame_d <= frame_overhang + desk.y, "Frame does not fit on the desk");
 assert(2 * ext - frame_overhang >= 10, "Front rail barely on the desk");
-assert(legs[0] <= x_bay0 && legs[1] >= x_bay1, "Leg room narrower than the yoke bay");
 assert(hangers[0] >= legs[1], "Apron hanger in the leg room");
-assert(hangers[0] >= x_bay1 + ext, "Apron hanger not under the throttle side");
+assert(pedestal_x - pedestal_size.x / 2 <= throttle_x0 + throttle_size.x, "Pedestal not under the throttle box");
 assert(abs(under_y0 + under_bolt_y - ext / 2) < 0.01, "Pedestal floor bolts miss the lower bar slot");
 assert(pedestal_face[0] >= apron_bar[0] && pedestal_face[2] <= apron_bar[1],
        "Pedestal does not fit between its hangers");
@@ -436,7 +507,6 @@ assert(clamp_open >= ext + desk.z + 1, "Desk clamps do not open far enough for t
 assert(clamp_reach >= clamp_y + 2, "Desk clamps do not reach over the rail to the desk");
 assert(clamp_y - clamp_pad_d / 2 >= frame_overhang - 3, "Desk clamp jaw not under the desk");
 assert(clamp_w + 10 <= ear_len, "Desk clamps do not fit on the rail ends beside the sheet");
-assert(park_size.x + 10 <= yoke_clamp_gap, "Parking brake runs into the yoke's desk clamps");
 assert(park_size.y <= desk.y / 3, "Parking brake body too deep under the desk");
-assert(abs(park_x - yoke_c) < 0.01 && park_bolt_dx * 2 + m5_head_d <= park_size.x + 10,
+assert(abs(park_x - col_x) < 0.01 && park_bolt_dx * 2 + m5_head_d <= park_size.x + 10,
        "Parking brake bolts do not fit");

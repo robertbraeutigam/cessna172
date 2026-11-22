@@ -2,18 +2,18 @@
 //
 // Two parts of 2020 extrusion: the front part (a vertical rectangle with
 // the uprights, stepped up over the radios, in front of the desk edge, and
-// the apron hanging under the throttle) and the desk part (a ladder on the desk, cut at the yoke),
-// bolted together and braced at 45 degrees; two ACM sheets over the front
-// (left, and right over the radios) with a cut-out for every component. Values, layout and checks are in
-// frame.inc.scad; this file has the views and the cut list (echo). It has
-// no printed parts.
+// the apron hanging under the throttle) and the desk part (a ladder on the
+// desk, with the yoke stand on it), bolted together and braced at 45
+// degrees; two ACM sheets over the front (left, and right over the radios)
+// with a cut-out for every component, laid out like the X-Plane 172N panel.
+// Values, layout and checks are in frame.inc.scad; this file has the views
+// and the cut list (echo). It has no printed parts.
 //
 // Bought parts (lengths: see the echo of the build, or the README):
 // - 2020 extrusion, front part: top bar left and right, bottom bar,
-//   2 uprights left, 2 uprights right (longer), 2 apron hangers, lower bar
-// - 2020 extrusion, desk part: front rail left, front rail right, rear
-//   rail, 5 crossbars, 4 braces (cut square); the hub stands on two of
-//   the crossbars
+//   1 upright left, 3 uprights right (longer), 2 apron hangers, lower bar
+// - 2020 extrusion, desk part: front rail, rear rail, 8 crossbars, 4
+//   braces (cut square); yoke stand: 4 posts, 2 side bars, 2 cross bars
 // - 8 45 degree connectors for 2020, one at each brace end
 // - corner brackets, M5 screws and T-nuts (6 mm slot)
 // - 3 mm ACM sheet: the left and right sheets, and the apron sheet
@@ -23,21 +23,25 @@
 //
 // Assembly:
 // 1. Front part, flat on the floor: the bottom bar, the uprights on it,
-//    the right top bar on the two right ones, the left top bar on the two
-//    left ones and against the side of the bay's right upright, the two hangers under the bottom bar and the lower
+//    the right top bar on the three right ones, the left top bar on the left
+//    one and against the side of the split upright, the two hangers under the bottom bar and the lower
 //    bar between their ends, all with corner brackets.
-// 2. Cut the sheets (cuts, sheet_screws, apron_screws in the echo, the
-//    "sheet" view), drill their screw holes, and screw them onto the front
-//    slots with T-nuts.
-// 3. Desk part: the front rail halves, the rear rail and the crossbars.
+// 2. Cut the sheets (cuts, col_cut (round), sheet_screws, apron_screws in
+//    the echo, the "sheet" view), drill their screw holes, and screw them
+//    onto the front slots with T-nuts.
+// 3. Desk part: the front rail, the rear rail and the crossbars. The yoke
+//    stand on its two crossbars: the posts, the side bars on them, the
+//    cross bars on those (drill them for the yoke's clamp screws first).
 // 4. Put the desk part on the desk, stand the front part in front of the
 //    desk edge, its bottom bar against the edge (felt pads), and bolt it
 //    on: a corner bracket from each upright's back to the front rail, the
 //    braces from the uprights to the crossbars with a 45 degree connector
 //    on each end, in the obtuse angle. Clamp each rail end (ear) onto
-//    the desk with a screw clamp. Put the yoke into the bay, its front on the bottom bar, and
-//    clamp it with its own clamps.
-// 5. Push the throttle box through its cut-out onto the rail and the
+//    the desk with a screw clamp.
+// 5. Take the desk clamps off the yoke, push its shaft through the column
+//    hole from behind, stand it on the stand's cross bars and screw it on
+//    through them with the clamp screws.
+// 6. Push the throttle box through its cut-out onto the rail and the
 //    middle crossbar until its face is on the sheet, bolt its floor into
 //    the rail (throttle_bolts), drill the sheet through
 //    its flange holes and screw the flange on (M3, nuts behind the sheet).
@@ -45,9 +49,15 @@
 //    its plate screwed onto the sheet; the pedestal goes in like the
 //    throttle box onto the lower bar, the parking brake under the bottom
 //    bar, when they exist.
-// 6. Put the hub behind the throttle box, its left ears on the yoke bay's
-//    right crossbar, its front and back ears on the throttle's crossbar,
+// 7. Put the hub behind the throttle box, its left ears on the throttle
+//    crossbar, its front and back ears on the hub crossbar,
 //    and bolt them into T-nuts in the crossbars' top slots (hub_bolts).
+//
+// Stage 2 (physical instruments): the left and the split upright swapped
+// for longer ones (upright_len_full), a new left top bar on them, the right
+// top bar cut to end against the split upright's side, the old left top
+// bar stays as a mid bar; a full height left sheet with the six-pack holes
+// (six_c, outlined in the "sheet" view); see the README.
 
 include <frame.inc.scad>
 
@@ -64,15 +74,19 @@ c_switch = "#3a3d42";
 
 echo(frame = [frame_w, frame_d, sheet_h], right_part_h = sheet_h_r);
 echo(front_part_2020 = [["top bar left, cut", round(sheet_split)], ["top bar right, cut", round(frame_w - sheet_split)],
-                        ["bottom bar", frame_w], ["2 uprights left", upright_len], ["2 uprights right", upright_len_r],
+                        ["bottom bar", frame_w], ["1 upright left", upright_len], ["3 uprights right", upright_len_r],
                         ["2 hangers", hanger_len],
                         ["lower bar", apron_bar_len]]);
-echo(desk_part_2020 = [["front rail left", rails[0][1] - rails[0][0]], ["front rail right", rails[1][1] - rails[1][0]],
-                       ["rear rail", frame_w], ["5 crossbars", crossbar_len], ["4 braces, cut square", brace_len]]);
+echo(desk_part_2020 = [["front rail", rail_len], ["rear rail", frame_w],
+                       [str(len(crossbar_xs), " crossbars"), crossbar_len], ["4 braces, cut square", brace_len]]);
+echo(yoke_stand_2020 = [["4 posts, cut", stand_post], ["2 side bars", stand_len], ["2 cross bars", stand_w]],
+     yoke_z0 = yoke_z0, col_z = col_z, col_x = col_x);
 echo(sheet_left = [sheet_split, sheet_h + ext], sheet_right = [frame_w - sheet_split, sheet_h_r + ext],
      screws = len(sheet_screws));
-echo(ign_cut = ign_cut, switch_cut = switch_cut, bay_cut = bay_cut, throttle_cut = throttle_cut, radio_cut = radio_cut,
-     primer_cut = primer_cut, flaps_cut = flaps_cut, stack_cut_reserved = stack_cut);
+echo(ign_cut = ign_cut, switch_cut = switch_cut, col_cut_round = [col_x, col_z, yoke_hole_d], throttle_cut = throttle_cut,
+     radio_cut = radio_cut, primer_cut = primer_cut, flaps_cut = flaps_cut, stack_cut_reserved = stack_cut);
+echo(stage2_six_pack = six_c, six_cut_d = six_cut_d, stage2_upright_len = upright_len_full,
+     stage2_sheet_left = [sheet_split, upright_len_full + 2 * ext]);
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
 echo(apron_sheet = [apron[1] - apron[0], apron_h - ext], apron_screws = len(apron_screws));
 echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts);
@@ -117,8 +131,7 @@ module front_part() {
 }
 
 module desk_frame_part() {
-   for (r = rails)
-      bar([r[0], ext, 0], [r[1] - r[0], ext, ext]);
+   bar([rail[0], ext, 0], [rail_len, ext, ext]);
    bar([0, rear_y, 0], [frame_w, ext, ext]);
    for (x = crossbar_xs)
       bar([x, 2 * ext, 0], [ext, crossbar_len, ext]);
@@ -126,9 +139,22 @@ module desk_frame_part() {
       brace(x);
 }
 
+// Yoke stand on its two crossbars: posts at the side bars' ends, the side
+// bars, the cross bars across them under the housing's clamp screws
+module stand_part() {
+   for (x = stand_xs) {
+      for (y = [stand_y0, stand_y0 + stand_len - ext])
+         bar([x, y, ext], [ext, ext, stand_post]);
+      bar([x, stand_y0, ext + stand_post], [ext, stand_len, ext]);
+   }
+   for (y = stand_bar_ys)
+      bar([stand_xs[0], y, 2 * ext + stand_post], [stand_w, ext, ext]);
+}
+
 module frame_part() {
    front_part();
    desk_frame_part();
+   stand_part();
 }
 
 // Bought screw clamp, view only: the fixed jaw on the rail end, the spine
@@ -174,6 +200,7 @@ module sheet_2d() {
          translate([sheet_split + 0.25, -ext]) square([frame_w - sheet_split - 0.25, sheet_h_r + ext]);
       }
       for (c = cuts) rect(c);
+      translate([col_x, col_z]) circle(d = yoke_hole_d);
       for (p = sheet_screws)
          translate(p) circle(d = m5_d);
    }
@@ -206,24 +233,27 @@ module desk_part() {
          cube([frame_w + 200, desk.y, desk.z]);
 }
 
+// Yoke on its stand, the shaft in, through the column hole
 module yoke_part() {
-   x = (x_bay0 + x_bay1) / 2;
+   wy = yoke_front_y - yoke_reach + yoke_wheel_t / 2;   // wheel middle
    color(c_device) {
-      translate([x - yoke_housing.x / 2, yoke_front_y, 0])
+      translate([col_x - yoke_housing.x / 2, yoke_front_y, yoke_z0])
          cube(yoke_housing);
-      translate([x, yoke_front_y + 1, yoke_shaft_z])
-         rotate([90, 0, 0]) cylinder(d = 22, h = 90);
-      translate([x, yoke_front_y - 100, yoke_shaft_z]) {
+      translate([col_x, yoke_front_y + 1, col_z])
+         rotate([90, 0, 0]) cylinder(d = yoke_shaft_d, h = yoke_front_y + 1 - wy);
+      translate([col_x, wy, col_z]) {
          cube([yoke_wheel_w - 80, 24, 26], center = true);
          for (s = [-1, 1])
             translate([s * (yoke_wheel_w / 2 - 20), 0, 0])
                rotate([0, s * 15, 0]) cylinder(d = 32, h = 110, center = true);
       }
    }
+   // the FFB yoke's height (outline)
+   %translate([col_x - yoke_housing.x / 2, yoke_front_y, yoke_z0]) cube([yoke_housing.x, yoke_housing.y, ffb_h]);
 }
 
 module radio_part() {
-   translate([x_rc, -sheet_t, radio_front_z0]) {
+   translate([radio_x, -sheet_t, radio_front_z0]) {
       color(c_device) {
          translate([-radio_front.x / 2, -radio_front_t, 0])
             cube([radio_front.x, radio_front_t, radio_front.y]);
@@ -300,7 +330,7 @@ module throttle_part() {
       for (i = [0 : 2])
          translate([throttle_rod_xs[i], 0, throttle_rod_z]) {
             color("#b9c0c8") rotate([90, 0, 0]) cylinder(d = 6, h = 60);
-            color(["#9aa0a8", "#222", "#c0392b"][i])
+            color(["#222", "#9aa0a8", "#c0392b"][i])
                translate([0, -60, 0]) rotate([90, 0, 0]) cylinder(d = 26, h = 14);
          }
    }
@@ -421,12 +451,40 @@ module stack_outline() {
                }
 }
 
+// Stage 2: the six-pack's holes and the full height left sheet (outlines, view only)
+module six_outline() {
+   color("#e0b030")
+      translate([0, -sheet_t - 0.5, 0]) rotate([90, 0, 0]) linear_extrude(0.5) {
+         for (c = six_c)
+            translate(c) difference() { circle(d = six_cut_d); circle(d = six_cut_d - 3); }
+         difference() {
+            translate([0, -ext]) square([sheet_split, upright_len_full + 2 * ext]);
+            translate([1.5, -ext + 1.5]) square([sheet_split - 3, upright_len_full + 2 * ext - 3]);
+         }
+      }
+}
+
 // Sheet cutting view: the sheets with the frame behind them, the DIY
-// stack's place outlined
+// stack's and the six-pack's (stage 2) places outlined
 module sheet_view() {
    frame_part();
    sheet_part();
    stack_outline();
+   six_outline();
+}
+
+// The yoke on its stand behind the switch panel, cut in its middle (seen from the left)
+module yoke_view() {
+   intersection() {
+      union() {
+         desk_part();
+         frame_part();
+         sheet_part();
+         yoke_part();
+         switch_panel_part();
+      }
+      translate([col_x - 200, -200, -desk.z - 1]) cube([200, 600, 400]);
+   }
 }
 
 // Below the desk top: the apron, under-desk components and the leg room
@@ -447,11 +505,11 @@ module under_view() {
 
 // Close-up of the left desk clamp, the desk and the frame around it cut off
 module clamp_view() {
-   x0 = rails[0][0] - 40;
+   x0 = rail[0] - 40;
    x1 = 60;
    color(c_desk) translate([x0, frame_overhang, -desk.z]) cube([x1 - x0, 110, desk.z]);
    color(c_alu) {
-      translate([rails[0][0], ext, 0]) cube([x1 - rails[0][0], ext, ext]);
+      translate([rail[0], ext, 0]) cube([x1 - rail[0], ext, ext]);
       translate([0, 0, -ext]) cube([x1, ext, ext]);
       translate([0, 0, 0]) cube([ext, ext, 70]);
       translate([0, 2 * ext, 0]) cube([ext, 90, ext]);
@@ -478,5 +536,6 @@ module throttle_view() {
 //frame_part(); // Make view frame 55,0,-35
 //sheet_view(); // Make view sheet 90,0,0
 //throttle_view(); // Make view throttle 55,0,150
+//yoke_view(); // Make view yoke 90,0,-90
 //under_view(); // Make view under 80,0,-20
 //clamp_view(); // Make view clamp 75,0,-50
