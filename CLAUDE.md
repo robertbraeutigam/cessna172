@@ -12,9 +12,9 @@ its own top-level directory; new components should follow the same layout.
     by MobiFlight on hub port 6 (direct port, lines A-C): one Cat5 cable
     through the back wall, clamped in a cable cradle and soldered straight
     to the pots, no board in the box. It is printed in one piece and has no lid: it goes
-    through a cut-out in the frame's sheet, its front wall is the face with
+    through a cut-out in the frame's sheet (below the desk top), its front wall is the face with
     a flange (top and sides, `flange_w`) screwed onto the sheet, and two M5
-    bolts through the floor go into the frame's front rail; `frame/frame.inc.scad`
+    bolts through the floor go into the frame's throttle bar; `frame/frame.inc.scad`
     repeats these sizes.
     Its views show the pots, rods with knobs, clamps, pins, cable and wiring
     as view-only parts; the knob, clamp and pin shapes there are copies of
@@ -26,9 +26,10 @@ its own top-level directory; new components should follow the same layout.
   Similar in function to the Saitek Switch Panel, but it should look as close to the real 172N panel as possible, and every
   switch position is a raw output wire for MobiFlight (active low, like a switch
   to GND). It is two panels printed separately and mounted side by side,
-  ignition (`ignition/`) on the left, raised (the frame's
-  `switch_ign_rise`) for the primer under its key; each has its own hole
-  in the sheet and a flange all round.
+  ignition (`ignition/`) on the left, a little raised (the frame's
+  `switch_ign_rise`, computed) with the primer under its key; each has its own hole
+  in the sheet and a flange all round. All of it hangs below the desk top
+  in the frame's lower panel.
   - `panel.inc.scad` — included by both (`ignition/` has an identical
     copy, keep them the same): back height (`panel_h`, the same
     for both), thickness, rim, face flange (`flange_w`) with the mount
@@ -39,7 +40,7 @@ its own top-level directory; new components should follow the same layout.
     frame's sheet, the flange is screwed onto it; `frame/frame.inc.scad`
     repeats these sizes.
   - `primer.scad` — the primer: a small panel of its own under the
-    ignition key, beside and as low as the switch row (own cut-out in the sheet, the
+    ignition key, beside the switch row and a little lower (own cut-out in the sheet, the
     ignition panel is not changed), a push-pull knob with a twist lock (lug in a keyway
     in a tube on the panel back, quarter turn pocket at its end) and a
     bracket behind it with the 75 mm linear pot (the carb heat type),
@@ -105,8 +106,8 @@ its own top-level directory; new components should follow the same layout.
   switch/encoder lines, one bussed network; the components have none). No wire goes to the
   Mega, nothing is soldered in the box. Power for big loads is not the
   hub's job (an external PSU and 5 V bus, later). It stands on the
-  frame's desk part behind the throttle box, its ears bolted into the
-  throttle's and the hub crossbar (`ear_slot_dx`; `frame/frame.inc.scad` repeats its sizes). Every MobiFlight component connects to
+  frame's desk part right of the yoke, its ears bolted into the
+  step upright's and the hub crossbar (`ear_slot_dx`; `frame/frame.inc.scad` repeats its sizes). Every MobiFlight component connects to
   its own numbered port with one Cat5 cable, RJ45 plug at the hub and
   soldered straight to the component (no connector there); the port
   pinouts and the port list are in the README's Connections section, keep
@@ -179,7 +180,7 @@ its own top-level directory; new components should follow the same layout.
     `frame/frame.inc.scad`).
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
-  sheet over it, all 2020 profile. `frame.inc.scad` holds the
+  sheets over it, all 2020 profile. `frame.inc.scad` holds the
   extrusion/sheet standard, the
   sizes of the components it carries (copies of the other components'
   values and MEASURE values for the bought Saitek yoke and radio panel,
@@ -187,31 +188,32 @@ its own top-level directory; new components should follow the same layout.
   views and the cut list (echo), no printed parts. Every
   component brings its own front face and is screwed onto a cut-out in the
   sheet; heavy or pulled ones also stand on the frame. The layout follows
-  the X-Plane 172N panel (`n172_*`, 1000 mm wide): switch row bottom
-  left, the yoke column above it, the six-pack above that, the radio stack
-  right of it over the throttle box and flaps. Stage 1 (now) is only as
-  high as its parts, the monitor shows the six-pack; stage 2 (physical
-  instruments) swaps the left and split uprights for longer ones and cuts
-  a full height left sheet with the reserved six-pack holes (`six_c`),
-  nothing else moves. The frame is two
-  parts bolted together: the vertical front part in front of the desk
-  edge (a rectangle with the uprights, stepped up on the right for the
-  radio stack (two top bars, two sheets split at `sheet_split` right of
-  the switch panel), its bottom bar just under the desk top, the DIY flaps panel (not designed yet) on the sheet right of the
-  throttle box, and the apron hanging under the throttle for the trim wheel
-  pedestal; the thin parking
-  brake hangs under the bottom bar below the yoke column), and the desk part (a
-  ladder on the desk), with 45 degree braces between them (stock bars cut
-  square, bought 45 degree connectors), and the yoke stand on two of its
-  crossbars (posts, side bars, cross bars): the Saitek yoke (clamps off,
-  their screws through the cross bars) stands on it behind the front
-  part, over the switch panel's back, its shaft through a round hole in
-  the sheet at the 172N column's height. Lengths are rounded to stock lengths (`round_*`). The front rail
-  runs past the sheet at both ends (`ear_len`), where two bought screw
-  clamps clamp it onto the desk (no printed parts in the load path: they
-  creep under constant load). `knee_w` around the yoke column stays open for the
-  legs. The hub stands on the desk part behind the throttle box (its ears
-  in the slots of the throttle's crossbar and the hub crossbar); the crossbars are as long as it needs.
+  the X-Plane 172N panel (`n172_*`) around the yoke column: the Saitek
+  yoke stands on the desk, clamped on its edge, its shaft through a round
+  hole in the sheet; above it the reserved instruments (`inst_c`: six-pack,
+  NAV 1 and 2 right of it, RPM beside the column), right of them the radio
+  stack; below the desk top the lower panel (ignition with the primer,
+  switch row, throttle box and flaps on the throttle bar, parking brake),
+  its backs under the desk's underside and the yoke's clamps, its bottom
+  over the pilot's knees (`knee_z`, the chair lowered). Stage 1 (now): the
+  left part above the desk is only as high as the yoke column needs, the
+  monitor shows the instruments; stage 2 (physical instruments) moves the
+  left top bar up to the right one's height and cuts a full height left
+  sheet, nothing else moves. The width is computed (`frame_w`). The frame
+  is two parts bolted together: the vertical front part in front of the
+  desk edge (bottom bar, four uprights: left end, split, step, right end;
+  two waist bars just under the desk top right of the yoke's clamps, a low
+  left and a high right top bar, the throttle bar behind, the apron with
+  the trim wheel pedestal hanging under the throttle; bars cut to length;
+  three sheets: an L shaped left one, lower right and upper right), and the
+  desk part (a ladder on the desk, stock lengths, its front rail cut at the
+  yoke), with 45 degree braces between them (stock bars cut square,
+  bought 45 degree connectors). The front rail runs past the sheet at both
+  ends (`ear_len`), where two bought screw clamps clamp it onto the desk
+  (no printed parts in the load path: they creep under constant load).
+  The hub stands on the desk part right of the yoke (its ears in the
+  slots of the step upright's crossbar and the hub crossbar); the
+  crossbars are as long as it and the yoke need.
 
 ## Documentation
 
