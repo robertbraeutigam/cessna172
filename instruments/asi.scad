@@ -7,10 +7,10 @@
 // MobiFlight on its own Arduino Nano moves the needle from X-Plane's
 // indicated airspeed and homes it on the hall sensor at start.
 //
-// The face (asi_face.pdf, a colour print): KNOTS outside, 40 to 200 kts
-// with a tick every 5 and numbers every 20, on a scale that is not linear
-// (asi_cal, like the real one: wider at the low end); MPH inside, 40 to 230
-// with numbers every 20. The 172N's arcs: white 41-85 (flaps, on the inside
+// The face (asi_face.pdf, a colour print): KNOTS outside, 40 to 170 kts
+// with a tick every 5 and numbers every 20 (to 160), on the X-Plane 172N's
+// scale (asi_cal: nearly linear, a little wider at the low end, 160 at
+// 10 o'clock); MPH inside, 40 to 190 with numbers every 20. The 172N's arcs: white 41-85 (flaps, on the inside
 // of the others), green 47-128, yellow 128-160, the red line at 160 (Vne).
 // The needle rests at 12 o'clock, 0.
 //
@@ -27,12 +27,13 @@ explode = 25;
 // --- Scale ---
 // knots -> needle angle (clockwise from 12 o'clock); the needle is driven
 // to it through the same points (the README's MobiFlight interpolation)
-asi_cal = [[0, 0], [40, 26], [60, 68], [80, 110], [100, 150], [120, 190],
-           [140, 228], [160, 263], [180, 296], [200, 326]];
+// (measured on the X-Plane 172N's dial)
+asi_cal = [[0, 0], [40, 38], [60, 92], [80, 140], [100, 186], [120, 229],
+           [140, 270], [160, 310], [170, 329]];
 kts_min = 40;                // the scale's first tick and number
-kts_max = 200;
+kts_max = 170;               // the last tick (the last number: 160)
 mph_per_kt = 1.150779;
-mph_range = [40, 230];
+mph_range = [40, 190];
 white_arc = [41, 85];        // the 172N's markings, KIAS
 green_arc = [47, 128];
 yellow_arc = [128, 160];
@@ -88,7 +89,8 @@ for (i = [1 : len(mph_nums) - 1]) let(a0 = mph_a(mph_nums[i - 1]), a1 = mph_a(mp
    assert(2 * mph_num_r * sin((a1 - a0) / 2) >= reach(str(mph_nums[i - 1]), mph_num_size, a0, true) + reach(str(mph_nums[i]), mph_num_size, a1, true) + 0.5,
           str(mph_nums[i], " mph too close to the one before"));
 // the gap at the top: the last numbers and the first, and MPH between them
-assert(2 * num_r * sin((360 - kts_a(kts_max) + kts_a(kts_min)) / 2) >= 2 * text_w("200", num_size) / 2 + 2, "200 and 40 kts too close");
+assert(2 * num_r * sin((360 - kts_a(kts_nums[len(kts_nums) - 1]) + kts_a(kts_min)) / 2) >= text_w(str(kts_nums[len(kts_nums) - 1]), num_size) / 2 + text_w(str(kts_min), num_size) / 2 + 2,
+       "The last and the first knots numbers too close");
 for (v = [mph_nums[0], mph_nums[len(mph_nums) - 1]])
    assert(abs(pol(mph_num_r, mph_a(v)).x) >= text_w("MPH", label_size * 0.9) / 2 + text_w(str(v), mph_num_size) / 2 + 0.5,
           "MPH runs into its numbers");

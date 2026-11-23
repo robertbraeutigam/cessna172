@@ -116,14 +116,15 @@ arc is stepped: 2100 to 2450 RPM at sea level, to 2575 at 5000 ft and to
 `red_line` in `rpm.scad`). RPM and HUNDREDS are over the hub, and a dummy
 hour meter with HOURS is under it.
 
-The ASI face: KNOTS on the outside, 40 to 200 kts, a tick every 5 and a
-number every 20; MPH on the inside, 40 to 230 mph, a number every 20.
-Like the real one the scale is not linear, wider at the low end:
-`asi_cal` in `asi.scad` gives the needle's angle for each 20 kts (0 kts
-at 12 o'clock, 40 at 26 degrees, 200 at 326), and the MPH ring uses the
-same curve. The 172N's markings (KIAS): the white flap arc 41 to 85, on
-the inside of the others, green 47 to 128, yellow 128 to 160 and the red
-line at 160 (`white_arc`, `green_arc`, `yellow_arc`, `red_line`).
+The ASI face: KNOTS on the outside, 40 to 170 kts, a tick every 5 and a
+number every 20 (to 160); MPH on the inside, 40 to 190 mph, a number
+every 20. The scale is the X-Plane 172N's, measured on its dial: nearly
+linear, a little wider at the low end. `asi_cal` in `asi.scad` gives the
+needle's angle for each 20 kts (0 kts at 12 o'clock, 40 at 38 degrees,
+100 at the bottom, 140 at 9 o'clock, 160 at 310, 170 at 329), and the
+MPH ring uses the same curve. The 172N's markings (KIAS): the white flap
+arc 41 to 85, on the inside of the others, green 47 to 128, yellow 128 to
+160 and the red line at 160 (`white_arc`, `green_arc`, `yellow_arc`, `red_line`).
 AIRSPEED and KNOTS are over and under the hub.
 
 ## Hardware
@@ -239,12 +240,12 @@ the steps per revolution to 2038 as above. The scale is not linear, so
 the output uses the Connector's *Interpolation* (on the output's
 *Modify* tab) with the points of `asi_cal`: steps = degrees x 2038 / 360.
 
-| kts | 0 | 40 | 60 | 80 | 100 | 120 | 140 | 160 | 180 | 200 |
-|-----|---|----|----|----|-----|-----|-----|-----|-----|-----|
-| degrees | 0 | 26 | 68 | 110 | 150 | 190 | 228 | 263 | 296 | 326 |
-| steps | 0 | 147 | 385 | 623 | 849 | 1076 | 1291 | 1489 | 1676 | 1846 |
+| kts | 0 | 40 | 60 | 80 | 100 | 120 | 140 | 160 | 170 |
+|-----|---|---|---|---|---|---|---|---|---|
+| degrees | 0 | 38 | 92 | 140 | 186 | 229 | 270 | 310 | 329 |
+| steps | 0 | 215 | 521 | 793 | 1053 | 1296 | 1528 | 1755 | 1863 |
 
-Above 200 kts it stays at 1846 (the needle must not run round past 0).
+Above 170 kts it stays at 1863 (the needle must not run round past 0).
 Direction, pin order and fine tuning as for the RPM indicator. If
 `asi_cal` changes, change this table too.
 
