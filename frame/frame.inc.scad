@@ -273,8 +273,7 @@ six_step = 89;
 inst_cut_d = 81;             // their hole (cut_d)
 inst_body_d = 84;            // the case behind the sheet (case_d), its screw ears on the diagonals
 inst_ear = [46, 9];          // the screw ears: from the axis, diameter (ear_r, ear_d)
-// The instruments are in the "deep" layout (instruments/asi.scad,
-// rpm.scad): the motor and the boards behind the case, within its
+// The standard instrument (instruments/instrument.inc.scad): the motor and the boards behind the case, within its
 // outline, this deep behind the sheet's back (instrument_depth echo)
 inst_depth = 46.6;
 

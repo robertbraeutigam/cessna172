@@ -1,10 +1,9 @@
 // RPM indicator on a 28BYJ-48 stepper
 //
-// A standard instrument (instrument.inc.scad) in the "deep" layout: the
-// stage 2 hole beside the yoke column (frame/), under the VSI; the force
-// feedback yoke's housing is set back far enough behind it (the frame's
-// ffb_back), so the motor and the boards are behind the case, within its
-// outline. MobiFlight on its own Arduino Nano moves
+// A standard instrument (instrument.inc.scad) in the stage 2 hole beside
+// the yoke column (frame/), under the VSI; the force feedback yoke's
+// housing is set back far enough behind it (the frame's ffb_back) for the
+// motor and the boards behind the case. MobiFlight on its own Arduino Nano moves
 // the needle from X-Plane's engine RPM and homes it on the hall sensor
 // at start.
 //
@@ -17,8 +16,6 @@
 // Parts and assembly: see instrument.inc.scad and the README.
 
 $fn = 60;
-
-layout = "deep";             // the VSI over it (instrument.inc.scad)
 
 include <instrument.inc.scad>
 

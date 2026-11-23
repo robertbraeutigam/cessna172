@@ -125,8 +125,8 @@ with all the left holes; the monitor goes up behind the glareshield. The
 build checks that the instruments stay on the left sheet, clear of each
 other, the yoke column hole and the split upright, and that their cases
 fit in front of the force feedback yoke's housing (`inst_body_d`,
-`inst_depth`: the [standard instrument](../instruments/README.md) in its
-`deep` layout, 84 mm round and 47 mm deep behind the sheet; the TC, HI,
+`inst_depth`: the [standard instrument](../instruments/README.md)'s case
+with the motor and boards behind it, 84 mm round and 47 mm deep behind the sheet; the TC, HI,
 VSI, NAV 1 and the RPM are in front of the housing). The ADF's place in the 172N, under NAV 2 at the column's height,
 is free as well.
 
