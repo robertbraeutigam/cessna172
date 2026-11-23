@@ -192,6 +192,26 @@ its own top-level directory; new components should follow the same layout.
   screws), drum, stand. The `motor_*`, `uln_*`, `nano_*`, sensor and
   magnet values are MEASURE.
 
+- `instruments/` — the analogue instruments (stage 2 holes in the frame's
+  left sheet, `inst_c`).
+  - `instrument.inc.scad` — the standard instrument, included by each:
+    a 3 1/8" case put into the sheet's hole from behind (four screws from
+    the front on the diagonals, like the real panel), lip, glass, dial (a
+    cup holding the glass, the face glued in), needle on a 3 mm steel
+    axle, a 1:1 pair of printed gears to a 28BYJ-48 on an arm to the
+    right (the case is only 15 mm deep behind the sheet: the RPM has the
+    yoke housing right behind it), a magnet in the motor gear over an
+    A3144 hall sensor for homing, and a carrier with the ULN2003 board
+    and an Arduino Nano of its own (MobiFlight, USB to the powered USB
+    hub). The face is a colour `Make print`: drawn in `ink(colour)`,
+    `print_page()` adds the glass template and the registration dots.
+    The motor, board, sensor and magnet values are the compass's
+    (MEASURE); `frame/frame.inc.scad` repeats the case's sizes and the
+    RPM's arm.
+  - `rpm.scad` — the RPM indicator (tachometer): 0-35 hundred RPM over
+    240 degrees, the 172N's stepped green arc and red line at 2700, a
+    dummy hour meter.
+
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the
   extrusion/sheet standard, the
@@ -306,6 +326,14 @@ box_lid(); // Make module lid
   `target/<file>_<name>.pdf`, 1:1 on an A4 page, filled black (paper parts
   like the compass card; the PDFs are deployed with the STLs). Prints are
   made with the models, also from files with modules.
+  `// Make print <name> <colour>,<colour>,...` (no spaces in the list) is
+  a colour print: the statement is rendered once per colour with
+  `print_color` set to it, the file drawing only that colour's shapes
+  (`ink()` in `instruments/instrument.inc.scad`), each layer filled with
+  its colour, and `qpdf` overlays them in the list's order (later covers
+  earlier; white covers, it is the paper). The PDF export centers every
+  layer on its own outline, so the file must draw the same registration
+  marks in every layer.
 - Files without any `Make module` marker are rendered whole to
   `target/<file>.stl`, unless they have `Make view` markers: then they
   only make views (their asserts are still checked), like `frame.scad`.
