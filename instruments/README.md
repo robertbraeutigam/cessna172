@@ -73,7 +73,7 @@ top bar is in the way.
   the bench. The Nano slides into rails with its USB jack down. In the
   six-pack the next instrument is right under it: use a mini USB cable
   with an angled plug (bent back). It is a board of its own, like every
-  component's (see [Connections](../hub/README.md#connections)). The stepper takes about
+  component's (see [Connections](../README.md#connections)). The stepper takes about
   0.25 A from USB while it moves, nothing at rest (see
   [MobiFlight](#mobiflight)).
 - **Print orientation**: the case, the dial and the back plate are printed
@@ -189,7 +189,18 @@ Per instrument:
 The same as the compass. The motor plugs into the ULN2003 board. The
 sensor's output is open collector and pulls low over the magnet; the
 Nano's internal pull-up is enough on its short wire. The USB cable goes
-down to the powered USB hub next to the [hub](../hub/README.md#connections).
+down to the powered USB hub on the desk.
+
+**USB**: one port on the powered USB hub per instrument (the six-pack,
+the NAV indicators and the RPM are 9). A stepper draws about 0.25 A while
+its coils are on, so an instrument with one stepper takes about 0.3 A
+with its Nano, one with two about 0.55 A: the port must give at least
+500 mA (see [Powered USB hub](../README.md#powered-usb-hub)). With the
+coils off at rest (see [MobiFlight](#mobiflight)) that is only while the
+needle moves, and at start, when every needle homes at once for a few
+seconds. X27.168 gauge steppers would cut even that (about 20 mA, no
+driver board), but they have an end stop inside: only for needles that
+do not turn round, like the ASI, VSI and RPM.
 
 ## MobiFlight
 
@@ -206,7 +217,7 @@ the Connector's dialog, as they change between versions.
   firmware's 400 steps a second), so a needle that twitches all the time
   in flight still takes only some 10-20 mA on average, and the motor and
   the ULN2003 board stay cool (see
-  [Powered USB hub](../hub/README.md#powered-usb-hub)).
+  [USB](#wiring)).
 - **Twitching**: the Connector moves the needle on every whole step of
   change (0.18 degrees of the needle: about 0.12 kt on the ASI), there is
   no deadband. If a needle looks too nervous, round the value in the

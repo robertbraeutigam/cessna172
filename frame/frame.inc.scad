@@ -51,7 +51,7 @@
 //   front rail, and a 45 degree brace from each upright that reaches the
 //   desk down to a crossbar stops it from rocking: a stock length, cut
 //   square, held by a bought 45 degree connector at each end. The powered
-//   USB hub (hub/README.md) stands on the desk between the step upright's
+//   USB hub (README.md, Connections) stands on the desk between the step upright's
 //   and the right end crossbar.
 //
 // The front rail runs past the sheet at both ends (ear_len): there a

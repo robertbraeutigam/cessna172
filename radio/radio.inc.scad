@@ -45,7 +45,7 @@ drv_high = 14;               // the parts on it, above the board
 
 // --- Arduino Nano, MEASURE (instruments/instrument.inc.scad has the same values) ---
 // Every unit has its own, running MobiFlight, with a USB cable out of the
-// open back to the powered USB hub (hub/README.md)
+// open back to the powered USB hub (README.md, Connections)
 nano_board = [18, 45];       // x, y (the USB jack at the back end)
 nano_t = 1.6;
 nano_under = 2.5;            // in floor rails: parts and solder stubs under the board

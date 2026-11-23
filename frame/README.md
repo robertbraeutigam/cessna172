@@ -151,9 +151,11 @@ throttle bar, its face flange is screwed onto the sheet like the switch
 panel's and two M5 bolts through its floor go into the bar.
 The pedestal does the same on the apron's lower bar. Every component has
 its own Arduino Nano and USB cable; the
-[powered USB hub](../hub/README.md#powered-usb-hub) they plug into stands
+[powered USB hub](../README.md#powered-usb-hub) they plug into stands
 on the desk right of the yoke, between the step upright's and the right
-end crossbar (not bolted down). The crossbars are as long as the yoke's
+end crossbar (not bolted down). The Saitek yoke and radio panel plug
+into it too, with their own USB cables (a port each, a few hundred mA
+together). The crossbars are as long as the yoke's
 housing needs.
 The [compass](../compass/README.md) stands over the panel on the right
 top bar, about over the radio stack's left edge (`n172_compass_dx`, a

@@ -2,8 +2,8 @@
 
 A home cockpit of the Cessna 172 for the X-Plane flight simulator. The parts
 are designed in [OpenSCAD](https://openscad.org/) and 3D printed, and the
-controls are read by [MobiFlight](https://www.mobiflight.com/) on an
-Arduino Mega.
+controls are read by [MobiFlight](https://www.mobiflight.com/), on an
+Arduino Nano in every component.
 
 Each cockpit component has its own directory, and its own `README.md`
 there with the working principle, the parts list with shop links, the
@@ -15,7 +15,6 @@ wiring and the assembly:
 | [`switchpanel/`](switchpanel/README.md) | the 172N lower left switch panel: master, lights, avionics; the primer below it |
 | [`ignition/`](ignition/README.md) | the ignition key switch, the left end of the switch panel |
 | [`frame/`](frame/README.md) | the aluminium frame and panel sheet that everything mounts on |
-| [`hub/`](hub/README.md) | how everything connects: a Nano per component, the powered USB hub (no parts to print) |
 | [`yoke/`](yoke/README.md) | the hollow control wheel: PTT, trim rocker, a Nano inside |
 | [`compass/`](compass/README.md) | the magnetic compass over the panel: a printed card on a 28BYJ-48 stepper, on its own Nano |
 | [`instruments/`](instruments/README.md) | the analogue instruments: the RPM and airspeed indicators, a 28BYJ-48 stepper behind a colour printed face |
@@ -23,7 +22,7 @@ wiring and the assembly:
 
 Every component has its own Arduino Nano running
 MobiFlight and one USB cable to a powered USB hub; see
-[Connections](hub/README.md#connections).
+[Connections](#connections).
 
 The pictures are rendered from the current `master` by the
 [Build](.github/workflows/build.yml) workflow and published, together with
@@ -81,6 +80,97 @@ are marked MEASURE in the source; `assert()`s check that the derived
 geometry still fits, so a wrong measurement fails the build instead of
 printing a bad part.
 
+## Connections
+
+There is no central box: every component has a board of its own running
+MobiFlight (an Arduino Nano; each radio unit too), with one USB cable to
+a powered USB hub on the desk, and one cable from there to the PC. Each
+component's README has its pins, its wiring and what it takes from USB.
+
+- **One board per component.** Everything inside a component is
+  soldered to its own Nano, and its USB cable is the only connection to
+  the rest of the cockpit. So each component is tested on the bench with
+  nothing but that cable, and swapped without touching the others. A
+  Nano is about 4 EUR; a shared board would save no money (it needs
+  ports, cables and a wiring board of its own) and gives that up.
+- **Plenty for each component.** MobiFlight's limits for a Nano
+  (`arduino_nano.board.json` in its firmware): 18 buttons, 8 analog
+  inputs, 9 encoders, 8 servos, 4 steppers, 6 multiplexers. Its pins: D2
+  to D12 and A0 to A5 for buttons, encoders, servos and stepper wires
+  (D13 has the LED: not for inputs), A6 and A7 only analog. Short wires
+  inside a component need no resistors: switches go to GND and use the
+  Nano's internal pull-ups.
+- **Names, not ports.** The Connector names each board when it flashes
+  it and stores that with a serial on the board, so identical Nanos are
+  told apart whichever COM port Windows gives them. The configuration
+  (one file for the whole cockpit) refers to them by that name.
+- **The USB cable** plugs into the Nano at the component (no connector of
+  our own), with a cable tie next to the plug where the cable could pull
+  on it. USB 2.0 is good for 5 m, plenty from the panel to the desk.
+
+### MobiFlight
+
+[MobiFlight](https://www.mobiflight.com/) is free and open source (MIT,
+[GitHub](https://github.com/MobiFlight/MobiFlight-Connector)). The
+MobiFlight Connector runs on the PC (**Windows only**) and talks to X-Plane
+11/12 directly through its datarefs and commands (X-Plane's UDP interface,
+no plugin). It also flashes the MobiFlight firmware onto the boards over
+USB; give each one the component's name then.
+
+In the Connector, each board gets one device per thing on it: a *Button*,
+an *Encoder*, an *Analog input*, a *Servo* or a *Stepper* on its pins.
+Each input then sets a dataref or sends a command on press and on
+release, each output follows a dataref. The configuration is a file: keep
+it with the cockpit.
+
+MobiFlight sends an X-Plane command only once; it cannot hold one while a
+button is pressed (still open:
+[MobiFlight-Connector#2405](https://github.com/MobiFlight/MobiFlight-Connector/issues/2405)).
+Where a command has to be held, like the ignition START, a small
+FlyWithLua (NG) plugin script in X-Plane does it (see
+[In X-Plane](ignition/README.md#in-x-plane)).
+
+### Powered USB hub
+
+It stands on the desk right of the yoke (see
+[Cockpit frame](frame/README.md)). Every component's README says how many
+ports it takes and how much current (its *USB* paragraph). With the whole
+six-pack, the NAV indicators, the RPM, the four radio units, the planned
+pedestal and flaps and the Saitek devices that is about 22 ports: a 16
+port hub, or two hubs, one into the other (USB takes up to 127 devices),
+and one cable from the first to the PC.
+
+The current is the limit. At rest it is small: every stepper has its
+coils off when it is at its target, so the whole panel takes a few
+hundred mA. The peak is at start, when every needle homes at once for a
+few seconds: with the compass and about 13 steppers in the instruments
+3.5-4 A. That is more than many cheap "powered" hubs give (their supply
+often has 2-3 A, shared by all ports; too little shows as boards
+resetting and needles losing their home). So the hub:
+
+- has a supply for the peak: 5 V / 4 A or more, or a 12 V supply (the
+  hub's own converter; 12 V / 3 A, 36 W, gives about 6 A at 5 V);
+- gives each port at least 500 mA (in its specs: BC 1.2 charging ports, or
+  "x A per port"), so a two stepper instrument is not cut off;
+- has every board's cable short and of a decent gauge (the cheap thin ones
+  drop voltage).
+
+The pedestal (trim indicator) and the flaps (indicator) are planned with
+a 9 g servo each, on a Nano of its own: about 0.15-0.3 A when it moves,
+up to 0.7 A stalled. Put a 470 uF capacitor across its supply at the
+servo; if its Nano resets when it moves, feed it from the USB 5 V before
+the Nano's diode (the 5V pin is behind it).
+
+### Power (later)
+
+USB only for now. With lighting or the FFB yoke comes one 24 V PSU with
+fused branches, a DC-DC converter to a 5 V bus, a separate cut-off switch
+on the FFB motor power and one star ground at the PSU. Bigger loads
+(backlighting, several servos in one component) then get their current
+from the 5 V bus with a 2 pin plug per component (e.g. JST-VH or a
+5.08 mm screw terminal), their GND joined to the Nano's GND there, not
+over USB. Leave room for that plug in components with loads.
+
 ## Components
 
 ### [Cockpit frame](frame/README.md)
@@ -89,13 +179,6 @@ The aluminium extrusion frame on the desk that carries all components, and
 the panel sheets over it, laid out like the X-Plane 172N's panel.
 
 [![Cockpit frame](https://robertbraeutigam.github.io/cessna172/frame/frame_montage.png)](https://robertbraeutigam.github.io/cessna172/frame/frame_montage.png)
-
-### [USB hub and connections](hub/README.md)
-
-Every component has an Arduino Nano of its own running MobiFlight, with
-one USB cable to a powered USB hub on the desk, so each one is tested on
-its own with nothing but that cable. The page has the boards, the
-MobiFlight setup and how big the USB hub's supply has to be.
 
 ### [Throttle quadrant](throttle/README.md)
 

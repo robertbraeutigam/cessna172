@@ -42,7 +42,7 @@ frame's right top bar, about where the windshield's middle is (see
   connection.
 - **Own board**: the stepper needs four outputs and a home input, on a
   Nano running MobiFlight, like every component (see
-  [Connections](../hub/README.md#connections)). The stepper takes about
+  [Connections](../README.md#connections)). The stepper takes about
   0.2 A at 5 V with its coils on, which USB supplies (the Nano's 5 V pin is
   behind a 0.5 A diode). With the coils switched off at rest (see
   [MobiFlight](#mobiflight)) it only draws that while the card turns and
@@ -126,8 +126,14 @@ thicker paper or vinyl, set `paper_t` and print again.
 
 The motor plugs into the ULN2003 board. The sensor's output is open
 collector and pulls low over the magnet; the Nano's internal pull-up is
-enough on its short wire. The USB cable goes to the powered USB hub next to
-the [hub](../hub/README.md#connections).
+enough on its short wire. The USB cable goes to the powered USB hub on
+the desk.
+
+**USB**: one port on the powered USB hub. With the Nano about 0.25 A
+while the card turns (and for a few seconds at start, while it homes),
+some 10-20 mA on average in flight with the coils off at rest (see
+[MobiFlight](#mobiflight)): the port must give 500 mA, as every port of
+the [powered USB hub](../README.md#powered-usb-hub) does.
 
 ## MobiFlight
 
@@ -158,7 +164,7 @@ as they change between versions.
   firmware's 400 steps a second), so a card that swings all the time
   in flight still takes only some 10-20 mA on average, and the motor and
   the ULN2003 board stay cool (see
-  [Powered USB hub](../hub/README.md#powered-usb-hub)).
+  [USB](#wiring)).
 - **Fine tuning**: if N is a little off the lubber line after homing,
   add an offset in the transform (e.g. `$+2`) rather than gluing the card
   again.

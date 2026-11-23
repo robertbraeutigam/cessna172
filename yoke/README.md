@@ -87,9 +87,11 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
   between the hole and the plug with a cable tie (strain relief, so a pull
   does not lever the jack) and plugs into the Nano. It runs through the
   tube to the powered USB hub (see
-  [Connections](../hub/README.md#connections)); the plug fits through the
+  [Connections](../README.md#connections)); the plug fits through the
   tube (21 mm inside). In a base that turns and slides the tube, leave
   the cable slack behind the tube's end for the full travel.
+- **USB:** one port on the powered USB hub; the Nano and the buttons take
+  about 50 mA.
 
 | File | Parts |
 |------|-------|
