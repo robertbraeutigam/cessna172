@@ -117,10 +117,13 @@ bar moves up to the right one's height (the left end upright already
 reaches there), and a new left sheet, as high as the right part, is cut
 with all the left holes; the monitor goes up behind the glareshield. The
 build checks that the instruments stay on the left sheet, clear of each
-other, the yoke column hole and the split upright, and that the RPM's
-body fits in front of the yoke housing (`inst_body_d`, `inst_depth`: a
-DIY instrument behind the sheet, 15 mm deep, like a round display; a
-guess). The ADF's place in the 172N, under NAV 2 at the column's height,
+other, the yoke column hole and the split upright, and that their cases
+fit in front of the yoke housing (`inst_body_d`, `inst_depth`: the
+[standard instrument](../instruments/README.md)'s case, 84 mm round and
+15 mm deep behind the sheet). The RPM indicator has the housing right
+behind it, so its motor and boards sit on an arm to the right, beside the
+housing (`rpm_arm`, `rpm_deep`); the build checks that they clear the
+housing, the step upright and the other instruments. The ADF's place in the 172N, under NAV 2 at the column's height,
 is free as well.
 
 The frame overhangs the desk edge by 22 mm (`frame_overhang`: a 2020 and

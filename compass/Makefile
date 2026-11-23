@@ -20,7 +20,12 @@ VIEW_OPTS=--preview --viewall --autocenter --projection=p --colorscheme=Tomorrow
 
 # Prints: 2D drawings exported 1:1 to a PDF page (filled black on white,
 # with OpenSCAD's scale bar to check the printer did not scale it), for
-# parts printed on paper, like the compass card
+# parts printed on paper, like the compass card. "Make print <name>
+# <colour>,<colour>,..." makes a colour print: the statement is rendered
+# once per colour with print_color set to it (the file draws only that
+# colour's shapes then), filled with it, and qpdf lays the layers over each
+# other in the order given. The export centers each layer on its own
+# outline: the file draws registration marks in every layer.
 PRINT_OPTS=-O export-pdf/paper-size=a4 -O export-pdf/orientation=auto \
 	-O export-pdf/fill=true -O export-pdf/stroke=false
 
@@ -67,11 +72,32 @@ target/%: %.scad $(INCLUDE_COPIES)
 		echo "Making single module model $<"; \
 		$(OPENSCAD) -o $@.stl target/$< || exit 1; \
 	fi;
-	@for p in `grep -o "Make print .*" <$< | cut -d " " -f 3`; \
+	@grep -o "Make print .*" <$< | while read make print name colors rest; \
 	do \
-		echo "Making print $$p"; \
-		sed "s/\/*\(.*\)Make print $$p *$$/\1/g" <target/$< >target/.print_$*.scad; \
-		$(OPENSCAD) $(PRINT_OPTS) -o $@_$$p.pdf target/.print_$*.scad || exit 1; \
+		echo "Making print $$name"; \
+		sed "s/\/*\(.*\)Make print $$name\( .*\)*$$/\1/g" <target/$< >target/.print_$*.scad; \
+		if [ -z "$$colors" ]; \
+		then \
+			$(OPENSCAD) $(PRINT_OPTS) -o $@_$$name.pdf target/.print_$*.scad || exit 1; \
+		else \
+			rm -f $@_$$name.pdf; \
+			scale=true; \
+			for c in `echo $$colors | tr , " "`; \
+			do \
+				echo "Making print $$name, $$c"; \
+				$(OPENSCAD) $(PRINT_OPTS) -O export-pdf/fill-color=$$c -O export-pdf/show-scale=$$scale \
+					-D "print_color=\"$$c\"" -o target/.print_$*_layer.pdf target/.print_$*.scad || exit 1; \
+				if [ -f $@_$$name.pdf ]; \
+				then \
+					qpdf --warning-exit-0 $@_$$name.pdf --overlay target/.print_$*_layer.pdf -- \
+						target/.print_$*_all.pdf || exit 1; \
+					mv target/.print_$*_all.pdf $@_$$name.pdf; \
+				else \
+					mv target/.print_$*_layer.pdf $@_$$name.pdf; \
+				fi; \
+				scale=false; \
+			done; \
+		fi; \
 	done
 	@touch $@
 
