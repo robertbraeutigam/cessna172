@@ -18,8 +18,10 @@
 //   dial's zero line) and the airplane
 //   are fixed, between the glass and the dial: yellow wing bars, a Y and
 //   a dot on a stem from a light brown pedestal, which stands on a black
-//   mask over the window's bottom; a dummy knob on the bezel's bottom edge
-//   (the real one sets the airplane's height).
+//   mask over the window's bottom; a dummy knob in front of the glass on
+//   the window's bottom edge, over the mask, on a boss of the bezel that
+//   stands into the window behind it (the real one sets the airplane's
+//   height).
 //   The dial turns with the horizon and the index reads its bank marks.
 //   The roll motor is on the back plate (1:1 to the roll gear), its gear's
 //   magnet homes it over a hall sensor.
@@ -141,8 +143,8 @@ dot_d = 2.6;                 // the dot on the horizon, on a thin neck
 pedestal = [-14, 17.6, 24];  // the light brown pedestal from the mask: its top z, width there, width at the mask
 mask_z = -21;                // the black mask over the window's bottom: its top edge
 foot_r = 37.4;               // the mask's edge in the ring's notch, outer radius
-knob = [12, 5, 1.2];         // the dummy knob on the bezel's bottom: diameter, length, knurl depth
-knob_z = -40;                // its axis
+knob = [12, 5, 1.2];         // the dummy knob on the window's bottom edge: diameter, length, knurl depth
+knob_z = -34;                // its axis: half over the window (the mask behind it), half over the bezel
 knob_pin = [3, 3];           // its stem, glued into the bezel: diameter, depth
 
 // --- Front bezel: square, in front of the sheet, the case's 4 screws through its corners ---
@@ -265,7 +267,8 @@ assert(index_w / 2 - mark_w[1] / 2 - index_slit >= 1.5, "Bank index too narrow f
 assert(-mask_z + 1 <= vis_r && -mask_z >= -pedestal[0] + 3, "Mask over the horizon or not over the window's bottom");
 assert(norm([wing[1], wing[2] / 2]) <= vis_r - 1 && wing[0] >= dot_d / 2 + 2, "Wings");
 assert(y_arm[3] - stem_w / 2 >= pedestal[0] + 2 && pedestal[2] / 2 >= pedestal[1] / 2, "Airplane's stem");
-assert(abs(knob_z) - knob_pin[0] / 2 >= window_d / 2 + bezel_chamfer + 1 && abs(knob_z) + knob_pin[0] / 2 <= bezel[0] / 2 - 1, "Knob's stem off the bezel");
+assert(abs(knob_z) - knob[0] / 2 >= -mask_z + 1 && abs(knob_z) + knob[0] / 2 <= bezel[0] / 2 - 1, "Knob not over the mask or off the bezel");
+assert(abs(knob_z) - knob[0] / 2 < window_d / 2 && abs(knob_z) + knob[0] / 2 > window_d / 2 + bezel_chamfer, "Knob not on the window's edge");
 assert(ai_front_screw - bezel[1] - sheet_t >= 4 && head_cb[1] <= bezel[1] - 2, "Bezel screws");
 for (c = [for (i = [0 : 3]) cols[i]]) assert(max(abs(c.x), abs(c.y)) + head_cb[0] / 2 + 1 <= bezel[0] / 2
                                              && norm(c) - head_cb[0] / 2 >= window_d / 2 + bezel_chamfer + 1, "Bezel screw off the bezel");
@@ -489,7 +492,7 @@ module ai_plane() {
    }
 }
 
-// the dummy knob (the real one sets the airplane's height): knurled, on the bezel's bottom, its stem glued into the bezel
+// the dummy knob (the real one sets the airplane's height): knurled, in front of the window's bottom edge, its stem glued into the bezel's boss
 module ai_knob() {
    translate([0, 0, knob_z]) {
       difference() {
@@ -501,12 +504,18 @@ module ai_knob() {
    }
 }
 
-// --- Front bezel: a square plate in front of the sheet, the window chamfered, the case's screws through its corners ---
+// --- Front bezel: a square plate in front of the sheet, the window chamfered, the case's screws through its corners,
+// a round boss behind the knob standing into the window's bottom (the knob hides it) ---
 module ai_bezel() {
    difference() {
-      along_y(-bezel[1], 0) offset(r = bezel[2]) square(bezel[0] - 2 * bezel[2], center = true);
-      along_y(-bezel[1] - 1, 1) circle(d = window_d, $fn = 180);
-      translate([0, -bezel[1] - 0.01, 0]) rotate([-90, 0, 0]) cylinder(d1 = window_d + 2 * bezel_chamfer, d2 = window_d, h = bezel_chamfer, $fn = 180);
+      union() {
+         difference() {
+            along_y(-bezel[1], 0) offset(r = bezel[2]) square(bezel[0] - 2 * bezel[2], center = true);
+            along_y(-bezel[1] - 1, 1) circle(d = window_d, $fn = 180);
+            translate([0, -bezel[1] - 0.01, 0]) rotate([-90, 0, 0]) cylinder(d1 = window_d + 2 * bezel_chamfer, d2 = window_d, h = bezel_chamfer, $fn = 180);
+         }
+         along_y(-bezel[1], 0) translate([0, knob_z]) circle(d = knob[0] - 0.4, $fn = 60);
+      }
       for (i = [0 : 3]) let(c = cols[i]) {
          translate([c.x, 1, c.y]) rotate([90, 0, 0]) cylinder(d = clear_d, h = bezel[1] + 2);
          translate([c.x, -bezel[1] - 0.01, c.y]) rotate([-90, 0, 0]) cylinder(d = head_cb[0], h = head_cb[1] + 0.01);
