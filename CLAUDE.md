@@ -190,12 +190,13 @@ its own top-level directory; new components should follow the same layout.
     interpolation table in the README), MPH inside, the 172N's white,
     green and yellow arcs and red line at 160.
   - `ai.scad` — the attitude indicator (the six-pack's top middle,
-    modelled on the X-Plane 172N's): the standard's case front, then its
+    modelled on the RC Allen 172 instrument: its dial and bowl markings,
+    the yellow airplane on a pedestal, the index): the standard's case front, then its
     own mechanism. A roll frame (a thin roll dial ring ending at the long
     bank marks, two arms, a back disc with the roll gear) turns in a
-    printed sleeve (front ring with the bank index and the glued-in
-    airplane on its mount with the bottom mask, a dummy knob in front of
-    the glass; legs to the back plate). The horizon is a bowl (part of a
+    printed sleeve (front ring with the bank index hanging on struts and
+    the glued-in airplane on its pedestal with the bottom mask, a dummy
+    knob in front of the glass; legs to the back plate). The horizon is a bowl (part of a
     sphere, `bowl_r`, two halves in sky and ground filament glued at the
     horizon, raised ribs painted white) on pivot pins in the arms, 1:1
     with the pitch, ±`pitch_max`. The pitch motor rides on the roll frame

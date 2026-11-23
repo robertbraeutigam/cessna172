@@ -250,7 +250,8 @@ Direction, pin order and fine tuning as for the RPM indicator. If
 
 ## Attitude indicator
 
-The six-pack's top middle instrument, modelled on the X-Plane 172N's. Its
+The six-pack's top middle instrument, modelled on the 172's RC Allen
+attitude indicator (and X-Plane's 172N). Its
 case front is the standard's (the 81 mm hole, the lip, the glass, the four
 screws through the sheet), but behind it is a mechanism of its own with
 two 28BYJ-48 steppers and a slip ring, and it is 116 mm deep behind the
@@ -260,17 +261,21 @@ housing, so the depth does not matter there (the frame checks it).
 ### How it works
 
 - **What you see**: a thin roll dial ring (turquoise sky over brown
-  ground, the bank marks 10, 20, 30, 60 and 90, the horizon line across
-  it, white lines in the ground 20 and 45 degrees under the horizon); the
-  ring ends where the long bank marks end, so its window is 59 mm across.
-  Behind it the horizon bowl, a part of a sphere, sky blue over brown with
-  the horizon and the pitch lines every 5 degrees. Fixed, between the
-  glass and the dial: the orange bank index at the top (on the sleeve's
-  ring), and the airplane: orange wing bars and dot on a black mount
-  rising from a black mask over the window's bottom. A dummy knob sits on
-  the mask, in front of the glass, its stem through a hole in the glass
-  (the real one sets the airplane's height). Like the X-Plane 172N's, the
-  dial turns with the horizon and the index reads its marks.
+  ground, a white triangle at 0, the bank marks 10, 20, 30, a dot at 45,
+  60 and 90, the horizon line across it); the ring ends where the long
+  bank marks end, so its window is 59 mm across. Behind it the horizon
+  bowl, a part of a sphere, sky blue over brown: the horizon, in the sky
+  a ladder (lines every 2 degrees to 8, then 10, 15, 20, 25, with 1 0 and
+  2 0 split by their lines), in the ground lines every 5 degrees, wider
+  downwards, with 10 and 20 at their ends, and two slanted rails
+  converging on the middle. Fixed, between the glass and the dial: the
+  bank index, a yellow triangle outline pointing up under the dial's zero
+  triangle, hanging from the top of the sleeve's ring on two thin struts;
+  and the airplane: yellow wing bars, a Y and a dot on a stem from a light
+  brown pedestal, which stands on a black mask over the window's bottom.
+  A dummy knob sits on the mask, in front of the glass, its stem through
+  a hole in the glass (the real one sets the airplane's height). The dial
+  turns with the horizon and the index reads its marks.
 - **Roll**: the dial is the front of the roll frame: two arms go back from
   it to a back disc with the roll gear. The frame turns in a printed
   sleeve in the case: the dial and the back disc run in it (a big plain
@@ -312,8 +317,9 @@ housing, so the depth does not matter there (the frame checks it).
   motor gear flat; the bracket on its plate, the feet up; the back plate
   on its front, the posts up; the carrier flat. The small pitch gears
   (module 0.8) are cut by a rolling rack in the model (undercut), so
-  they mesh. Everything else black; paint the index and the airplane's
-  wings and dot orange, the bowl's ribs (horizon and pitch lines) white.
+  they mesh. Everything else black; paint the index's triangle and the
+  airplane yellow, its pedestal light brown, the bowl's ribs (horizon,
+  lines, numbers) white.
 
 The `assert`s check that the bowl fills the window at both ends of its
 travel and turns in the sleeve, that the pitch motor, its cover and ears

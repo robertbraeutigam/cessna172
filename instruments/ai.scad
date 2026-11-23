@@ -8,23 +8,25 @@
 //
 // What moves:
 // - Roll: the roll frame turns in a printed sleeve in the case. Its front
-//   is the roll dial: a thin ring (sky and ground halves, the bank marks
-//   10, 20, 30, 60, 90 ending at its window, white lines in the ground: a
-//   colour print, ai_face.pdf); two arms go back from it to a back disc
-//   with the roll gear. The bank index (an orange triangle at 12 o'clock,
-//   on the sleeve's front ring) and the airplane are fixed, between the
-//   glass and the dial: the orange wing bars and dot on a black mount,
-//   rising from a black mask over the window's bottom, with a dummy knob
-//   in front of the glass on a stem through it (the real one sets the
-//   airplane's height). Like the X-Plane 172N's, the dial turns with the
-//   horizon and the index reads its bank marks. The roll motor is on the
-//   back plate (1:1 to the roll gear), its gear's magnet homes it over a
-//   hall sensor.
+//   is the roll dial: a thin ring (sky and ground halves, a white
+//   triangle at 0, the bank marks 10, 20, 30, a dot at 45, 60, 90, the
+//   long ones ending at its window: a colour print, ai_face.pdf); two arms
+//   go back from it to a back disc with the roll gear. Modelled on the RC
+//   Allen 172 instrument. The bank index (a yellow triangle outline at 12
+//   o'clock, pointing up, hanging from the sleeve's front ring on two struts) and the airplane
+//   are fixed, between the glass and the dial: yellow wing bars, a Y and
+//   a dot on a stem from a light brown pedestal, which stands on a black
+//   mask over the window's bottom, with a dummy knob in front of the
+//   glass on a stem through it (the real one sets the airplane's height).
+//   The dial turns with the horizon and the index reads its bank marks.
+//   The roll motor is on the back plate (1:1 to the roll gear), its gear's
+//   magnet homes it over a hall sensor.
 // - Pitch: the bowl, a part of a sphere (bowl_r) behind the dial's window,
 //   turns on two pins in the arms, one degree per degree of pitch, like
 //   the real instrument's sphere. It is two printed halves (sky blue and
-//   ground brown filament) glued at the horizon; the horizon and the pitch
-//   lines are raised ribs, painted white. The pitch motor rides on the
+//   ground brown filament) glued at the horizon; the horizon, the pitch
+//   ladder (1 0, 2 0) in the sky and the lines with 10, 20 and the two
+//   slanted rails in the ground are raised ribs, painted white. The pitch motor rides on the
 //   roll frame, inside the bowl, on a bracket from the back disc; its
 //   pinion turns a gear sector on the bowl's left hub (3:1). A magnet in
 //   the bowl's right side passes a hall sensor in the right arm just past
@@ -49,8 +51,8 @@
 // ground half in brown), the pitch gear sector, the pinion and the roll
 // motor gear (flat), the pitch motor's bracket (plate down), the back
 // plate with the carrier's posts (front down), the board carrier (flat).
-// Black but the bowl; paint the index, the airplane's wings and dot
-// orange, the bowl's ribs white.
+// Black but the bowl; paint the index's triangle and the airplane
+// yellow, its pedestal light brown, the bowl's ribs white.
 //
 // Parts to buy:
 // - 2 x 28BYJ-48 stepper (5 V) with its ULN2003 board, an Arduino Nano and
@@ -95,24 +97,29 @@ explode = 25;
 // --- Display ---
 pitch_max = 30;              // the bowl turns this far each way (MobiFlight clamps the pitch here)
 home_pitch = -33;            // the pitch sensor's place: just past nose down
-pitch_lines = [[5, 5], [10, 10], [15, 5], [20, 10]];   // nose up and down: pitch, length
+// the bowl's markings (raised ribs), like the RC Allen 172 instrument's: pitch, length, label
+sky_lines = [[2, 3.5], [4, 3.5], [6, 3.5], [8, 3.5], [10, 4, "1"], [15, 4.5], [20, 4, "2"], [25, 4.5]];   // the label's "1" left, "0" right
+ground_lines = [[-5, 9], [-10, 16, "10"], [-15, 20], [-20, 24, "20"], [-25, 26]];   // the label at both ends
+rails = [[1.4, -1.5], [15.7, -30]];   // the ground's two slanted lines: from [x, pitch] to [x, pitch], both sides
+label_size = 2.4;
 line_w = 0.8;                // the bowl's ribs
 horizon_w = 1.2;
 rib_h = 0.4;
 bank_short = [10, 20];       // bank marks, both sides
 bank_long = [30, 60];
+bank_dot = [45, 1.4];        // a dot: angle, diameter
+zero_tri = [5, 4];           // the white triangle at 0: base, height
 mark_r1 = 35;                // the marks' outer end
 mark_len = [3, 5.5];         // short, long: the long ones end at the dial's window
 mark_w = [0.7, 1];
-ground_lines = [20, 45];     // the dial's ground: white lines this far under the horizon, both sides
-ground_w = 0.8;
 // colours, in the print's order (keep the print marker below the same)
 c_black = "black";
 c_sky = "#4ba3d1";
 c_ground = "#7a4a2c";
 c_white = "white";
 face_colors = [c_black, c_sky, c_ground, c_white];
-c_plane = "#ff8c1a";         // view only: the airplane's wings and dot, the index (paint)
+c_plane = "#f2c200";         // view only: the airplane and the index (paint them yellow)
+c_pedestal = "#a88660";      // view only: the airplane's pedestal (paint it light brown)
 
 // --- Fixed parts in the case: the sleeve, its ring, the airplane ---
 ring_t = 2.6;                // the sleeve's front ring, behind the glass
@@ -122,12 +129,15 @@ bore_play = 0.15;            // sleeve to the case's bore, radial
 leg_w = 6;                   // the sleeve's legs behind the roll frame, to the back plate
 leg_angles = [0, 120, 240];  // clockwise from 12 o'clock, off the roll motor's gear
 plane_t = 1.5;
-index_tip = 30;              // the fixed bank index's tip from the axis
-index_w = 6.5;
+index_tip = 28.5;            // the fixed bank index (a yellow triangle outline pointing up): its tip from the axis
+index_tri = [4.6, 4.5, 0.8]; // base, height, the outline's width
+index_strut = [6, 0.9];      // it hangs from the ring at the top on two struts: their top ends' x, width
 index_t = 1.4;
-wing = [5.5, 18, 2.2];       // the airplane's wing bars: from, to (x), thickness
-dot_d = 4.5;
-mount_w = [3, 16];           // its black mount: width at the top, at the mask
+wing = [7.7, 20.8, 2.1];     // the airplane's wing bars: from, to (x), thickness
+y_arm = [7.2, -2.5, 1.2, -7];   // the Y's arms: from the wings' inner ends down to [x, z], then in to [x, z]
+stem_w = 2.5;                // the stem from the Y down to the pedestal
+dot_d = 2.6;                 // the dot on the horizon, on a thin neck
+pedestal = [-14, 17.6, 24];  // the light brown pedestal from the mask: its top z, width there, width at the mask
 mask_z = -21;                // the black mask over the window's bottom: its top edge
 foot_r = 37.4;               // the mask's edge in the ring's notch, outer radius
 knob = [10, 4, 1.2];         // the dummy knob in front of the glass: diameter, length, knurl depth
@@ -243,9 +253,11 @@ assert(y_plane0 >= y_glass1 + 0.3, "Airplane against the glass");
 assert(index_t <= y_rface - 0.6 - y_ring0, "Bank index runs into the dial");
 assert(ring_id / 2 < window_d / 2 && ring_id / 2 <= roll_r - 0.4, "The ring must hide the dial's rim and hold it");
 assert(face_r <= ring_id / 2 - 0.15 && face_r >= window_d / 2 - 1, "Dial face edge shows or is covered");
-assert(mark_r1 <= face_r - 0.3 && index_tip <= mark_r1 - 1, "Bank marks off the face or not under the index");
-assert(-mask_z + 1 <= vis_r && -mask_z >= dot_d / 2 + 10, "Mask over the horizon or not over the window's bottom");
-assert(norm([wing[1], wing[2] / 2]) <= vis_r && wing[0] >= dot_d / 2 + 1, "Wings");
+assert(mark_r1 <= face_r - 0.3 && index_tip <= mark_r1 - zero_tri[1] - 0.5, "Bank marks off the face or not over the index");
+assert(index_tip - index_tri[1] >= -pedestal[0] + 5, "Bank index too low");
+assert(-mask_z + 1 <= vis_r && -mask_z >= -pedestal[0] + 3, "Mask over the horizon or not over the window's bottom");
+assert(norm([wing[1], wing[2] / 2]) <= vis_r - 1 && wing[0] >= dot_d / 2 + 2, "Wings");
+assert(y_arm[3] - stem_w / 2 >= pedestal[0] + 2 && pedestal[2] / 2 >= pedestal[1] / 2, "Airplane's stem");
 assert(abs(knob_z) - knob[0] / 2 >= -mask_z + 1 && abs(knob_z) + knob[0] / 2 <= window_d / 2 - 0.5, "Knob off the mask");
 assert(foot_r <= sleeve_od / 2 - 1, "Mask's foot through the ring");
 // bowl
@@ -408,8 +420,8 @@ module ai_sleeve() {
             }
             rotate(-a) translate([-leg_w / 2, 0]) square([leg_w, sleeve_od]);
          }
-         // the bank index, pointing down at the dial's marks
-         along_y(y_ring0, y_ring0 + index_t) polygon([[0, index_tip], [-index_w / 2, ring_id / 2 + 0.5], [index_w / 2, ring_id / 2 + 0.5]]);
+         // the bank index, pointing up at the dial's marks
+         along_y(y_ring0, y_ring0 + index_t) index_2d();
       }
       // the mask's edge, from behind
       along_y(y_plane0, y_ring1 + 1) intersection() {
@@ -419,17 +431,51 @@ module ai_sleeve() {
    }
 }
 
-// --- Airplane: the wing bars and the dot on a black mount, the mask over the window's bottom ---
-// one flat part, printed black; paint the wings and the dot orange
+// --- Bank index: a triangle outline pointing up, hanging from the ring on two struts ---
+module index_tri_2d() {
+   b = index_tip - index_tri[1];
+   tri = [[0, index_tip], [-index_tri[0] / 2, b], [index_tri[0] / 2, b]];
+   difference() {
+      polygon(tri);
+      offset(delta = -index_tri[2]) polygon(tri);
+   }
+}
+
+module index_2d() {
+   b = index_tip - index_tri[1];
+   index_tri_2d();
+   for (s = [-1, 1]) hull() {
+      translate([s * index_tri[0] / 2, b + index_strut[1] / 2]) circle(d = index_strut[1]);
+      translate([s * index_strut[0], ring_id / 2 + 0.5]) circle(d = index_strut[1]);
+   }
+}
+
+// --- Airplane: the wing bars, the Y and the dot on a stem from the pedestal, the black mask over the window's bottom ---
+// one flat part, printed black; paint the airplane yellow, the pedestal light brown
 module wings_2d() {
-   circle(d = dot_d);
-   for (s = [-1, 1]) translate([s > 0 ? wing[0] : -wing[1], -wing[2] / 2]) square([wing[1] - wing[0], wing[2]]);
+   translate([0, 0.3]) circle(d = dot_d);
+   translate([-0.5, y_arm[3]]) square([1, 0.3 - y_arm[3]]);
+   for (s = [-1, 1]) {
+      translate([s > 0 ? wing[0] : -wing[1], -wing[2] / 2]) square([wing[1] - wing[0], wing[2]]);
+      hull() {
+         translate([s * wing[0], 0]) circle(d = wing[2]);
+         translate([s * y_arm[0], y_arm[1]]) circle(d = wing[2]);
+      }
+      hull() {
+         translate([s * y_arm[0], y_arm[1]]) circle(d = wing[2]);
+         translate([s * y_arm[2], y_arm[3]]) circle(d = wing[2]);
+      }
+   }
+   translate([-stem_w / 2, pedestal[0] - 0.01]) square([stem_w, y_arm[3] - pedestal[0] + 0.5]);
+}
+
+module pedestal_2d() {
+   polygon([[-pedestal[1] / 2, pedestal[0]], [pedestal[1] / 2, pedestal[0]], [pedestal[2] / 2, mask_z + 0.1], [-pedestal[2] / 2, mask_z + 0.1]]);
 }
 
 module plane_2d() {
    wings_2d();
-   // the mount: from under the dot down to the mask
-   polygon([[-mount_w[0] / 2, -dot_d / 2 + 0.5], [mount_w[0] / 2, -dot_d / 2 + 0.5], [mount_w[1] / 2, mask_z + 0.1], [-mount_w[1] / 2, mask_z + 0.1]]);
+   pedestal_2d();
    // the mask, its edge in the ring's notch
    intersection() {
       circle(r = foot_r, $fn = 180);
@@ -529,7 +575,7 @@ module ai_bowl_half(s) {
                }
                union() {
                   bwedge(-hw / 2, hw / 2, -bowl_x, bowl_x);
-                  for (l = pitch_lines, q = [-1, 1]) bwedge(q * l[0] - lw / 2, q * l[0] + lw / 2, -l[1] / 2, l[1] / 2);
+                  along_y(y_p - bowl_r - 2, y_p) bowl_marks_2d();
                }
             }
          }
@@ -539,6 +585,25 @@ module ai_bowl_half(s) {
       along_x(-bowl_x - 1, -x_pin[0] + 0.5) translate([y_p, 0]) circle(d = press_d);
       along_x(bowl_x - magnet[1] - 0.1, bowl_x + 1) translate(mag) circle(d = magnet[0] + 0.2);
    }
+}
+
+// the bowl's markings seen from the front at level (x right, z up): the
+// ladder in the sky, the lines, labels and rails in the ground
+module bowl_marks_2d() {
+   function pz(p) = bowl_r * sin(p);
+   for (l = sky_lines) {
+      translate([-l[1] / 2, pz(l[0]) - line_w / 2]) square([l[1], line_w]);
+      if (len(l) > 2) {
+         translate([-l[1] / 2 - 1.5, pz(l[0])]) text(l[2], size = label_size, font = font, halign = "right", valign = "center");
+         translate([l[1] / 2 + 1.5, pz(l[0])]) text("0", size = label_size, font = font, halign = "left", valign = "center");
+      }
+   }
+   for (l = ground_lines) {
+      translate([-l[1] / 2, pz(l[0]) - line_w / 2]) square([l[1], line_w]);
+      if (len(l) > 2) for (s = [-1, 1])
+         translate([s * (l[1] / 2 + 1.2), pz(l[0])]) text(l[2], size = label_size, font = font, halign = s > 0 ? "left" : "right", valign = "center");
+   }
+   for (s = [-1, 1]) hull() for (r = rails) translate([s * r[0], pz(r[1])]) circle(d = line_w + 0.1, $fn = 16);
 }
 
 // --- The bowl's gear: a sector round the back, on the left hub's hexagon ---
@@ -660,8 +725,9 @@ module ai_face_2d() {
       for (s = [-1, 1]) {
          for (a = bank_short) tick_2d(s * a, mark_r1 - mark_len[0], mark_r1, mark_w[0]);
          for (a = bank_long) tick_2d(s * a, mark_r1 - mark_len[1], mark_r1, mark_w[1]);
-         for (a = ground_lines) tick_2d(s * (90 + a), vis_r, face_r, ground_w);
+         translate(pol(mark_r1 - bank_dot[1], s * bank_dot[0])) circle(d = bank_dot[1]);
       }
+      polygon([[-zero_tri[0] / 2, mark_r1], [zero_tri[0] / 2, mark_r1], [0, mark_r1 - zero_tri[1]]]);
    }
 }
 
@@ -781,8 +847,11 @@ module ai_parts(r = view_roll, p = view_pitch, e = 0, with_case = true, with_sle
       if (with_sleeve) color(c_case) render() ai_sleeve();
       color(c_case) ai_plane();
       color(c_plane) translate([0, y_plane0 - 0.02, 0]) rotate([90, 0, 0]) linear_extrude(0.01) wings_2d();
-      color(c_plane) translate([0, y_ring0 - 0.02, 0]) rotate([90, 0, 0]) linear_extrude(0.01)
-         polygon([[0, index_tip], [-index_w / 2, ring_id / 2 + 0.5], [index_w / 2, ring_id / 2 + 0.5]]);
+      color(c_pedestal) translate([0, y_plane0 - 0.02, 0]) rotate([90, 0, 0]) linear_extrude(0.01) difference() {
+         pedestal_2d();
+         wings_2d();
+      }
+      color(c_plane) translate([0, y_ring0 - 0.02, 0]) rotate([90, 0, 0]) linear_extrude(0.01) index_tri_2d();
    }
    ai_roll_parts(r, p);
    translate([0, 0.8 * e, 0]) color(c_case) render() ai_roll_motor_gear();
