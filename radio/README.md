@@ -7,8 +7,10 @@ radios (COM1/NAV1, then COM2/NAV2) and the KT 76C transponder at the
 bottom, stacked in one cut-out of the panel sheet like the real stack.
 Every unit has an Arduino Nano of its own running MobiFlight, with a USB
 cable out of its open back to the powered USB hub (see
-[Connections](../hub/README.md#connections)), so each one is tested on
-its own. All units are 224 mm wide (`unit_w`, the KX155's
+[Connections](../README.md#connections)), so each one is tested on
+its own: four ports on the powered USB hub. Each unit takes about 50 mA
+for its Nano and, with the MAX7219 digits at low brightness, some tens
+to a hundred mA for its display and lamps. All units are 224 mm wide (`unit_w`, the KX155's
 width), each has its real height: the stack is 33 + 2 x 50.8 + 41.9 =
 176.5 mm high.
 

@@ -13,7 +13,7 @@ stands and are held down by printed pins. A printed clamp on each rod has a
 slot that takes the pot's slider ear, so pulling the knob moves the slider.
 An Arduino Nano running MobiFlight, on the box's floor, reads them: one USB
 cable out of the back wall to the powered USB hub (see
-[Connections](../hub/README.md#connections)), so the box can be tested on
+[Connections](../README.md#connections)), so the box can be tested on
 its own with nothing but that cable.
 
 The box mounts in the [cockpit frame](../frame/README.md) and has no lid: it
@@ -68,6 +68,9 @@ Two short wires take 5 V and GND on from the carb heat pot to the same end
 tabs of the throttle and the mixture pot, the same end of every pot to
 5 V, so all three read the same way. If a control reads backwards, swap
 its pot's two end tabs (or invert it in the Connector).
+
+**USB**: one port on the powered USB hub. The Nano and the three pots
+take about 50 mA, nothing more.
 
 ## MobiFlight
 

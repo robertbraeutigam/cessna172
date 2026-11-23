@@ -247,9 +247,13 @@ All switches, the ignition and the primer go to one Arduino Nano running
 MobiFlight on the back of the switch panel, each on a pin of its own
 (the Nano has enough of them: 15 inputs and the primer's analog pin). One
 USB cable runs from it to the powered USB hub (see
-[Connections](../hub/README.md#connections)), so the switch panel with
+[Connections](../README.md#connections)), so the switch panel with
 the ignition and the primer can be tested on its own with nothing but
 that cable.
+
+**USB**: one port on the powered USB hub for the switch panel, the
+ignition and the primer: the Nano about 50 mA, the ignition's five hall
+sensors a few mA each, under 100 mA in all.
 
 The Nano lies in two rails on a small printed carrier plate
 (`switches_carrier.stl`, printed plate down), component side out, its

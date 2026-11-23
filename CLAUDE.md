@@ -81,16 +81,6 @@ its own top-level directory; new components should follow the same layout.
     while START is pressed (MobiFlight writes its dataref; it cannot hold
     a command itself).
 
-- `hub/` — no parts: `README.md` is how everything connects. Every
-  MobiFlight component has its own Arduino Nano (each radio unit too)
-  with one USB cable to a powered USB hub on the desk right of the yoke,
-  so each one stands and is tested on its own; switches go to GND on the
-  Nano's internal pull-ups, no resistors, no muxes. The README has the
-  board list, the MobiFlight setup, the USB hub's current (steppers with
-  their coils off at rest, the homing peak) and power. (The old hub, a
-  Mega with RJ45 ports and Cat5 cables, is retired; `hub.scad` is in the
-  git history.)
-
 - `yoke/` — `yoke.scad`: the hollow Cessna control wheel (trapezoid hub,
   bar with a sagging bottom, arms leaning inwards with block heads square
   on their ends; `arm_frame` places things on an arm end), its outline a
@@ -244,13 +234,20 @@ Every component has one `README.md` in its directory: it describes that
 component (working principle, hardware with shop links, wiring, assembly)
 and embeds its montage images. The top-level `README.md` is the overview:
 building, and a short description, the montage and a link per component.
-The connections between components (the boards, MobiFlight, the powered
-USB hub, power) are in `hub/README.md`; the other READMEs link there
-instead of repeating it. Links between READMEs are relative
-(`../hub/README.md#connections`). Keep them in sync when a design, part
-list or wiring changes: the component's README, and `hub/README.md` too
-when a component's board or its current changes, and the
-top-level overview when a component is added or its summary changes. A new
+Its `Connections` section is how the components connect: every
+MobiFlight component has its own Arduino Nano (each radio unit too) with
+one USB cable to a powered USB hub on the desk right of the yoke, so each
+one stands and is tested on its own; switches go to GND on the Nano's
+internal pull-ups. It has the MobiFlight setup, the USB hub's spec (port
+count, the homing peak) and power; the other READMEs link there
+(`../README.md#connections`) instead of repeating it. What a component
+takes from the hub (ports, current, its peculiarities) is in its own
+README, in a *USB* paragraph. Links between READMEs are relative. Keep
+them in sync when a design, part list or wiring changes: the component's
+README (its *USB* paragraph too when its board or its current changes),
+and the top-level overview when a component is added, its summary
+changes or the hub's totals change. (The old hub, a Mega with RJ45 ports
+and Cat5 cables, is retired; its `hub/` directory is in the git history.) A new
 component gets its own README and an entry in the top-level one; do not add
 other docs files. The scad header comments stay as the in-source summary.
 

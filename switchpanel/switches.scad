@@ -35,7 +35,7 @@
 // - An Arduino Nano running MobiFlight reads all of it (the switches, the
 //   ignition and the primer): it lies in rails on a separate carrier plate
 //   (`nano_carrier`), with a block for a cable tie next to its USB jack.
-//   One USB cable runs to the powered USB hub (hub/README.md,
+//   One USB cable runs to the powered USB hub (README.md,
 //   Connections); it plugs into the Nano and the tie holds it on the
 //   block, so pulling the cable does not lever the jack. The carrier can
 //   be wired up on its own (ignition, primer) and tested before the panel

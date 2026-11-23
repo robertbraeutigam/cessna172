@@ -14,7 +14,7 @@
 // Everything is hollow: the wires run from the heads down the arms and
 // along the bar to an Arduino Nano running MobiFlight in the hub, and its
 // USB cable from there through the hollow control tube to the powered USB
-// hub (hub/README.md, Connections).
+// hub (README.md, Connections).
 //
 // Printing: 378 mm wide, so the wheel is cut into six shells, all printed
 // outer face down (both faces are flat, the edges rounded), no supports:

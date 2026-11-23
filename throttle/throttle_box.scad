@@ -12,7 +12,7 @@
 // Read by MobiFlight on an Arduino Nano of its own, in rails on the floor
 // between the carb heat and the throttle pot, its USB jack at the back
 // wall: the USB cable to the powered USB hub plugs in through a window in
-// it (hub/README.md, Connections). Wires, soldered to the Nano's pins:
+// it (README.md, Connections). Wires, soldered to the Nano's pins:
 // - 5 V and GND to the carb heat pot's end tabs, then on with two short
 //   wires to the same tabs of the throttle and the mixture pot (the same
 //   end of each pot to 5 V, so all read the same way)
