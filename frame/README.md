@@ -110,7 +110,7 @@ right of the radio panel (`frame_w` is computed, 850 mm).
 instruments) on 89 mm (3.5") centres, the six-pack in two rows 92 and
 180 mm over the yoke column, its middle column 9 mm left of it; NAV 1 and
 NAV 2 in a column 100 mm right of the six-pack's, in the same rows; the
-RPM indicator beside the column, under the altimeter. In stage 1 the
+RPM indicator beside the column, under the VSI. In stage 1 the
 six-pack and the NAV indicators are above the left sheet, where the
 monitor shows them; the RPM is mostly behind it. For stage 2 the left top
 bar moves up to the right one's height (the left end upright already

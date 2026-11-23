@@ -5,18 +5,26 @@
 // from behind, its front flush with the sheet's front, and four screws
 // from the front on the diagonals hold it (they show, like on the real
 // panel). The needle is turned by a 28BYJ-48 geared stepper through two
-// printed gears (1:1), so the motor sits beside the case, on an arm to
-// the right, and the case itself is only as deep as the gears: the RPM
-// indicator has the yoke's housing 19 mm behind the sheet. A disc magnet
-// in the motor gear passes a hall sensor, which homes the needle.
-// MobiFlight on an Arduino Nano of its own drives it through the ULN2003
-// board; both sit on a carrier behind the arm, beside the motor.
+// printed gears (1:1). A disc magnet in the motor gear passes a hall
+// sensor, which homes the needle. MobiFlight on an Arduino Nano of its own
+// drives it through the ULN2003 board; both sit on a printed carrier.
+//
+// Two layouts; the instrument sets `layout` (the include does not):
+// - "arm": big gears, the motor beside the case, on an arm to the right,
+//   the boards' carrier behind the arm, beside the motor; the case itself
+//   is only as deep as the gears. For the RPM indicator, which has the
+//   yoke's housing 19 mm behind the sheet.
+// - "deep": small gears, the motor behind the case (its body over the
+//   needle's axis), the carrier on posts behind the motor, its boards
+//   facing forward; nothing outside the case's outline, so it fits
+//   between the six-pack's neighbours, but 47 mm deep behind the sheet.
 //
 // Front to back: the lip (the window), the clear sheet (glass), the dial
 // (a shallow cup: its rim holds the glass against the lip, the face is
 // glued into it), the needle on a 3 mm steel axle, the needle gear, the
 // back plate (the axle's bearing; three posts press the dial forward; the
-// motor on its back). The motor gear is on the motor's shaft in the arm.
+// motor on its back). The motor gear is on the motor's shaft beside the
+// needle gear (in the arm, or in the case's bore and a pocket in its wall).
 //
 // - The face is a colour print on paper (<file>_face.pdf, a print marker with
 //   a colour list, see the Makefile): an instrument draws it as a 2D
@@ -42,9 +50,11 @@
 // - clear sheet 1 mm, PET or acrylic (glass_t), the face printed on paper
 //   (paper_t)
 // - M3 x 8 button head, black (4, through the sheet into the case),
-//   M3 x 8 countersunk self tapping (6, back plate into the case),
+//   M3 x 8 countersunk self tapping (6 "arm", 4 "deep", back plate into the case),
 //   M3 x 8 countersunk + nut (2, motor ears), M3 x 6 self tapping
-//   (3, board carrier; 4, ULN2003 board)
+//   (4, ULN2003 board), board carrier: "arm" M3 x 6 self tapping (3,
+//   through the carrier into the back plate), "deep" M3 x 8 countersunk
+//   self tapping (4, from the back plate's front into the posts)
 //
 // Assembly: magnet into the motor gear's pocket (check which face pulls
 // the sensor low), sensor into its pocket on the back plate (flat face
@@ -61,6 +71,7 @@ sheet_t = 3;
 cut_d = 81;                  // the instrument's hole (inst_cut_d)
 yoke_side = 55.5;            // view only: the RPM's yoke housing side from its axis (frame/)
 yoke_gap = 22;               // view only: the sheet's back to the yoke housing
+inst_pitch = [89, 88];       // check only: the six-pack's centres across and down (frame/)
 
 // --- 28BYJ-48 stepper, MEASURE (the compass's values) ---
 motor_d = 28;
@@ -127,22 +138,28 @@ needle_len = 33;
 needle_tail = 8;
 needle_w = [2.2, 0.8];       // at the hub, at the tip
 
+// --- Layout ---
+assert(layout == "arm" || layout == "deep", "layout is \"arm\" or \"deep\"");
+is_arm = layout == "arm";
+
 // --- Gears and back plate ---
-gear_m = 1.5;
-gear_z = 43;                 // both: 1:1
+gear_m = is_arm ? 1.5 : 1;
+gear_z = is_arm ? 43 : 26;   // both: 1:1
 gear_t = 5;
 gear_play = 0.1;             // thinner teeth and a wider center distance
 gear_gap = 0.5;              // to the dial and to the back plate
 back_t = 3.5;
 post_d = 3.4;                // the dial's posts on the back plate
 post_angles = [90, 180, 270];
-mag_r = 24;                  // magnet and sensor from the motor's shaft
-mag_angle = 90;              // up
+mag_r = is_arm ? 24 : 8.2;   // magnet and sensor from the motor's shaft
+mag_angle = is_arm ? 90 : 0; // up; "deep": right, away from the motor's body
+motor_dir = is_arm ? 1 : -1; // the motor's body right of its shaft, or left (over the axis)
 
 // --- Boards ---
 car_t = 2.5;                 // carrier plate
 uln_standoff = 4;
 rail_w = 1.5;
+car_post_d = 7;              // "deep": the carrier's posts
 board_gap = 2;               // motor cover to the ULN2003 board, boards apart
 
 // --- Face and print ---
@@ -170,7 +187,6 @@ y_gear1 = y_gear0 + gear_t;
 y_back0 = y_gear1 + gear_gap;                 // the back plate, the case's back
 y_back1 = y_back0 + back_t;                   // the motor's flange on it
 y_shaft_end = y_back1 - shaft_len;
-y_box0 = min(y_shaft_end, y_gear0) - 0.5;     // the arm's inside, from here back
 y_axle0 = y_needle0 + needle_skin;
 y_axle1 = y_axle0 + axle[1];
 depth = y_back1 - y_sheet1;                   // behind the sheet's back (countersunk heads, flush)
@@ -180,28 +196,43 @@ gear_rf = gear_rp - 1.25 * gear_m;
 drive_a = 2 * gear_rp + gear_play;            // the motor's shaft from the axis, along x
 arm_r = gear_ra + 1 + wall;                   // the arm round the motor gear
 cols = concat([for (a = [45 : 90 : 315]) ear_r * [cos(a), sin(a)]],
-              [for (s = [-1, 1]) [drive_a, s * (gear_ra + 1.5 + col_d / 2)]]);   // case screw columns [x, z]
+              is_arm ? [for (s = [-1, 1]) [drive_a, s * (gear_ra + 1.5 + col_d / 2)]] : []);   // case screw columns [x, z]
 post_r = (rim_od + 0.3) / 2 - post_d / 2 - 0.15;
-motor_c = [drive_a + motor_shaft_dy, 0];      // the motor body's middle, its cover to the right
+motor_c = [drive_a + motor_dir * motor_shaft_dy, 0];   // the motor body's middle, its cover further out
 ears = [for (s = [-1, 1]) [motor_c.x, s * motor_ear_dx]];
 sensor_c = [drive_a + mag_r * cos(mag_angle), mag_r * sin(mag_angle)];
-cover_x1 = motor_c.x + motor_cover[1];
-uln_x0 = cover_x1 + board_gap;                // ULN2003 board, standing in front of the carrier
+cover_x1 = motor_c.x + motor_dir * motor_cover[1];      // the cover's end
+// boards: "arm" right of the motor, standing behind the carrier; "deep"
+// the ULN2003 board left of the cover, the Nano behind the motor, both in
+// front of the carrier
+uln_x0 = is_arm ? cover_x1 + board_gap : cover_x1 - board_gap - uln_board.x;
 car_x0 = uln_x0 - 1;
-car_screw_x = uln_x0 + uln_board.x + board_gap + 1.5;
-nano_x = car_screw_x + 1.5 + board_gap + rail_w + nano_board.x / 2 + 0.1;   // its middle; along z, USB down
+car_screw_x = uln_x0 + uln_board.x + board_gap + 1.5;   // "arm"
+nano_x = is_arm ? car_screw_x + 1.5 + board_gap + rail_w + nano_board.x / 2 + 0.1
+                : cover_x1 + rail_w + 0.1 + nano_board.x / 2;   // its middle; along z, USB down
 car_x1 = nano_x + nano_board.x / 2 + 0.1 + rail_w + 1;
 car_h = max(uln_board.y, nano_board.y + 3) + 4;
-y_car1 = y_back1 + car_t;
+y_car0 = is_arm ? y_back1                                         // the carrier plate
+                : y_back1 + motor_flange_t + motor_h + 1 + nano_under + nano_t + nano_usb[1];
+y_car1 = y_car0 + car_t;
 uln_holes = [for (x = [0, 1], z = [-1, 1])
    [uln_x0 + uln_hole_in + x * (uln_board.x - 2 * uln_hole_in), z * (uln_board.y / 2 - uln_hole_in)]];
-car_screws = [[car_x0 + 3.5, car_h / 2 - 3.5], [car_x0 + 3.5, -car_h / 2 + 3.5], [car_screw_x, 0]];
-// what is deeper than the case: the motor and the boards, [x0, x1, half height]
+// "deep": the right posts beside the Nano, as low as the motor's body and the motor gear (the screw heads) let them
+post_x = car_x1 + car_post_d / 2;
+post_z = ceil(sqrt(max(0, pow(motor_d / 2 + car_post_d / 2 + 1, 2) - pow(post_x - motor_c.x, 2),
+                          pow(gear_ra + csk_d / 2 + 0.5, 2) - pow(post_x - drive_a, 2))));
+car_screws = is_arm ? [[car_x0 + 3.5, car_h / 2 - 3.5], [car_x0 + 3.5, -car_h / 2 + 3.5], [car_screw_x, 0]]
+                    : [for (s = [-1, 1]) each [[uln_x0 + uln_board.x / 2, s * (uln_board.y / 2 + 1 + car_post_d / 2)],
+                                               [post_x, s * post_z]]];
+// "arm": what is deeper than the case: the motor and the boards, [x0, x1, half height]
 deep = [motor_c.x - motor_d / 2, car_x1, max(car_h / 2, motor_ear_dx + motor_ear_w / 2)];
 arm = [car_x1, max([for (c = cols) abs(c.y) + col_d / 2])];   // the arm: right end, half height
+deep_depth = y_car1 - y_sheet1;               // "deep": behind the sheet's back
 
-echo(instrument_depth = depth, deep = deep, arm = arm, drive_a = drive_a,
-     face_d = face_d, glass_d = glass_d, axle_in_plate = y_axle1 - y_back0);
+if (is_arm) echo(instrument_depth = depth, deep = deep, arm = arm, drive_a = drive_a,
+                 face_d = face_d, glass_d = glass_d, axle_in_plate = y_axle1 - y_back0);
+else echo(instrument_depth = deep_depth, case_depth = depth, drive_a = drive_a,
+          face_d = face_d, glass_d = glass_d, axle_in_plate = y_axle1 - y_back0);
 
 // --- Checks ---
 assert(window_d + 2 <= rim_id, "The dial's rim shows in the window");
@@ -226,10 +257,41 @@ assert(gear_t - magnet[1] - 0.1 >= 1, "Magnet pocket too deep for the gear");
 assert(norm(sensor_c - motor_c) >= motor_d / 2 + 2 && min([for (e = ears) norm(sensor_c - e)]) >= nut[0] / 2 + sensor.x / 2 + 2,
        "Sensor's legs run into the motor or its ear screws");
 assert(norm(sensor_c - [drive_a, 0]) + sensor.z / 2 + 3 <= arm_r + 1, "Sensor off the back plate");
-for (e = ears) assert(norm(e - [drive_a, 0]) + csk_d / 2 <= arm_r - 1, "Motor ear screws off the arm");
-assert(deep[0] >= yoke_side + 3, "Motor runs into the yoke housing (frame/)");
-assert(depth <= yoke_gap - 3, "Case too deep for the yoke housing behind it (frame/)");
 assert(norm(nano_board) <= 2 * car_h, "Nano carrier too small");
+if (is_arm) {
+   for (e = ears) assert(norm(e - [drive_a, 0]) + csk_d / 2 <= arm_r - 1, "Motor ear screws off the arm");
+   assert(deep[0] >= yoke_side + 3, "Motor runs into the yoke housing (frame/)");
+   assert(depth <= yoke_gap - 3, "Case too deep for the yoke housing behind it (frame/)");
+} else {
+   assert(drive_a + gear_ra + 1 + wall <= case_r + 1.5, "Motor gear bulges out of the case");
+   // the motor's shaft end in a pocket in the dial's back
+   assert(y_shaft_end - 0.3 - y_dial0 >= 0.6, "Motor's shaft too close to the face");
+   for (e = ears) {
+      assert(norm(e) + csk_d / 2 <= bore_d / 2 - 1, "Motor ear screws off the back plate");
+      assert(norm(e) >= gear_ra + nut[0] / 2 + 1, "Motor ear nuts on the axle's bearing");
+   }
+   assert(cover_x1 >= -bore_d / 2 + 2, "Motor's cover off the back plate");
+   for (s = car_screws) {
+      assert(norm(s - motor_c) >= motor_d / 2 + car_post_d / 2 + 0.9, "A carrier post runs into the motor");
+      assert(min([for (e = ears) norm(s - e)]) >= motor_ear_w / 2 + car_post_d / 2 + 0.5, "A carrier post runs into a motor ear");
+      assert(norm(s - [drive_a, 0]) >= gear_ra + csk_d / 2 + 0.4 && norm(s) >= gear_ra + csk_d / 2 + 0.5,
+             "A carrier screw's head under a gear");
+      assert(norm(s - sensor_c) >= car_post_d / 2 + sensor.x / 2 + 1.5, "A carrier post runs into the sensor's legs");
+      assert(norm(s) + csk_d / 2 <= bore_d / 2 - 1, "A carrier screw off the back plate");
+      assert(min([for (a = post_angles) norm(s - post_r * [cos(a), sin(a)])]) >= post_d / 2 + csk_d / 2 + 1,
+             "A carrier screw runs into a dial post");
+      assert(s.x - car_post_d / 2 >= car_x1 - 1 || s.x + car_post_d / 2 <= car_x0 + 1
+             || abs(s.y) - car_post_d / 2 >= uln_board.y / 2 + 0.5, "A carrier post runs into the ULN2003 board");
+   }
+   assert(y_car0 - y_back1 - motor_flange_t - motor_h >= nano_under + nano_t + nano_usb[1] + 0.9, "Nano runs into the motor");
+   assert(y_car0 - uln_standoff - nano_t - uln_parts >= y_back1 + 1, "ULN2003 board's parts run into the back plate");
+   assert(uln_x0 + uln_board.x + 1 <= cover_x1, "ULN2003 board runs into the motor's cover");
+   // between the six-pack's neighbours (they are as big), clear of the case screws' heads
+   assert(max(abs(car_x0), post_x + car_post_d / 2, car_x1) <= inst_pitch.x / 2 - 1 && car_h / 2 <= inst_pitch.y / 2 - 1,
+          "Board carrier runs into the next instrument");
+   for (i = [0 : 3]) let(c = cols[i], q = [min(max(c.x, car_x0), car_x1), min(max(c.y, -car_h / 2), car_h / 2)])
+      assert(norm(c - q) >= csk_d / 2 + 2, "Board carrier over a case screw");
+}
 
 // --- Helpers ---
 function pol(r, a) = [r * sin(a), r * cos(a)];        // a: clockwise from 12 o'clock, as on the face
@@ -284,7 +346,7 @@ module case_outline() {
 
 module back_outline() {
    case_outline();
-   hull() {
+   if (is_arm) hull() {
       translate([drive_a, 0]) circle(r = arm_r, $fn = 120);
       translate([car_x0, -car_h / 2]) square([car_x1 - car_x0, car_h]);
    }
@@ -322,6 +384,8 @@ module dial() {
          }
       }
       along_y(y_dial0 - 1, y_dial1 + 1) circle(d = axle[0] + 0.3);
+      // "deep": the motor's shaft end
+      if (drive_a - shaft_d < rim_od / 2) along_y(y_shaft_end - 0.3, y_dial1 + 1) translate([drive_a, 0]) circle(d = shaft_d + 1);
    }
 }
 
@@ -358,7 +422,8 @@ module needle_gear(a = 0) {
 
 module motor_gear(a = 0) {
    translate([drive_a, 0, 0]) rotate([0, a, 0]) difference() {
-      along_y(y_gear0, y_gear1) gear_2d(gear_z);   // odd: a gap faces the needle gear's tooth
+      // a gap faces the needle gear's tooth (turned half a tooth if even)
+      along_y(y_gear0, y_gear1) rotate(gear_z % 2 == 0 ? 180 / gear_z : 0) gear_2d(gear_z);
       // the shaft, on its flats
       translate([0, y_gear1 + 1, 0]) rotate([90, 0, 0]) double_d(shaft_d + 0.1, shaft_flat + 0.1, y_gear1 + 1 - y_gear0 + 1);
       // magnet in the back face
@@ -387,33 +452,61 @@ module back_plate() {
          cube([sensor.x + 0.3, sensor.y + 0.01, sensor.z + 0.3]);
       translate([sensor_c.x - sensor.x / 2 - 0.15, y_back0 - 1, sensor_c.y + sensor.z / 2 - 1])
          cube([sensor.x + 0.3, back_t + 2, 2.5]);
-      // the board carrier's screws
-      for (s = car_screws) translate([s.x, y_back0 - 1, s.y]) rotate([-90, 0, 0]) cylinder(d = pilot_d, h = back_t + 2);
+      // the board carrier's screws: "arm" into the plate from behind, "deep" from the front into the posts
+      if (is_arm) for (s = car_screws) translate([s.x, y_back0 - 1, s.y]) rotate([-90, 0, 0]) cylinder(d = pilot_d, h = back_t + 2);
+      else for (s = car_screws) translate([s.x, y_back0, s.y]) rotate([90, 0, 0]) csk_hole();
    }
 }
 
 // --- Board carrier: the ULN2003 board on standoffs, the Nano in rails (USB down) ---
+// Drawn with the plate's board side at y = 0, the boards towards +y;
+// on_carrier() puts it in place: "arm" on the back plate's back, the boards
+// behind it; "deep" behind the motor, the boards facing forward.
+module on_carrier() {
+   if (is_arm) translate([0, y_car1, 0]) children();
+   else translate([0, y_car0, 0]) mirror([0, 1, 0]) children();
+}
+
+module carrier_outline() {
+   if (is_arm) translate([car_x0, -car_h / 2]) square([car_x1 - car_x0, car_h]);
+   else hull() {
+      translate([car_x0, -car_h / 2]) square([car_x1 - car_x0, car_h]);
+      for (s = car_screws) translate(s) circle(d = car_post_d);
+   }
+}
+
 module carrier() {
-   difference() {
+   post_h = y_car0 - y_back1;
+   on_carrier() difference() {
       union() {
-         translate([car_x0, y_back1, -car_h / 2]) cube([car_x1 - car_x0, car_t, car_h]);
-         for (h = uln_holes) translate([h.x, y_car1 - 0.01, h.y]) rotate([-90, 0, 0]) cylinder(d = 6, h = uln_standoff + 0.01);
+         along_y(-car_t, 0) carrier_outline();
+         for (h = uln_holes) translate([h.x, -0.01, h.y]) rotate([-90, 0, 0]) cylinder(d = 6, h = uln_standoff + 0.01);
          // Nano rails: a ledge under each long edge, a lip over it, a stop at the top end
          for (s = [-1, 1]) {
             xo = nano_x + s * (nano_board.x / 2 + 0.1);
-            translate([s > 0 ? xo : xo - rail_w, y_car1 - 0.01, -nano_board.y / 2 - 1])
+            translate([s > 0 ? xo : xo - rail_w, -0.01, -nano_board.y / 2 - 1])
                cube([rail_w, nano_under + nano_t + 0.8 + 0.01, nano_board.y + 2]);
-            translate([s > 0 ? xo - 1.2 : xo, y_car1 - 0.01, -nano_board.y / 2 - 1])
+            translate([s > 0 ? xo - 1.2 : xo, -0.01, -nano_board.y / 2 - 1])
                cube([1.2, nano_under + 0.01, nano_board.y + 2]);
-            translate([s > 0 ? xo - 0.8 : xo, y_car1 + nano_under + nano_t + 0.1, -nano_board.y / 2 - 1])
+            translate([s > 0 ? xo - 0.8 : xo, nano_under + nano_t + 0.1, -nano_board.y / 2 - 1])
                cube([0.8 + 0.01, 0.7, nano_board.y + 2]);
          }
-         translate([nano_x - nano_board.x / 2 - 0.1, y_car1 - 0.01, nano_board.y / 2 + 0.1])
+         translate([nano_x - nano_board.x / 2 - 0.1, -0.01, nano_board.y / 2 + 0.1])
             cube([nano_board.x + 0.2, nano_under + nano_t + 0.01, 1.5]);
+         // "deep": the posts to the back plate
+         if (!is_arm) for (s = car_screws) translate([s.x, -0.01, s.y]) rotate([-90, 0, 0]) cylinder(d = car_post_d, h = post_h + 0.01);
       }
-      for (h = uln_holes) translate([h.x, y_car1 - 1, h.y]) rotate([-90, 0, 0]) cylinder(d = pilot_d, h = uln_standoff + 2);
-      for (s = car_screws) translate([s.x, y_car1 + 0.01, s.y]) rotate([-90, 0, 0]) cylinder(d = clear_d, h = car_t + 1);
+      for (h = uln_holes) translate([h.x, -1, h.y]) rotate([-90, 0, 0]) cylinder(d = pilot_d, h = uln_standoff + 2);
+      if (is_arm) for (s = car_screws) translate([s.x, -car_t - 1, s.y]) rotate([-90, 0, 0]) cylinder(d = clear_d, h = car_t + 2);
+      else for (s = car_screws) translate([s.x, post_h - back_screw + back_t - 1, s.y]) rotate([-90, 0, 0])
+         cylinder(d = pilot_d, h = back_screw - back_t + 2);
    }
+}
+
+// in print orientation: the plate down
+module carrier_print() {
+   if (is_arm) translate([0, 0, -y_back1]) rotate([90, 0, 0]) carrier();
+   else translate([0, 0, y_car1]) rotate([-90, 0, 0]) carrier();
 }
 
 // --- Face: colour layers ---
@@ -490,11 +583,11 @@ module motor_local() {
 }
 
 module motor_part() {
-   translate([drive_a, y_back1, 0]) rotate([0, 90, 0]) rotate([90, 0, 0]) motor_local();
+   translate([drive_a, y_back1, 0]) rotate([0, motor_dir > 0 ? 0 : 180, 0]) rotate([0, 90, 0]) rotate([90, 0, 0]) motor_local();
 }
 
 module uln_part() {
-   translate([uln_x0, y_car1 + uln_standoff, -uln_board.y / 2]) {
+   on_carrier() translate([uln_x0, uln_standoff, -uln_board.y / 2]) {
       color(c_uln) cube([uln_board.x, nano_t, uln_board.y]);
       color("#202020") translate([8, nano_t, 6]) cube([19, 6, 7]);
       color("#f0f0f0") translate([7, nano_t, uln_board.y - 9]) cube([12, 7, 6]);
@@ -503,7 +596,7 @@ module uln_part() {
 }
 
 module nano_part() {
-   translate([nano_x - nano_board.x / 2, y_car1 + nano_under, -nano_board.y / 2]) {
+   on_carrier() translate([nano_x - nano_board.x / 2, nano_under, -nano_board.y / 2]) {
       color(c_board) cube([nano_board.x, nano_t, nano_board.y]);
       color("#202020") translate([nano_board.x / 2 - 3.5, nano_t, 20]) cube([7, 1.2, 7]);
       color(c_steel) translate([nano_board.x / 2 - nano_usb[0] / 2, nano_t, -1]) cube([nano_usb[0], nano_usb[1], 9]);

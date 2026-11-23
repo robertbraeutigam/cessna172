@@ -18,7 +18,7 @@ wiring and the assembly:
 | [`hub/`](hub/README.md) | the box with the MobiFlight Mega and the Cat5 ports |
 | [`yoke/`](yoke/README.md) | the hollow control wheel: PTT, trim rocker, a mux inside |
 | [`compass/`](compass/README.md) | the magnetic compass over the panel: a printed card on a 28BYJ-48 stepper, on its own Nano |
-| [`instruments/`](instruments/README.md) | the analogue instruments: the RPM indicator, a 28BYJ-48 stepper behind a colour printed face |
+| [`instruments/`](instruments/README.md) | the analogue instruments: the RPM and airspeed indicators, a 28BYJ-48 stepper behind a colour printed face |
 | [`radio/`](radio/README.md) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, on their own Mega (the audio panel on its own Nano) |
 
 How the components connect to the computer (the hub's ports, their
@@ -138,9 +138,13 @@ Arduino Nano of its own.
 
 The analogue instruments, built on one standard: a 3 1/8" case behind the
 panel, a colour printed face, a needle turned by a 28BYJ-48 stepper through
-two printed gears. The first is the RPM indicator.
+two printed gears. So far the RPM indicator (motor on an arm beside the
+case, for the yoke housing behind it) and the airspeed indicator (motor
+and boards behind the case, to fit the six-pack).
 
 [![RPM indicator](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)
+
+[![Airspeed indicator](https://robertbraeutigam.github.io/cessna172/instruments/asi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/asi_montage.png)
 
 ### [Radio stack](radio/README.md)
 

@@ -17,6 +17,8 @@
 
 $fn = 60;
 
+layout = "arm";            // the yoke housing is right behind it (instrument.inc.scad)
+
 include <instrument.inc.scad>
 
 // Preview: the needle at this RPM, parts apart by explode
