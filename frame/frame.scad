@@ -57,6 +57,8 @@
 // 7. Put the hub on the step crossbar (left ears) and the hub crossbar
 //    (front and back ears) and bolt them into T-nuts in the crossbars' top
 //    slots (hub_bolts).
+// 8. Bolt the compass stand into T-nuts in the right top bar's top slot
+//    (compass_bolts).
 //
 // Stage 2 (physical instruments): the left top bar moved up to the right
 // one's height, a full height left sheet with the instrument holes
@@ -95,7 +97,8 @@ echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
 echo(apron_sheet = [apron[2] - apron[0], apron[3] - apron[1]], apron_screws = len(apron_screws));
 echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts);
 echo(hub = [hub_x0, hub_y0], hub_bolts = hub_bolts);
-echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2 + len(hub_bolts), desk_clamps = len(clamp_xs), clamp_y = clamp_y);
+echo(compass_bolts = compass_bolts);
+echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2 + len(hub_bolts) + len(compass_bolts), desk_clamps = len(clamp_xs), clamp_y = clamp_y);
 
 // --- Frame ---
 
@@ -420,7 +423,24 @@ module hub_part() {
    }
 }
 
+// Compass over the panel on the right top bar: the stand, the body with
+// its bezel and the card behind the window
+module compass_part() {
+   translate([compass_x, ext / 2, z_tr + ext]) {
+      color(c_box) {
+         translate([-compass_foot.x / 2, -compass_foot.y / 2, 0]) cube(compass_foot);
+         translate([-compass_neck.x / 2, -compass_neck.y / 2, 0]) cube([compass_neck.x, compass_neck.y, compass_rise]);
+      }
+      translate([0, -compass_stand_dy, compass_rise]) {
+         color(c_device) translate([-compass_body.x / 2, compass_face_dy, 0]) cube(compass_body);
+         color("#e8e8e8") translate([-24, compass_face_dy - 0.5, compass_body.z / 2 - 13]) cube([48, 1, 26]);
+      }
+      color("#b9c0c8") for (s = [-1, 1]) translate([s * compass_bolt_dx, 0, compass_foot.z]) cylinder(d = m5_head_d, h = 3);
+   }
+}
+
 module components() {
+   compass_part();
    hub_part();
    yoke_part();
    radio_part();

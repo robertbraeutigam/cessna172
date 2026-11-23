@@ -17,6 +17,7 @@ wiring and the assembly:
 | [`frame/`](frame/README.md) | the aluminium frame and panel sheet that everything mounts on |
 | [`hub/`](hub/README.md) | the box with the MobiFlight Mega and the Cat5 ports |
 | [`yoke/`](yoke/README.md) | the hollow control wheel: PTT, trim rocker, a mux inside |
+| [`compass/`](compass/README.md) | the magnetic compass over the panel: a printed card on a 28BYJ-48 stepper, on its own Nano |
 | [`radio/`](radio/README.md) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, on their own Mega (the audio panel on its own Nano) |
 
 How the components connect to the computer (the hub's ports, their
@@ -55,10 +56,12 @@ that instantiates a part tell the Makefile what to render:
 box_lid(); // Make module lid                        -> target/<file>_lid.stl
 //#big_pots(); // Ignore module                      -> never rendered
 //exploded_view(); // Make view main 62,0,32         -> target/<file>_main.png
+card_print(); // Make print card                     -> target/<file>_card.pdf
 ```
 
 A leading `//` only hides a line from the OpenSCAD preview; the build still
-renders it. `{{gitrev}}` in the source is replaced with the short git hash,
+renders it. A print is a 2D drawing for paper (the compass card): exported
+1:1 to an A4 PDF, filled black, with OpenSCAD's scale bar to check it. `{{gitrev}}` in the source is replaced with the short git hash,
 so the version is embossed into the parts.
 
 Values and modules shared by several files of a component go into a
@@ -116,6 +119,14 @@ The hollow Cessna control wheel with PTT buttons, an electric trim rocker
 and a mux inside.
 
 [![Yoke](https://robertbraeutigam.github.io/cessna172/yoke/yoke_montage.png)](https://robertbraeutigam.github.io/cessna172/yoke/yoke_montage.png)
+
+### [Compass](compass/README.md)
+
+The magnetic compass over the panel: a drum card with a printed paper
+strip, turned by a 28BYJ-48 stepper and homed on a hall sensor, on an
+Arduino Nano of its own.
+
+[![Compass](https://robertbraeutigam.github.io/cessna172/compass/compass_montage.png)](https://robertbraeutigam.github.io/cessna172/compass/compass_montage.png)
 
 ### [Radio stack](radio/README.md)
 
