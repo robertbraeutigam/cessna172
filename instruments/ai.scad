@@ -3,21 +3,23 @@
 // The six-pack's top middle instrument (frame/), between the airspeed
 // indicator and the altimeter, over the heading indicator. It has the
 // standard instrument's case front (instrument.inc.scad: the hole, the
-// lip, the glass, the four screws through the sheet), but it is deeper:
+// lip, the glass), a square bezel in front of the sheet (the case's four
+// screws through its corners and the sheet), and it is deeper:
 // the horizon is a bowl on a roll frame, the pitch motor rides on it.
 //
 // What moves:
 // - Roll: the roll frame turns in a printed sleeve in the case. Its front
-//   is the roll dial: a thin ring (sky and ground halves, a white
-//   triangle at 0, the bank marks 10, 20, 30, a dot at 45, 60, 90, the
+//   is the roll dial: a thin ring (sky and ground halves, the bank marks
+//   0, 10, 20, 30, a dot at 45, 60, 90, the
 //   long ones ending at its window: a colour print, ai_face.pdf); two arms
 //   go back from it to a back disc with the roll gear. Modelled on the RC
-//   Allen 172 instrument. The bank index (a yellow triangle outline at 12
-//   o'clock, pointing up, hanging from the sleeve's front ring on two struts) and the airplane
+//   Allen 172 instrument. The bank index (a yellow triangle hanging from
+//   the sleeve's front ring at 12 o'clock, a slit down its middle for the
+//   dial's zero line) and the airplane
 //   are fixed, between the glass and the dial: yellow wing bars, a Y and
 //   a dot on a stem from a light brown pedestal, which stands on a black
-//   mask over the window's bottom, with a dummy knob in front of the
-//   glass on a stem through it (the real one sets the airplane's height).
+//   mask over the window's bottom; a dummy knob on the bezel's bottom edge
+//   (the real one sets the airplane's height).
 //   The dial turns with the horizon and the index reads its bank marks.
 //   The roll motor is on the back plate (1:1 to the roll gear), its gear's
 //   magnet homes it over a hall sensor.
@@ -45,7 +47,7 @@
 //
 // Parts (printed): the case (back side down), the sleeve with the front
 // ring and the bank index (ring down), the airplane with its mount and the
-// mask (flat), the knob (front down), the roll dial with the arms (dial
+// mask (flat), the bezel (back down), the knob (front down), the roll dial with the arms (dial
 // down), the back disc with the roll gear (front down), the two bowl
 // halves (horizon face down, supports under the inside: sky half in blue,
 // ground half in brown), the pitch gear sector, the pinion and the roll
@@ -60,9 +62,8 @@
 //   6 x 3 mm, a capsule slip ring with 8 wires (MSM-12-08A: 12 mm, a 24 mm
 //   flange with 3 holes)
 // - 2 x steel dowel pin 3 x 10 mm (the bowl's pivots)
-// - clear sheet 1 mm (glass, a 3.4 mm hole for the knob's stem), the dial's
-//   face printed on photo paper
-// - M3 x 8 button head, black (4, through the sheet into the case),
+// - clear sheet 1 mm (glass), the dial's face printed on photo paper
+// - M3 x 12 button head, black (4, through the bezel and the sheet into the case),
 //   M3 x 8 countersunk self tapping (4, back plate into the case; 2, back
 //   disc onto the arms; 2, back disc onto the bracket; 4, the carrier onto
 //   its posts), M3 x 8 countersunk + nut (2, roll motor ears), M3 x 8 pan
@@ -76,10 +77,11 @@
 // into its hubs (the pinion meshing), sensor into the right arm. Back
 // disc onto the arms. Airplane's mask into the sleeve's ring. Glass into
 // the case, the sleeve behind it, the roll frame into the sleeve; knob
-// through the glass into the mask (glue). Slip ring onto the back plate,
+// into the bezel (glue). Slip ring onto the back plate,
 // roll motor, its sensor and gear on, its rotor wires through the back
 // disc to the pitch motor and sensor; back plate into the case. Carrier
-// onto its posts, boards on it, wire it.
+// onto its posts, boards on it, wire it. Into the panel: the case into
+// the hole from behind, the bezel in front, the four screws through both.
 //
 // Coordinates as in instrument.inc.scad: x to the right, y away from the
 // pilot, z up, the origin on the roll axis at the sheet's front face.
@@ -106,9 +108,8 @@ line_w = 0.8;                // the bowl's ribs
 horizon_w = 1.2;
 rib_h = 0.4;
 bank_short = [10, 20];       // bank marks, both sides
-bank_long = [30, 60];
+bank_long = [0, 30, 60];     // 0: the line the index's slit shows
 bank_dot = [45, 1.4];        // a dot: angle, diameter
-zero_tri = [5, 4];           // the white triangle at 0: base, height
 mark_r1 = 35;                // the marks' outer end
 mark_len = [3, 5.5];         // short, long: the long ones end at the dial's window
 mark_w = [0.7, 1];
@@ -129,9 +130,9 @@ bore_play = 0.15;            // sleeve to the case's bore, radial
 leg_w = 6;                   // the sleeve's legs behind the roll frame, to the back plate
 leg_angles = [0, 120, 240];  // clockwise from 12 o'clock, off the roll motor's gear
 plane_t = 1.5;
-index_tip = 28.5;            // the fixed bank index (a yellow triangle outline pointing up): its tip from the axis
-index_tri = [4.6, 4.5, 0.8]; // base, height, the outline's width
-index_strut = [6, 0.9];      // it hangs from the ring at the top on two struts: their top ends' x, width
+index_tip = 29;              // the fixed bank index: a yellow triangle hanging from the ring at the top, pointing down: its tip from the axis
+index_w = 8;                 // its width at the ring
+index_slit = 0.6;            // the slit down its middle: the zero line's width and this each side
 index_t = 1.4;
 wing = [7.7, 20.8, 2.1];     // the airplane's wing bars: from, to (x), thickness
 y_arm = [7.2, -2.5, 1.2, -7];   // the Y's arms: from the wings' inner ends down to [x, z], then in to [x, z]
@@ -140,9 +141,15 @@ dot_d = 2.6;                 // the dot on the horizon, on a thin neck
 pedestal = [-14, 17.6, 24];  // the light brown pedestal from the mask: its top z, width there, width at the mask
 mask_z = -21;                // the black mask over the window's bottom: its top edge
 foot_r = 37.4;               // the mask's edge in the ring's notch, outer radius
-knob = [10, 4, 1.2];         // the dummy knob in front of the glass: diameter, length, knurl depth
-knob_z = -28.5;              // its axis
-knob_pin = 3;                // its stem, through a hole in the glass into the mask
+knob = [12, 5, 1.2];         // the dummy knob on the bezel's bottom: diameter, length, knurl depth
+knob_z = -40;                // its axis
+knob_pin = [3, 3];           // its stem, glued into the bezel: diameter, depth
+
+// --- Front bezel: square, in front of the sheet, the case's 4 screws through its corners ---
+bezel = [86, 4, 6];          // size, thickness, corner radius
+bezel_chamfer = 1.2;         // round the window
+ai_front_screw = 12;         // M3 x 12 button head through the bezel and the sheet into the case
+head_cb = [6.4, 1.5];        // their heads' counterbore: diameter, depth
 
 // --- Roll frame ---
 roll_play = 0.3;             // radial, the roll dial and the back disc in the sleeve
@@ -253,12 +260,15 @@ assert(y_plane0 >= y_glass1 + 0.3, "Airplane against the glass");
 assert(index_t <= y_rface - 0.6 - y_ring0, "Bank index runs into the dial");
 assert(ring_id / 2 < window_d / 2 && ring_id / 2 <= roll_r - 0.4, "The ring must hide the dial's rim and hold it");
 assert(face_r <= ring_id / 2 - 0.15 && face_r >= window_d / 2 - 1, "Dial face edge shows or is covered");
-assert(mark_r1 <= face_r - 0.3 && index_tip <= mark_r1 - zero_tri[1] - 0.5, "Bank marks off the face or not over the index");
-assert(index_tip - index_tri[1] >= -pedestal[0] + 5, "Bank index too low");
+assert(mark_r1 <= face_r - 0.3 && index_tip <= mark_r1 - mark_len[0] && index_tip >= vis_r - 1, "Bank index not over the marks");
+assert(index_w / 2 - mark_w[1] / 2 - index_slit >= 1.5, "Bank index too narrow for its slit");
 assert(-mask_z + 1 <= vis_r && -mask_z >= -pedestal[0] + 3, "Mask over the horizon or not over the window's bottom");
 assert(norm([wing[1], wing[2] / 2]) <= vis_r - 1 && wing[0] >= dot_d / 2 + 2, "Wings");
 assert(y_arm[3] - stem_w / 2 >= pedestal[0] + 2 && pedestal[2] / 2 >= pedestal[1] / 2, "Airplane's stem");
-assert(abs(knob_z) - knob[0] / 2 >= -mask_z + 1 && abs(knob_z) + knob[0] / 2 <= window_d / 2 - 0.5, "Knob off the mask");
+assert(abs(knob_z) - knob_pin[0] / 2 >= window_d / 2 + bezel_chamfer + 1 && abs(knob_z) + knob_pin[0] / 2 <= bezel[0] / 2 - 1, "Knob's stem off the bezel");
+assert(ai_front_screw - bezel[1] - sheet_t >= 4 && head_cb[1] <= bezel[1] - 2, "Bezel screws");
+for (c = [for (i = [0 : 3]) cols[i]]) assert(max(abs(c.x), abs(c.y)) + head_cb[0] / 2 + 1 <= bezel[0] / 2
+                                             && norm(c) - head_cb[0] / 2 >= window_d / 2 + bezel_chamfer + 1, "Bezel screw off the bezel");
 assert(foot_r <= sleeve_od / 2 - 1, "Mask's foot through the ring");
 // bowl
 assert(bowl_r <= roll_r - 1, "Bowl does not turn in the sleeve");
@@ -395,7 +405,7 @@ module ai_case() {
       }
       for (i = [0 : len(cols) - 1]) {
          c = cols[i];
-         if (i < 4) translate([c.x, y_sheet1 - 0.01, c.y]) rotate([-90, 0, 0]) cylinder(d = pilot_d, h = front_screw - sheet_t + 1);
+         if (i < 4) translate([c.x, y_sheet1 - 0.01, c.y]) rotate([-90, 0, 0]) cylinder(d = pilot_d, h = ai_front_screw - bezel[1] - sheet_t + 1);
          translate([c.x, y_bk0 + 0.01, c.y]) rotate([90, 0, 0]) cylinder(d = pilot_d, h = back_screw - back_t + 1);
       }
    }
@@ -431,22 +441,12 @@ module ai_sleeve() {
    }
 }
 
-// --- Bank index: a triangle outline pointing up, hanging from the ring on two struts ---
-module index_tri_2d() {
-   b = index_tip - index_tri[1];
-   tri = [[0, index_tip], [-index_tri[0] / 2, b], [index_tri[0] / 2, b]];
-   difference() {
-      polygon(tri);
-      offset(delta = -index_tri[2]) polygon(tri);
-   }
-}
-
+// --- Bank index: a triangle hanging from the ring at the top ---
 module index_2d() {
-   b = index_tip - index_tri[1];
-   index_tri_2d();
-   for (s = [-1, 1]) hull() {
-      translate([s * index_tri[0] / 2, b + index_strut[1] / 2]) circle(d = index_strut[1]);
-      translate([s * index_strut[0], ring_id / 2 + 0.5]) circle(d = index_strut[1]);
+   // a triangle from the ring down to its tip, a slit down its middle (the dial's zero line shows in it)
+   difference() {
+      polygon([[0, index_tip], [-index_w / 2, ring_id / 2 + 0.5], [index_w / 2, ring_id / 2 + 0.5]]);
+      translate([-mark_w[1] / 2 - index_slit, index_tip - 1]) square([mark_w[1] + 2 * index_slit, ring_id / 2 - index_tip + 3]);
    }
 }
 
@@ -486,19 +486,32 @@ module plane_2d() {
 module ai_plane() {
    difference() {
       along_y(y_plane0, y_plane1) plane_2d();
-      along_y(y_plane0 - 1, y_plane1 + 1) translate([0, knob_z]) circle(d = knob_pin - 0.1);
    }
 }
 
-// the dummy knob (the real one sets the airplane's height): knurled, in front of the glass, its stem through the glass into the mask
+// the dummy knob (the real one sets the airplane's height): knurled, on the bezel's bottom, its stem glued into the bezel
 module ai_knob() {
    translate([0, 0, knob_z]) {
       difference() {
-         along_y(y_glass0 - knob[1], y_glass0 - 0.2) circle(d = knob[0], $fn = 60);
-         for (a = [0 : 20 : 340]) rotate([0, a, 0]) translate([knob[0] / 2, y_glass0 - knob[1] - 1, 0]) rotate([-90, 0, 0])
+         along_y(-bezel[1] - knob[1], -bezel[1]) circle(d = knob[0], $fn = 60);
+         for (a = [0 : 20 : 340]) rotate([0, a, 0]) translate([knob[0] / 2, -bezel[1] - knob[1] - 1, 0]) rotate([-90, 0, 0])
             cylinder(d = knob[2] * 1.6, h = knob[1] + 2, $fn = 12);
       }
-      along_y(y_glass0 - 0.21, y_plane1 - 0.2) circle(d = knob_pin);
+      along_y(-bezel[1] - 0.01, -bezel[1] + knob_pin[1] - 0.2) circle(d = knob_pin[0]);
+   }
+}
+
+// --- Front bezel: a square plate in front of the sheet, the window chamfered, the case's screws through its corners ---
+module ai_bezel() {
+   difference() {
+      along_y(-bezel[1], 0) offset(r = bezel[2]) square(bezel[0] - 2 * bezel[2], center = true);
+      along_y(-bezel[1] - 1, 1) circle(d = window_d, $fn = 180);
+      translate([0, -bezel[1] - 0.01, 0]) rotate([-90, 0, 0]) cylinder(d1 = window_d + 2 * bezel_chamfer, d2 = window_d, h = bezel_chamfer, $fn = 180);
+      for (i = [0 : 3]) let(c = cols[i]) {
+         translate([c.x, 1, c.y]) rotate([90, 0, 0]) cylinder(d = clear_d, h = bezel[1] + 2);
+         translate([c.x, -bezel[1] - 0.01, c.y]) rotate([-90, 0, 0]) cylinder(d = head_cb[0], h = head_cb[1] + 0.01);
+      }
+      translate([0, -bezel[1] - 1, knob_z]) rotate([-90, 0, 0]) cylinder(d = knob_pin[0] + 0.1, h = knob_pin[1] + 1);
    }
 }
 
@@ -727,7 +740,6 @@ module ai_face_2d() {
          for (a = bank_long) tick_2d(s * a, mark_r1 - mark_len[1], mark_r1, mark_w[1]);
          translate(pol(mark_r1 - bank_dot[1], s * bank_dot[0])) circle(d = bank_dot[1]);
       }
-      polygon([[-zero_tri[0] / 2, mark_r1], [zero_tri[0] / 2, mark_r1], [0, mark_r1 - zero_tri[1]]]);
    }
 }
 
@@ -742,21 +754,14 @@ module ai_face_print() {
          circle(r = face_r + 0.4, $fn = 180);
          circle(r = face_r, $fn = 180);
       }
-      translate([2 * step + glass_d / 2 - face_r, 0]) {
-         difference() {
-            circle(d = glass_d + 0.6, $fn = 180);
-            circle(d = glass_d, $fn = 180);
-         }
-         // the knob's hole (anywhere at this radius)
-         translate([0, knob_z]) difference() {
-            circle(d = knob_pin + 0.9);
-            circle(d = knob_pin + 0.4);
-         }
+      translate([2 * step + glass_d / 2 - face_r, 0]) difference() {
+         circle(d = glass_d + 0.6, $fn = 180);
+         circle(d = glass_d, $fn = 180);
       }
       translate([-face_r, -face_r - 8])
          text(str("AI: roll dial ", d, " mm (cut the outside on the line's inside, the window on the colours' edge),"), size = 3, font = font);
       translate([-face_r, -face_r - 13])
-         text(str("glass ", glass_d, " mm with a ", knob_pin + 0.4, " mm hole for the knob; print at 100 %"), size = 3, font = font);
+         text(str("glass ", glass_d, " mm (cut on the line's inside); print at 100 %"), size = 3, font = font);
    }
    for (x = [-face_r - 2, w - face_r + 2], y = [-face_r - 16, glass_d / 2 + 2]) translate([x, y]) square(0.1, center = true);
 }
@@ -851,7 +856,7 @@ module ai_parts(r = view_roll, p = view_pitch, e = 0, with_case = true, with_sle
          pedestal_2d();
          wings_2d();
       }
-      color(c_plane) translate([0, y_ring0 - 0.02, 0]) rotate([90, 0, 0]) linear_extrude(0.01) index_tri_2d();
+      color(c_plane) translate([0, y_ring0 - 0.02, 0]) rotate([90, 0, 0]) linear_extrude(0.01) index_2d();
    }
    ai_roll_parts(r, p);
    translate([0, 0.8 * e, 0]) color(c_case) render() ai_roll_motor_gear();
@@ -866,16 +871,24 @@ module ai_parts(r = view_roll, p = view_pitch, e = 0, with_case = true, with_sle
       ai_boards_part();
    }
    if (with_case) {
-      color(c_case) ai_knob();
-      color(c_glass) along_y(y_glass0, y_glass1) difference() {
-         circle(d = glass_d, $fn = 180);
-         translate([0, knob_z]) circle(d = knob_pin + 0.4);
-      }
+      color(c_case) ai_bezel();
+      color("#45484d") ai_knob();
+      color(c_glass) along_y(y_glass0, y_glass1) circle(d = glass_d, $fn = 180);
    }
 }
 
+// a piece of the sheet round the hole, the bezel's screws in front of it
+module ai_sheet_part(w = 150, h = 120, x0 = -75) {
+   color(c_sheet) along_y(0, sheet_t) difference() {
+      translate([x0, -h / 2]) square([w, h]);
+      circle(d = cut_d, $fn = 180);
+      for (i = [0 : 3]) translate(cols[i]) circle(d = clear_d);
+   }
+   color("#111111") for (i = [0 : 3]) translate([cols[i].x, -bezel[1] + head_cb[1], cols[i].y]) rotate([90, 0, 0]) cylinder(d = head_d, h = 1.65);
+}
+
 module assembled_view() {
-   sheet_part(150, 120, -75);
+   ai_sheet_part();
    ai_parts();
 }
 
@@ -896,7 +909,8 @@ module face_view() {
 translate([0, 0, y_bk0]) rotate([-90, 0, 0]) ai_case(); // Make module case
 translate([0, 0, -y_ring0]) rotate([90, 0, 0]) ai_sleeve(); // Make module sleeve
 translate([0, 0, -y_plane0]) rotate([90, 0, 0]) ai_plane(); // Make module plane
-translate([0, 0, -(y_glass0 - knob[1])]) rotate([90, 0, 0]) translate([0, 0, -knob_z]) ai_knob(); // Make module knob
+translate([0, 0, bezel[1] + knob[1]]) rotate([90, 0, 0]) translate([0, 0, -knob_z]) ai_knob(); // Make module knob
+rotate([-90, 0, 0]) ai_bezel(); // Make module bezel
 translate([0, 0, -y_rd0]) rotate([90, 0, 0]) ai_roll_dial(); // Make module roll_dial
 translate([0, 0, -y_b0]) rotate([90, 0, 0]) ai_roll_back(); // Make module roll_back
 translate([0, -y_p, 0]) ai_bowl_half(1); // Make module bowl_sky

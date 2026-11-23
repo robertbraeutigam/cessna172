@@ -194,9 +194,12 @@ its own top-level directory; new components should follow the same layout.
     the yellow airplane on a pedestal, the index): the standard's case front, then its
     own mechanism. A roll frame (a thin roll dial ring ending at the long
     bank marks, two arms, a back disc with the roll gear) turns in a
-    printed sleeve (front ring with the bank index hanging on struts and
-    the glued-in airplane on its pedestal with the bottom mask, a dummy
-    knob in front of the glass; legs to the back plate). The horizon is a bowl (part of a
+    printed sleeve (front ring with the bank index, a triangle hanging
+    from the top with a slit for the dial's zero line, and the glued-in
+    airplane on its pedestal with the bottom mask; legs to the back
+    plate). A square front bezel (`bezel`, the frame's `ai_bezel`) in
+    front of the sheet, the case's 4 screws through its corners, a dummy
+    knob on its bottom edge. The horizon is a bowl (part of a
     sphere, `bowl_r`, two halves in sky and ground filament glued at the
     horizon, raised ribs painted white) on pivot pins in the arms, 1:1
     with the pitch, ±`pitch_max`. The pitch motor rides on the roll frame

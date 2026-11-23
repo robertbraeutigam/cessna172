@@ -252,8 +252,9 @@ Direction, pin order and fine tuning as for the RPM indicator. If
 
 The six-pack's top middle instrument, modelled on the 172's RC Allen
 attitude indicator (and X-Plane's 172N). Its
-case front is the standard's (the 81 mm hole, the lip, the glass, the four
-screws through the sheet), but behind it is a mechanism of its own with
+case front is the standard's (the 81 mm hole, the lip, the glass), with
+a square front bezel (86 mm, 4 mm thick) in front of the sheet: the
+case's four screws go through its corners and the sheet. Behind it is a mechanism of its own with
 two 28BYJ-48 steppers and a slip ring, and it is 116 mm deep behind the
 sheet (`ai_depth`). It is in the top row, over the force feedback yoke's
 housing, so the depth does not matter there (the frame checks it).
@@ -261,21 +262,21 @@ housing, so the depth does not matter there (the frame checks it).
 ### How it works
 
 - **What you see**: a thin roll dial ring (turquoise sky over brown
-  ground, a white triangle at 0, the bank marks 10, 20, 30, a dot at 45,
-  60 and 90, the horizon line across it); the ring ends where the long
+  ground, the bank marks 0, 10, 20, 30, a dot at 45, 60 and 90, the
+  horizon line across it); the ring ends where the long
   bank marks end, so its window is 59 mm across. Behind it the horizon
   bowl, a part of a sphere, sky blue over brown: the horizon, in the sky
   a ladder (lines every 2 degrees to 8, then 10, 15, 20, 25, with 1 0 and
   2 0 split by their lines), in the ground lines every 5 degrees, wider
   downwards, with 10 and 20 at their ends, and two slanted rails
   converging on the middle. Fixed, between the glass and the dial: the
-  bank index, a yellow triangle outline pointing up under the dial's zero
-  triangle, hanging from the top of the sleeve's ring on two thin struts;
-  and the airplane: yellow wing bars, a Y and a dot on a stem from a light
-  brown pedestal, which stands on a black mask over the window's bottom.
-  A dummy knob sits on the mask, in front of the glass, its stem through
-  a hole in the glass (the real one sets the airplane's height). The dial
-  turns with the horizon and the index reads its marks.
+  bank index, a yellow triangle hanging from the top of the sleeve's ring
+  and pointing down, with a slit down its middle where the dial's zero
+  line shows; and the airplane: yellow wing bars, a Y and a dot on a stem
+  from a light brown pedestal, which stands on a black mask over the
+  window's bottom. A dummy knob sits on the bezel's bottom edge, its stem
+  glued into the bezel (the real one sets the airplane's height). The
+  dial turns with the horizon and the index reads its marks.
 - **Roll**: the dial is the front of the roll frame: two arms go back from
   it to a back disc with the roll gear. The frame turns in a printed
   sleeve in the case: the dial and the back disc run in it (a big plain
@@ -308,8 +309,9 @@ housing, so the depth does not matter there (the frame checks it).
   back (they face back, in reach for wiring). The AI is deeper than its
   neighbours, so its carrier is behind them, and the Nano's USB jack
   points left.
-- **Print orientation**: the case back side down; the sleeve on its ring;
-  the airplane (with its mount and the mask) flat; the knob on its front;
+- **Print orientation**: the case back side down; the bezel on its back
+  (the counterbores up); the sleeve on its ring; the airplane (with its
+  pedestal and the mask) flat; the knob on its front;
   the roll dial on its face, the arms up; the back disc on its front, the
   roll gear up; the bowl halves on their horizon face, with supports under
   the inside of the shell (the outside stays clean): the sky half in blue,
@@ -317,7 +319,7 @@ housing, so the depth does not matter there (the frame checks it).
   motor gear flat; the bracket on its plate, the feet up; the back plate
   on its front, the posts up; the carrier flat. The small pitch gears
   (module 0.8) are cut by a rolling rack in the model (undercut), so
-  they mesh. Everything else black; paint the index's triangle and the
+  they mesh. Everything else black; paint the index and the
   airplane yellow, its pedestal light brown, the bowl's ribs (horizon,
   lines, numbers) white.
 
@@ -337,8 +339,7 @@ template, on the project page as
 a colour print like the other faces. Print at 100 % on matte photo
 paper. Cut the outside on the black line's inside and the window on the
 colours' edge, and glue it onto the dial, sky up (the horizon at the
-arms). The glass's template has the knob's hole: drill it 3.4 mm
-(anywhere on that circle, the glass is round).
+arms).
 
 ### Hardware
 
@@ -350,9 +351,9 @@ arms). The glass's template has the knob's hole: drill it 3.4 mm
 | 2 | A3144 hall sensor | homes |
 | 2 | disc magnet 6 x 3 mm | homes |
 | 2 | steel dowel pin 3 x 10 mm | the bowl's pivots |
-| 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass, with a 3.4 mm hole for the knob |
+| 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
 | 1 | the dial's face, printed on photo paper | roll dial |
-| 4 | M3 x 8 button head, black | case through the sheet |
+| 4 | M3 x 12 button head, black | case through the bezel and the sheet |
 | 4 | M3 x 8 countersunk self tapping screw | back plate into the case |
 | 2 | M3 x 8 countersunk self tapping screw | back disc onto the arms |
 | 2 | M3 x 8 countersunk self tapping screw | back disc onto the bracket's feet |
@@ -379,9 +380,9 @@ The slip ring's hole circle (`sr_holes`, 18 mm) is a guess: measure it.
    hubs (press fit), the sector meshing the pinion. Back disc onto the
    arms (two screws).
 5. The airplane's mask into the notch in the sleeve's ring (glue). Glass
-   into the case from behind, its knob hole over the mask's, the sleeve
-   behind it, the roll frame into the sleeve (the dial against the ring).
-   The knob's stem through the glass into the mask (glue).
+   into the case from behind, the sleeve behind it, the roll frame into
+   the sleeve (the dial against the ring). The knob's stem into the
+   bezel's hole (glue).
 6. Slip ring through the back plate, its flange screwed on the front; the
    roll motor (ears countersunk from the front, nuts behind) and its
    sensor; the magnet into the roll motor gear's flange, the gear onto
@@ -389,7 +390,10 @@ The slip ring's hole circle (`sr_holes`, 18 mm) is a guess: measure it.
    disc to the pitch motor and sensor (solder, tie them to the bracket).
    Back plate into the case, the gears meshing as it goes on.
 7. Carrier onto its posts, the ULN2003 boards and the Nano onto it, wire
-   it (below). Into the panel like the standard instrument.
+   it (below). Into the panel like the standard instrument, but with the
+   bezel in front of the sheet: drill the four screw holes using the
+   bezel as the template, case into the hole from behind, the four
+   M3 x 12 screws through the bezel and the sheet into the case.
 
 ### Wiring
 
