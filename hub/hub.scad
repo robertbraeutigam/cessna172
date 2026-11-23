@@ -6,7 +6,7 @@
 // cable, soldered straight to the component at its other end. Ports 1-3
 // are mux ports (S0-S3, SIG, AUX), ports 4-6 direct ports (six lines
 // to their own Mega pins, servo power on the orange pair); 5 V and GND are
-// pins 4 and 5 on all of them (README, Connections).
+// pins 4 and 5 on all of them (README.md, Connections).
 //
 // - The RJ45 boards sit along two walls, their jacks behind cut-outs in
 //   them, the numbers beside the jacks: the mux ports 1-3 along the front

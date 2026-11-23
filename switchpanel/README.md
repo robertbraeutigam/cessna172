@@ -1,0 +1,363 @@
+# Switch panel
+
+[Cessna 172 home cockpit](../README.md) / `switchpanel/`
+
+The lower left switch panel of the 172N.
+Similar in function to the Saitek Switch Panel, but it should look as close
+to the real panel as possible. Every switch position is a raw input for
+MobiFlight, active low, like a switch to GND.
+
+It is two panels, printed separately and mounted side by side: the
+[ignition](../ignition/README.md) on the left, a component of its own
+([`ignition/`](../ignition/README.md)), and the switch row, which also carries the
+input multiplexer for both. Their basics are in `panel.inc.scad`, which is
+in both directories (keep the copies identical): both are 3 mm thick,
+with the same rim, flange, mount holes and lettering. The back of each
+panel is 80 mm high (`panel_h`), closed by an 8 mm rim, and goes through a
+hole in the cockpit sheet ([frame](../frame/README.md)); a 10 mm face flange
+(`flange_w`) all round sits on the sheet and is screwed to it with M3
+screws, nuts behind the sheet; the face is 3 mm in front of the sheet.
+
+The whole switch panel hangs below the desk top, in the frame's lower
+panel (see [Cockpit frame](../frame/README.md)). The ignition sits 20 mm
+higher than the switch row (the frame's `switch_ign_rise`, as much as its
+back clears the desk's underside), with the [primer](#primer) under its
+key, like in the X-Plane 172N: a third, small panel of its own
+(`primer.scad`) with its own hole in the sheet. So the two panels are
+separate, each with its own hole and its flange all round, their faces
+2 mm apart (20 mm of sheet between the holes). `panel.inc.scad`
+takes the height of the back as a parameter for it.
+
+## Primer
+
+[![Primer](https://robertbraeutigam.github.io/cessna172/switchpanel/primer_montage.png)](https://robertbraeutigam.github.io/cessna172/switchpanel/primer_montage.png)
+
+`primer.scad`: the push-pull primer with its twist lock, read by a linear
+pot. It is a separate 47 x 47 mm panel under the ignition, centered
+under its key like in the X-Plane 172N, left of the switch row and a
+little lower, in its own cut-out in the sheet (20 mm of sheet under the
+ignition's), so the ignition panel stays as it is. The knob pulls out 45 mm (`stroke`,
+about the 1¾" of a panel plunger primer) and pushes back in; fully in, it
+turns a quarter turn clockwise to lock, and only then. Turned back
+(counterclockwise), a spring pops it 5 mm out (`pop`), like the real one.
+
+### How it works
+
+The same idea as the [throttle quadrant](../throttle/README.md): a 6 mm rod
+moves the slider of a linear pot, through a clamp-like carrier with a slot
+over the pot's slider ear. The pot is the 75 mm one used for the carb heat.
+
+- **Knob and twist lock:** the knob's 10 mm stem slides in a square tube on
+  the back of the panel, the front bearing. A lug on the end of the stem
+  runs in a keyway along the tube, so the knob cannot turn while it is out
+  and always comes back lined up. At the back of the tube the keyway opens
+  into a quarter turn pocket: fully in, the lug turns into it and the end of
+  the keyway holds it (locked). Pulled out, the lug stops on the back of
+  the panel plate.
+- **Rod:** an M3 set screw in the knob's head holds the rod. The rod runs
+  back through the bracket, whose front wall (screwed onto the end of the
+  tube) and rear wall are two more bearings.
+- **Pot:** in the bracket the pot sits on two stands, held down by two
+  printed straps, with its slider ear pointing at the rod. The carrier on
+  the rod is held between two rod collars (the throttle's plain clamp). The
+  rod turns in it for the twist lock; the carrier itself slides between the
+  bracket's two ribs, so it cannot turn.
+- **Pop out:** a compression spring on the rod, between the rear collar and
+  the rear wall. The collar only reaches it in the last 5 mm before the knob
+  is in, so the locked lug holds it compressed, and unlocking pops the knob
+  out that far; the rest of the stroke is free.
+
+The bracket is beside the rod towards the pilot's right, about 49 x 26 mm
+across (it reaches about 38 mm to the side of the rod, its walls 11 mm to
+the other side over the tube), and with the knob in, the rod ends about 193 mm behind the panel,
+under the ignition and clear of the frame's upright and brace. The
+bracket is wider than the cut-out, so it goes on from behind the sheet.
+
+### Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 1 | linear potentiometer, 75 mm (like the carb heat one) | primer position |
+| 1 | 6 mm rod, 208 mm (`rod_len`) | knob to the pot carrier |
+| 1 | compression spring, about 9 mm OD, 6.8 mm ID, 15 mm long (`pop_spring_*`) | pops the knob out when unlocked |
+| 2 | `throttle/clamp.scad` plain clamp (`clamp_plain.stl`), with an M3 screw + nut | rod collars on both sides of the carrier |
+| 4 | M3 x 12 socket head screw | bracket onto the tube |
+| 4 | M3 x 10 screw | pot straps onto the stands |
+| 1 | M3 x 6 set screw | knob onto the rod |
+| 4 | M3 x 10 pan head screw + nut | face flange onto the sheet |
+| - | 3 wires | pot to the switch panel's mux board |
+
+Printed: `primer_panel.stl` (front side down), `primer_face.stl` (front
+side up), `primer_knob.stl` (on the end of its stem), `primer_bracket.stl`
+(on its spine), `primer_strap.stl` (2x), `primer_carrier.stl`.
+
+The pot's travel (`pot_travel`) is measured: 60 mm, so the 45 mm stroke
+uses the middle three quarters of it (the build fails if the stroke comes
+within 4 mm of the travel). **MEASURE:** the pot's slider ear (`pot_ear`)
+and the spring you pick (`pop_spring_od`, `_id`, `_len`, `_solid`): it
+has to fit over the rod and on the collar, and it must not go solid
+before the knob is in; the bracket gets longer for a longer spring. A
+stiffer spring pops harder, the pot slider's friction works against it.
+
+### Assembly
+
+1. Paint the label, put the face on the panel, push the panel through its
+   cut-out and screw the flange onto the sheet.
+2. From behind: put the knob's stem into the tube, the lug in the keyway.
+3. Screw the bracket onto the end of the tube (hex key through the holes
+   in its rear wall).
+4. Solder three wires to the pot, put it onto its stands and screw the
+   straps on.
+5. Push the rod in from the back: through the rear wall, the spring, a collar, the
+   carrier (its slot over the pot's ear), the other collar, the front wall
+   and into the knob, and tighten the set screw.
+6. With the knob out, slide the carrier to where the ear is 22.5 mm
+   (`stroke / 2`) in front of the pot's middle, and tighten the collars
+   against it so the rod still turns.
+
+### Wiring and X-Plane
+
+The pot connects to the switch panel's mux board: its ends to 5 V and GND
+there, the wiper to the brown AUX wire of the Cat5 cable, which goes to
+the Mega's A13 at the hub (port 3, see [Ports](../hub/README.md#ports)). It is an analog
+input, not a mux input. Which end goes to 5 V decides the direction; swap
+them, or invert the range in the MobiFlight Connector.
+
+In the MobiFlight Connector it is an analog input on A13 that writes the
+primer's dataref. **VERIFY** which dataref the X-Plane 172 uses for the
+primer with DataRefTool while working the primer in the virtual cockpit.
+
+## Switches
+
+[![Switch panel](https://robertbraeutigam.github.io/cessna172/switchpanel/switches_montage.png)](https://robertbraeutigam.github.io/cessna172/switchpanel/switches_montage.png)
+
+`switches.scad`: the switch row, laid out like the panel of the X-Plane
+172N (which differs from a real one, e.g. in the split AVIONICS). The
+red split MASTER (ALT, BAT) on the left, toggle switches in the middle
+(PITOT HEAT, then the LIGHTS group: BCN, LAND, TAXI, NAV, STRB) and the
+black split AVIONICS (BUS 1, BUS 2) on the right; the panel ends there.
+Up is ON, like in the airplane: every toggle has OFF under it, the rockers
+ON beside their top half, towards the toggles. The rockers have their name
+above and the two switch names below them, and sit higher than the
+toggles, about half way up to the breakers (`rk_raise`). Above the toggles
+is a row of circuit breakers, as in the X-Plane panel; they are for show
+only.
+
+The switch list (`groups` in the source) drives the layout. The
+panel is 216.6 x 100 mm (the back 196.6 x 80 mm). Like the ignition, its
+front is a separate 1 mm face with the labels standing 0.8 mm out of it,
+for a white paint pen; the face is printed front side up
+(`switches_face.stl`), the panel front side down, so neither needs
+supports, and together they are 3 mm thick. The toggle nuts, the rocker
+lips and the mount screws clamp the face on. The switches and labels need about 61 mm of the back's height, the
+rest is split between above and below them. The rim on the back stiffens
+it.
+
+### Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 1 | double rocker switch, 6 pin, red | MASTER: ALT, BAT |
+| 1 | double rocker switch, 6 pin, black (there is no white one) | AVIONICS: BUS 1, BUS 2 |
+| 6 | toggle switch, M12 neck, 18 mm lever | PITOT HEAT, BCN, LAND, TAXI, NAV, STRB |
+| 6 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet (`mount_count`) |
+| 1 | CD74HC4067 16 channel mux breakout board | all inputs, see [Multiplexer](#multiplexer) |
+| 4 | M3 x 8 self tapping screw | mux onto its standoffs on the carrier, carrier (`switches_carrier.stl`) onto the panel |
+| 6 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
+| 1 | Cat5 patch cable, stranded copper (see [Cables](../hub/README.md#cables)) | to hub port 3, soldered to the mux |
+| 1 | cable tie, up to 3.6 mm wide | the cable onto its block (`tie`) |
+| 1 | 7 pin Dupont or JST connector (optional) | ignition cable, so the panels can be separated, see [Wiring](#wiring) |
+| - | wire, heat shrink | see [Wiring](#wiring) |
+
+### Double rocker switches
+
+[Double Rocker Switch 6-Pin 250V 16A/AC Red Rocker Illuminated On/Off](https://www.amazon.de/-/en/Double-Rocker-Switch-6-Pin-Illuminated/dp/B0DLTMGKSS),
+in red for MASTER and black for AVIONICS. Two independent rockers side by
+side in one housing, tall and narrow like the real split switches.
+
+They snap into a cutout from the front: ramps on their top and bottom end
+catch behind the face and the panel, which is thinned there by a pocket
+in the back, to 0.5 mm behind the 1 mm face.
+Dimensions from the listing (`rk_*`):
+
+- panel cutout 22 x 28.5 mm (width x height)
+- front lip 24.3 x 31.3 mm, 2 mm thick
+- body 21.7 x 25.3 mm, no mounting holes
+- 31.5 mm from the front to the end of the pins
+
+**MEASURE when they arrive:** the gap between the lip and the ramps, i.e.
+the panel thickness they snap onto (`rk_grip`, now 1.5 mm). Also check the
+pin positions.
+
+The lamps are neon (250 V) and will not light on 5 V; leave the lamp pin
+unconnected. Each rocker has 3 pins: find the two that close when the
+rocker is ON with a multimeter.
+
+### Toggle switches
+
+Standard M12 toggle switches, about the size of the real ones. From the
+listing: body 30 x 15.5 x 15 mm, 12 mm neck (M12 thread), 18 mm lever.
+Either a 2 pin ON-OFF or a 6 pin ON-ON (DPDT) switch works. Do not take an
+ON-OFF-ON one (e.g. "-203"): the real switch has no center position.
+
+The toggles go in from the back, and a nut and washer on the front clamp
+them. The body sits in a 1 mm deep square pocket in the back of the panel,
+so it cannot turn.
+
+**MEASURE when they arrive** (`tg_*`, `toggle = "M12"`):
+
+- The 30 mm is assumed to be from the top of the body to the end of the
+  lugs, and 15.5 x 15 mm the body.
+- The thread length (now 9.5 mm; the panel is 2 mm thick there, the washer
+  and nut need about 4 mm of it).
+- The nut across flats (now 14 mm). The switches are 19 mm apart, so a nut
+  up to about 15 mm fits; the build checks this.
+- The lever and the lug positions.
+
+The mini MTS-202 (M6, 10 mm lever) works too: set `toggle = "MTS-202"`.
+amazon.de listings:
+[ETOPARS, 10 pieces](https://www.amazon.de/ETOPARS-Kippschalter-Armaturenbrett-Wippschalter-L%C3%B6tanschluss/dp/B08Z7R4RB9),
+[Taiss, 10 pieces](https://www.amazon.de/MTS-202-Terminals-Positionen-Kippschalter-wasserdichte/dp/B07JNV6SCJ).
+
+### Circuit breakers
+
+The real 172N has a row of push-to-reset circuit breakers above the
+switches, each with its name on the panel above it and its rating (A) on
+the button. Here they are non-functional dummies: a hex nut with a button
+on top and the rating engraved into the button, all printed as one part
+(`switches_breakers.stl`, nut side down). They are glued into hex holes in
+the 1 mm face, onto the panel behind it, which locate them and keep them
+straight; nothing goes through the panel. Print them in black and paint the
+nut silver and the rating white, or print the nut and the button in
+different colors.
+
+They are the ones of the X-Plane 172N's row over the toggles: FLAP 10,
+INST 5, AVN BUS 1 15, AVN BUS 2 15, TURN COORD 5, INST LTS 5 (its ALT
+FLD and WARN breakers right of AVIONICS are left out, the panel ends at
+the AVIONICS switch). The list (`breakers` in the source, name lines and
+rating) is placed over the toggles, one above each, from the left; the build checks that the row
+still fits the panel height, and the top middle mount screw moves between
+two breakers. Real breakers
+(e.g. Klixon push-to-reset) would need a bigger hole and room behind the
+panel, so making them functional later means a hole through the panel
+as well.
+
+### Multiplexer
+
+All switches and the ignition go to one CD74HC4067 breakout board on the
+back of the switch panel. MobiFlight reads it as a Multiplexer device: 16
+inputs through one Mega pin. So everything is soldered on the panels, and
+only one Cat5 cable runs to the hub (port 3).
+
+The board sits on two standoffs on a small printed carrier plate
+(`switches_carrier.stl`, printed plate down), together with the block for
+the cable tie. The carrier is a part of its own, so the mux, the Cat5 cable
+and the ignition can be wired up before the switch panel is printed; it is
+then screwed with two M3 x 8 self tapping screws onto two bosses on the
+panel back, in the strip behind the breaker labels, on the left (pilot side)
+half, where the ignition cable comes in. Mount the mux with the chip
+outwards, so the solder joints face you; `assert`s check that the carrier
+clears the switches and fits inside the rim.
+
+**MEASURE** (`mux_*`): the board size (41 x 18 mm) is measured; the
+mounting holes (`mux_holes`, guessed on the center line 17.5 mm from the
+middle) and the order of the control pins (`mux_ctl_names`) are still
+guesses. It is screwed on with M3: its holes must be at least about 3.1 mm
+(`mux_hole_min`), drill them out if they are smaller. If it has no
+mounting holes, glue it onto the standoffs. The carrier is printed from
+the same values, so check the hole positions on the board before printing
+it.
+
+#### Inputs
+
+| Mux | Input | Mux | Input |
+|-----|-------|-----|-------|
+| C0 | MASTER ALT | C8 | AVIONICS BUS 1 |
+| C1 | MASTER BAT | C9 | AVIONICS BUS 2 |
+| C2 | PITOT HEAT | C10 | free |
+| C3 | BCN | C11 | ignition OFF |
+| C4 | LAND | C12 | ignition R |
+| C5 | TAXI | C13 | ignition L |
+| C6 | NAV | C14 | ignition BOTH |
+| C7 | STRB | C15 | ignition START |
+
+The switches are in label order (the `groups` order), and the ignition
+positions are the last five (`ignition_c0`), where they were when the
+ignition was wired; C10 is free. In the MobiFlight Connector every
+channel is a button: a toggle or rocker sets its dataref to 1 on press and
+to 0 on release, an ignition position sets the key position on press, and
+START holds the starter while it is pressed through a FlyWithLua script
+(see [In X-Plane](../ignition/README.md#in-x-plane)). The OFF hall sensor is needed: a position is only set on press,
+so without it the key would stay on R in the sim when it is turned to OFF.
+
+#### Cable to the hub
+
+The mux goes to hub port 3 (see [Port pinout](../hub/README.md#port-pinout)) with a Cat5
+cable soldered straight into its control row (see [Cables](../hub/README.md#cables)):
+
+| Mux pin | Wire (T568B) | Mega (at the hub) |
+|---------|--------------|-------------------|
+| S0, S1, S2, S3 | white-orange, orange, white-green, green | pins 38, 40, 42, 48 (shared by all muxes) |
+| VCC | blue | 5 V |
+| GND | white-blue | GND |
+| SIG | white-brown | D28, the mux's data pin in the MobiFlight Connector |
+| EN | - | not to the hub: bridge it to GND on the board (enable is active low) |
+
+The brown wire (AUX) is the [primer](#primer) pot's wiper; the pot's
+other two wires go to VCC and GND on the board. The cable
+comes in over the top rim and is tied down with a cable tie on the block
+right of the mux on the carrier (`tie_block`: the tie goes through the slot
+at the plate and around the cable in the groove on top), so the wires fan out from
+there to the pins without any pull on them. The cable is 6 mm
+(`cable_d`, measured); **MEASURE** the tie (`tie`, 3.6 x 1.3 mm).
+
+The switches and the hall sensors have no pull-up resistors of their own:
+the 4.7 kOhm SIG pull-up on the hub's shield pulls whichever
+input is selected up (see [Port pinout](../hub/README.md#port-pinout)). Test it on
+the bench with one switch on the mux before soldering all of them.
+
+### Wiring
+
+Every input is wired like a switch to GND (active low, as MobiFlight expects):
+
+- **Toggle, 2 pin:** one lug to GND, the other to its mux input. Mount it so
+  it is ON with the lever up.
+- **Toggle, 6 pin:** use one pole. Its middle lug (common) goes to GND, the
+  bottom lug to the mux input: lever up (ON) connects the common to the
+  bottom lug. Check with a multimeter.
+- **Rocker:** the two pins of each rocker that close when it is ON; one to
+  GND, the other to the mux input.
+- **Ignition:** the A3144 outputs go to C11..C15. The sensors also need 5 V
+  and GND: take them from the mux VCC and GND.
+- **Primer:** the pot's ends to the mux VCC and GND, its wiper to the Cat5
+  cable's brown AUX wire (not to the mux).
+
+So on the switch panel: one GND wire daisy chained over all 10 switches to
+the mux GND, and one signal wire from each switch to its C pin, soldered
+straight into the board. The ignition cable (5 signals, 5 V, GND) is
+soldered to the mux too; to be able to separate the two panels later, put
+a 7 pin Dupont or JST connector into it. GND and VCC get several wires (switch chain, EN bridge,
+ignition, primer, Cat5 cable): join the extra wires into one before the pin, with
+solder and heat shrink.
+
+### Assembly
+
+1. Screw the mux onto the carrier's standoffs, solder the Cat5 cable to
+   the mux control row and tie it onto its block. The ignition cable (or
+   its connector) and the EN bridge can be soldered on now as well; the carrier
+   does not need the panel yet.
+2. Solder the wires to the switches; the rockers are hard to get out
+   again once snapped in.
+3. Lay the face on the front, put the toggles in from the back and
+   tighten their nuts.
+4. Snap the rockers in from the front.
+5. Screw the carrier onto its bosses on the panel back and solder the
+   switch wires to the mux.
+6. Glue the dummy breakers into their pockets.
+7. Mount the panel.
+
+### Notes
+
+- ALT and BAT are two independent switches. The real split master has an
+  interlock (ALT pushes BAT on, BAT pushes ALT off); X-Plane does not need
+  it.

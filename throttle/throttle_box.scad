@@ -12,7 +12,7 @@
 // Read by MobiFlight on the hub's Mega (hub/), direct port 6: one Cat5
 // cable, RJ45 plug at the hub, soldered straight to the pots here (no board
 // in the box). It comes in through the back wall at the left and is tied
-// into the cable cradle. Wires (T568B colors, see the README's port pinout):
+// into the cable cradle. Wires (T568B colors, see hub/README.md, Port pinout):
 // - blue (5 V) and white-blue (GND) to the carb heat pot's end tabs, then
 //   on with two short wires to the same tabs of the throttle and the
 //   mixture pot (the same end of each pot to 5 V, so all read the same way)

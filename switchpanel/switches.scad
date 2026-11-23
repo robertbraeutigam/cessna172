@@ -557,7 +557,7 @@ c_pcb = "#5a3d8a";
 wire_colors = ["#e8433a", "#f5a030", "#f2d03b", "#4caf50", "#3d7bd9", "#8e5bd6", "#9aa3ad", "#eceff2"];
 wire_d = 1.2;
 c_cable = "#8fa3b8";
-// Cat5 pairs on the mux control pins (T568B, README Port pinout)
+// Cat5 pairs on the mux control pins (T568B, hub/README.md Port pinout)
 cat5_names = ["S0", "S1", "S2", "VCC", "GND", "S3", "SIG"];
 cat5_colors = ["#f8d2a8", "#f5a030", "#c4e6bf", "#3d7bd9", "#c3d6f5", "#4caf50", "#e3d2c0"];
 

@@ -110,8 +110,8 @@ its own top-level directory; new components should follow the same layout.
   step upright's and the hub crossbar (`ear_slot_dx`; `frame/frame.inc.scad` repeats its sizes). Every MobiFlight component connects to
   its own numbered port with one Cat5 cable, RJ45 plug at the hub and
   soldered straight to the component (no connector there); the port
-  pinouts and the port list are in the README's Connections section, keep
-  components and README in sync with them. The `rj_*` and
+  pinouts and the port list are in the Connections section of
+  `hub/README.md`, keep components and that section in sync with them. The `rj_*` and
   shield board values are measured.
 
 - `yoke/` — `yoke.scad`: the hollow Cessna control wheel (trapezoid hub,
@@ -217,17 +217,25 @@ its own top-level directory; new components should follow the same layout.
 
 ## Documentation
 
-`README.md` at the top level is the only documentation file: it describes
-every component (working principle, hardware with shop links, wiring,
-assembly) and embeds the montage images. Keep it in sync when a design,
-part list or wiring changes; do not add per-component docs files. The scad
-header comments stay as the in-source summary.
+Every component has one `README.md` in its directory: it describes that
+component (working principle, hardware with shop links, wiring, assembly)
+and embeds its montage images. The top-level `README.md` is the overview:
+building, and a short description, the montage and a link per component.
+The connections between components (MobiFlight, port pinout, cables, the
+port list, power) are in the Connections section of `hub/README.md`; the
+other READMEs link there instead of repeating it. Links between READMEs are
+relative (`../hub/README.md#port-pinout`). Keep them in sync when a
+design, part list or wiring changes: the component's README, and
+`hub/README.md` too when a port, its pins or a cable changes, and the
+top-level overview when a component is added or its summary changes. A new
+component gets its own README and an entry in the top-level one; do not add
+other docs files. The scad header comments stay as the in-source summary.
 
 The README images are not committed. The `Build` workflow
 (`.github/workflows/build.yml`) runs `make` in every component on each push
 and, on `master`, deploys the STLs and PNGs to GitHub Pages at
 `https://robertbraeutigam.github.io/cessna172/<component>/<file>`; the
-README links there. It caches each component's `target/` together with
+READMEs link there. It caches each component's `target/` together with
 `target/.sources.sha256` (hashes of the sources it was made from), so only
 changed `.scad` files are rendered again; a changed Makefile re-renders the
 whole component. Unchanged parts therefore keep the `{{gitrev}}` and montage
