@@ -213,7 +213,8 @@ Add a Servo device on D44 and D46 in the Connector.
 - The **hub** holds the Arduino Mega with the MobiFlight
   firmware and 6 RJ45 ports. A powered USB hub next to it takes the USB
   cables (Mega, Saitek yoke, Saitek radio panel, later the
-  FFB yoke, the radio stack's Mega and the audio panel's Nano), so
+  FFB yoke, the radio stack's Mega, the audio panel's Nano and the
+  compass's Nano), so
   one USB cable runs to the PC.
 - Every MobiFlight component connects to its own hub port with one
   straight Cat5 patch cable, soldered straight to the component (see
@@ -231,6 +232,10 @@ Add a Servo device on D44 and D46 in the Connector.
   have, so it has a second Mega of its own, on its own USB cable to the
   powered USB hub. Its audio panel did not fit on that Mega any more and
   has an Arduino Nano of its own, on a third USB cable.
+- The **compass** (see [Compass](../compass/README.md)) does not use the
+  hub either: its stepper needs four outputs and a home input, and all
+  three direct ports are taken. It runs MobiFlight on an Arduino Nano of
+  its own, on a USB cable to the powered USB hub.
 
 ### MobiFlight
 

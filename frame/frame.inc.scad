@@ -181,6 +181,20 @@ hub_jacks = [29.5, 67.5, 105.5];   // the 3 jacks' middles along the front and t
 hub_usb_y = 88;              // its USB jack from the box's front (wall + row_y + mega_usb)
 hub_usb_room = 40;           // left of the box for the USB plug
 
+// --- Compass, from compass/compass.scad ---
+// It stands over the panel on the right top bar, about at the windshield's
+// middle like the 172's (which hangs from the windshield's top): a printed
+// stand, its foot bolted into the bar's top slot (two M5, T-nuts), the
+// compass on its neck. It has its own Nano on a USB cable, nothing on the
+// sheet.
+compass_body = [65, 107.6, 65];   // body_w, depth (bezel to back), body_h
+compass_face_dy = -34.1;     // the bezel's front from the card axis (axis_to_face)
+compass_stand_dy = 14;       // stand_dy: the stand's middle behind the card axis
+compass_rise = 25;           // rise: the compass's bottom over the bar
+compass_foot = [70, 20, 5];  // foot
+compass_neck = [28, 20];     // neck
+compass_bolt_dx = 25;        // foot_bolt_dx
+
 // --- Switch panel, from ignition/ and switchpanel/ ---
 // Two panels side by side, each with its own hole and a face flange
 // (flange_w) all round, screwed onto the sheet with M3 (drill through the
@@ -260,6 +274,8 @@ n172_nav_dx = 100;           // NAV indicators' column right of the six-pack's r
 n172_rpm = [6, 6];           // RPM indicator from the six-pack's right column / the yoke column
 n172_stack_dz = 224;         // radio stack's top over the yoke column
 n172_glare_dz = 241;         // glareshield (the panel top) over the yoke column
+n172_compass_dx = 290;       // the compass (the windshield's middle) right of the yoke column, a guess:
+                             // about over the radio stack's left edge
 // Instruments (stage 2, reserved): 3 1/8" on 3.5" centres
 six_step = 89;
 inst_cut_d = 81;             // their hole
@@ -290,6 +306,8 @@ x_bay1 = yoke_x[1] + yoke_play;
 x_a = throttle_x0 - throttle_play - sheet_edge;
 x_r = nav_x + inst_cut_d / 2 + sheet_edge;
 radio_x = x_r + sheet_edge + radio_body.x / 2 + 0.5;   // the radio's and the DIY stack's middle
+compass_x = col_x + n172_compass_dx;         // its card axis, on the right top bar
+compass_bolts = [for (s = [-1, 1]) [compass_x + s * compass_bolt_dx, ext / 2]];   // M5 into the right top bar's top slot, [x, y]
 
 // --- Layout, z ---
 // Lower panel: the backs reach behind the sheet under the desk, so they
@@ -473,6 +491,7 @@ for (c = [throttle_cut, flaps_cut])
    assert(c[0] - x_a >= sheet_edge && c[2] <= frame_w - sheet_edge && c[3] <= -ext - sheet_web,
           "Throttle or flaps cut-out off the lower right sheet");
 assert(throttle_face[3] <= z_waist - 3 && flaps_face[3] <= z_waist - 3, "Throttle or flaps face runs into the waist bars");
+assert(compass_x - compass_foot.x / 2 >= x_r && compass_x + compass_foot.x / 2 <= frame_w, "Compass stand off the right top bar");
 assert(radio_cut[0] - x_r >= sheet_edge && stack_cut[0] - x_r >= sheet_edge, "Radio too close to the step upright");
 assert(frame_w - max(radio_cut[2], stack_cut[2], flaps_cut[2]) >= sheet_edge, "Right part's cut-outs too close to the sheet edge");
 assert(radio_cut[1] >= -ext + sheet_edge, "Radio too close to the upper right sheet's bottom");

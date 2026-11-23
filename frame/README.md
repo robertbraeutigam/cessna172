@@ -153,6 +153,10 @@ brace), the ears on its front and back walls into the second one's (M5,
 T-nuts). Its front ports face the pilot, its right ports face right and
 its USB jack left, towards the yoke (at least 40 mm room for the plug);
 the crossbars are as long as the hub and the yoke need.
+The [compass](../compass/README.md) stands over the panel on the right
+top bar, about over the radio stack's left edge (`n172_compass_dx`, a
+guess for the windshield's middle): its printed stand's foot is bolted
+into the bar's top slot (two M5, T-nuts, `compass_bolts`).
 The extrusion carries the
 loads, the sheet only covers the front, so cut-outs do not weaken it.
 Keep at least 25 mm of sheet to the edge and 20 mm between cut-outs
@@ -212,6 +216,6 @@ with the box in place.
 | 6 | 45 degree connector for 2020 | brace ends |
 | - | corner brackets, M5 screws, M5 T-nuts | frame joints, and the front part onto the front rail |
 | 4 | 3 mm ACM sheet | panel: left (L shaped), lower right and upper right sheet (sheet_* in the echo); the apron sheet |
-| 59 | M5 button head screw + T-nut (+ washer at the throttle box floor) | sheets, throttle box, pedestal, parking brake and hub |
+| 61 | M5 button head screw + T-nut (+ washer at the throttle box floor) | sheets, throttle box, pedestal, parking brake, hub and compass stand |
 | 2 | screw clamp with rubber jaws, 50 mm opening | rail ends onto the desk |
 | 4 | felt pad | on the uprights' and the waist bars' backs, against the desk edge |

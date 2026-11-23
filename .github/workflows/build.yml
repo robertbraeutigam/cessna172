@@ -1,4 +1,4 @@
-# Renders every component (STLs, PNG views, montages) and publishes them to
+# Renders every component (STLs, PNG views, montages, PDF prints) and publishes them to
 # GitHub Pages, which is where the README takes its images from. Every push
 # is built, so a broken model shows up on any branch; only master deploys.
 name: Build
@@ -99,7 +99,7 @@ jobs:
                 name=${scad%.scad}
                 echo "$dir: $scad changed or deleted"
                 rm -f "target/$name" "target/$name.views" "target/$name.stl" \
-                  target/"$name"_*.stl target/"$name"_*.png
+                  target/"$name"_*.stl target/"$name"_*.png target/"$name"_*.pdf
                 for other in "$name"_*.scad; do
                   if [ -f "$other" ]; then rm -f "target/${other%.scad}" "target/${other%.scad}.views"; fi
                 done
@@ -144,7 +144,7 @@ jobs:
           for target in */target; do
             component=$(dirname "$target")
             mkdir -p "_site/$component"
-            find "$target" -maxdepth 1 ! -name '.*' \( -name '*.png' -o -name '*.stl' \) \
+            find "$target" -maxdepth 1 ! -name '.*' \( -name '*.png' -o -name '*.stl' -o -name '*.pdf' \) \
               -exec cp {} "_site/$component/" \;
           done
           {

@@ -18,6 +18,12 @@ VIEW_BACKGROUND=\#f8f8f8
 VIEW_RENDER_SIZE=3200,2400
 VIEW_OPTS=--preview --viewall --autocenter --projection=p --colorscheme=Tomorrow
 
+# Prints: 2D drawings exported 1:1 to a PDF page (filled black on white,
+# with OpenSCAD's scale bar to check the printer did not scale it), for
+# parts printed on paper, like the compass card
+PRINT_OPTS=-O export-pdf/paper-size=a4 -O export-pdf/orientation=auto \
+	-O export-pdf/fill=true -O export-pdf/stroke=false
+
 # Montage: title, the "main" view, then the other views as thumbnails. The
 # thumbnail tiles (380+2*10 wide) fill the 1600 width of VIEW_SIZE.
 MONTAGE_TITLE_SIZE=1600x190
@@ -28,7 +34,8 @@ MONTAGE_THUMB=380x285+10+10
 COMMENT_MARKERS=-e "s/{{gitrev}}/$(GITREV)/g" \
 	-e "s/\(.*Make module.*\)/\/\/\1/g" \
 	-e "s/\(.*Ignore module.*\)/\/\/\1/g" \
-	-e "s/\(.*Make view.*\)/\/\/\1/g"
+	-e "s/\(.*Make view.*\)/\/\/\1/g" \
+	-e "s/\(.*Make print.*\)/\/\/\1/g"
 
 build: models views
 
@@ -52,14 +59,20 @@ target/%: %.scad $(INCLUDE_COPIES)
 			sed "s/\/*\(.*\)Make module $$m *$$/\1/g" <target/$< >target/.model_$*.scad; \
 			$(OPENSCAD) -o $@_$$m.stl target/.model_$*.scad || exit 1; \
 		done; \
-	elif grep "Make view" >/dev/null $<; \
+	elif grep "Make view\|Make print" >/dev/null $<; \
 	then                                  \
-		echo "No models in $<, only views"; \
+		echo "No models in $<, only views or prints"; \
 		$(OPENSCAD) -o target/.check_$*.echo target/$< || exit 1; \
 	else                                  \
 		echo "Making single module model $<"; \
 		$(OPENSCAD) -o $@.stl target/$< || exit 1; \
 	fi;
+	@for p in `grep -o "Make print .*" <$< | cut -d " " -f 3`; \
+	do \
+		echo "Making print $$p"; \
+		sed "s/\/*\(.*\)Make print $$p *$$/\1/g" <target/$< >target/.print_$*.scad; \
+		$(OPENSCAD) $(PRINT_OPTS) -o $@_$$p.pdf target/.print_$*.scad || exit 1; \
+	done
 	@touch $@
 
 # Views: "<statement> // Make view <name> <rx>,<ry>,<rz>" renders the

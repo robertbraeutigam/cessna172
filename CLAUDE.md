@@ -179,6 +179,19 @@ its own top-level directory; new components should follow the same layout.
     already as high as the whole stack needs (`stack_units_h` in
     `frame/frame.inc.scad`).
 
+- `compass/` — `compass.scad`: the 172's magnetic compass (Airpath C2300
+  size), standing over the panel on a printed stand bolted into the frame's
+  right top bar (`frame/frame.inc.scad` repeats its sizes). The card is a
+  drum (inverted cup) pressed onto a 28BYJ-48 stepper's shaft, over the
+  motor; a printed paper strip (`card_print`, a `Make print`) is glued
+  around it, numbers falling to the right like the real card. A magnet in
+  the drum and an A3144 hall sensor on a post home it. MobiFlight on an
+  Arduino Nano of its own (the hub's direct ports are taken; USB to the
+  powered USB hub) drives the ULN2003 board. Parts: base (everything is
+  mounted on it), shell, bezel (window, lubber line, dummy compensator
+  screws), drum, stand. The `motor_*`, `uln_*`, `nano_*`, sensor and
+  magnet values are MEASURE.
+
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the
   extrusion/sheet standard, the
@@ -233,7 +246,7 @@ other docs files. The scad header comments stay as the in-source summary.
 
 The README images are not committed. The `Build` workflow
 (`.github/workflows/build.yml`) runs `make` in every component on each push
-and, on `master`, deploys the STLs and PNGs to GitHub Pages at
+and, on `master`, deploys the STLs, PNGs and PDFs to GitHub Pages at
 `https://robertbraeutigam.github.io/cessna172/<component>/<file>`; the
 READMEs link there. It caches each component's `target/` together with
 `target/.sources.sha256` (hashes of the sources it was made from), so only
@@ -289,6 +302,10 @@ box_lid(); // Make module lid
   OpenSCAD GUI preview. To stop building a module, remove the marker.
 - `// Ignore module` — never rendered. Used for reference geometry (pots, rods)
   that is shown with `#` in the preview while designing.
+- `// Make print <name>` — a 2D statement exported to
+  `target/<file>_<name>.pdf`, 1:1 on an A4 page, filled black (paper parts
+  like the compass card; the PDFs are deployed with the STLs). Prints are
+  made with the models, also from files with modules.
 - Files without any `Make module` marker are rendered whole to
   `target/<file>.stl`, unless they have `Make view` markers: then they
   only make views (their asserts are still checked), like `frame.scad`.
