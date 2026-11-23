@@ -43,6 +43,19 @@ tact = [6, 3.5, 1.5];        // tactile switch 6 x 6: body square, body height, 
 drv_board = [32, 32];        // MAX7219 8x8 matrix kit board: x, y (lying on the floor)
 drv_high = 14;               // the parts on it, above the board
 
+// --- Arduino Nano, MEASURE (instruments/instrument.inc.scad has the same values) ---
+// Every unit has its own, running MobiFlight, with a USB cable out of the
+// open back to the powered USB hub (hub/README.md)
+nano_board = [18, 45];       // x, y (the USB jack at the back end)
+nano_t = 1.6;
+nano_under = 2.5;            // in floor rails: parts and solder stubs under the board
+nano_usb = [8, 4];           // jack: width, height over the board
+nano_high = 14;              // on a logic board: female header, board, USB jack
+nano_rail_w = 1.5;
+
+// --- CD74HC4067 breakout, MEASURE ---
+mux_board = [41, 18];
+
 // --- Rotary switch, MEASURE (1 pole 12 way, Lorlin CK type; all guesses) ---
 // KT 76C function selector, KMA 26 mic selector
 rot_bush = [9.5, 9];         // threaded bushing (3/8"): diameter, length from the mounting face
@@ -212,6 +225,33 @@ module driver_board_part() {
    color("#202020")
       for (dx = [3, drv_board.x - 5.5])
          translate([dx, 4, board_t]) cube([2.5, 20.3, 8.5]);
+}
+
+// The Nano's floor rails: a ledge under each long edge, a lip over it and
+// a stop at the front; it slides in from the open back, its USB jack at
+// y1, centered on x = cx (a dab of hot glue keeps it there)
+module nano_rails(cx, y1) {
+   y0 = y1 - nano_board.y;
+   for (s = [-1, 1]) {
+      xo = cx + s * (nano_board.x / 2 + 0.1);
+      translate([s > 0 ? xo : xo - nano_rail_w, y0 - nano_rail_w, wall - 0.01])
+         cube([nano_rail_w, nano_board.y + nano_rail_w, nano_under + nano_t + 0.8 + 0.01]);
+      translate([s > 0 ? xo - 1.2 : xo, y0, wall - 0.01])
+         cube([1.2, nano_board.y, nano_under + 0.01]);
+      translate([s > 0 ? xo - 0.8 : xo, y0, wall + nano_under + nano_t + 0.1])
+         cube([0.8 + 0.01, nano_board.y, 0.7]);
+   }
+   translate([cx - nano_board.x / 2 - 0.1, y0 - nano_rail_w, wall - 0.01])
+      cube([nano_board.x + 0.2, nano_rail_w, nano_under + nano_t + 0.01]);
+}
+
+// The Nano in its floor rails (view only)
+module nano_part(cx, y1) {
+   translate([cx - nano_board.x / 2, y1 - nano_board.y, wall + nano_under]) {
+      color("#1d4fa0") cube([nano_board.x, nano_board.y, nano_t]);
+      color("#202020") translate([nano_board.x / 2 - 3.5, 18, nano_t]) cube([7, 7, 1.2]);
+      color("#b9c0c8") translate([nano_board.x / 2 - nano_usb.x / 2, nano_board.y - 8, nano_t]) cube([nano_usb.x, 9, nano_usb.y]);
+   }
 }
 
 // Tactile switch, the button's top at y=0, pressed along +y, centered on x/z

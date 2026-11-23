@@ -91,13 +91,6 @@ vol_shaft = [6, 15];         // diameter, length from the mounting face
 // --- Rectangular LED for the annunciator bars, MEASURE ---
 bar_led = [5, 2, 7];         // x, z, height over the board
 
-// --- Arduino Nano, MEASURE ---
-nano_board = [18, 45];       // x, y (the USB jack at the back end)
-nano_high = 14;              // over the logic board: female header, board, USB jack
-
-// --- CD74HC4067 breakout (switchpanel/switches.scad) ---
-mux_board = [41, 18];
-
 // --- Logic board ---
 lg_board = [72, 50];         // perfboard in the rails: x, y
 lg_high = 14;                // the parts on it, above the board
