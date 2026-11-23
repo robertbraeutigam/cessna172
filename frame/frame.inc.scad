@@ -279,7 +279,7 @@ inst_depth = 46.6;
 // The attitude indicator (instruments/ai.scad) is deeper (its drum and two
 // motors, ai_depth echo): it must be in the top row, over the force
 // feedback yoke's housing
-ai_depth = 118.1;
+ai_depth = 120.1;
 
 // --- Layout, x ---
 x_sw0 = sheet_edge;                          // switch panel, left face edge

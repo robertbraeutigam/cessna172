@@ -253,18 +253,23 @@ Direction, pin order and fine tuning as for the RPM indicator. If
 The six-pack's top middle instrument. Its case front is the standard's
 (the 81 mm hole, the lip, the glass, the four screws through the sheet),
 but behind it is a mechanism of its own with two 28BYJ-48 steppers, and
-it is 118 mm deep behind the sheet (`ai_depth`). It is in the top row,
+it is 120 mm deep behind the sheet (`ai_depth`). It is in the top row,
 over the force feedback yoke's housing, so the depth does not matter
 there (the frame checks it).
 
 ### How it works
 
-- **What you see**: the roll dial (sky over ground, the bank marks 10,
-  20, 30, 45 (triangles), 60 and 90, the horizon line across it) with a
-  round window in the middle, and the horizon drum behind the window. The
-  miniature airplane (on a stem from the bottom) and the bank index (a
-  triangle at the top) are fixed, between the glass and the dial. Like
-  the 172N's, the dial turns with the horizon and the index reads its
+- **What you see**, modelled on the X-Plane 172N's: the roll dial
+  (turquoise sky over brown ground, the bank marks 10, 20, 30, 60 and 90,
+  the horizon line across it, white lines in the ground 20 and 45 degrees
+  under the horizon) with a 46 mm window in the middle, and the horizon
+  drum behind the window (pitch lines every 5 degrees). Fixed, between
+  the glass and the dial: the orange bank index at the top (on the
+  sleeve's ring), and the airplane: orange wing bars and dot on a black
+  mount rising from a black mask over the window's bottom. A dummy knob
+  sits on the mask, in front of the glass, its stem through a hole in the
+  glass (the real one sets the airplane's height). Like the X-Plane
+  172N's, the dial turns with the horizon and the index reads its
   marks.
 - **Roll**: the dial is the front of the roll frame: two arms go back from
   it and carry the drum, a back disc closes them, with the roll gear and
@@ -283,7 +288,7 @@ there (the frame checks it).
   the drum; a planet gear on the roll frame meshes it, and a bevel pinion
   on the planet's shaft turns a bevel gear in the drum's right end. The
   drum turns by the pitch axle's turn relative to the roll frame, 1:1
-  (48/16 x 12/36). So both motors stay on the back plate and no wire goes
+  (51/17 x 12/36). So both motors stay on the back plate and no wire goes
   into the turning part, but a roll also turns the drum unless the pitch
   motor turns with it: MobiFlight adds the roll to the pitch motor's
   position (see [MobiFlight](#mobiflight-1)). The drum turns round freely,
@@ -308,14 +313,14 @@ there (the frame checks it).
   neighbours, so its carrier is behind them, and the Nano's USB jack
   points left.
 - **Print orientation**: the case back side down; the sleeve on its ring;
-  the airplane flat; the roll dial on its face, the arms up; the back
+  the airplane (with its mount and the mask) flat; the knob on its front;
+  the roll dial on its face, the arms up; the back
   disc on its front, the roll gear up; the drum on its left end; the
   drum's bevel gear on its disc, the teeth up; the gears flat; the back
   plate on its front, the posts up; the carrier flat. The small pitch
   gears (module 0.8) are cut by a rolling rack in the model (undercut),
-  so they mesh with each other and with the bevel gear. Everything black
-  but the airplane and the index: print the airplane orange (paint its
-  stem black) and paint the index orange.
+  so they mesh with each other and with the bevel gear. Everything black;
+  paint the index and the airplane's wings and dot orange.
 
 The `assert`s check that the drum fills the window and turns in the
 sleeve clear of the arms, that the bevel pair and the sun and planet fit
@@ -331,11 +336,13 @@ template) and `target/ai_drum.pdf` (two drum strips), on the project
 page as [face](https://robertbraeutigam.github.io/cessna172/instruments/ai_face.pdf)
 and [drum](https://robertbraeutigam.github.io/cessna172/instruments/ai_drum.pdf),
 colour prints like the other faces. Print at 100 % on matte photo paper.
+The glass's template has the knob's hole: drill it 3.4 mm (anywhere on
+that circle, the glass is round).
 
 - The roll dial: cut the outside on the black line's inside and the
   window on the colours' edge, glue it onto the dial, sky up (the horizon
   at the arms).
-- The drum strip (151.4 x 46 mm): glue it round the drum, the horizon line
+- The drum strip (157.7 x 48 mm): glue it round the drum, the horizon line
   at the drum's front with the dial level, the sky up; the ends meet at
   the back.
 
@@ -350,7 +357,7 @@ colour prints like the other faces. Print at 100 % on matte photo paper.
 | 2 | steel dowel pin 3 x 20 mm | the drum's axle ends |
 | 1 | steel dowel pin 3 x 24 mm | the planet's shaft |
 | 1 | steel dowel pin 3 x 20 mm | the pitch axle |
-| 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
+| 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass, with a 3.4 mm hole for the knob |
 | 2 | the prints, on photo paper | roll dial face, drum strip |
 | 4 | M3 x 8 button head, black | case through the sheet |
 | 4 | M3 x 8 countersunk self tapping screw | back plate into the case |
@@ -372,9 +379,10 @@ colour prints like the other faces. Print at 100 % on matte photo paper.
    pitch axle, its front end level with the sun's front (glue).
 4. Back disc onto the arms (two screws): its tube over the sun's hub,
    the planet's shaft in its hole, sun and planet meshing.
-5. Airplane's foot into the notch in the sleeve's ring (glue). Glass into
-   the case from behind, the sleeve behind it, the roll frame into the
-   sleeve (the dial against the ring).
+5. The airplane's mask into the notch in the sleeve's ring (glue). Glass
+   into the case from behind, its knob hole over the mask's, the sleeve
+   behind it, the roll frame into the sleeve (the dial against the ring).
+   The knob's stem through the glass into the mask (glue).
 6. Magnets into the motor gears (check which face pulls the sensor low),
    sensors into their pockets (flat face out, legs through the slots),
    motors onto the back plate, motor gears onto the shafts. Pitch gear

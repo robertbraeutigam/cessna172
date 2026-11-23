@@ -8,12 +8,16 @@
 //
 // What moves:
 // - Roll: the roll frame turns in a printed sleeve in the case. Its front
-//   is the roll dial (sky and ground halves, the bank marks 10, 20, 30, 45,
-//   60, 90: a colour print, ai_face.pdf), behind it two arms carry the
-//   drum; its back disc carries the roll gear. The bank index (a triangle
-//   at 12 o'clock) and the miniature airplane are fixed, on the sleeve's
-//   front ring, between the glass and the dial. Like the 172N's, the dial
-//   turns with the horizon and the index reads its bank marks.
+//   is the roll dial (sky and ground halves, the bank marks 10, 20, 30,
+//   60, 90, white lines in the ground: a colour print, ai_face.pdf), behind
+//   it two arms carry the drum; its back disc carries the roll gear. The
+//   bank index (an orange triangle at 12 o'clock, on the sleeve's front
+//   ring) and the airplane are fixed, between the glass and the dial: the
+//   orange wing bars and dot on a black mount, rising from a black mask
+//   over the window's bottom, with a dummy knob in front of the glass on a
+//   stem through it (the real one sets the airplane's height). Like the
+//   X-Plane 172N's, the dial turns with the horizon and the index reads
+//   its bank marks.
 // - Pitch: the drum (a cylinder across the dial's window, sky and ground
 //   with the pitch lines on a printed strip, ai_drum.pdf) turns on its
 //   axis across the roll frame. Its drive comes through the roll axis: a
@@ -41,13 +45,13 @@
 // frame's ai_depth checks it).
 //
 // Parts (printed): the case (back side down), the sleeve with the front
-// ring and the bank index (ring down), the airplane (flat), the roll dial
+// ring and the bank index (ring down), the airplane with its mount and the
+// mask (flat), the knob (front down), the roll dial
 // with the arms (dial down), the roll back disc with the roll gear (front
 // down), the drum (left end down), the drum's bevel gear (disc down), the
 // sun, planet, pinion and pitch gears, the two motor gears, the back
 // plate with the carrier's posts (front down), the board carrier (flat).
-// All black but the airplane and the index (orange: print the sleeve and
-// the airplane in black and paint them, or print the airplane orange).
+// All black; paint the index and the airplane's wings and dot orange.
 //
 // Parts to buy:
 // - 2 x 28BYJ-48 stepper (5 V) with its ULN2003 board, an Arduino Nano and
@@ -55,7 +59,8 @@
 //   6 x 3 mm
 // - steel dowel pins 3 mm: 2 x 20 (drum), 1 x 24 (planet shaft), 1 x 20
 //   (pitch axle)
-// - clear sheet 1 mm (glass), the two prints on photo paper
+// - clear sheet 1 mm (glass, a 3.4 mm hole for the knob's stem), the two
+//   prints on photo paper
 // - M3 x 8 button head, black (4, through the sheet into the case),
 //   M3 x 8 countersunk self tapping (4, back plate into the case; 2, the
 //   roll back disc onto the arms; 4, the carrier onto its posts),
@@ -66,7 +71,8 @@
 // drum's right end; roll dial face onto the dial. Drum between the arms,
 // pins through the arms into its hubs. Pinion and planet gear onto their
 // shaft (through the front boss), sun onto the pitch axle, back disc onto
-// the arms (its tube over the sun's hub). Airplane into the sleeve's ring.
+// the arms (its tube over the sun's hub). Airplane's mask into the
+// sleeve's ring. Knob through the glass into the mask (glue).
 // Glass into the case, the sleeve behind it, the roll frame into the
 // sleeve. Pitch gear onto the axle, magnets into the motor gears, sensors
 // and motors onto the back plate, motor gears on, back plate into the
@@ -88,23 +94,23 @@ explode = 25;
 // --- Display ---
 pitch_k = 1.5;               // drum degrees per degree of pitch
 pitch_max = 60;              // MobiFlight clamps the pitch here (the drum at 90: the horizon at the window's edge)
-pitch_lines = [[5, 7], [10, 14], [15, 7], [20, 14]];   // nose up and down: pitch, length
+pitch_lines = [[5, 5], [10, 10], [15, 5], [20, 10]];   // nose up and down: pitch, length
 line_w = 0.6;
 horizon_w = 1;
 bank_short = [10, 20];       // bank marks, both sides
 bank_long = [30, 60];
-bank_tri = 45;
 mark_r1 = 35;                // the marks' outer end
 mark_len = [3, 5.5];         // short, long
 mark_w = [0.7, 1];
-tri = [3.2, 3];              // the 45 degree triangles, the zero one: base, height
+ground_lines = [20, 45];     // the dial's ground: white lines this far under the horizon, both sides
+ground_w = 0.8;
 // colours, in the prints' order (keep the print markers below the same)
 c_black = "black";
-c_sky = "#3f7fca";
-c_ground = "#7b4b26";
+c_sky = "#4ba3d1";
+c_ground = "#7a4a2c";
 c_white = "white";
 face_colors = [c_black, c_sky, c_ground, c_white];
-c_plane = "#ff8c1a";         // view only: the airplane and the index (paint)
+c_plane = "#ff8c1a";         // view only: the airplane's wings and dot, the index (paint)
 
 // --- Fixed parts in the case: the sleeve, its ring, the airplane ---
 ring_t = 2.6;                // the sleeve's front ring, behind the glass
@@ -115,21 +121,27 @@ leg_w = 6;                   // the sleeve's legs behind the roll frame, to the 
 leg_angles = [0, 120, 240];  // clockwise from 12 o'clock, off the motor gears
 plane_t = 1.5;
 plane_glass = 0.5;           // the airplane behind the glass
-index_tip = 32;              // the fixed bank index's tip from the axis
-index_w = 4.5;
+index_tip = 29;              // the fixed bank index's tip from the axis
+index_w = 6.5;
 index_t = 1.4;
-stem_w = [2, 4];             // the airplane's stem: at the airplane, at its foot
-foot = [6, 1.6];             // its foot in the ring's notch: width, radial
+wing = [5.5, 18, 2.2];       // the airplane's wing bars: from, to (x), thickness
+dot_d = 4.5;
+mount_w = [3, 16];           // its black mount: width at the top, at the mask
+mask_z = -21;                // the black mask over the window's bottom: its top edge
+foot_r = 37.4;               // the mask's edge in the ring's notch, outer radius
+knob = [10, 4, 1.2];         // the dummy knob in front of the glass: diameter, length, knurl depth
+knob_z = -28.5;              // its axis
+knob_pin = 3;                // its stem, through a hole in the glass into the mask
 
 // --- Roll frame ---
 roll_play = 0.3;             // radial, the roll dial and the back disc in the sleeve
 rd_t = 1.5;                  // the roll dial
-vis_r = 21;                  // the dial's window: the drum shows through it
+vis_r = 23;                  // the dial's window: the drum shows through it
 face_r = 35.6;               // the dial's paper face, outer edge (under the ring's edge)
 dial_gap = 0.4;              // airplane to the dial's face
 arm = [4, 4.5];              // arms: x, z
-r_arm = [27.3, 9];           // the right arm's inner edge (x) and its bottom (z): over the pinion and the planet
-l_arm_x = -25;               // the left arm's inner edge
+r_arm = [27.3, 9.5];           // the right arm's inner edge (x) and its bottom (z): over the pinion and the planet
+l_arm_x = -25.5;               // the left arm's inner edge
 boss_d = 7;
 fboss_d = 5.6;               // the planet shaft's front boss, beside the bevel gear's teeth
 fboss_l = 5;                 // the planet shaft's front boss, along y
@@ -137,9 +149,9 @@ bd_t = 2.5;                  // back disc
 rtube_d = [10, 6.4];          // the roll frame's tube: outside, its bore on the sun's hub
 
 // --- Drum ---
-drum_r = 24;                 // its shell's outside (the strip on it)
+drum_r = 25;                 // its shell's outside (the strip on it)
 shell_t = 1.2;
-drum_half = 23;              // half its length
+drum_half = 24;              // half its length
 drum_gap = 0.8;              // the strip to the roll dial
 end_t = 1.5;                 // left end
 drum_hub_d = 8;
@@ -147,8 +159,8 @@ rib = 1;                     // the seat for the bevel gear's disc
 
 // --- Pitch gears, module gm ---
 gm = 0.8;
-z_sun = 48;
-z_planet = 16;
+z_sun = 51;
+z_planet = 17;
 z_pinion = 12;
 z_face = 36;
 gt = 4;                      // sun and planet
@@ -253,6 +265,10 @@ assert(ring_id / 2 < window_d / 2 && ring_id / 2 <= roll_r - 0.4, "The ring must
 assert(face_r <= ring_id / 2 - 0.15 && face_r >= window_d / 2 - 1, "Dial face edge shows or is covered");
 assert(mark_r1 <= face_r - 0.3 && index_tip <= mark_r1 - 1, "Bank marks off the face or not under the index");
 assert(mark_r1 - mark_len[1] >= vis_r + 3, "Bank marks into the window");
+assert(-mask_z + 1 <= vis_r && -mask_z >= dot_d / 2 + 10, "Mask over the horizon or not over the window's bottom");
+assert(norm([wing[1], wing[2] / 2]) <= vis_r + 3 && wing[0] >= dot_d / 2 + 1, "Wings");
+assert(abs(knob_z) - knob[0] / 2 >= -mask_z + 1 && abs(knob_z) + knob[0] / 2 <= window_d / 2 - 0.5, "Knob off the mask");
+assert(foot_r <= sleeve_od / 2 - 1, "Mask's foot through the ring");
 // drum
 assert(drum_half >= vis_r + 1 && drum_r >= vis_r + 2, "Drum does not fill the dial's window");
 assert(norm([drum_half, drum_rp]) <= roll_r - 1, "Drum does not turn in the sleeve");
@@ -425,33 +441,49 @@ module ai_sleeve() {
          // the bank index, pointing down at the dial's marks
          along_y(y_ring0, y_ring0 + index_t) polygon([[0, index_tip], [-index_w / 2, ring_id / 2 + 0.5], [index_w / 2, ring_id / 2 + 0.5]]);
       }
-      // the airplane's foot, from behind
-      along_y(y_plane0, y_ring1 + 1) translate([-foot[0] / 2 - 0.1, -ring_id / 2 - foot[1] - 0.1]) square([foot[0] + 0.2, foot[1] + 0.3]);
+      // the mask's edge, from behind
+      along_y(y_plane0, y_ring1 + 1) intersection() {
+         circle(r = foot_r + 0.15, $fn = 180);
+         translate([-50, mask_z + 0.15 - 50]) square(50 * [2, 1]);
+      }
    }
 }
 
-// --- Airplane: the wings and the dot on a stem from the ring at 6 o'clock ---
+// --- Airplane: the wing bars and the dot on a black mount, the mask over the window's bottom ---
+// one flat part, printed black; paint the wings and the dot orange
+module wings_2d() {
+   circle(d = dot_d);
+   for (s = [-1, 1]) translate([s > 0 ? wing[0] : -wing[1], -wing[2] / 2]) square([wing[1] - wing[0], wing[2]]);
+}
+
 module plane_2d() {
-   circle(d = 3.5);
-   for (s = [-1, 1]) {
-      hull() {
-         translate([s * 6, 0]) circle(d = 1.6);
-         translate([s * 17, 0]) circle(d = 1.6);
-      }
-      hull() {
-         translate([s * 6, 0]) circle(d = 1.6);
-         translate([s * 4, -2.5]) circle(d = 1.4);
-      }
+   wings_2d();
+   // the mount: from under the dot down to the mask
+   polygon([[-mount_w[0] / 2, -dot_d / 2 + 0.5], [mount_w[0] / 2, -dot_d / 2 + 0.5], [mount_w[1] / 2, mask_z + 0.1], [-mount_w[1] / 2, mask_z + 0.1]]);
+   // the mask, its edge in the ring's notch
+   intersection() {
+      circle(r = foot_r, $fn = 180);
+      translate([-50, mask_z - 50]) square(50 * [2, 1]);
    }
-   hull() {
-      translate([-stem_w[0] / 2, -3]) square([stem_w[0], 0.1]);
-      translate([-stem_w[1] / 2, -ring_id / 2]) square([stem_w[1], 0.1]);
-   }
-   translate([-foot[0] / 2, -ring_id / 2 - foot[1]]) square([foot[0], foot[1] + 0.1]);
 }
 
 module ai_plane() {
-   along_y(y_plane0, y_plane1) plane_2d();
+   difference() {
+      along_y(y_plane0, y_plane1) plane_2d();
+      along_y(y_plane0 - 1, y_plane1 + 1) translate([0, knob_z]) circle(d = knob_pin - 0.1);
+   }
+}
+
+// the dummy knob (the real one sets the airplane's height): knurled, in front of the glass, its stem through the glass into the mask
+module ai_knob() {
+   translate([0, 0, knob_z]) {
+      difference() {
+         along_y(y_glass0 - knob[1], y_glass0 - 0.2) circle(d = knob[0], $fn = 60);
+         for (a = [0 : 20 : 340]) rotate([0, a, 0]) translate([knob[0] / 2, y_glass0 - knob[1] - 1, 0]) rotate([-90, 0, 0])
+            cylinder(d = knob[2] * 1.6, h = knob[1] + 2, $fn = 12);
+      }
+      along_y(y_glass0 - 0.21, y_plane1 - 0.2) circle(d = knob_pin);
+   }
 }
 
 // --- Roll frame: the dial with the arms ---
@@ -651,10 +683,8 @@ module ai_face_2d() {
       for (s = [-1, 1]) {
          for (a = bank_short) tick_2d(s * a, mark_r1 - mark_len[0], mark_r1, mark_w[0]);
          for (a = bank_long) tick_2d(s * a, mark_r1 - mark_len[1], mark_r1, mark_w[1]);
-         polygon([pol(mark_r1, s * bank_tri - 2.6), pol(mark_r1, s * bank_tri + 2.6), pol(mark_r1 - tri[1], s * bank_tri)]);
+         for (a = ground_lines) tick_2d(s * (90 + a), vis_r, face_r, ground_w);
       }
-      // zero: a triangle pointing up at the index
-      polygon([pol(mark_r1 - 0.3, 0), pol(mark_r1 - tri[1] - 0.3, -2.8), pol(mark_r1 - tri[1] - 0.3, 2.8)]);
    }
 }
 
@@ -680,15 +710,23 @@ module ai_face_print() {
          circle(r = face_r + 0.4, $fn = 180);
          circle(r = face_r, $fn = 180);
       }
-      translate([2 * step + glass_d / 2 - face_r, 0]) difference() {
-         circle(d = glass_d + 0.6, $fn = 180);
-         circle(d = glass_d, $fn = 180);
+      translate([2 * step + glass_d / 2 - face_r, 0]) {
+         difference() {
+            circle(d = glass_d + 0.6, $fn = 180);
+            circle(d = glass_d, $fn = 180);
+         }
+         // the knob's hole (anywhere at this radius)
+         translate([0, knob_z]) difference() {
+            circle(d = knob_pin + 0.9);
+            circle(d = knob_pin + 0.4);
+         }
       }
       translate([-face_r, -face_r - 8])
-         text(str("AI: roll dial ", d, " mm (cut the outside on the line's inside, the window on the colours' edge), glass ",
-                  glass_d, " mm, print at 100 %"), size = 3, font = font);
+         text(str("AI: roll dial ", d, " mm (cut the outside on the line's inside, the window on the colours' edge),"), size = 3, font = font);
+      translate([-face_r, -face_r - 13])
+         text(str("glass ", glass_d, " mm with a ", knob_pin + 0.4, " mm hole for the knob; print at 100 %"), size = 3, font = font);
    }
-   for (x = [-face_r - 2, w - face_r + 2], y = [-face_r - 11, glass_d / 2 + 2]) translate([x, y]) square(0.1, center = true);
+   for (x = [-face_r - 2, w - face_r + 2], y = [-face_r - 16, glass_d / 2 + 2]) translate([x, y]) square(0.1, center = true);
 }
 
 module ai_drum_print() {
@@ -779,7 +817,10 @@ module ai_parts(r = view_roll, p = view_pitch, e = 0, with_case = true, with_sle
    if (with_case) color(c_case) render() ai_case();
    translate([0, -3.4 * e, 0]) {
       if (with_sleeve) color(c_case) render() ai_sleeve();
-      color(c_plane) ai_plane();
+      color(c_case) ai_plane();
+      color(c_plane) translate([0, y_plane0 - 0.02, 0]) rotate([90, 0, 0]) linear_extrude(0.01) wings_2d();
+      color(c_plane) translate([0, y_ring0 - 0.02, 0]) rotate([90, 0, 0]) linear_extrude(0.01)
+         polygon([[0, index_tip], [-index_w / 2, ring_id / 2 + 0.5], [index_w / 2, ring_id / 2 + 0.5]]);
    }
    ai_roll_parts(r, p);
    ai_axle_parts(r, p);
@@ -797,7 +838,13 @@ module ai_parts(r = view_roll, p = view_pitch, e = 0, with_case = true, with_sle
       color(c_case) ai_carrier();
       ai_boards_part();
    }
-   if (with_case) color(c_glass) along_y(y_glass0, y_glass1) circle(d = glass_d, $fn = 180);
+   if (with_case) {
+      color(c_case) ai_knob();
+      color(c_glass) along_y(y_glass0, y_glass1) difference() {
+         circle(d = glass_d, $fn = 180);
+         translate([0, knob_z]) circle(d = knob_pin + 0.4);
+      }
+   }
 }
 
 module assembled_view() {
@@ -824,6 +871,7 @@ module face_view() {
 translate([0, 0, y_bk0]) rotate([-90, 0, 0]) ai_case(); // Make module case
 translate([0, 0, -y_ring0]) rotate([90, 0, 0]) ai_sleeve(); // Make module sleeve
 translate([0, 0, -y_plane0]) rotate([90, 0, 0]) ai_plane(); // Make module plane
+translate([0, 0, -(y_glass0 - knob[1])]) rotate([90, 0, 0]) translate([0, 0, -knob_z]) ai_knob(); // Make module knob
 translate([0, 0, -y_rd0]) rotate([90, 0, 0]) ai_roll_dial(); // Make module roll_dial
 translate([0, 0, -y_b0]) rotate([90, 0, 0]) ai_roll_back(); // Make module roll_back
 translate([0, 0, drum_half]) rotate([0, -90, 0]) translate([0, -y_drum, 0]) ai_drum(); // Make module drum
@@ -837,8 +885,8 @@ translate([0, 0, y_pg1]) rotate([-90, 0, 0]) translate([drive_a, 0, 0]) ai_pitch
 translate([0, 0, -y_bk0]) rotate([90, 0, 0]) ai_back_plate(); // Make module back
 translate([0, 0, -y_cr0]) rotate([90, 0, 0]) ai_carrier(); // Make module carrier
 
-ai_face_print(); // Make print face black,#3f7fca,#7b4b26,white
-ai_drum_print(); // Make print drum black,#3f7fca,#7b4b26,white
+ai_face_print(); // Make print face black,#4ba3d1,#7a4a2c,white
+ai_drum_print(); // Make print drum black,#4ba3d1,#7a4a2c,white
 
 //assembled_view(); // Make view main 80,0,-25
 //assembled_view(); // Make view front 90,0,0

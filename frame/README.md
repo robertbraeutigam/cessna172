@@ -129,7 +129,7 @@ fit in front of the force feedback yoke's housing (`inst_body_d`,
 with the motor and boards behind it, 84 mm round and 47 mm deep behind the sheet; the TC, HI,
 VSI, NAV 1 and the RPM are in front of the housing). The
 [attitude indicator](../instruments/README.md#attitude-indicator) is
-deeper, 118 mm (`ai_depth`), so it must stay in the top row, over the
+deeper, 120 mm (`ai_depth`), so it must stay in the top row, over the
 housing. The ADF's place in the 172N, under NAV 2 at the column's height,
 is free as well.
 
