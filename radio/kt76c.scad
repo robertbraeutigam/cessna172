@@ -16,7 +16,7 @@
 // all driven by one MAX7219. The annunciators are words cut through a
 // printed black mask behind the red filter (stencil letters: thin bridges
 // hold the islands of A, O, D, B, R), each in its own cell with a 3 mm red
-// LED behind it on its own Mega pin.
+// LED behind it on its own Nano pin.
 //
 // Inside: one front perfboard (cut L shaped, its lower strip runs under the
 // selector switch) carries the digit modules, the annunciator LEDs and the
@@ -25,8 +25,12 @@
 // The selector is a 1 pole 12 way rotary switch with its stop washer set to
 // 5 positions, nutted onto the face. The MAX7219 is the 8x8 matrix kit
 // board without the matrix, in rails on the floor like the KX155's.
-// Everything goes to the radio stack's Mega on one cable out of the open
-// back, tied onto tie_block.
+// Everything goes to an Arduino Nano of its own running MobiFlight, on a
+// logic board in rails on the floor like the KMA 26's: 16 buttons and
+// selector positions through a CD74HC4067 mux (more inputs than the Nano
+// has pins), the MAX7219 and the 6 annunciator LEDs on pins of their own
+// (nano_pins, mux_inputs; the README has the tables). Its USB cable to the
+// powered USB hub runs out of the open back, tied onto tie_block.
 //
 // Coordinates: radio.inc.scad (installed: x right, y backwards, z up).
 // Printed: the body front side down, the face front side up, the display
@@ -38,6 +42,9 @@
 // - 11 tactile switches 6 x 6 mm, 5 mm high (tact)
 // - 3 7 segment modules, 0.28", 3 digits, common cathode, red (dig_*)
 // - 1 MAX7219 8x8 matrix kit board (drv_board), leave the matrix off
+// - 1 Arduino Nano (ATmega328P, 5 V, nano_*) with female headers, a mini
+//   USB cable, a cable tie; 1 CD74HC4067 mux breakout (mux_board);
+//   perfboard for the logic board (lg_board)
 // - 6 red LEDs, 3 mm, with a 1 kOhm resistor each
 // - 1 red transparent acrylic piece, filter_t thick (filter_size)
 // - perfboard, 10 x 22 cm (board_size)
@@ -50,8 +57,8 @@
 // with the mask's back, see the asserts), screw it onto the bosses (the
 // digits go into the mask's openings and the LEDs into its cells). Face
 // onto the plate, rotary switch through both from the back, nut on the
-// front. Driver board into its rails, wiring, cable tied onto the tie
-// block. Knob on last, pointing at OFF with the switch turned fully left.
+// front. Driver board and logic board into their rails, wiring, the USB
+// cable plugged in and tied onto the tie block. Knob on last, pointing at OFF with the switch turned fully left.
 // Into the sheet under the KX155s, the 4 screws through the end flanges.
 
 $fn = 64;
@@ -103,8 +110,13 @@ ann_cols = [["R", "FL"], ["ALT", "GND"], ["ON", "SBY"]];
 // --- Body ---
 board_dz = 0.5;              // board edge beyond the tactile switches
 board_gap = 0.5;             // board to the walls and the rotary switch
-drv_x = 90;                  // driver board's left rail
-tie_x = 150;
+lg_board = [72, 50];         // logic board (perfboard) in its rails: x, y; the Nano at its back right, the mux at its front left
+lg_high = 14;                // the parts on it, above the board
+// --- Nano pins and mux inputs, in the order of the README's tables ---
+nano_pins = [["D2", "mux S0"], ["D3", "mux S1"], ["D4", "mux S2"], ["D5", "mux S3"], ["D6", "mux SIG"],
+             ["D7", "MAX7219 DIN"], ["D8", "MAX7219 CS"], ["D9", "MAX7219 CLK"],
+             ["D10", "R"], ["D11", "FL"], ["D12", "ALT"], ["A0", "ON"], ["A1", "GND"], ["A2", "SBY"]];
+mux_inputs = ["0", "1", "2", "3", "4", "5", "6", "7", "CLR", "VFR", "IDT", "OFF", "SBY", "TST", "ON", "ALT"];
 
 // --- Calculated ---
 x_in0 = flange_w + wall;
@@ -168,8 +180,15 @@ m_len = m_bore + m_front;
 m_nut_recess = [corners(rot_nut[0]) + 0.9, face_t + rot_nut[1] + 0.5 - m_back];
 m_bush_recess = [rot_bush[0] + 0.6, rot_bush[1] - plate_t + 0.5 - m_back];
 
-drv_y0 = max(board_y + board_t, plate_t + rot_body[1]) + 3;
-unit_d = drv_y0 + drv_board.y + 4;
+drv_y0 = max(board_y + board_t, plate_t + rot_body[1]) + 3;   // the driver and logic boards from here back
+lg_pitch = lg_board.x - 2 * drv_over + 2 * fit + rail.x;    // logic board: rail to rail
+lg_x = x_in0 + 1;                                          // its left rail, at the left wall
+lg_board_x0 = lg_x + rail.x + fit - drv_over;
+lg_board_z = wall + rail.y - 1.6 - board_t;
+drv_pitch = drv_board.x - 2 * drv_over + 2 * fit + rail.x;
+drv_x = lg_x + lg_pitch + rail.x + 2;                      // driver board's left rail, right of it
+tie_x = drv_x + drv_pitch + rail.x + 3;
+unit_d = drv_y0 + max(drv_board.y, lg_board.y) + 4;
 
 bed = [255, 255];
 
@@ -226,6 +245,10 @@ assert(btn_stem >= 0.5, "Front board too close to the plate for the tactile swit
 assert(drv_x >= x_in0 + 0.5 && drv_x + 2 * rail.x + drv_board.x <= x_in1 - 0.5, "Driver board does not fit");
 assert(board_size.x <= 220 && board_size.y <= 100, "Front board does not fit a 10 x 22 cm perfboard");
 assert(len(mod_xs) * dig_n - (dig_n * code_mods - code_shown) <= 8, "More than 8 digits for one MAX7219");
+assert(tie_x + tie_block.x <= x_in1 - 0.5, "Logic board, driver board and tie block do not fit side by side");
+assert(lg_board_z + board_t + max(lg_high, nano_high) <= xp_h - wall - 0.5, "Parts on the logic board hit the top");
+assert(nano_board.x + mux_board.x + 6 <= lg_board.x && nano_board.y + 4 <= lg_board.y, "Nano and mux do not fit the logic board");
+assert(len(mux_inputs) == 16 && len(nano_pins) <= 18, "16 mux inputs, at most 18 Nano pins");
 
 // --- 2D shapes in x/z ---
 
@@ -291,12 +314,14 @@ module unit_body() {
          // Board bosses
          for (b = bosses)
             boss(b[0], b[1], board_y);
-         // Driver board rails and their front stop
-         for (i = [0, 1])
-            translate([drv_x + i * (drv_board.x - 2 * drv_over + 2 * fit + rail.x), drv_y0 - 2, wall - 0.01])
-               cube([rail.x, unit_d - drv_y0 + 2, rail.y + 0.01]);
-         translate([drv_x, drv_y0 - 2, wall - 0.01])
-            cube([drv_board.x - 2 * drv_over + 2 * fit + 2 * rail.x, 2, rail.y + 0.01]);
+         // Driver and logic board rails and their front stops
+         for (r = [[drv_x, drv_pitch], [lg_x, lg_pitch]]) {
+            for (i = [0, 1])
+               translate([r[0] + i * r[1], drv_y0 - 2, wall - 0.01])
+                  cube([rail.x, unit_d - drv_y0 + 2, rail.y + 0.01]);
+            translate([r[0], drv_y0 - 2, wall - 0.01])
+               cube([r[1] + rail.x, 2, rail.y + 0.01]);
+         }
          // Cable tie block, at the back
          translate([tie_x, unit_d - tie_block.y, wall - 0.01])
             cube(tie_block + [0, 0, 0.01]);
@@ -310,9 +335,9 @@ module unit_body() {
             translate([knob_x, knob_z]) circle(d = rot_bush[0] + 0.4);
             mount_holes_2d(unit_w, xp_h);
          }
-      // Grooves in the rails for the driver board edges
-      for (i = [0, 1])
-         translate([drv_x + i * (drv_board.x - 2 * drv_over + 2 * fit + rail.x) - drv_over - fit, drv_y0, wall + rail.y - 1.6 - board_t - fit])
+      // Grooves in the rails for the board edges
+      for (r = [[drv_x, drv_pitch], [lg_x, lg_pitch]], i = [0, 1])
+         translate([r[0] + i * r[1] - drv_over - fit, drv_y0, wall + rail.y - 1.6 - board_t - fit])
             cube([rail.x + 2 * (drv_over + fit), unit_d, board_t + 2 * fit]);
       // Tunnel for the cable tie
       translate([tie_x - 1, unit_d - tie_block.y / 2 - 2, wall + 1.5])
@@ -453,6 +478,25 @@ module driver_part() {
       driver_board_part();
 }
 
+// Logic board: the Nano at the back right (USB jack at the back edge), the
+// mux at the front left (like the KMA 26's)
+module logic_part() {
+   translate([lg_board_x0, drv_y0, lg_board_z]) {
+      color("#3a6b3a") cube([lg_board.x, lg_board.y, board_t]);
+      translate([0, 0, board_t]) {
+         translate([lg_board.x - 3 - nano_board.x, lg_board.y - nano_board.y, 0]) {
+            color("#202020") for (dx = [0.5, nano_board.x - 3]) translate([dx, 1, 0]) cube([2.5, nano_board.y - 2, nano_high - 4.6]);
+            color("#1d4fa0") translate([0, 0, nano_high - 4.6]) cube([nano_board.x, nano_board.y, 1.6]);
+            color(c_steel) translate([nano_board.x / 2 - 4, nano_board.y - 5, nano_high - 3]) cube([8, 5.5, 3]);
+         }
+         translate([3, 3, 0]) {
+            color("#202020") for (dy = [0.5, mux_board.y - 3]) translate([1, dy, 0]) cube([mux_board.x - 2, 2.5, 2.5]);
+            color("#1d4fa0") translate([0, 0, 2.5]) cube([mux_board.x, mux_board.y, 1.6]);
+         }
+      }
+   }
+}
+
 module rotary_part() {
    translate([knob_x, 0, knob_z]) {
       color(c_steel) {
@@ -503,6 +547,7 @@ module parts_inside() {
    filter_part();
    board_part();
    driver_part();
+   logic_part();
    rotary_part();
 }
 
