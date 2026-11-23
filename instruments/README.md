@@ -6,10 +6,14 @@
 
 [![Airspeed indicator](https://robertbraeutigam.github.io/cessna172/instruments/asi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/asi_montage.png)
 
+[![Attitude indicator](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)
+
 The analogue ("steam") instruments. They all follow one standard
 (`instrument.inc.scad`): a 3 1/8" case behind a round hole in the panel,
 a colour printed face, and a needle turned by a 28BYJ-48 geared stepper.
-So far: the RPM indicator (tachometer) and the airspeed indicator (ASI). The instruments go into
+So far: the RPM indicator (tachometer), the airspeed indicator (ASI) and
+the attitude indicator (AI), which has the standard's case front but a
+mechanism of its own (see [Attitude indicator](#attitude-indicator)). The instruments go into
 the holes of the stage 2 left sheet (see
 [Cockpit frame](../frame/README.md)): the stage 1 sheet is lower and its
 top bar is in the way.
@@ -19,6 +23,7 @@ top bar is in the way.
 | `instrument.inc.scad` | the standard: case, dial, needle, gears, back plate, board carrier; the face's colour layers and print page |
 | `rpm.scad` | the RPM indicator: its face and the parts above; the face print |
 | `asi.scad` | the airspeed indicator: its face and the parts above; the face print |
+| `ai.scad` | the attitude indicator: the standard's case front, a roll frame with the horizon bowl and the pitch motor on it, a slip ring, the roll motor; the roll dial's print |
 
 ## How it works
 
@@ -242,3 +247,189 @@ the output uses the Connector's *Interpolation* (on the output's
 Above 200 kts it stays at 1846 (the needle must not run round past 0).
 Direction, pin order and fine tuning as for the RPM indicator. If
 `asi_cal` changes, change this table too.
+
+## Attitude indicator
+
+The six-pack's top middle instrument, modelled on the 172's RC Allen
+attitude indicator (and X-Plane's 172N). Its
+case front is the standard's (the 81 mm hole, the lip, the glass), with
+a square front bezel (86 mm, 4 mm thick) in front of the sheet: the
+case's four screws go through its corners and the sheet. Behind it is a mechanism of its own with
+two 28BYJ-48 steppers and a slip ring, and it is 116 mm deep behind the
+sheet (`ai_depth`). It is in the top row, over the force feedback yoke's
+housing, so the depth does not matter there (the frame checks it).
+
+### How it works
+
+- **What you see**: a thin roll dial ring (turquoise sky over brown
+  ground, the bank marks 0, 10, 20, 30, a dot at 45, 60 and 90, the
+  horizon line across it); the ring ends where the long
+  bank marks end, so its window is 59 mm across. Behind it the horizon
+  bowl, a part of a sphere, sky blue over brown: the horizon, in the sky
+  a ladder (lines every 2 degrees to 8, then 10, 15, 20, 25, with 1 0 and
+  2 0 split by their lines), in the ground lines every 5 degrees, wider
+  downwards, with 10 and 20 at their ends, and two slanted rails
+  converging on the middle. Fixed, between the glass and the dial: the
+  bank index, a yellow triangle hanging from the top of the sleeve's ring
+  and pointing down, with a slit down its middle where the dial's zero
+  line shows; and the airplane: yellow wing bars, a Y and a dot on a stem
+  from a light brown pedestal, which stands on a black mask over the
+  window's bottom. A dummy knob sits on the bezel's bottom edge, its stem
+  glued into the bezel (the real one sets the airplane's height). The
+  dial turns with the horizon and the index reads its marks.
+- **Roll**: the dial is the front of the roll frame: two arms go back from
+  it to a back disc with the roll gear. The frame turns in a printed
+  sleeve in the case: the dial and the back disc run in it (a big plain
+  bearing at each end), the dial's rim against the sleeve's front ring.
+  The sleeve's ring holds the glass against the lip, three legs on its
+  back press it forward from the back plate. The roll gear is 1:1 with
+  the roll motor's gear (the standard's gears), so the roll turns round
+  freely. The roll motor is on the back plate's back, its body beside its
+  shaft (the slip ring is on the axis); a magnet in its gear's flange
+  passes a hall sensor in the back plate for homing.
+- **Pitch**: the bowl is a 33 mm sphere's front, cut 60 mm wide, with a
+  side plate at each end. It turns on two steel pins in the arms, through
+  its middle, one degree per degree of pitch, like the real instrument's
+  sphere (10 degrees of pitch move the horizon about 6 mm). The pitch
+  motor rides on the roll frame, inside the bowl, on a bracket screwed
+  onto the back disc; its 8 tooth pinion turns a 24 tooth gear sector on
+  the bowl's left hub (3:1). The bowl turns 30 degrees each way. A magnet
+  in its right side plate passes a hall sensor in the right arm at 33
+  degrees nose down, just past the travel, for homing.
+- **Slip ring**: the pitch motor and its sensor need 7 wires (4 coils,
+  5 V, GND, the sensor's output) across the turning roll axis. They go
+  through an MSM-12-08A capsule slip ring (8 wires, the spare one doubles
+  the 5 V): its flange is screwed onto the back plate's front, its front
+  end reaches into the roll gear's bore, and its turning wires come out
+  there, through the back disc to the motor and the sensor (tie them to
+  the bracket). Its body goes through the back plate, and its fixed wires
+  come out of its back end to the boards. So the roll turns round freely.
+- **Electronics**: a board carrier on four posts of the back plate,
+  behind the roll motor, with both ULN2003 boards and the Nano on its
+  back (they face back, in reach for wiring). The AI is deeper than its
+  neighbours, so its carrier is behind them, and the Nano's USB jack
+  points left.
+- **Print orientation**: the case back side down; the bezel on its back
+  (the counterbores up); the sleeve on its ring; the airplane (with its
+  pedestal and the mask) flat; the knob on its front;
+  the roll dial on its face, the arms up; the back disc on its front, the
+  roll gear up; the bowl halves on their horizon face, with supports under
+  the inside of the shell (the outside stays clean): the sky half in blue,
+  the ground half in brown filament; the sector, the pinion, the roll
+  motor gear flat; the bracket on its plate, the feet up; the back plate
+  on its front, the posts up; the carrier flat. The small pitch gears
+  (module 0.8) are cut by a rolling rack in the model (undercut), so
+  they mesh. Everything else black; paint the index and the
+  airplane yellow, its pedestal light brown, the bowl's ribs (horizon,
+  lines, numbers) white.
+
+The `assert`s check that the bowl fills the window at both ends of its
+travel and turns in the sleeve, that the pitch motor, its cover and ears
+stay inside the bowl's shell and clear of the arms and the back disc,
+that the bracket's feet clear the motor, that the sector covers the
+travel, that the pins reach into the hubs, that the slip ring, the roll
+motor, its gear, sensor and ears clear each other, and that the
+carrier's posts, screws and boards fit.
+
+### The print
+
+`make` writes `target/ai_face.pdf` (two roll dial faces and the glass's
+template, on the project page as
+[face](https://robertbraeutigam.github.io/cessna172/instruments/ai_face.pdf)),
+a colour print like the other faces. Print at 100 % on matte photo
+paper. Cut the outside on the black line's inside and the window on the
+colours' edge, and glue it onto the dial, sky up (the horizon at the
+arms).
+
+### Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 2 | 28BYJ-48 stepper, 5 V, with its ULN2003 driver board | roll, pitch |
+| 1 | Arduino Nano (ATmega328P, 5 V), mini USB cable with an angled plug | MobiFlight board of the instrument |
+| 1 | capsule slip ring, 8 wires (MSM-12-08A: 12 mm, 24 mm flange with 3 holes) | the pitch motor's and sensor's wires across the roll axis |
+| 2 | A3144 hall sensor | homes |
+| 2 | disc magnet 6 x 3 mm | homes |
+| 2 | steel dowel pin 3 x 10 mm | the bowl's pivots |
+| 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
+| 1 | the dial's face, printed on photo paper | roll dial |
+| 4 | M3 x 12 button head, black | case through the bezel and the sheet |
+| 4 | M3 x 8 countersunk self tapping screw | back plate into the case |
+| 2 | M3 x 8 countersunk self tapping screw | back disc onto the arms |
+| 2 | M3 x 8 countersunk self tapping screw | back disc onto the bracket's feet |
+| 2 | M3 x 8 countersunk screw + nut | roll motor ears |
+| 2 | M3 x 8 pan head screw + nut | pitch motor ears on the bracket |
+| 3 | M3 x 6 pan head self tapping screw | slip ring flange onto the back plate |
+| 4 | M3 x 8 countersunk self tapping screw | carrier onto its posts |
+| 8 | M3 x 6 self tapping screw | ULN2003 boards |
+
+The slip ring's hole circle (`sr_holes`, 18 mm) is a guess: measure it.
+
+### Assembly
+
+1. Glue the face onto the roll dial. Glue the bowl halves together at
+   the horizon (the hubs' halves and the pin holes line up), paint the
+   ribs. Magnet into the right side plate's pocket (check which face pulls
+   the sensor low), the gear sector onto the left hub's hexagon (glue).
+2. Pitch sensor into the right arm's pocket (flat face out), its legs in
+   the groove to the back.
+3. Pitch motor onto its bracket (ears on the plate, nuts on the motor's
+   side), the pinion onto its shaft, the bracket onto the back disc (two
+   screws from the back disc's back).
+4. Bowl between the arms, the pins from outside through the arms into its
+   hubs (press fit), the sector meshing the pinion. Back disc onto the
+   arms (two screws).
+5. The airplane's mask into the notch in the sleeve's ring (glue). Glass
+   into the case from behind, the sleeve behind it, the roll frame into
+   the sleeve (the dial against the ring). The knob's stem into the
+   bezel's hole (glue).
+6. Slip ring through the back plate, its flange screwed on the front; the
+   roll motor (ears countersunk from the front, nuts behind) and its
+   sensor; the magnet into the roll motor gear's flange, the gear onto
+   the shaft. Turning wires through the roll gear's bore and the back
+   disc to the pitch motor and sensor (solder, tie them to the bracket).
+   Back plate into the case, the gears meshing as it goes on.
+7. Carrier onto its posts, the ULN2003 boards and the Nano onto it, wire
+   it (below). Into the panel like the standard instrument, but with the
+   bezel in front of the sheet: drill the four screw holes using the
+   bezel as the template, case into the hole from behind, the four
+   M3 x 12 screws through the bezel and the sheet into the case.
+
+### Wiring
+
+| Signal | Nano pin | MobiFlight device |
+|--------|----------|-------------------|
+| roll ULN2003 IN1..IN4 | D2, D3, D4, D5 | *Stepper* roll |
+| roll hall sensor OUT | D6 | roll's home input |
+| pitch ULN2003 IN1..IN4 | D7, D8, D9, D10 | *Stepper* pitch |
+| pitch hall sensor OUT (through the slip ring) | D11 | pitch's home input |
+| both ULN2003 + and -, sensors' VCC and GND | 5 V, GND | |
+
+The pitch motor's 5 wires (its plug cut off) and the pitch sensor's
+output and GND go through the slip ring; the sensor's VCC shares the
+motor's red (5 V) wire, and the eighth wire doubles it.
+
+**USB**: one port on the powered USB hub, about 0.55 A while both motors
+move (two steppers, see [USB](#wiring) above).
+
+### MobiFlight
+
+Two *Steppers* (pins above, 2038 steps a turn, home inputs, coils off at
+rest). The datarefs are the vacuum attitude indicator's,
+`sim/cockpit2/gauges/indicators/roll_vacuum_deg_pilot` and
+`pitch_vacuum_deg_pilot` (it tumbles with the vacuum, like the real one).
+
+- **Roll**: tick *Compass mode*, so a roll past 180 degrees takes the
+  short way round; steps = roll x 2038 / 360, `$*5.661` (plus an offset,
+  below). If the dial turns the wrong way, give the motor its pins the
+  other way round (D5..D2).
+- **Pitch**: the bowl turns 3 x 2038 / 360 = 16.98 steps a degree. It
+  homes at 33 degrees nose down, so the output is
+  `(Max(-30,Min(30,$))+33)*16.98` (plus a small offset, below). Homing
+  must turn the bowl nose down, towards its sensor: if it turns the other
+  way, give the motor its pins the other way round (D10..D7) and make the
+  steps negative (`-(...)`).
+- **Offsets**: after homing, add the roll offset (in steps) to the roll
+  transform until the dial is level, then fine tune the pitch so the
+  horizon is under the airplane's wings. Check the names against the
+  Connector's dialogs, as they change between versions.

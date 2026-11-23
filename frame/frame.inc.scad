@@ -276,6 +276,11 @@ inst_ear = [46, 9];          // the screw ears: from the axis, diameter (ear_r, 
 // The standard instrument (instruments/instrument.inc.scad): the motor and the boards behind the case, within its
 // outline, this deep behind the sheet's back (instrument_depth echo)
 inst_depth = 46.6;
+// The attitude indicator (instruments/ai.scad) is deeper (its bowl and two
+// motors, ai_depth echo): it must be in the top row, over the force
+// feedback yoke's housing
+ai_depth = 115.5;
+ai_bezel = 86;               // its square front bezel, in front of the sheet (bezel[0])
 
 // --- Layout, x ---
 x_sw0 = sheet_edge;                          // switch panel, left face edge
@@ -519,6 +524,14 @@ for (i = [0 : len(inst_c) - 1])
                 str(inst_names[i], " (stage 2) runs into the force feedback yoke's housing"));
       assert(r[2] <= x_a || r[1] >= z_waist + 2 * ext, str(inst_names[i], " (stage 2) over the split upright"));
    }
+let(i = search(["AI"], inst_names)[0])
+   for (j = [0 : len(inst_c) - 1]) if (j != i)
+      let(d = [abs(inst_c[j].x - inst_c[i].x), abs(inst_c[j].y - inst_c[i].y)])
+         assert(norm([max(0, d.x - ai_bezel / 2), max(0, d.y - ai_bezel / 2)]) >= inst_cut_d / 2 + 1,
+                str("AI's bezel runs into ", inst_names[j]));
+let(i = search(["AI"], inst_names)[0], b = circ(inst_c[i], inst_body_d))
+   assert(!overlaps([b[0], b[2]], yoke_x) || b[1] >= ffb_h || ai_depth <= ffb_front_y - 3,
+          "AI (stage 2) runs into the force feedback yoke's housing");
 for (i = [0 : 7])
    assert(inst_c[i].y - inst_cut_d / 2 >= sheet_h, str(inst_names[i], " hidden behind the stage 1 left sheet (the monitor shows it)"));
 assert(sheet_h <= sheet_h_max, "Left panel too high for the monitor");
