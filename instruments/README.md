@@ -17,7 +17,7 @@ top bar is in the way.
 | File | Parts |
 |------|-------|
 | `instrument.inc.scad` | the standard: case, dial, needle, gears, back plate, board carrier in two layouts (`arm`, `deep`); the face's colour layers and print page |
-| `rpm.scad` | the RPM indicator (`arm` layout): its face and the parts above; the face print |
+| `rpm.scad` | the RPM indicator (`deep` layout): its face and the parts above; the face print |
 | `asi.scad` | the airspeed indicator (`deep` layout): its face and the parts above; the face print |
 
 ## How it works
@@ -43,14 +43,13 @@ top bar is in the way.
 - **Two layouts** (`layout`, set by each instrument's file): the case
   with the gears is 15 mm deep behind the sheet in both; what differs is
   where the motor and the boards go.
-  - `arm` (the RPM indicator): it sits beside the yoke column, and the
-    Saitek yoke's housing is only 22 mm behind the sheet there, so the
-    motor can not sit behind the needle. Big gears (43 teeth, module
-    1.5) put the motor gear, the motor and the boards on an arm to the
-    right, past the housing's side. The frame checks that they clear the
-    housing, the step upright and the other instruments (`rpm_arm`,
-    `rpm_deep` in `frame/frame.inc.scad`).
-  - `deep` (the ASI): in the six-pack an arm would run into the next
+  - `arm` (no instrument uses it now): for a place with something close
+    behind the sheet, where the motor can not sit behind the needle. Big
+    gears (43 teeth, module 1.5) put the motor gear, the motor and the
+    boards on an arm to the right. The RPM indicator had it while the
+    Saitek yoke's housing was to stand 22 mm behind it; the frame now
+    sets the force feedback yoke's housing back for the instruments.
+  - `deep` (the ASI and the RPM indicator): in the six-pack an arm would run into the next
     instrument, but there is room behind it. Small gears (26 teeth,
     module 1) keep the motor gear inside the case (in a pocket in its
     wall); the motor's body lies over the needle's axis on the back
@@ -58,8 +57,9 @@ top bar is in the way.
     motor, its boards facing forward: the ULN2003 board beside the
     motor's wire cover, the Nano behind the motor. Nothing is outside the
     case's outline, so the instruments can sit on the 89 / 88 mm
-    centres, but it is 47 mm deep behind the sheet (`asi_depth` in the
-    frame, which checks it against the yoke housing). The motor's shaft
+    centres, but it is 47 mm deep behind the sheet (`inst_depth` in the
+    frame, which checks it against the force feedback yoke's housing,
+    set back for it: `ffb_back`). The motor's shaft
     end sits in a pocket in the dial's back.
 - **Home**: a 6 x 3 mm disc magnet in the motor gear's back face passes
   0.5 mm over an A3144 hall sensor in a pocket in the back plate. The

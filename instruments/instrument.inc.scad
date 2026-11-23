@@ -12,12 +12,14 @@
 // Two layouts; the instrument sets `layout` (the include does not):
 // - "arm": big gears, the motor beside the case, on an arm to the right,
 //   the boards' carrier behind the arm, beside the motor; the case itself
-//   is only as deep as the gears. For the RPM indicator, which has the
-//   yoke's housing 19 mm behind the sheet.
+//   is only as deep as the gears. For a place with something close
+//   behind the sheet (the RPM had it while the Saitek yoke's housing was
+//   22 mm behind it); no instrument uses it now.
 // - "deep": small gears, the motor behind the case (its body over the
 //   needle's axis), the carrier on posts behind the motor, its boards
 //   facing forward; nothing outside the case's outline, so it fits
-//   between the six-pack's neighbours, but 47 mm deep behind the sheet.
+//   between the six-pack's neighbours, but 47 mm deep behind the sheet
+//   (the frame sets the force feedback yoke's housing back for it).
 //
 // Front to back: the lip (the window), the clear sheet (glass), the dial
 // (a shallow cup: its rim holds the glass against the lip, the face is
@@ -69,8 +71,8 @@
 // --- The frame's sheet (frame/) ---
 sheet_t = 3;
 cut_d = 81;                  // the instrument's hole (inst_cut_d)
-yoke_side = 55.5;            // view only: the RPM's yoke housing side from its axis (frame/)
-yoke_gap = 22;               // view only: the sheet's back to the yoke housing
+yoke_side = 55.5;            // "arm" only: the yoke housing's side from the axis
+yoke_gap = 22;               // "arm" only: the sheet's back to the yoke housing
 inst_pitch = [89, 88];       // check only: the six-pack's centres across and down (frame/)
 
 // --- 28BYJ-48 stepper, MEASURE (the compass's values) ---

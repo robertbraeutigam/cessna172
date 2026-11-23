@@ -62,7 +62,12 @@ is there). Its shaft comes through a round hole in the left sheet
 from the left edge; the left top bar is just over it, so the left sheet
 ends 100 mm above the desk. With the shaft in, the wheel is about 30 mm in
 front of the sheet (`yoke_reach`, checked). The stand-in for a future
-force feedback yoke (`ffb_h`, 130 mm) stands 30 mm over the left sheet.
+force feedback yoke (DIY, comes with the stage 2 instruments: `ffb_h`,
+130 mm high) stands 30 mm over the left sheet, its housing 30 mm further
+back than the Saitek's (`ffb_back`, its shaft made as long as that needs),
+so the instruments' cases fit in front of it. The Saitek could not go
+back: its clamps need the desk edge, and its wheel would come within
+about 2 mm of the sheet with the shaft in.
 
 **Lower panel**, below the desk top. The panels' backs reach behind the
 sheet under the desk, so they stay under its underside (28 mm, `desk`)
@@ -119,12 +124,10 @@ reaches there), and a new left sheet, as high as the right part, is cut
 with all the left holes; the monitor goes up behind the glareshield. The
 build checks that the instruments stay on the left sheet, clear of each
 other, the yoke column hole and the split upright, and that their cases
-fit in front of the yoke housing (`inst_body_d`, `inst_depth`: the
-[standard instrument](../instruments/README.md)'s case, 84 mm round and
-15 mm deep behind the sheet). The RPM indicator has the housing right
-behind it, so its motor and boards sit on an arm to the right, beside the
-housing (`rpm_arm`, `rpm_deep`); the build checks that they clear the
-housing, the step upright and the other instruments. The ADF's place in the 172N, under NAV 2 at the column's height,
+fit in front of the force feedback yoke's housing (`inst_body_d`,
+`inst_depth`: the [standard instrument](../instruments/README.md) in its
+`deep` layout, 84 mm round and 47 mm deep behind the sheet; the TC, HI,
+VSI, NAV 1 and the RPM are in front of the housing). The ADF's place in the 172N, under NAV 2 at the column's height,
 is free as well.
 
 The frame overhangs the desk edge by 22 mm (`frame_overhang`: a 2020 and
@@ -155,8 +158,8 @@ its own Arduino Nano and USB cable; the
 on the desk right of the yoke, between the step upright's and the right
 end crossbar (not bolted down). The Saitek yoke and radio panel plug
 into it too, with their own USB cables (a port each, a few hundred mA
-together). The crossbars are as long as the yoke's
-housing needs.
+together). The crossbars are as long as the force
+feedback yoke's housing needs.
 The [compass](../compass/README.md) stands over the panel on the right
 top bar, about over the radio stack's left edge (`n172_compass_dx`, a
 guess for the windshield's middle): its printed stand's foot is bolted
@@ -196,7 +199,7 @@ mm high; spec sheet: 310 mm wide with the wheel; its shaft height and
 diameter `yoke_shaft_z`, `yoke_shaft_d`, the wheel's reach `yoke_reach`,
 `yoke_wheel_t`, and its clamps `yoke_clamp_*`: where they are and how far
 below the desk they reach set how low the switch row goes), the force
-feedback yoke's height (`ffb_h`), how deep the switch panel reaches
+feedback yoke's height and set back (`ffb_h`, `ffb_back`), how deep the switch panel reaches
 behind the sheet (`switch_depth`), the radio panel body that goes through
 the sheet (`radio_body`, from Logitech's "Construction dimensions for
 Flight Panels" drawing) and the panel heights the monitor allows
