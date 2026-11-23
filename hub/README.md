@@ -214,7 +214,7 @@ Add a Servo device on D44 and D46 in the Connector.
   firmware and 6 RJ45 ports. A powered USB hub next to it takes the USB
   cables (Mega, Saitek yoke, Saitek radio panel, later the
   FFB yoke, the radio stack's Mega, the audio panel's Nano, the
-  compass's Nano and the RPM and airspeed indicators' Nanos), so
+  compass's Nano and a Nano per instrument; see [Powered USB hub](#powered-usb-hub)), so
   one USB cable runs to the PC.
 - Every MobiFlight component connects to its own hub port with one
   straight Cat5 patch cable, soldered straight to the component (see
@@ -236,11 +236,19 @@ Add a Servo device on D44 and D46 in the Connector.
   hub either: its stepper needs four outputs and a home input, and all
   three direct ports are taken. It runs MobiFlight on an Arduino Nano of
   its own, on a USB cable to the powered USB hub.
-- The **RPM indicator** and the **airspeed indicator** (see
-  [Instruments](../instruments/README.md)) are the same: a stepper with a
-  home input on a Nano of its own each. When more instruments follow,
-  they may get a board of their own together (a Mega takes many
-  steppers), and their wires move to it.
+- The **instruments** (see [Instruments](../instruments/README.md)) are
+  the same: every instrument has a Nano of its own on its board carrier,
+  with one USB cable out to the powered USB hub. The Nano drives the
+  instrument's stepper (or two: MobiFlight takes up to 4 steppers on a
+  Nano, `MaxSteppers` in its board file) with its home input, and an
+  encoder if the instrument has one (the NAV indicators' OBS). Sharing a
+  Mega would save no money (a Nano is about 4 EUR, a Mega about 20, and
+  a shared Mega needs RJ45 boards, a shield and a box) and would cost the
+  simplicity: each instrument is tested on the bench with nothing but a
+  USB cable, and swapped without touching the others. The Connector tells
+  the Nanos apart by the name and serial it stores on each, whichever COM
+  port Windows gives them. Their motor current comes over USB too, see
+  [Powered USB hub](#powered-usb-hub).
 
 ### MobiFlight
 
@@ -418,9 +426,9 @@ same S0-S3 bus.
   pot in the Connector. Line D and pins 1 and 2 are free (e.g. a pot for a
   fourth control; see the wrong port warning in
   [Port pinout](#port-pinout) before using pins 1 and 2).
-- **Likely later**: panel light dimmers (pots, on free lines), steam gauges
-  (servos on a direct port; steppers, like the RPM indicator's, need four
-  lines and a home input each, more than a port has),
+- **Likely later**: panel light dimmers (pots, on free lines), small
+  gauges (servos on a direct port; stepper gauges are instruments with a
+  Nano of their own, see [Connections](#connections)),
   outputs (annunciator lights, avionics displays): MobiFlight drives them
   through 74HC595 shift registers or MAX7219 drivers with three lines each
   (data, clock, latch), which fit a direct port once their lines get a
@@ -459,9 +467,42 @@ each extra mux costs only one Mega pin. The options:
   powered USB hub): fine for one or two
   components, but each is one more board to flash and one more USB device.
 
+### Powered USB hub
+
+Every board that is not the hub's Mega has its own USB cable: the Saitek
+yoke and radio panel, the radio stack's Mega, the audio panel's Nano, the
+compass's Nano and a Nano per instrument, about 15 with the whole
+six-pack, NAV indicators and RPM. USB takes up to 127 devices, and hubs
+can be chained, so the count is no problem: a 10 or 16 port hub, or two
+7 port hubs, one into the other, and one cable from the first to the PC.
+
+The current is the limit: the steppers (28BYJ-48) take their power from USB too.
+One draws about 0.25 A while its coils are on, so an instrument with one
+stepper about 0.3 A with its Nano and one with two about 0.55 A, at the
+500 mA a USB 2.0 port is meant to give. With the compass and about 13
+steppers in the instruments that is 3.5-4 A in all, more than many cheap
+"powered" hubs give (their supply often has 2-3 A, shared by all ports;
+too little shows as boards resetting and needles losing their home).
+So the hub:
+
+- has a supply for the whole load: 5 V / 4 A or more, or better a 12 V
+  supply (the hub's own converter);
+- gives each port at least 500 mA (in its specs: BC 1.2 charging ports, or
+  "x A per port"), so a two stepper instrument is not cut off;
+- stands on the desk next to the [hub](#connections), every board's cable
+  short and of a decent gauge (the cheap thin ones drop voltage).
+
+Two things would cut the current a lot and are worth checking before
+more instruments are built: whether MobiFlight can switch a stepper's
+coils off when the needle stands still (the 28BYJ-48's gearbox holds it
+without power), and X27.168 gauge steppers (about 20 mA, no driver
+board, but an end stop inside: only for needles that do not turn round,
+like the ASI, VSI and RPM).
+
 ### Power (later)
 
-USB only for now. With lighting, gauges or the FFB yoke comes one 24 V PSU
+USB only for now (the instruments' steppers on the
+[powered USB hub](#powered-usb-hub)). With lighting, gauges or the FFB yoke comes one 24 V PSU
 with fused branches, a DC-DC converter to a 5 V bus, a separate cut-off
 switch on the FFB motor power and one star ground at the PSU. That is not
 in the hub. The servos then keep their orange pair in the Cat5, but the
