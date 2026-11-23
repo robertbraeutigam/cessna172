@@ -1,9 +1,9 @@
 // Airspeed indicator on a 28BYJ-48 stepper
 //
-// A standard instrument (instrument.inc.scad) in the "deep" layout: the
-// six-pack's top left hole (frame/), with the attitude indicator 89 mm to
-// its right and the turn coordinator 88 mm under it, so the motor and the
-// boards are behind the case, within its outline, instead of on an arm.
+// A standard instrument (instrument.inc.scad) in the six-pack's top left
+// hole (frame/), with the attitude indicator 89 mm to its right and the
+// turn coordinator 88 mm under it; the motor and the boards are behind
+// the case, within its outline.
 // MobiFlight on its own Arduino Nano moves the needle from X-Plane's
 // indicated airspeed and homes it on the hall sensor at start.
 //
@@ -17,8 +17,6 @@
 // Parts and assembly: see instrument.inc.scad and the README.
 
 $fn = 60;
-
-layout = "deep";             // room behind it, neighbours on both sides (instrument.inc.scad)
 
 include <instrument.inc.scad>
 

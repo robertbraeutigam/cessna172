@@ -16,9 +16,9 @@ top bar is in the way.
 
 | File | Parts |
 |------|-------|
-| `instrument.inc.scad` | the standard: case, dial, needle, gears, back plate, board carrier in two layouts (`arm`, `deep`); the face's colour layers and print page |
-| `rpm.scad` | the RPM indicator (`arm` layout): its face and the parts above; the face print |
-| `asi.scad` | the airspeed indicator (`deep` layout): its face and the parts above; the face print |
+| `instrument.inc.scad` | the standard: case, dial, needle, gears, back plate, board carrier; the face's colour layers and print page |
+| `rpm.scad` | the RPM indicator: its face and the parts above; the face print |
+| `asi.scad` | the airspeed indicator: its face and the parts above; the face print |
 
 ## How it works
 
@@ -40,27 +40,16 @@ top bar is in the way.
   on the back plate's back. A 1:1 drive keeps the motor's resolution
   (about 0.18 degrees a step), and the needle turns the other way from
   the motor.
-- **Two layouts** (`layout`, set by each instrument's file): the case
-  with the gears is 15 mm deep behind the sheet in both; what differs is
-  where the motor and the boards go.
-  - `arm` (the RPM indicator): it sits beside the yoke column, and the
-    Saitek yoke's housing is only 22 mm behind the sheet there, so the
-    motor can not sit behind the needle. Big gears (43 teeth, module
-    1.5) put the motor gear, the motor and the boards on an arm to the
-    right, past the housing's side. The frame checks that they clear the
-    housing, the step upright and the other instruments (`rpm_arm`,
-    `rpm_deep` in `frame/frame.inc.scad`).
-  - `deep` (the ASI): in the six-pack an arm would run into the next
-    instrument, but there is room behind it. Small gears (26 teeth,
-    module 1) keep the motor gear inside the case (in a pocket in its
-    wall); the motor's body lies over the needle's axis on the back
-    plate's back, and the board carrier stands on four posts behind the
-    motor, its boards facing forward: the ULN2003 board beside the
-    motor's wire cover, the Nano behind the motor. Nothing is outside the
-    case's outline, so the instruments can sit on the 89 / 88 mm
-    centres, but it is 47 mm deep behind the sheet (`asi_depth` in the
-    frame, which checks it against the yoke housing). The motor's shaft
-    end sits in a pocket in the dial's back.
+- **Motor and boards behind the case**: small gears (26 teeth, module 1)
+  keep the motor gear inside the case (in a pocket in its wall); the
+  motor's body lies over the needle's axis on the back plate's back, and
+  the board carrier stands on four posts behind the motor, its boards
+  facing forward: the ULN2003 board beside the motor's wire cover, the
+  Nano behind the motor. Nothing is outside the case's outline, so the
+  instruments can sit on the 89 / 88 mm centres, but it is 47 mm deep
+  behind the sheet (`inst_depth` in the frame, which checks it against
+  the force feedback yoke's housing, set back for it: `ffb_back`). The
+  motor's shaft end sits in a pocket in the dial's back.
 - **Home**: a 6 x 3 mm disc magnet in the motor gear's back face passes
   0.5 mm over an A3144 hall sensor in a pocket in the back plate. The
   gears are 1:1, so there is one home per needle turn. At start
@@ -68,8 +57,8 @@ top bar is in the way.
   0. The needle is pressed on pointing at 0 after it has homed, so the
   magnet's place does not matter.
 - **Electronics**: the ULN2003 driver board and an Arduino Nano running
-  MobiFlight are on a printed carrier, screwed onto the back plate (beside
-  the motor in `arm`, on posts behind it in `deep`), so it can be wired on
+  MobiFlight are on a printed carrier, screwed onto the back plate (on
+  posts behind the motor), so it can be wired on
   the bench. The Nano slides into rails with its USB jack down. In the
   six-pack the next instrument is right under it: use a mini USB cable
   with an angled plug (bent back). It is a board of its own, like every
@@ -78,7 +67,7 @@ top bar is in the way.
   [MobiFlight](#mobiflight)).
 - **Print orientation**: the case, the dial and the back plate are printed
   back side down, the gears and the needle front side down, the carrier
-  flat (in `deep` its board side up, with the posts). The motor gear's
+  flat (its board side up, with the posts). The motor gear's
   pocket in the case is open towards the sheet, so there is no bridge
   over it. All of it is black but the needle: print
   that white, or paint it.
@@ -87,8 +76,7 @@ The motor, board, sensor and magnet values are the compass's MEASURE
 values. The `assert`s check that the face covers the window, that the
 posts, columns and sensor clear the gears, that the screws from the front
 and the back do not meet in the columns, that the magnet fits the gear,
-and, in `arm`, that the case is shallow enough and the motor far enough
-right for the yoke housing; in `deep`, that the motor, the carrier's
+and that the motor, the carrier's
 posts, its screws and the boards clear each other, the gears and the
 dial's posts, and that the carrier stays between the neighbours and off
 the case screws.
@@ -147,12 +135,11 @@ Per instrument:
 | 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
 | 1 | the face, printed on photo paper | face |
 | 4 | M3 x 8 button head, black | case through the sheet |
-| 6 (`arm`), 4 (`deep`) | M3 x 8 countersunk self tapping screw | back plate into the case |
+| 4 | M3 x 8 countersunk self tapping screw | back plate into the case |
 | 2 | M3 x 8 countersunk screw + nut | motor ears (heads in the back plate's front, nuts behind the ears) |
 | 4 | M3 x 6 self tapping screw | ULN2003 board |
-| 3 (`arm`) | M3 x 6 self tapping screw | carrier onto the back plate, through the carrier |
-| 4 (`deep`) | M3 x 8 countersunk self tapping screw | carrier's posts, from the back plate's front |
-| 1 (`deep`) | mini USB cable with an angled plug | the Nano, room under it is short in the six-pack |
+| 4 | M3 x 8 countersunk self tapping screw | carrier's posts, from the back plate's front |
+| 1 | mini USB cable with an angled plug | the Nano, room under it is short in the six-pack |
 
 ## Assembly
 
@@ -164,8 +151,8 @@ Per instrument:
    screws from the front, nuts behind the ears. Motor gear onto its shaft.
 3. ULN2003 board onto the carrier's standoffs, the Nano into its rails
    (USB down, a dab of hot glue at the bottom end), the carrier onto the
-   back plate (`arm`: screws through the carrier; `deep`: over the motor,
-   screws from the back plate's front into its posts). Wire it (see
+   back plate (over the motor, screws from the back plate's front into
+   its posts). Wire it (see
    [Wiring](#wiring)).
 4. Needle gear onto the axle (glue it), the axle into the back plate's
    bearing hole.

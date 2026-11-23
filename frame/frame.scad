@@ -250,8 +250,8 @@ module yoke_part() {
                cube([c[1] - c[0], yoke_clamp_t + 40, yoke_clamp_low - desk_low + 5]);
                translate([-1, yoke_clamp_t, yoke_clamp_low - 8]) cube([c[1] - c[0] + 2, 41, -desk_low + 8]);
             }
-   // the FFB yoke's height (outline)
-   %translate([yoke_x[0], yoke_front_y, 0]) cube([yoke_housing.x, yoke_housing.y, ffb_h]);
+   // the force feedback yoke's housing (stage 2, outline)
+   %translate([yoke_x[0], ffb_front_y, 0]) cube([yoke_housing.x, yoke_housing.y, ffb_h]);
 }
 
 module radio_part() {

@@ -1,9 +1,9 @@
 // RPM indicator on a 28BYJ-48 stepper
 //
-// The first of the standard instruments (instrument.inc.scad): the case
-// in the stage 2 hole beside the yoke column (frame/), its motor and
-// boards on the arm to the right, beside the yoke's housing, which is
-// right behind the sheet here. MobiFlight on its own Arduino Nano moves
+// A standard instrument (instrument.inc.scad) in the stage 2 hole beside
+// the yoke column (frame/), under the VSI; the force feedback yoke's
+// housing is set back far enough behind it (the frame's ffb_back) for the
+// motor and the boards behind the case. MobiFlight on its own Arduino Nano moves
 // the needle from X-Plane's engine RPM and homes it on the hall sensor
 // at start.
 //
@@ -16,8 +16,6 @@
 // Parts and assembly: see instrument.inc.scad and the README.
 
 $fn = 60;
-
-layout = "arm";            // the yoke housing is right behind it (instrument.inc.scad)
 
 include <instrument.inc.scad>
 
@@ -104,14 +102,9 @@ module rpm_parts(v = view_rpm, e = 0, with_case = true) {
    instrument_parts(rpm_a(v), face_colors, e, with_case) rpm_face_2d();
 }
 
-module assembled_view(v = view_rpm, w = 230) {
-   sheet_part(w);
+module assembled_view(v = view_rpm) {
+   sheet_part(150, 120, -75);
    rpm_parts(v);
-}
-
-module back_view(v = view_rpm) {
-   assembled_view(v, 260);
-   yoke_part();
 }
 
 module exploded_view(v = view_rpm) {
@@ -133,13 +126,13 @@ translate([0, 0, y_back1]) rotate([-90, 0, 0]) back_plate(); // Make module back
 translate([0, 0, -y_gear0]) rotate([90, 0, 0]) needle_gear(); // Make module needle_gear
 translate([0, 0, -y_gear0]) rotate([90, 0, 0]) translate([-drive_a, 0, 0]) motor_gear(); // Make module motor_gear
 translate([0, 0, -y_needle0]) rotate([90, 0, 0]) needle(); // Make module needle
-translate([0, 0, -y_back1]) rotate([90, 0, 0]) carrier(); // Make module carrier
+carrier_print(); // Make module carrier
 
 rpm_print(); // Make print face black,#1f9e3a,white,#e02020
 
-//assembled_view(w = 140); // Make view main 80,0,-25
-//assembled_view(w = 140); // Make view front 90,0,0
+//assembled_view(); // Make view main 80,0,-25
+//assembled_view(); // Make view front 90,0,0
 //exploded_view(); // Make view exploded 70,0,-50
 //inside_view(); // Make view inside 60,0,-55
-//back_view(); // Make view back 75,0,155
+//assembled_view(); // Make view back 75,0,155
 //face_view(); // Make view face 0,0,0

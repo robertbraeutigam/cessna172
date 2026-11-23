@@ -171,24 +171,21 @@ its own top-level directory; new components should follow the same layout.
     a 3 1/8" case put into the sheet's hole from behind (four screws from
     the front on the diagonals, like the real panel), lip, glass, dial (a
     cup holding the glass, the face glued in), needle on a 3 mm steel
-    axle, a 1:1 pair of printed gears to a 28BYJ-48 on an arm to the
-    right (the case is only 15 mm deep behind the sheet: the RPM has the
-    yoke housing right behind it), a magnet in the motor gear over an
+    axle, a 1:1 pair of printed gears to a 28BYJ-48, a magnet in the motor gear over an
     A3144 hall sensor for homing, and a carrier with the ULN2003 board
     and an Arduino Nano of its own (MobiFlight, USB to the powered USB
     hub). The face is a colour `Make print`: drawn in `ink(colour)`,
     `print_page()` adds the glass template and the registration dots.
     The motor, board, sensor and magnet values are the compass's
-    (MEASURE); `frame/frame.inc.scad` repeats the case's sizes, the
-    RPM's arm and the ASI's depth.
-    Two layouts, set by each file (`layout`): `arm` (big gears, the motor
-    and boards on an arm to the right) and `deep` (small gears, the motor
-    behind the case over the axis, the carrier on posts behind it, all
-    within the case's outline, 47 mm deep; `asi_depth` in the frame).
-  - `rpm.scad` — the RPM indicator (tachometer, `arm`): 0-35 hundred RPM over
+    (MEASURE); `frame/frame.inc.scad` repeats the case's sizes and depth.
+    Small gears, the motor behind the case over the axis, the carrier
+    on posts behind it, all within the case's outline, 47 mm deep
+    (`inst_depth` in the frame, which sets the force feedback yoke back
+    for it).
+  - `rpm.scad` — the RPM indicator (tachometer): 0-35 hundred RPM over
     240 degrees, the 172N's stepped green arc and red line at 2700, a
     dummy hour meter.
-  - `asi.scad` — the airspeed indicator (`deep`, the six-pack's top left):
+  - `asi.scad` — the airspeed indicator (the six-pack's top left):
     KNOTS 40-200 on a non-linear scale (`asi_cal`, also the MobiFlight
     interpolation table in the README), MPH inside, the 172N's white,
     green and yellow arcs and red line at 160.
@@ -209,7 +206,9 @@ its own top-level directory; new components should follow the same layout.
   stack; below the desk top the lower panel (ignition with the primer,
   switch row, throttle box and flaps on the throttle bar, parking brake),
   its backs under the desk's underside and the yoke's clamps, its bottom
-  over the pilot's knees (`knee_z`, the chair lowered). Stage 1 (now): the
+  over the pilot's knees (`knee_z`, the chair lowered). Stage 2 also
+  brings a DIY force feedback yoke, its housing set back (`ffb_back`) so
+  the instruments' deep cases fit in front of it. Stage 1 (now): the
   left part above the desk is only as high as the yoke column needs, the
   monitor shows the instruments; stage 2 (physical instruments) moves the
   left top bar up to the right one's height and cuts a full height left

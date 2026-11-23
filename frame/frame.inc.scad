@@ -104,6 +104,11 @@ desk_low = -(desk.z + desk_skirt);    // the desk's underside at its front edge
 // front of the edge (behind the sheet), their jaws under the desk.
 yoke_housing = [283, 280, 100];   // housing body: width, depth, height
 ffb_h = 130;                 // the future force feedback yoke's height
+// The force feedback yoke (DIY, stage 2, with the physical instruments):
+// its housing as wide and deep as the Saitek's (a guess), set back this
+// far behind the Saitek's front (the desk edge), so the instruments' cases
+// fit in front of it; its shaft is made as long as that needs.
+ffb_back = 30;
 yoke_shaft_z = 65;           // shaft center above the desk (the yoke column)
 yoke_shaft_d = 22;           // the shaft through the sheet
 yoke_hole_d = 28;            // its round hole in the sheet
@@ -268,17 +273,9 @@ six_step = 89;
 inst_cut_d = 81;             // their hole (cut_d)
 inst_body_d = 84;            // the case behind the sheet (case_d), its screw ears on the diagonals
 inst_ear = [46, 9];          // the screw ears: from the axis, diameter (ear_r, ear_d)
-inst_depth = 15;             // the case behind the sheet's back (instrument_depth echo)
-// The ASI (instruments/asi.scad) is in the "deep" layout: the motor and
-// the boards behind the case, within its outline, this deep behind the
-// sheet's back (instrument_depth echo)
-asi_depth = 46.6;
-// The RPM's drive (instruments/rpm.scad): its motor sits on an arm to the
-// right, beside the yoke housing, which is right behind the RPM. From the
-// axis, [x0, x1, half height]: the arm, as deep as the case, and what is
-// deeper (the motor and the boards; arm and deep echoes)
-rpm_arm = [0, 155.8, 42.25];
-rpm_deep = [58.6, 155.8, 26];
+// The standard instrument (instruments/instrument.inc.scad): the motor and the boards behind the case, within its
+// outline, this deep behind the sheet's back (instrument_depth echo)
+inst_depth = 46.6;
 
 // --- Layout, x ---
 x_sw0 = sheet_edge;                          // switch panel, left face edge
@@ -417,7 +414,8 @@ brace_rise = brace_len / sqrt(2);
 brace_top = ext + brace_rise;
 brace_foot_y = ext + brace_rise + ext * sqrt(2);   // the brace's back end on the crossbar
 yoke_front_y = frame_overhang;               // housing front at the desk edge
-crossbar_len = ceil((yoke_front_y + yoke_housing.y - ext) / round_d) * round_d;
+ffb_front_y = yoke_front_y + ffb_back;       // the force feedback yoke's housing front (stage 2)
+crossbar_len = ceil((ffb_front_y + yoke_housing.y - ext) / round_d) * round_d;
 rear_y = 2 * ext + crossbar_len;
 frame_d = rear_y + ext;
 rails = [[x_bay0 - ceil((x_bay0 + ear_len) / round_d) * round_d, x_bay0],
@@ -517,21 +515,10 @@ for (i = [0 : len(inst_c) - 1])
       for (j = [0 : len(inst_c) - 1])
          assert(i == j || norm(inst_c[i] - inst_c[j]) >= max(inst_cut_d + 3, inst_body_d + 1), str(inst_names[i], " (stage 2) runs into another instrument"));
       let(b = circ(inst_c[i], inst_body_d))
-         assert(!overlaps([b[0], b[2]], yoke_x) || b[1] >= max(yoke_housing.z, ffb_h)
-                || (inst_names[i] == "ASI" ? asi_depth : inst_depth) <= yoke_front_y - 3,
-                str(inst_names[i], " (stage 2) runs into the yoke housing"));
+         assert(!overlaps([b[0], b[2]], yoke_x) || b[1] >= ffb_h || inst_depth <= ffb_front_y - 3,
+                str(inst_names[i], " (stage 2) runs into the force feedback yoke's housing"));
       assert(r[2] <= x_a || r[1] >= z_waist + 2 * ext, str(inst_names[i], " (stage 2) over the split upright"));
    }
-// the RPM's arm and motor: beside the yoke housing, off the step upright and the other instruments
-let(c = inst_c[8], arm_r = [c.x + rpm_arm[0], c.y - rpm_arm[2], c.x + rpm_arm[1], c.y + rpm_arm[2]],
-    deep_r = [c.x + rpm_deep[0], c.y - rpm_deep[2], c.x + rpm_deep[1], c.y + rpm_deep[2]]) {
-   assert(deep_r[0] >= yoke_x[1] + 3 || deep_r[1] >= max(yoke_housing.z, ffb_h), "RPM's motor runs into the yoke housing");
-   assert(arm_r[2] <= x_r - 3, "RPM's arm runs into the step upright");
-   assert(deep_r[1] >= 3, "RPM's motor runs into the desk");
-   for (i = [0 : 7])
-      assert(apart(arm_r, circ(inst_c[i], inst_body_d), 1),
-             str("RPM's arm runs into ", inst_names[i], " (stage 2)"));
-}
 for (i = [0 : 7])
    assert(inst_c[i].y - inst_cut_d / 2 >= sheet_h, str(inst_names[i], " hidden behind the stage 1 left sheet (the monitor shows it)"));
 assert(sheet_h <= sheet_h_max, "Left panel too high for the monitor");
