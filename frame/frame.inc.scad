@@ -50,8 +50,9 @@
 //   with its own clamps on the desk edge. The front part is bolted to the
 //   front rail, and a 45 degree brace from each upright that reaches the
 //   desk down to a crossbar stops it from rocking: a stock length, cut
-//   square, held by a bought 45 degree connector at each end. The hub
-//   stands on two crossbars.
+//   square, held by a bought 45 degree connector at each end. The powered
+//   USB hub (hub/README.md) stands on the desk between the step upright's
+//   and the right end crossbar.
 //
 // The front rail runs past the sheet at both ends (ear_len): there a
 // bought screw clamp (rubber jaws) on each end clamps the rail onto the
@@ -164,22 +165,6 @@ flaps_plate = [50, 63];      // front plate, width x height
 flaps_body = [44, 57, 64];   // through the sheet (a guess: 3 mm smaller than the plate all round), depth behind it
 flaps_play = 0.5;            // body to its cut-out
 flaps_gap = 70;              // throttle box face to the flaps plate (172N)
-
-// --- Hub, from hub/hub.scad ---
-// The box with the MobiFlight Mega and the RJ45 ports stands on the desk
-// part right of the yoke, across the step upright's crossbar and the hub
-// crossbar right of it: the two ears on its left wall are bolted into
-// the first one's top slot, the ears on its front and back walls into the
-// second one's (M5, T-nuts), behind the step upright's brace. Its front
-// ports (1-3) face the pilot, its right ports (4-6) face right and its
-// USB jack left, towards the yoke.
-hub_size = [172, 135, 53];   // outer, with the lid
-hub_ear_out = 12;            // ear.y: how far the ears stand out, their holes in the middle
-hub_ear_slot_dx = 156.5;     // ear_slot_dx: the left ears' holes to the front and back ears'
-hub_ear_left_ys = [9, 126];  // the left ears' holes from the box's front (round_r + ear.x / 2 from its ends)
-hub_jacks = [29.5, 67.5, 105.5];   // the 3 jacks' middles along the front and the right wall (view only)
-hub_usb_y = 88;              // its USB jack from the box's front (wall + row_y + mega_usb)
-hub_usb_room = 40;           // left of the box for the USB plug
 
 // --- Compass, from compass/compass.scad ---
 // It stands over the panel on the right top bar, about at the windshield's
@@ -421,10 +406,7 @@ sheet_upper_right = [x_r, -ext, frame_w, sheet_h_r];
 
 // desk part: the front rail behind the front part, cut at the yoke, at
 // least ear_len past the sheet at both ends
-// Hub right of the yoke, its left ears over the step crossbar's slot,
-// the front and back ears over the hub crossbar's slot, behind the step brace
-hub_slot_x = [x_r + ext / 2, x_r + ext / 2 + hub_ear_slot_dx];
-crossbar_xs = [0, x_r, frame_w - ext, hub_slot_x[1] - ext / 2];   // left sides: the uprights on the desk, the hub's
+crossbar_xs = [0, x_r, frame_w - ext];   // left sides: under the uprights on the desk
 brace_xs = [0, x_r, frame_w - ext];
 brace_room = 30;             // upright above the brace, for the connector's leg
 // Brace: its inner edge (towards the corner) from the upright's back at
@@ -434,14 +416,8 @@ brace_room = 30;             // upright above the brace, for the connector's leg
 brace_rise = brace_len / sqrt(2);
 brace_top = ext + brace_rise;
 brace_foot_y = ext + brace_rise + ext * sqrt(2);   // the brace's back end on the crossbar
-hub_x0 = hub_slot_x[0] + hub_ear_out / 2;                    // outer left wall
-hub_y0 = ceil((brace_foot_y + 5 - (hub_ear_left_ys[0] - 7)) / 5) * 5;   // outer front wall, the left ears behind the brace
-// M5 through its ears into T-nuts in the crossbars' top slots, [x, y]
-hub_bolts = concat([for (y = hub_ear_left_ys) [hub_slot_x[0], hub_y0 + y]],
-                   [for (y = [-hub_ear_out / 2, hub_size.y + hub_ear_out / 2]) [hub_slot_x[1], hub_y0 + y]]);
 yoke_front_y = frame_overhang;               // housing front at the desk edge
-crossbar_len = ceil(max(yoke_front_y + yoke_housing.y - ext,
-                        hub_bolts[3].y + m5_head_d / 2 - 2 * ext) / round_d) * round_d;
+crossbar_len = ceil((yoke_front_y + yoke_housing.y - ext) / round_d) * round_d;
 rear_y = 2 * ext + crossbar_len;
 frame_d = rear_y + ext;
 rails = [[x_bay0 - ceil((x_bay0 + ear_len) / round_d) * round_d, x_bay0],
@@ -562,11 +538,6 @@ assert(sheet_h <= sheet_h_max, "Left panel too high for the monitor");
 assert(sheet_h_r <= sheet_h_r_max, "Right part of the panel too high for the monitor");
 assert(abs(throttle_y0 + throttle_bolt_y - ext * 3 / 2) < 0.01, "Throttle floor bolts miss the throttle bar's slot");
 assert(throttle_bar[0] + ext <= throttle_x0 && flaps_cut[2] <= throttle_bar[1], "Throttle box or flaps not on the throttle bar");
-assert(abs(hub_slot_x[0] + hub_ear_slot_dx - hub_slot_x[1]) < 0.01,
-       "Hub's front and back ears miss the hub crossbar's slot (ear_slot_dx in hub.scad)");
-assert(hub_x0 + hub_size.x + hub_ear_out <= frame_w - ext - 3, "Hub runs into the right end crossbar");
-assert(hub_x0 - hub_usb_room >= x_bay1, "Hub's USB plug runs into the yoke");
-assert(hub_bolts[3].y + m5_head_d / 2 <= rear_y, "Hub's back ear is off the crossbar");
 assert(ext + brace_rise + ext / sqrt(2) <= rear_y, "Braces do not land on the crossbars");
 assert(brace_top + brace_room <= z_tr, "Braces too long: no room for the connector on the upright");
 assert(rails[1][1] - rails[0][0] <= desk.x && frame_d <= frame_overhang + desk.y, "Frame does not fit on the desk");

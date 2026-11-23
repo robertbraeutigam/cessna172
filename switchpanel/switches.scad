@@ -32,21 +32,22 @@
 //   and has the same height, rim, flange and mount holes (panel.inc.scad).
 //   The ignition sits higher, with the primer under its key (frame/), so
 //   both are panels of their own, each with a flange all round.
-// - A CD74HC4067 input multiplexer board sits on two standoffs on a
-//   separate carrier plate (`mux_carrier`), with a block for a cable tie
-//   next to it. All switches (and the ignition) are soldered to the mux, so
-//   only one Cat5 cable runs to the hub (port 3). The cable is soldered
-//   straight to the mux (no connector, the plug at the hub end is the only
-//   one) and a cable tie holds it on the block, so pulling the cable does
-//   not pull the solder joints. The carrier can be wired up on its own
-//   (ignition, cable) before the panel is made, and is then screwed onto
-//   two bosses on the panel back, in the strip behind the breaker labels.
+// - An Arduino Nano running MobiFlight reads all of it (the switches, the
+//   ignition and the primer): it lies in rails on a separate carrier plate
+//   (`nano_carrier`), with a block for a cable tie next to its USB jack.
+//   One USB cable runs to the powered USB hub (hub/README.md,
+//   Connections); it plugs into the Nano and the tie holds it on the
+//   block, so pulling the cable does not lever the jack. The carrier can
+//   be wired up on its own (ignition, primer) and tested before the panel
+//   is made, and is then screwed onto two bosses on the panel back, in the
+//   strip behind the breaker labels.
 //
 // Wiring: every switch closes one contact: one side to a common GND wire,
-// the other to a mux input (active low, like any switch to GND). ALT and
-// BAT are independent, there is no mechanical interlock between them.
-// Mux inputs C0.. are the switches in label order, the ignition positions
-// are the last five (ignition_c0..; details in the README).
+// the other to its own Nano pin (active low, like any switch to GND; the
+// Nano's internal pull-ups). ALT and BAT are independent, there is no
+// mechanical interlock between them. The switches in label order are on
+// D2.. (switch_pins), the ignition positions on A0..A4 (ignition_pins),
+// the primer pot on A7 (details in the README).
 //
 // Coordinates: the front of the panel is at z=0, +z points towards the
 // pilot, x to the pilot's right, y up. The panel starts at x=-margin_x, the
@@ -56,19 +57,19 @@
 // - 1 red and 1 black double rocker switch, 6 pin
 // - 6 toggle switches, M12 neck (2 pin ON-OFF or 6 pin ON-ON)
 // - mount_count x M3 screws to mount the panel
-// - CD74HC4067 16 channel mux breakout board
-// - 4 x M3 x 8 self tapping screws: mux onto the carrier, carrier onto the panel
-// - a stranded copper Cat5 patch cable (cut off at one end), a cable tie
+// - Arduino Nano (ATmega328P, 5 V, mini USB), a mini USB cable to the
+//   powered USB hub, a cable tie
+// - 2 x M3 x 8 self tapping screws: carrier onto the panel
 // - glue for the printed dummy breakers
 // - wire: one GND wire daisy chained over all switches, one wire per switch
 //
-// Assembly: screw the mux onto the carrier, solder the Cat5 cable to the
-// mux control row and tie it onto its block (the ignition can be soldered
-// on now too). Then solder the wires to the switches (the rockers are hard
-// to get out again), put the toggles in from the back and tighten their
-// nuts, snap the rockers in from the front, screw the carrier onto its
-// bosses, solder the other wire ends to the mux, glue the dummy breakers
-// into their pockets, then mount the panel. The face goes on before the
+// Assembly: slide the Nano into its rails on the carrier (the ignition and
+// the primer can be soldered on now too). Then solder the wires to the
+// switches (the rockers are hard to get out again), put the toggles in
+// from the back and tighten their nuts, snap the rockers in from the
+// front, screw the carrier onto its bosses, solder the other wire ends to
+// the Nano, plug the USB cable in and tie it onto its block, glue the
+// dummy breakers into their pockets, then mount the panel. The face goes on before the
 // toggle nuts and the rockers.
 
 $fn = 48;
@@ -120,37 +121,42 @@ tg_pin_pitch = mts ? [4.7, 4.7] : [7, 6];  // between the 2 poles, along the thr
 tg_pitch = 19;
 tg_pocket_depth = 1;         // body pocket in the back, keeps the toggle from turning
 
-// --- Input multiplexer, CD74HC4067 breakout (MEASURE: from listings) ---
-mux_board = [41, 18];        // PCB, along the pin rows x across (measured)
-mux_board_t = 1.6;
-mux_holes = [[-17.5, 0], [17.5, 0]];  // MEASURE: guess, from the board center
-mux_hole_min = 3.1;          // MEASURE: the board's holes must take an M3 (drill them out if not)
-mux_hole_d = mux_hole_min;   // in the board, for the view
-mux_pin_inset = 1.3;         // pin row to the board edge
-mux_pin_stub = 3;            // wire ends and solder below the board
-mux_channels = 16;
-mux_ctl_names = ["SIG", "S3", "S2", "S1", "S0", "EN", "VCC", "GND"];  // MEASURE: order on the board
+// --- Arduino Nano, MEASURE (instruments/instrument.inc.scad has the same values) ---
+// It lies along x, its USB jack to the right (+x), its component side
+// away from the panel.
+nano_board = [45, 18];       // along x (the USB jack at +x) x across
+nano_t = 1.6;
+nano_under = 2.5;            // parts and solder stubs under the board
+nano_usb = [8, 4];           // jack: width, height over the board
+nano_row = 15.24;            // between the two pin rows
+nano_pin_pitch = 2.54;
+nano_pins = 15;              // per row
+// The rows, each from the USB end (the Nano's pinout). Seen from the
+// back, the component side up and the jack pointing left, the digital row
+// is the upper one.
+nano_digital_row = ["D12", "D11", "D10", "D9", "D8", "D7", "D6", "D5", "D4", "D3", "D2", "GND", "RST", "RX0", "TX1"];
+nano_analog_row = ["D13", "3V3", "REF", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "5V", "RST", "GND", "VIN"];
+switch_pins = ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D12"];   // in label order; not D13 (its LED pulls it down)
 ignition_inputs = 5;         // OFF, R, L, BOTH, START
-ignition_c0 = 11;            // on C11..C15, the last five inputs (already wired, keep it)
-mux_x = 45;                  // board center; left half, the ignition is left of the panel
-mux_standoff_d = 6.5;
-mux_standoff_h = 5;          // carrier plate to the board
-mux_screw_hole = 2.8;        // M3 self tapping
-mux_clear = 0.3;
-mux_screw_len = 8;           // M3 x 8, through the board into the standoff and plate
+ignition_pins = ["A0", "A1", "A2", "A3", "A4"];
+primer_pin = "A7";           // analog only
+rail_w = 1.5;                // the Nano's rails on the carrier
+usb_plug = [12, 9, 28];      // MEASURE: the USB cable's plug: width, height, length with its strain relief
+nano_x = 45;                 // board center; left half, the ignition is left of the panel
+nano_clear = 0.3;
 
-// --- Cable to the hub: soldered to the mux, tied down next to it ---
-cable_d = 6;                 // Cat5 patch cable (measured)
+// --- USB cable: tied down next to the plug ---
+cable_d = 4;                 // MEASURE: the USB cable
 tie = [3.6, 1.3];            // cable tie, width x thickness
 tie_clear = 0.6;             // added to the tie's width and thickness in the slot
 tie_block = [10, 13, 6];     // along the cable (x) x across x height off the carrier plate
 tie_groove = 1.5;            // cable groove in the block top
-tie_gap = 12;                // mux board edge to the block, the wires fan out there
+tie_gap = 2;                 // the plug's end to the block
 
-// --- Mux carrier: a plate with the mux and the tie block, screwed onto
-// two bosses on the panel back ---
+// --- Nano carrier: a plate with the Nano's rails and the tie block,
+// screwed onto two bosses on the panel back ---
 carrier_t = 3;               // plate
-carrier_rim = 1.5;           // plate beyond the mux board, top and bottom
+carrier_rim = 0;             // plate beyond the rails, top and bottom (the rails stand on its edge)
 carrier_end = 9;             // plate beyond the board and the block, for the screws
 carrier_r = 2;               // plate corners
 carrier_screw_hole = 3.2;    // M3, in the plate
@@ -292,25 +298,30 @@ mount_holes = concat(
    mount_center ? [[panel_cx, panel_mount_y0(panel_y0)], [mount_top_cx, panel_mount_y1(panel_y0)]] : []);
 mount_count = len(mount_holes);
 
-// Mux carrier. Its own coordinates: the mux board center at x=y=0, the
+// Nano carrier. Its own coordinates: the Nano's middle at x=y=0, the
 // plate's panel side at z=0, +z away from the panel (as printed). On the
 // panel it is as high as the rim allows; carrier_z is its panel side.
-carrier_size = [mux_board.x + tie_gap + tie_block.x + 2 * carrier_end, mux_board.y + 2 * carrier_rim];
-carrier_x0 = -mux_board.x / 2 - carrier_end;
-tie_lx = mux_board.x / 2 + tie_gap + tie_block.x / 2;   // tie block center
+nano_stop_x = -nano_board.x / 2 - 0.1 - rail_w;            // the stop's outer face, at the left end
+tie_lx = nano_board.x / 2 + usb_plug.z + tie_gap + tie_block.x / 2;   // tie block center
+carrier_x0 = nano_stop_x - carrier_end;
+carrier_size = [tie_lx + tie_block.x / 2 + carrier_end - carrier_x0, nano_board.y + 2 * (0.1 + rail_w + carrier_rim)];
 carrier_holes = [[carrier_x0 + carrier_end / 2, 0], [carrier_x0 + carrier_size.x - carrier_end / 2, 0]];
-mux_y = panel_y1 - rim_w - mux_clear - carrier_size.y / 2;
+nano_y = panel_y1 - rim_w - nano_clear - carrier_size.y / 2;
 carrier_z = -panel_t - carrier_boss_h;
 carrier_pilot_len = carrier_boss_h + panel_t - face_t - 1;   // stops 1 mm before the face
-// The mux board's panel side is at mux_z
-mux_z = carrier_z - carrier_t - mux_standoff_h;
-mux_switch_y = max(rk_y + rk_pocket.y / 2, tg_pocket.y / 2);  // the switches reach up to here behind the panel
-function mux_ch_pin(i) = [mux_x + (i - 7.5) * 2.54, mux_y - mux_board.y / 2 + mux_pin_inset];
-function mux_ctl_pin(name) = [mux_x + (search([name], mux_ctl_names)[0] - 3.5) * 2.54,
-                              mux_y + mux_board.y / 2 - mux_pin_inset];
-// Cable tie block, right of the mux; the cable runs along x on its top
-tie_x = mux_x + tie_lx;
-tie_y = mux_y;
+// The Nano board's panel side is at nano_z, its component side at nano_top_z
+nano_z = carrier_z - carrier_t - nano_under;
+nano_top_z = nano_z - nano_t;
+usb_lz = carrier_t + nano_under + nano_t + nano_usb.y / 2;  // the jack's middle, carrier coordinates
+nano_switch_y = max(rk_y + rk_pocket.y / 2, tg_pocket.y / 2);  // the switches reach up to here behind the panel
+// A pin on the panel back (as placed): the digital row up, the analog row down
+function nano_pin(name) =
+   let(d = search([name], nano_digital_row)[0], a = search([name], nano_analog_row)[0])
+   [nano_x + (nano_pins - 1) / 2 * nano_pin_pitch - (d != [] ? d : a) * nano_pin_pitch,
+    nano_y + (d != [] ? 1 : -1) * nano_row / 2];
+// Cable tie block, right of the Nano; the cable runs along x on its top
+tie_x = nano_x + tie_lx;
+tie_y = nano_y;
 tie_z = carrier_z - carrier_t;   // foot of the block
 tie_slot = tie + [tie_clear, tie_clear];
 
@@ -339,7 +350,7 @@ min_on_cb_dist = min([for (u = units) if (is_rocker(u)) for (x = cb_xs)
 min_cb_rk_dist = min([for (u = units) if (is_rocker(u)) for (x = cb_xs)
                   box_dist([x, cb_y], [u[0], rk_y], rk_bezel) - cb_r]);
 
-echo(panel_size = panel_size, face_size = face_size, switches = switch_count, mux_inputs = switch_count + ignition_inputs, breakers = len(breakers), rk_y = rk_y);
+echo(panel_size = panel_size, face_size = face_size, switches = switch_count, nano_inputs = switch_count + ignition_inputs, breakers = len(breakers), rk_y = rk_y);
 
 // --- Sanity checks ---
 assert(face_size.x <= bed.x && face_size.y <= bed.y, "Panel does not fit the printer bed");
@@ -356,15 +367,12 @@ assert(min_front_gap >= 1, "Switches too close to each other, increase tg_pitch 
 assert(min_web >= 1.2, "Too thin a wall between two pockets, increase tg_pitch or group_space");
 assert(panel_y0 + rim_w + 0.5 <= min(rk_y - rk_pocket.y / 2, -tg_pocket.y / 2), "Rim runs into a switch pocket, increase margin_bottom");
 assert(len(view_on) <= switch_count, "view_on has more entries than there are switches");
-assert(switch_count <= ignition_c0 && ignition_c0 + ignition_inputs <= mux_channels, "More switches than mux inputs");
-assert(mux_y - carrier_size.y / 2 >= mux_switch_y + mux_clear, "Mux carrier runs into the switches, increase margin_top");
-assert(mux_x + carrier_x0 >= panel_x0 + rim_w + mux_clear && mux_x + carrier_x0 + carrier_size.x <= panel_x1 - rim_w - mux_clear,
-       "Mux carrier does not fit inside the rim, move mux_x");
-assert(mux_standoff_h >= mux_pin_stub + 1, "Mux standoffs too short for the pin ends");
-assert(mux_standoff_d >= mux_screw_hole + 3, "Mux standoff wall too thin");
-assert(mux_hole_min >= 3.1, "Mux board holes too small for M3 screws");
-assert(min([for (h = mux_holes) mux_board.x / 2 - abs(h.x)]) >= 2.5, "Mux holes too close to the board ends for an M3 head");
-assert(mux_screw_len - mux_board_t <= mux_standoff_h + carrier_t && mux_screw_len - mux_board_t >= 4, "Mux screws do not fit the standoffs");
+assert(switch_count <= len(switch_pins), "More switches than Nano pins for them");
+assert(nano_y - carrier_size.y / 2 >= nano_switch_y + nano_clear, "Nano carrier runs into the switches, increase margin_top");
+assert(nano_x + carrier_x0 >= panel_x0 + rim_w + nano_clear && nano_x + carrier_x0 + carrier_size.x <= panel_x1 - rim_w - nano_clear,
+       "Nano carrier does not fit inside the rim, move nano_x");
+assert(abs(carrier_t + tie_block.z - tie_groove + cable_d / 2 - usb_lz) <= 1.5, "The tie block holds the cable off the jack's height");
+assert(usb_lz - usb_plug.y / 2 >= carrier_t, "USB plug runs into the carrier plate");
 assert(carrier_end >= carrier_boss_d && carrier_end / 2 - carrier_screw_hole / 2 >= 2, "Carrier too short at the ends for its screws");
 assert(carrier_size.y >= carrier_boss_d && carrier_size.y >= tie_block.y, "Carrier too narrow for its bosses or the tie block");
 assert(carrier_boss_d >= carrier_pilot + 3, "Carrier boss wall too thin");
@@ -449,14 +457,14 @@ module panel() {
       union() {
          mirror([0, 0, 1])
             panel_blank(panel_x0, panel_x1, panel_y0, mount_holes);
-         // Bosses for the mux carrier
+         // Bosses for the Nano carrier
          for (h = carrier_holes)
-            translate([mux_x + h.x, mux_y + h.y, carrier_z])
+            translate([nano_x + h.x, nano_y + h.y, carrier_z])
                cylinder(d = carrier_boss_d, h = carrier_boss_h + 0.01);
       }
       // Carrier screw holes, not through the front
       for (h = carrier_holes)
-         translate([mux_x + h.x, mux_y + h.y, carrier_z - 1])
+         translate([nano_x + h.x, nano_y + h.y, carrier_z - 1])
             cylinder(d = carrier_pilot, h = carrier_pilot_len + 1);
       for (u = units)
          translate([u[0], unit_y(u), 0])
@@ -553,13 +561,10 @@ c_steel = "#b9c0c8";
 c_chrome = "#e2e6ea";
 c_line = "#8fd0ff";
 c_gnd = "#1d1f22";
-c_pcb = "#5a3d8a";
+c_pcb = "#1d4fa0";
 wire_colors = ["#e8433a", "#f5a030", "#f2d03b", "#4caf50", "#3d7bd9", "#8e5bd6", "#9aa3ad", "#eceff2"];
 wire_d = 1.2;
-c_cable = "#8fa3b8";
-// Cat5 pairs on the mux control pins (T568B, hub/README.md Port pinout)
-cat5_names = ["S0", "S1", "S2", "VCC", "GND", "S3", "SIG"];
-cat5_colors = ["#f8d2a8", "#f5a030", "#c4e6bf", "#3d7bd9", "#c3d6f5", "#4caf50", "#e3d2c0"];
+c_cable = "#26282b";
 
 function rocker_color(name) = name == "red" ? "#d33a2c" : name == "white" ? "#eeeeea" : "#26282b";
 function is_on(i) = i < len(view_on) && view_on[i] == 1;
@@ -689,23 +694,30 @@ module tie_block() {
    }
 }
 
-// Mux carrier in its own coordinates (see carrier_size), as printed: plate
-// on the bed, the mux standoffs and the tie block on top
-module mux_carrier() {
+// Nano carrier in its own coordinates (see carrier_size), as printed:
+// plate on the bed, the Nano's rails (a ledge under each long edge, a lip
+// over it, a stop at the left end; it slides in from the USB end) and the
+// tie block on top
+module nano_carrier() {
    difference() {
       union() {
          translate([carrier_x0 + carrier_size.x / 2, 0, 0])
             linear_extrude(carrier_t)
                rrect(carrier_size, carrier_r);
-         for (h = mux_holes)
-            translate([h.x, h.y, carrier_t - 0.01])
-               cylinder(d = mux_standoff_d, h = mux_standoff_h + 0.01);
+         for (s = [-1, 1]) {
+            yo = s * (nano_board.y / 2 + 0.1);
+            translate([nano_stop_x, s > 0 ? yo : yo - rail_w, carrier_t - 0.01])
+               cube([nano_board.x - nano_stop_x - nano_board.x / 2, rail_w, nano_under + nano_t + 0.8 + 0.01]);
+            translate([nano_stop_x, s > 0 ? yo - 1.2 : yo, carrier_t - 0.01])
+               cube([nano_board.x - nano_stop_x - nano_board.x / 2, 1.2, nano_under + 0.01]);
+            translate([nano_stop_x, s > 0 ? yo - 0.8 : yo, carrier_t + nano_under + nano_t + 0.1])
+               cube([nano_board.x - nano_stop_x - nano_board.x / 2, 0.8 + 0.01, 0.7]);
+         }
+         translate([nano_stop_x, -nano_board.y / 2 - 0.1, carrier_t - 0.01])
+            cube([rail_w, nano_board.y + 0.2, nano_under + nano_t + 0.01]);
          translate([tie_lx, 0, carrier_t])
             tie_block();
       }
-      for (h = mux_holes)
-         translate([h.x, h.y, -1])
-            cylinder(d = mux_screw_hole, h = carrier_t + mux_standoff_h + 2);
       for (h = carrier_holes)
          translate([h.x, h.y, -1])
             cylinder(d = carrier_screw_hole, h = carrier_t + 2);
@@ -714,50 +726,40 @@ module mux_carrier() {
 
 // The carrier where it goes on the panel back
 module carrier_placed() {
-   translate([mux_x, mux_y, carrier_z])
+   translate([nano_x, nano_y, carrier_z])
       mirror([0, 0, 1])
-         mux_carrier();
+         nano_carrier();
 }
 
-// Mux board with its pin holes, panel side at mux_z
-module mux_part() {
-   pins = concat([for (i = [0 : mux_channels - 1]) mux_ch_pin(i)],
-                 [for (n = mux_ctl_names) mux_ctl_pin(n)]);
+// The Nano, its component side at nano_top_z
+module nano_part() {
    color(c_pcb)
       difference() {
-         translate([mux_x, mux_y, mux_z - mux_board_t])
-            linear_extrude(mux_board_t)
-               square(mux_board, center = true);
-         for (p = pins)
-            translate([p.x, p.y, mux_z - mux_board_t - 1])
-               cylinder(d = 1, h = mux_board_t + 2, $fn = 8);
-         for (h = mux_holes)
-            translate([mux_x + h.x, mux_y + h.y, mux_z - mux_board_t - 1])
-               cylinder(d = mux_hole_d, h = mux_board_t + 2);
+         translate([nano_x, nano_y, nano_top_z])
+            linear_extrude(nano_t)
+               square(nano_board, center = true);
+         for (n = concat(nano_digital_row, nano_analog_row)) let(p = nano_pin(n))
+            translate([p.x, p.y, nano_top_z - 1])
+               cylinder(d = 1, h = nano_t + 2, $fn = 8);
       }
-   // The chip
    color(c_body)
-      translate([mux_x, mux_y, mux_z - mux_board_t - 0.75])
-         cube([10, 5.3, 1.5], center = true);
-}
-
-module mux_screws() {
-   for (h = mux_holes)
-      translate([mux_x + h.x, mux_y + h.y, mux_z - mux_board_t])
-         mount_screw(mux_screw_len, c_steel);
+      translate([nano_x, nano_y, nano_top_z - 0.6])
+         rotate([0, 0, 45]) cube([7, 7, 1.2], center = true);
+   color(c_steel)
+      translate([nano_x + nano_board.x / 2 - 4, nano_y, nano_top_z - nano_usb.y / 2])
+         cube([9, nano_usb.x, nano_usb.y], center = true);
 }
 
 module carrier_screws() {
    for (h = carrier_holes)
-      translate([mux_x + h.x, mux_y + h.y, carrier_z - carrier_t])
+      translate([nano_x + h.x, nano_y + h.y, carrier_z - carrier_t])
          mount_screw(carrier_screw_len, c_steel);
 }
 
 module carrier_part() {
    color(c_panel)
       carrier_placed();
-   mux_part();
-   mux_screws();
+   nano_part();
 }
 
 module unit_part(u, cut = false, nuts = true) {
@@ -835,16 +837,16 @@ function wire_tabs() = [for (u = units)
          ? [[u[0] + p.x, rk_y + rk_pin_pitch, -rk_body_depth - rk_tab.z], [u[0] + p.x, rk_y, -rk_body_depth - rk_tab.z]]
          : [[u[0] + p.x, 0, tg_body_z - tg_body_depth - tg_tab.z], [u[0] + p.x, -tg_pin_pitch.y, tg_body_z - tg_body_depth - tg_tab.z]]];
 
-mux_joint_z = mux_z - mux_board_t - 0.3;   // solder joints on the outer face of the mux
+nano_joint_z = nano_top_z - 0.3;   // solder joints on the Nano's component side
 
-// GND daisy chained over the switches to the mux GND, a signal wire from
-// every switch to its mux input, and the cable (cable_part). The ignition
-// cable (ignition_c0.., VCC, GND) is not shown.
+// GND daisy chained over the switches to the Nano's GND, a signal wire
+// from every switch to its pin, and the USB cable (cable_part). The
+// ignition's and the primer's wires are not shown.
 module wires_part() {
    t = wire_tabs();
    z = min([for (w = t) w[0].z]) - 2;
-   zb = mux_joint_z;
-   gnd = mux_ctl_pin("GND");
+   zb = nano_joint_z;
+   gnd = nano_pin("GND");
    wire(concat(
       [[gnd.x, gnd.y, zb], [gnd.x, gnd.y, z], [gnd.x, t[0][0].y, z]],
       [for (w = t) [w[0].x, w[0].y, z]]), c_gnd);
@@ -852,39 +854,28 @@ module wires_part() {
       wire([w[0] + [0, 0, 0.5], [w[0].x, w[0].y, z]], c_gnd);
    for (i = [0 : len(t) - 1]) {
       s = t[i][1];
-      p = mux_ch_pin(i);
+      p = nano_pin(switch_pins[i]);
       zs = z - 2 - (i % 3) * 1.6;
-      wire([s + [0, 0, 0.5], [s.x + 1.5, s.y, zs], [s.x + 1.5, p.y - 1.5, zs], [p.x, p.y - 1.5, zs], [p.x, p.y, zb]],
+      wire([s + [0, 0, 0.5], [s.x + 1.5, s.y, zs], [s.x + 1.5, p.y + 1.5, zs], [p.x, p.y + 1.5, zs], [p.x, p.y, zb]],
            wire_colors[i % len(wire_colors)]);
    }
    cable_part();
 }
 
-// EN bridged to GND and the Cat5 cable to the hub, soldered to the control
-// row and tied onto its block
+// The USB cable: plugged into the Nano, tied onto its block, then over the
+// top rim
 module cable_part() {
-   zb = mux_joint_z;
-   gnd = mux_ctl_pin("GND");
-   // EN to GND: the mux is always enabled
-   en = mux_ctl_pin("EN");
-   wire([[en.x, en.y, zb], [en.x, en.y - 1.5, zb - 1], [gnd.x, gnd.y - 1.5, zb - 1], [gnd.x, gnd.y, zb]], c_gnd);
-   // Cat5 cable to the hub: its pairs soldered to the control row (T568B
-   // colors), the jacket tied onto the block, then over the top rim
-   zt = tie_z - tie_block.z + tie_groove - cable_d / 2;     // cable axis
-   x_end = tie_x - tie_block.x / 2 - 2;                     // jacket end
-   for (j = [0 : len(mux_ctl_names) - 1])
-      if (mux_ctl_names[j] != "EN") {
-         p = mux_ctl_pin(mux_ctl_names[j]);
-         wire([[p.x, p.y, zb], [p.x, p.y, zb - 2 - j * 0.3], [x_end - 3, tie_y + (j - 3.5) * 0.6, zt],
-               [x_end + 0.5, tie_y + (j - 3.5) * 0.6, zt]],
-              cat5_colors[search([mux_ctl_names[j]], cat5_names)[0]]);
-      }
-   // Past the block it bends away from the panel (if it is not clear of the
-   // rim already) and over the top rim
+   zj = carrier_z - usb_lz;                                   // the jack's middle
+   zt = tie_z - tie_block.z + tie_groove - cable_d / 2;       // cable axis on the block
+   x_plug = nano_x + nano_board.x / 2;
+   color(c_cable) {
+      translate([x_plug, nano_y - usb_plug.x / 2, zj - usb_plug.y / 2])
+         cube([usb_plug.z, usb_plug.x, usb_plug.y]);
+   }
    x_bend = tie_x + tie_block.x / 2 + cable_d;
    z_over = min(zt, -panel_t - rim_h - cable_d / 2 - 1);
-   path = [[x_end, tie_y, zt], [x_bend, tie_y, zt], [x_bend + 4, tie_y, z_over],
-           [x_bend + 4, panel_y1 + 20, z_over]];
+   path = [[x_plug + usb_plug.z, tie_y, zj], [tie_x - tie_block.x / 2, tie_y, zt], [x_bend, tie_y, zt],
+           [x_bend + 4, tie_y, z_over], [x_bend + 4, panel_y1 + 20, z_over]];
    color(c_cable)
       for (i = [1 : len(path) - 1])
          hull() {
@@ -960,9 +951,9 @@ module exploded_view(e = 30) {
          dashed_line(0, e);
    translate([0, 0, e])
       breakers_part();
-   // The carrier with the mux goes on from the back
+   // The carrier with the Nano goes on from the back
    for (h = carrier_holes)
-      translate([mux_x + h.x, mux_y + h.y, 0])
+      translate([nano_x + h.x, nano_y + h.y, 0])
          dashed_line(-1.6 * e, carrier_z, 0.35);
    translate([0, 0, -e])
       carrier_part();
@@ -975,7 +966,7 @@ module exploded_view(e = 30) {
       mount_screws();
 }
 
-// The mux carrier on its own, from the back: mux, cable tied on
+// The Nano carrier on its own, from the back: the Nano, the cable tied on
 module carrier_view() {
    carrier_part();
    carrier_screws();
@@ -1000,7 +991,7 @@ module section_view(u, w = 40) {
 rotate([0, 180, 0]) panel(); // Make module panel
 translate([0, 0, -30]) face(); // Make module face
 breakers_plate(); // Make module breakers
-mux_carrier(); // Make module carrier
+nano_carrier(); // Make module carrier
 
 //switches_part(); // Ignore module
 

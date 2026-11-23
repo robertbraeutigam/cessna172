@@ -72,9 +72,8 @@ top bar is in the way.
   the motor in `arm`, on posts behind it in `deep`), so it can be wired on
   the bench. The Nano slides into rails with its USB jack down. In the
   six-pack the next instrument is right under it: use a mini USB cable
-  with an angled plug (bent back). It is a board of its own, like the compass's:
-  the hub's direct ports are taken (see
-  [Connections](../hub/README.md#connections)). The stepper takes about
+  with an angled plug (bent back). It is a board of its own, like every
+  component's (see [Connections](../hub/README.md#connections)). The stepper takes about
   0.25 A from USB while it moves, nothing at rest (see
   [MobiFlight](#mobiflight)).
 - **Print orientation**: the case, the dial and the back plate are printed

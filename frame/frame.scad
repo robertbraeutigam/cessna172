@@ -16,7 +16,7 @@
 //   (left end, split, step, right end; the left end one as high as the right part), 2 waist bars, top bar left and
 //   right, throttle bar, 2 apron hangers, lower bar
 // - 2020 extrusion, desk part (stock lengths): front rail left and right,
-//   rear rail, 4 crossbars, 3 braces (cut square)
+//   rear rail, 3 crossbars, 3 braces (cut square)
 // - 6 45 degree connectors for 2020, one at each brace end
 // - corner brackets, M5 screws and T-nuts (6 mm slot)
 // - 3 mm ACM sheet: the left (L shaped), lower right, upper right and apron sheets
@@ -54,10 +54,7 @@
 //    through its cut-out right of it onto the bar, its plate screwed onto
 //    the sheet; the pedestal goes in like the throttle box onto the lower
 //    bar, the parking brake onto the bottom bar, when they exist.
-// 7. Put the hub on the step crossbar (left ears) and the hub crossbar
-//    (front and back ears) and bolt them into T-nuts in the crossbars' top
-//    slots (hub_bolts).
-// 8. Bolt the compass stand into T-nuts in the right top bar's top slot
+// 7. Bolt the compass stand into T-nuts in the right top bar's top slot
 //    (compass_bolts).
 //
 // Stage 2 (physical instruments): the left top bar moved up to the right
@@ -96,9 +93,8 @@ echo(stage2_instruments = [for (i = [0 : len(inst_c) - 1]) [inst_names[i], inst_
 echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
 echo(apron_sheet = [apron[2] - apron[0], apron[3] - apron[1]], apron_screws = len(apron_screws));
 echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts);
-echo(hub = [hub_x0, hub_y0], hub_bolts = hub_bolts);
 echo(compass_bolts = compass_bolts);
-echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2 + len(hub_bolts) + len(compass_bolts), desk_clamps = len(clamp_xs), clamp_y = clamp_y);
+echo(m5 = len(sheet_screws) + len(apron_screws) + 2 + 2 + 2 + len(compass_bolts), desk_clamps = len(clamp_xs), clamp_y = clamp_y);
 
 // --- Frame ---
 
@@ -404,25 +400,6 @@ module park_part(set = false) {
                cylinder(d = 10, h = park_handle, center = !set);
 }
 
-// Hub on the desk part: the box with its lid, the ears on the crossbars,
-// the jacks in its front and right walls, the USB jack in its left wall
-module hub_part() {
-   translate([hub_x0, hub_y0, ext]) {
-      color(c_box) {
-         translate([2, 2, 0]) minkowski() { cube(hub_size - [4, 4, 1]); cylinder(r = 2, h = 1); }
-         for (y = hub_ear_left_ys) translate([-hub_ear_out, y - 7, 0]) cube([hub_ear_out + 1, 14, 4]);
-         for (y = [-hub_ear_out, hub_size.y - 1]) translate([hub_ear_slot_dx - hub_ear_out / 2 - 7, y, 0]) cube([14, hub_ear_out + 1, 4]);
-      }
-      color("#111") {
-         for (x = hub_jacks) translate([x - 8, -0.5, 8]) cube([16, 1, 15]);
-         for (y = hub_jacks) translate([hub_size.x - 0.5, y - 8, 8]) cube([1, 16, 15]);
-         translate([-0.5, hub_usb_y, 8]) cube([1, 12, 11]);
-      }
-      color("#b9c0c8")
-         for (b = hub_bolts) translate([b.x - hub_x0, b.y - hub_y0, 4]) cylinder(d = m5_head_d, h = 3);
-   }
-}
-
 // Compass over the panel on the right top bar: the stand, the body with
 // its bezel and the card behind the window
 module compass_part() {
@@ -441,7 +418,6 @@ module compass_part() {
 
 module components() {
    compass_part();
-   hub_part();
    yoke_part();
    radio_part();
    switch_panel_part();

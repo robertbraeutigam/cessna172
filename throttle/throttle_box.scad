@@ -9,17 +9,14 @@
 // the throttle bar's top slot. The box is behind the sheet, so it needs no
 // lid; its top stays open.
 //
-// Read by MobiFlight on the hub's Mega (hub/), direct port 6: one Cat5
-// cable, RJ45 plug at the hub, soldered straight to the pots here (no board
-// in the box). It comes in through the back wall at the left and is tied
-// into the cable cradle. Wires (T568B colors, see hub/README.md, Port pinout):
-// - blue (5 V) and white-blue (GND) to the carb heat pot's end tabs, then
-//   on with two short wires to the same tabs of the throttle and the
-//   mixture pot (the same end of each pot to 5 V, so all read the same way)
-// - white-green (line A, A2): throttle wiper
-// - green (line B, A5): mixture wiper
-// - white-brown (line C, A6): carb heat wiper
-// - white-orange, orange and brown are not used: cut short, insulate
+// Read by MobiFlight on an Arduino Nano of its own, in rails on the floor
+// between the carb heat and the throttle pot, its USB jack at the back
+// wall: the USB cable to the powered USB hub plugs in through a window in
+// it (hub/README.md, Connections). Wires, soldered to the Nano's pins:
+// - 5 V and GND to the carb heat pot's end tabs, then on with two short
+//   wires to the same tabs of the throttle and the mixture pot (the same
+//   end of each pot to 5 V, so all read the same way)
+// - A0: throttle wiper, A1: mixture wiper, A2: carb heat wiper
 
 $fn = 30;
 
@@ -71,17 +68,14 @@ big_pot_full_width = 16;
 big_pot_module_height = 6;
 big_pot_full_length = 130;
 
-// Cat5 cable to the hub, MEASURE its jacket
-cable_d = 6;
-cradle_z = 15;               // cradle top, the cable lies on it
-cable_z = cradle_z + cable_d / 2;
-cable_x = roundness + end_gap + 10;
-cradle_top_t = 5;
-cradle_top_z = cable_z + 1;  // underside of the cradle top, clear of the base for tightening
-cradle_groove_d = cable_d - 0.5;  // squeezes the jacket
-assert(cable_z + cradle_groove_d / 2 - cradle_top_z <= cradle_top_t - 1.5,
-       "Cable groove too deep for the cradle top");
-assert(cable_z + cable_d / 2 + 2 <= height, "Cable hole too high for the back wall");
+// Arduino Nano, MEASURE (instruments/instrument.inc.scad has the same values)
+nano_board = [18, 45];       // width, length; the mini USB jack at one end
+nano_t = 1.6;
+nano_under = 2.5;            // parts and solder stubs under the board
+nano_usb = [8, 4];           // jack: width, height over the board
+usb_plug = [12, 9];          // MEASURE: the USB cable's plug body (width, height), through the back wall
+rail_w = 1.5;                // the Nano's rails on the floor
+nano_x = 46;                 // its middle, between the carb heat pot's legs and the throttle pot's
 
 // Small linear pot dimensions
 small_pot_stand_distance = 60;
@@ -118,8 +112,8 @@ module box_underside() {
          face();
          // Rod supports
          rod_supports();
-         // Cable cradle
-         cable_cradle();
+         // The Nano's rails
+         nano_rails();
       }
       // Face mount holes
       for (h = mount_holes)
@@ -138,10 +132,9 @@ module box_underside() {
       translate([roundness+end_gap+2*control_gap, wall_thickness*2, wall_thickness+big_pot_stand_height+big_pot_module_height+15+7])
          rotate([90, 0, 0])
             cylinder(d=11.2, h=wall_thickness*2);
-      // Cat5 cable hole
-      translate([cable_x, wall_thickness+depth+roundness*2, cable_z])
-         rotate([90, 0, 0])
-            cylinder(d=cable_d+0.5, h=50);
+      // Window for the USB plug, in front of the Nano's jack
+      translate([nano_x - usb_plug.x / 2, back_in - 1, usb_z - usb_plug.y / 2])
+         cube([usb_plug.x, wall_thickness + 2, usb_plug.y]);
    }
    // Linear pot stands
    translate([roundness+end_gap+control_gap, 55, 0])
@@ -177,32 +170,34 @@ module face() {
             }
 }
 
-module cable_cradle() {
-   translate([cable_x-20/2, depth, wall_thickness]) {
-      difference() {
-         cube([20, 20, cradle_z-wall_thickness]);
-         translate([4, 10, 0])
-            cylinder(d=3.2, h=13);
-         translate([16, 10, 0])
-            cylinder(d=3.2, h=13);
-      }
+// The Nano: component side up, its USB jack against the back wall's
+// inside. It slides in from the front between two rails (a ledge under
+// each long edge, a lip over it); a dab of hot glue at its front end
+// keeps it there when the plug goes in.
+back_in = depth + 2 * roundness - wall_thickness;   // the back wall's inside
+nano_y0 = back_in - 0.3 - nano_board.y;
+nano_z = wall_thickness + nano_under;               // the board's underside
+usb_z = nano_z + nano_t + nano_usb.y / 2;           // the jack's middle
+
+module nano_rails() {
+   for (s = [-1, 1]) {
+      xo = nano_x + s * (nano_board.x / 2 + 0.1);
+      translate([s > 0 ? xo : xo - rail_w, nano_y0, wall_thickness - 0.01])
+         cube([rail_w, nano_board.y, nano_under + nano_t + 0.8 + 0.01]);
+      translate([s > 0 ? xo - 1.2 : xo, nano_y0, wall_thickness - 0.01])
+         cube([1.2, nano_board.y, nano_under + 0.01]);
+      translate([s > 0 ? xo - 0.8 : xo, nano_y0, nano_z + nano_t + 0.1])
+         cube([0.8 + 0.01, nano_board.y, 0.7]);
    }
 }
 
-module cable_cradle_top() {
-   translate([cable_x-20/2, depth, cradle_top_z]) {
-      difference() {
-         cube([20, 20-wall_thickness, cradle_top_t]);
-         translate([4, 10, -1])
-            cylinder(d=3.2, h=10);
-         translate([16, 10, -1])
-            cylinder(d=3.2, h=10);
-         translate([20/2, 20, cable_z-cradle_top_z])
-            rotate([90, 0, 0])
-               cylinder(d=cradle_groove_d, h=21);
-      }
-   }
-}
+// Between the carb heat pot's legs and the throttle pot's (with its legs)
+nano_rail_x = [nano_x - nano_board.x / 2 - 0.1 - rail_w, nano_x + nano_board.x / 2 + 0.1 + rail_w];
+assert(nano_rail_x[0] >= roundness + end_gap + small_pot_full_width + 1, "Nano runs into the carb heat pot's legs");
+assert(nano_rail_x[1] <= roundness + end_gap + control_gap - big_pot_full_width + 3 - 1, "Nano runs into the throttle pot's legs");
+assert(nano_y0 >= 55 + small_pot_stand_distance + 2 + 10 + 1, "Nano runs into the carb heat pot's back legs");
+assert(usb_z - usb_plug.y / 2 >= wall_thickness + 1 && usb_z + usb_plug.y / 2 <= height - 3, "USB window off the back wall");
+assert(nano_x - usb_plug.x / 2 >= roundness + 1, "USB window in the back wall's rounded corner");
 
 
 module big_pot_stand() {
@@ -381,11 +376,9 @@ c_mixture = "#c62828";
 c_pcb = "#1d1f22";
 c_gold = "#d9b24a";
 c_cable = "#26282b";
-wire_colors = ["#e8433a", "#1d1f22"]; // 5 V, GND between the pots
-// Cat5 wires, T568B: blue, white-blue, wipers of carb heat, throttle, mixture
-c_blue = "#2563c9";
-c_white_blue = "#a9c4ee";
-wiper_colors = ["#c9a98f", "#a8d5a0", "#2e8b3a"]; // white-brown, white-green, green
+c_nano = "#1d4fa0";
+wire_colors = ["#e8433a", "#1d1f22"]; // 5 V, GND
+wiper_colors = ["#f1c40f", "#2e8b3a", "#e67e22"]; // wipers of carb heat, throttle, mixture
 
 module wire(points, c, d = wire_d) {
    color(c)
@@ -558,7 +551,6 @@ module holders_part(lift = 0) {
    color(c_print)
       translate([0, 0, lift]) {
          small_pot_holder();
-         cable_cradle_top();
       }
 }
 
@@ -575,24 +567,34 @@ module route(a, b, zr, c) {
    wire([a, [a.x, a.y, zr], [b.x, b.y, zr], b], c);
 }
 
-// Where the Cat5 jacket ends and the wires fan out
-cable_end = [cable_x, depth - 4, cable_z];
+// The Nano's pins along its left edge (USB jack back, seen from above):
+// A0..A7, then 5 V and GND; k-th of [5 V, GND, A0, A1, A2] from the back
+function nano_pin(k) = [nano_x - nano_board.x / 2 + 1.3, back_in - 12 - 2.54 * k, nano_z + nano_t + 0.5];
+
+module nano_part() {
+   translate([nano_x - nano_board.x / 2, nano_y0, nano_z]) {
+      color(c_nano) cube([nano_board.x, nano_board.y, nano_t]);
+      color("#202020") translate([nano_board.x / 2 - 3.5, 18, nano_t]) cube([7, 7, 1.2]);
+      color(c_steel) translate([nano_board.x / 2 - nano_usb.x / 2, nano_board.y - 8, nano_t]) cube([nano_usb.x, 9, nano_usb.y]);
+   }
+}
 
 module wires_part() {
-   // Cat5 wires: 5 V and GND to the carb heat pot, each wiper to its pot
-   e = cable_end;
-   route(e + [-1.5, 0, 0], pot_tab(0, 0), 24, c_blue);
-   route(e + [-0.5, 0, 0], pot_tab(0, 1), 25.5, c_white_blue);
+   // 5 V and GND to the carb heat pot, each wiper to its pot
+   route(nano_pin(0), pot_tab(0, 0), 24, wire_colors[0]);
+   route(nano_pin(1), pot_tab(0, 1), 25.5, wire_colors[1]);
    for (i = [0 : 2])
-      route(e + [0.5 + i, 0, 0], pot_tab(i, 2), 27 + 1.5 * i, wiper_colors[i]);
+      route(nano_pin(2 + [2, 0, 1][i]), pot_tab(i, 2), 27 + 1.5 * i, wiper_colors[i]);
    // 5 V and GND on from pot to pot
    for (i = [0 : 1], j = [0 : 1])
       route(pot_tab(i, j), pot_tab(i + 1, j), 32 + 1.5 * j, wire_colors[j]);
-   // The cable through the cradle and out of the back wall
-   color(c_cable)
-      translate([cable_x, cable_end.y, cable_z])
-         rotate([-90, 0, 0])
-            cylinder(d = cable_d, h = 2 * roundness + 4 + 40);
+   nano_part();
+   // The USB cable, plugged in through the back wall
+   color(c_cable) {
+      translate([nano_x - usb_plug.x / 2 + 1, back_in - 1, usb_z - usb_plug.y / 2 + 1])
+         cube([usb_plug.x - 2, 18, usb_plug.y - 2]);
+      translate([nano_x, back_in + 16, usb_z]) rotate([-90, 0, 0]) cylinder(d = 4, h = 40);
+   }
 }
 
 module underside_part() {
@@ -657,7 +659,7 @@ module exploded_view(e = 35) {
    }
    translate([0, 0, 2 * e]) pins_part();
    translate([0, 0, 2 * e]) small_pot_holder_part();
-   translate([0, 0, 2 * e]) color(c_print) cable_cradle_top();
+   translate([0, 0, e]) nano_part();
 }
 
 module small_pot_holder_part() {
@@ -667,8 +669,6 @@ module small_pot_holder_part() {
 box_underside(); // Make module underside
 
 //small_pot_holder(); // Make module holder_small_pot
-
-//cable_cradle_top(); // Make module cradle_top
 
 //#big_pots(); // Ignore module
 

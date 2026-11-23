@@ -40,9 +40,8 @@ frame's right top bar, about where the windshield's middle is (see
   screwed behind a plate at the back, which hides the board and its LEDs
   from the window. Everything is soldered, and the USB cable is the only
   connection.
-- **Own board**: all three direct ports of the hub are taken, and the
-  stepper needs four outputs and a home input. A Nano running MobiFlight
-  is the simplest fit, like the audio panel's (see
+- **Own board**: the stepper needs four outputs and a home input, on a
+  Nano running MobiFlight, like every component (see
   [Connections](../hub/README.md#connections)). The stepper takes about
   0.2 A at 5 V with its coils on, which USB supplies (the Nano's 5 V pin is
   behind a 0.5 A diode). With the coils switched off at rest (see

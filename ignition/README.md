@@ -140,7 +140,8 @@ through `ignition/ignition.lua`, a FlyWithLua script: it creates the
 dataref `cessna172/ignition/start` and holds `sim/starters/engage_starter_1`
 while it is 1. Copy it to `X-Plane/Resources/plugins/FlyWithLua/Scripts/`.
 
-In the MobiFlight Connector (inputs C11..C15 of the mux):
+In the MobiFlight Connector (pins A0..A4 of the switch panel's Nano, see
+[Inputs](../switchpanel/README.md#inputs)):
 
 | Input | On press | On release |
 |-------|----------|------------|

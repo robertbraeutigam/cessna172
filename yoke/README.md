@@ -3,8 +3,8 @@
 [Cessna 172 home cockpit](../README.md) / `yoke/`
 
 The Cessna control wheel, hollow, with a PTT button on
-each horn, an electric trim rocker on the left one, a mux inside and the
-cable out through the control tube.
+each horn, an electric trim rocker on the left one, an Arduino Nano inside
+and its USB cable out through the control tube.
 
 [![Yoke](https://robertbraeutigam.github.io/cessna172/yoke/yoke_montage.png)](https://robertbraeutigam.github.io/cessna172/yoke/yoke_montage.png)
 
@@ -28,7 +28,7 @@ yoke, or any bearing that takes the tube) is not part of it.
 `yoke.scad` holds everything. The outline is a list of points at the top
 (`bar_*`, `hub_top`, `arm_end`, `arm_outer`, `arm_inner`), rounded with
 `fillet` and `round`; `assert`s check that the pieces fit the bed and that the
-buttons, the mux and the cable fit inside.
+buttons, the Nano and the cable fit inside.
 
 ## How it is built
 
@@ -75,17 +75,21 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
   momentary (ON)-OFF-(ON) mini rocker for the electric trim, as on the
   real wheel (the right pad is blank, room for one more button). Their nuts are inside the heads; the wires run down the inner
   side of the arms and along the bar into the hub.
-- **Mux:** a CD74HC4067 board (as on the switch panel) on two standoffs on
-  the back center piece's inside, under the tube's hole, the control row
-  up. Inputs, all to GND (active low): C0 left PTT, C1 trim nose down, C2
-  trim nose up, C3 right PTT. C4..C15 and the AUX wire (a pot, e.g. a map
-  light dimmer) are free.
-- **Cable:** the Cat5 cable comes out of the tube, is tied onto the block
-  between the hole and the mux with a cable tie (strain relief) and
-  soldered to the mux control row, like the switch panel's (see [Cable to
-  the hub](../switchpanel/README.md#cable-to-the-hub)). It runs through the tube to hub port 1. In
-  a base that turns and slides the tube, leave the cable slack behind the
-  tube's end for the full travel.
+- **Nano:** an Arduino Nano running MobiFlight stands in a pocket on the
+  back center piece's inside, under the tube's hole, its USB jack up (a
+  ledge under each long edge, a wall beside it and a stop under it; it
+  goes in from the front and a dab of hot glue holds it). Inputs, all to
+  GND (active low, the Nano's internal pull-ups): D2 left PTT, D3 trim
+  nose down, D4 trim nose up, D5 right PTT. The other pins are free (an
+  analog one, e.g. A0, could take a map light dimmer pot). So the yoke is
+  tested on its own with nothing but its USB cable.
+- **Cable:** the USB cable comes out of the tube, is tied onto the block
+  between the hole and the plug with a cable tie (strain relief, so a pull
+  does not lever the jack) and plugs into the Nano. It runs through the
+  tube to the powered USB hub (see
+  [Connections](../hub/README.md#connections)); the plug fits through the
+  tube (21 mm inside). In a base that turns and slides the tube, leave
+  the cable slack behind the tube's end for the full travel.
 
 | File | Parts |
 |------|-------|
@@ -98,8 +102,8 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
 | 1 | aluminium round tube, 25 x 2 mm | control tube, the length the base needs |
 | 2 | 12 mm momentary push button | PTT, left and right |
 | 1 | momentary (ON)-OFF-(ON) mini rocker, 13 x 19 mm cut-out | electric trim |
-| 1 | CD74HC4067 breakout board, 2 M3 x 6 self tapping screws | input mux |
-| 1 | stranded copper Cat5 patch cable, cable tie | to hub port 1 |
+| 1 | Arduino Nano (ATmega328P, 5 V, mini USB), hot glue | MobiFlight board of the yoke |
+| 1 | mini USB cable, long enough through the tube to the powered USB hub; cable tie | to the PC |
 | 22 | M3 x 12 socket head screw | shell pieces |
 | 2 | M3 x 10 screw | heads |
 | 4 | M3 x 8 socket head screw | thumb rests |
@@ -108,27 +112,27 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
 
 **MEASURE:** the tube (`tube_od`, `tube_wall`), the buttons (`ptt_*`:
 hole, body length, nut size; the head's 2.5 mm top must be within their
-panel range), the rocker (`trim_*`: cut-out and body depth) and the mux
-board's holes (`mux_*`, as on the switch panel).
+panel range), the rocker (`trim_*`: cut-out and body depth), the USB
+plug and cable (`usb_plug`, `cable_d`; the plug sits between the Nano and
+the tie block); the Nano's values are the instruments' (`nano_*`).
 
 ## Assembly
 
 1. Put the buttons and the rocker into the heads (nuts inside) and solder
    a long wire to each contact; GND is one wire chained over the left
    head's contacts and one from the right head.
-2. Screw the mux onto its standoffs.
-3. Push the Cat5 cable through the tube. Bolt the collar onto the front
+2. Flash the Nano with MobiFlight (step 7), so it can be tested on the bench.
+3. Push the USB cable through the tube. Bolt the collar onto the front
    center piece (nuts inside), push the tube into the collar up to the
    hub, drill it through the cross bolt holes and bolt it.
 4. Lay the back pieces face down side by side. Push the head wires down
-   the arms and along the bar, solder them to C0..C3 and GND, and the
-   cable to the mux control row (bridge EN to GND); tie the cable onto its
-   block.
+   the arms and along the bar, solder them to D2..D5 and GND of the Nano,
+   put it into its pocket (hot glue), plug the cable in and tie it onto
+   its block.
 5. Put the front pieces on, the lips into them, and screw them on from the
    front: the center piece first, then the horn pieces.
 6. Screw the thumb rests onto the heads. Put the
    heads on (spigots into the arms, wires pulled through) and screw them
    on.
-7. In the MobiFlight Connector, the mux on port 1 (SIG D22) is a
-   Multiplexer device; C0 and C3 are buttons for the PTT, C1 and C2 for the
-   trim.
+7. In the MobiFlight Connector (the Nano flashed and named *Yoke*), D2
+   and D5 are buttons for the PTT, D3 and D4 for the trim.

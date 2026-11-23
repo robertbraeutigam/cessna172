@@ -45,7 +45,8 @@ parts, each built on its own and then bolted together:
   radios change. The lower and upper sheets meet between the two waist
   bars, each screwed onto one.
 - **Desk part**, flat on the desk behind it: a ladder of a front rail, a
-  rear rail and four crossbars, stock lengths. The front rail is cut at
+  rear rail and three crossbars (under the left end, step and right end
+  uprights), stock lengths. The front rail is cut at
   the yoke. The front part is bolted to the front rail with corner
   brackets, and a 45 degree brace from the left end, step and right end
   uprights down to a crossbar stops it from rocking. The braces are 200 mm
@@ -72,7 +73,7 @@ the ignition 20 mm higher (as high as the desk allows, `switch_ign_rise`),
 the primer under its key 20 mm of sheet under the ignition's hole, the
 throttle box with its rods 56 mm over the switch row's bottom like in the
 172N (85 mm below the desk top), its body under the desk on the throttle
-bar, and the flaps panel (lever pot and indicator servo, on hub port 5; not
+bar, and the flaps panel (lever pot and indicator servo, on a Nano of its own; not
 designed yet, so its 50 x 63 mm front plate and 64 mm depth are
 placeholders) 70 mm (`flaps_gap`) right of the throttle box face, its
 body on the throttle bar too. The **parking brake** sits on the bottom bar
@@ -148,14 +149,12 @@ into the sheet for it and its face is screwed onto the sheet. Heavy or
 pulled components also stand on the frame: the throttle box sits on the
 throttle bar, its face flange is screwed onto the sheet like the switch
 panel's and two M5 bolts through its floor go into the bar.
-The pedestal does the same on the apron's lower bar. The [hub](../hub/README.md)
-stands on the desk part right of the yoke, across the step upright's
-crossbar and the hub crossbar right of it: the two ears on its left wall
-are bolted into the first one's top slot (behind the step upright's
-brace), the ears on its front and back walls into the second one's (M5,
-T-nuts). Its front ports face the pilot, its right ports face right and
-its USB jack left, towards the yoke (at least 40 mm room for the plug);
-the crossbars are as long as the hub and the yoke need.
+The pedestal does the same on the apron's lower bar. Every component has
+its own Arduino Nano and USB cable; the
+[powered USB hub](../hub/README.md#powered-usb-hub) they plug into stands
+on the desk right of the yoke, between the step upright's and the right
+end crossbar (not bolted down). The crossbars are as long as the yoke's
+housing needs.
 The [compass](../compass/README.md) stands over the panel on the right
 top bar, about over the radio stack's left edge (`n172_compass_dx`, a
 guess for the windshield's middle): its printed stand's foot is bolted
@@ -170,7 +169,7 @@ components are cut when they arrive.
 All values are in `frame.inc.scad`; the layout (cut-outs, screw holes) is
 computed from the component sizes and the 172N positions, and the build
 prints the cut list (`echo`). With the current guesses the frame is 850 x
-410 mm, the left part 100 mm and the right part 330 mm high above the
+360 mm, the left part 100 mm and the right part 330 mm high above the
 desk, the lower panel 190 mm below it; the left sheet is 511.5 x 290 mm
 (396 mm wide under the waist), the lower right one 454 x 170 mm, the upper
 right one 338.5 x 350 mm, the apron sheet 350 x 220 mm. With the ears the
@@ -179,7 +178,7 @@ frame takes 993 mm of the desk width.
 | Part | 2020 bars |
 |------|-----------|
 | front part (cut) | bottom bar 850, uprights 480 (left end), 130 (split), 310 (step), 480 (right end), 2 waist bars 434, top bar left 491.5 and right 338.5, throttle bar 434, 2 apron hangers 200, lower bar 310 |
-| desk part | front rail left 200 and right 500, rear rail 850, 4 crossbars 350, 3 braces 200 (cut square) |
+| desk part | front rail left 200 and right 500, rear rail 850, 3 crossbars 300, 3 braces 200 (cut square) |
 
 | File | Parts |
 |------|-------|
@@ -215,10 +214,10 @@ with the box in place.
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 22 | 2020 extrusion, 6 mm slot | front part: bottom bar, 4 uprights, 2 waist bars, top bar left and right, throttle bar, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 4 crossbars, 3 braces (cut square) |
+| 21 | 2020 extrusion, 6 mm slot | front part: bottom bar, 4 uprights, 2 waist bars, top bar left and right, throttle bar, 2 apron hangers, lower bar; desk part: front rail left and right, rear rail, 3 crossbars, 3 braces (cut square) |
 | 6 | 45 degree connector for 2020 | brace ends |
 | - | corner brackets, M5 screws, M5 T-nuts | frame joints, and the front part onto the front rail |
 | 4 | 3 mm ACM sheet | panel: left (L shaped), lower right and upper right sheet (sheet_* in the echo); the apron sheet |
-| 61 | M5 button head screw + T-nut (+ washer at the throttle box floor) | sheets, throttle box, pedestal, parking brake, hub and compass stand |
+| 57 | M5 button head screw + T-nut (+ washer at the throttle box floor) | sheets, throttle box, pedestal, parking brake and compass stand |
 | 2 | screw clamp with rubber jaws, 50 mm opening | rail ends onto the desk |
 | 4 | felt pad | on the uprights' and the waist bars' backs, against the desk edge |

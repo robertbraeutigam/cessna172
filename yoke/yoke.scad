@@ -12,9 +12,9 @@
 // pilot, its top a concave round from the side into the shelf, its
 // underside angled back into the side; all of it on the head's side.
 // Everything is hollow: the wires run from the heads down the arms and
-// along the bar to a CD74HC4067 mux in the hub, and the Cat5 cable from
-// there through the hollow control tube to hub port 1 (mux port: SIG D22,
-// AUX A11; hub/README.md "Ports").
+// along the bar to an Arduino Nano running MobiFlight in the hub, and its
+// USB cable from there through the hollow control tube to the powered USB
+// hub (hub/README.md, Connections).
 //
 // Printing: 378 mm wide, so the wheel is cut into six shells, all printed
 // outer face down (both faces are flat, the edges rounded), no supports:
@@ -36,10 +36,11 @@
 //   and holds the tube with two M4 cross bolts; the tube's end stands on
 //   the hub's front, the cable goes through a hole there.
 //
-// Inside: the mux on standoffs on the back center piece under the tube's
-// hole, a block for the cable tie between them (strain relief, like the
-// switch panel). Inputs: C0 left PTT, C1 trim nose down, C2 trim nose up,
-// C3 right PTT, all to GND (active low); C4..C15 and AUX are free.
+// Inside: the Nano standing in a pocket on the back center piece under the
+// tube's hole, its USB jack up, a block for the cable tie between the plug
+// and the hole (strain relief, like the switch panel). Inputs: D2 left
+// PTT, D3 trim nose down, D4 trim nose up, D5 right PTT, all to GND
+// (active low, the Nano's internal pull-ups).
 //
 // Coordinates: x to the pilot's right, y forward (along the control tube,
 // towards the panel), z up, z=0 the lowest point of the bar; the tube's
@@ -50,8 +51,9 @@
 //   base it goes into is not part of this design)
 // - 2x 12 mm momentary push button (ptt_*, MEASURE)
 // - 1x momentary (ON)-OFF-(ON) mini rocker (trim_*, MEASURE)
-// - CD74HC4067 breakout board, 2x M3x6 self tapping screws
-// - stranded copper Cat5 patch cable, a cable tie
+// - Arduino Nano (ATmega328P, 5 V, mini USB), hot glue
+// - mini USB cable, long enough through the tube to the powered USB hub,
+//   a cable tie
 // - 22x M3x12 socket head screws (shells), 2x M3x10 (heads), 4x M3x8
 //   socket head (thumb rests),
 //   4x M4x20 + nuts + washers (collar onto the hub),
@@ -59,14 +61,12 @@
 //
 // Assembly: screw the thumb rests onto the heads,
 // put the buttons and the rocker into the heads (nuts inside),
-// solder a wire pair to each. Screw the mux onto its standoffs. Push the
-// Cat5 cable through the tube; bolt the collar onto the front center piece
-// (nuts inside), push the tube into the collar up to the hub, drill it
-// through the cross bolt holes and bolt it. Lay the back pieces face down
-// side by side, push the head wires down the arms and along the bar,
-// solder them and the cable to the mux (switchpanel/README.md "Cable to
-// the hub"), tie the
-// cable onto its block. Put the front pieces on (lips in) and screw them
+// solder a wire pair to each. Push the USB cable through the tube; bolt
+// the collar onto the front center piece (nuts inside), push the tube into
+// the collar up to the hub, drill it through the cross bolt holes and bolt
+// it. Lay the back pieces face down side by side, push the head wires down
+// the arms and along the bar, solder them to the Nano, put it into its
+// pocket (hot glue), plug the cable in and tie it onto its block. Put the front pieces on (lips in) and screw them
 // on, then the heads (spigots into the arms), one screw each.
 
 $fn = 48;
@@ -172,27 +172,30 @@ trim_cut = [13, 19];         // panel cut-out, across x along the 45 degree pad
 trim_depth = 20;             // body behind the face
 trim_bezel = [15, 21, 2];    // view only
 
-// --- Input multiplexer, CD74HC4067 breakout (as in switchpanel/switches.scad) ---
-mux_board = [41, 18];        // measured
-mux_board_t = 1.6;
-mux_holes = [[-17.5, 0], [17.5, 0]];  // MEASURE: guess, from the board center
-mux_hole_min = 3.1;          // MEASURE: the board's holes must take an M3 (drill them out if not)
-mux_hole_d = mux_hole_min;
-mux_pin_inset = 1.3;
-mux_channels = 16;
-mux_ctl_names = ["SIG", "S3", "S2", "S1", "S0", "EN", "VCC", "GND"];  // MEASURE: order on the board
-mux_standoff_d = 6.5;
-mux_standoff_h = 5;          // back wall to the board, room for the pin ends
-mux_screw_hole = 2.8;        // M3 self tapping
-mux_z = 58;                  // board center: in the hub, under the tube, control row up
+// --- Arduino Nano, MEASURE (instruments/instrument.inc.scad has the same values) ---
+// Standing on the back wall, its USB jack up, component side forward.
+nano_board = [18, 45];       // across (x) x along z, the jack at the top
+nano_t = 1.6;
+nano_under = 2.5;            // parts and solder stubs under the board
+nano_usb = [8, 4];           // jack: width, height over the board
+nano_row = 15.24;            // between the two pin rows
+nano_pin_pitch = 2.54;
+nano_pins = 15;              // per row
+// The rows, each from the USB end (the Nano's pinout); seen from the
+// front (the panel side), the jack up, the digital row is on the right (-x)
+nano_digital_row = ["D12", "D11", "D10", "D9", "D8", "D7", "D6", "D5", "D4", "D3", "D2", "GND", "RST", "RX0", "TX1"];
+nano_analog_row = ["D13", "3V3", "REF", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "5V", "RST", "GND", "VIN"];
+input_pins = ["D2", "D3", "D4", "D5"];   // left PTT, trim nose down, trim nose up, right PTT
+rail_w = 1.5;                // the pocket's side walls
+usb_plug = [12, 9, 28];      // MEASURE: the USB cable's plug: width, height, length with its strain relief
 
-// --- Cable to the hub: tied down between the tube and the mux ---
-cable_d = 6;                 // Cat5 patch cable (measured)
+// --- USB cable: tied down between the plug and the tube ---
+cable_d = 4;                 // MEASURE: the USB cable
 tie = [3.6, 1.3];            // cable tie, width x thickness
 tie_clear = 0.6;
 tie_block = [10, 13, 6];     // along the cable (z) x across (x) x height off the wall
 tie_groove = 1.5;
-tie_z = 82;
+tie_gap = 2;                 // the plug's end to the block
 
 gitrev_depth = 0.6;
 
@@ -250,8 +253,21 @@ bosses_right = concat(
 bosses = concat(bosses_right, [for (b = bosses_right) [-b.x, b.y]]);
 screw_tip = screw_seat - screw_len;
 
-mux_y = y_in_aft + mux_standoff_h;           // board's back
 tie_slot = tie + [tie_clear, tie_clear];
+// The tie block as high as the tube's hole lets it, the plug under it, the
+// Nano under that
+tie_z = z_shaft - cable_hole / 2 - 2 - tie_block.x / 2;
+nano_z1 = tie_z - tie_block.x / 2 - tie_gap - usb_plug.z;   // the board's top end
+nano_z0 = nano_z1 - nano_board.y;
+nano_y = y_in_aft + nano_under;              // the board's back
+nano_y1 = nano_y + nano_t;                   // its component side
+usb_y = nano_y1 + nano_usb.y / 2;            // the jack's middle
+nano_box = [-nano_board.x / 2 - 0.1 - rail_w, nano_z0 - 0.1 - rail_w,
+            nano_board.x / 2 + 0.1 + rail_w, nano_z1];   // the pocket, [x0, z0, x1, z1]
+function nano_pin(name) =
+   let(d = search([name], nano_digital_row)[0], a = search([name], nano_analog_row)[0])
+   [(d != [] ? -1 : 1) * nano_row / 2, nano_z0 + nano_board.y / 2 + (nano_pins - 1) / 2 * nano_pin_pitch
+                                       - (d != [] ? d : a) * nano_pin_pitch];
 
 collar_bore = tube_od + tube_clear;
 collar_od = tube_od + 2 * collar_wall;
@@ -303,19 +319,20 @@ assert(thumb_depth(thumb_screw.y - head_bore / 2) >= thumb_seat + 0.5, "Thumb re
 assert(-head.x / 2 + head_wall + thumb_pad.y <= -trim_cut.x / 2 - 1, "Thumb rest screw pads run into the trim rocker");
 for (p = thumb_screws())
    assert(p.y - thumb_pad.x / 2 >= head_wall + 1, "Thumb rest screw pads run into the head's bottom");
-// hub: collar, cable, tie, mux
+// hub: collar, cable, tie, Nano
 assert(z_shaft + collar_flange.x / 2 <= hub_top.y - round - 2 &&
        collar_flange.x / 2 + wall <= hub_hw(z_shaft + collar_flange.x / 2), "Collar flange does not fit the hub");
 assert(collar_bolt_r - m4_head.x / 2 >= collar_od / 2 + 1.5 && collar_bolt_r + m4_head.x / 2 <= collar_flange.x / 2,
        "Collar bolts do not fit the flange");
 assert(min([for (b = bosses, c = collar_bolts) norm(b - c)]) >= boss_d / 2 + m4_nut.x, "Collar nuts run into the bosses");
 assert(cable_hole < tube_od - 1, "The tube does not stand on the hub front");
-assert(tie_z + tie_block.x / 2 <= z_shaft - cable_hole / 2 - 2, "Cable tie block runs into the hole");
-assert(mux_z + mux_board.y / 2 + 3 <= tie_z - tie_block.x / 2, "Mux too close to the tie block");
-assert(mux_board.x / 2 + 2 <= hub_hw(mux_z + mux_board.y / 2) - wall - edge_r &&
-       mux_z - mux_board.y / 2 >= wall + edge_r, "Mux does not fit the hub");
-assert(min([for (b = bosses, h = mux_holes) norm(b - [h.x, mux_z + h.y])]) >= boss_d / 2 + mux_board.y / 2,
-       "Mux runs into a boss");
+assert(nano_box[0] >= -(hub_hw(hub_z0) - wall - edge_r) && nano_box[1] >= bar_bottom(nano_box[2]) + wall + edge_r,
+       "Nano does not fit the hub and the bar");
+assert(abs(y_in_aft + tie_block.z - tie_groove + cable_d / 2 - usb_y) <= 2, "The tie block holds the cable off the jack");
+assert(usb_y + usb_plug.y / 2 <= y_in_fwd - 2, "USB plug runs into the front wall");
+for (b = bosses)
+   assert(norm([max(0, nano_box[0] - b.x, b.x - nano_box[2]), max(0, nano_box[1] - b.y, b.y - tie_z - tie_block.x / 2)])
+          >= boss_d / 2 + 0.5, "Nano, plug or tie block runs into a boss");
 
 // --- Shape ---
 
@@ -395,6 +412,21 @@ module tie_block() {
             }
 }
 
+// The Nano's pocket on the back wall: a ledge under each long edge, a side
+// wall beside it and a stop under the bottom end; it goes in from the
+// front, hot glue holds it
+module nano_pocket() {
+   for (s = [-1, 1]) {
+      xo = s * (nano_board.x / 2 + 0.1);
+      translate([s > 0 ? xo : xo - rail_w, y_in_aft - 0.01, nano_z0 - 0.1 - rail_w])
+         cube([rail_w, nano_under + nano_t + 0.01, nano_board.y + 0.1 + rail_w]);
+      translate([s > 0 ? xo - 1.2 : xo, y_in_aft - 0.01, nano_z0 - 0.1])
+         cube([1.2, nano_under + 0.01, nano_board.y + 0.1]);
+   }
+   translate([nano_box[0], y_in_aft - 0.01, nano_box[1]])
+      cube([nano_box[2] - nano_box[0], nano_under + nano_t + 0.01, rail_w]);
+}
+
 // Solid additions inside the shell
 module inner_parts() {
    intersection() {
@@ -406,8 +438,7 @@ module inner_parts() {
          y_cyl([0, z_shaft], collar_flange.x, y_in_fwd - collar_pad, y_in_fwd + 0.01);
       }
    }
-   for (h = mux_holes)
-      y_cyl([h.x, mux_z + h.y], mux_standoff_d, y_in_aft - 0.01, mux_y);
+   nano_pocket();
    tie_block();
 }
 
@@ -424,8 +455,6 @@ module holes() {
    for (s = [-1, 1])
       arm_frame(s)
          y_cyl([0, -head_screw_z], clear_d, 0, y_fwd + 1);
-   for (h = mux_holes)
-      y_cyl([h.x, mux_z + h.y], mux_screw_hole, y_in_aft + 1, mux_y + 1);
 }
 
 // Version on the front of the bar, readable from the front
@@ -696,11 +725,10 @@ c_shell = "#2b2d31";
 c_shell2 = "#3a3d42";
 c_collar = "#3d7bd9";
 c_steel = "#b9c0c8";
-c_pcb = "#1f7a3a";
+c_pcb = "#1d4fa0";
 c_body = "#1d1f22";
 c_cable = "#3d7bd9";
 c_red = "#e8433a";
-c_wire = ["#f2a33a", "#e8e8e8", "#f2a33a", "#e8e8e8", "#3d7bd9", "#e8e8e8", "#7a4a2a", "#e8e8e8"];
 
 module tube_part() {
    color(c_steel)
@@ -732,26 +760,14 @@ module controls_part(sides = [-1, 1]) {
    }
 }
 
-function mux_ch_pin(i) = [(7.5 - i) * 2.54, mux_z - mux_board.y / 2 + mux_pin_inset];
-function mux_ctl_pin(name) = [(3.5 - search([name], mux_ctl_names)[0]) * 2.54,
-                              mux_z + mux_board.y / 2 - mux_pin_inset];
-
-// Board with the control row at the top, the channel row at the bottom
-module mux_part() {
-   color(c_pcb)
-      difference() {
-         translate([0, mux_y + mux_board_t / 2, mux_z])
-            cube([mux_board.x, mux_board_t, mux_board.y], center = true);
-         for (h = mux_holes)
-            y_cyl([h.x, mux_z + h.y], mux_hole_d, mux_y - 1, mux_y + 3);
-      }
-   color(c_body)
-      translate([0, mux_y + mux_board_t + 0.75, mux_z])
-         cube([10, 1.5, 5.3], center = true);
-   color(c_steel)
-      for (p = concat([for (i = [0 : mux_channels - 1]) mux_ch_pin(i)],
-                      [for (n = mux_ctl_names) mux_ctl_pin(n)]))
-         y_cyl(p, 0.8, mux_y + mux_board_t, mux_y + mux_board_t + 2);
+// The Nano: component side forward, its jack up
+module nano_part() {
+   color(c_pcb) translate([-nano_board.x / 2, nano_y, nano_z0]) cube([nano_board.x, nano_t, nano_board.y]);
+   color(c_body) translate([0, nano_y1 + 0.6, nano_z0 + 18]) rotate([0, 45, 0]) cube([7, 1.2, 7], center = true);
+   color(c_steel) translate([-nano_usb.x / 2, nano_y1, nano_z1 - 8]) cube([nano_usb.x, nano_usb.y, 9]);
+   color("#d9b24a")
+      for (n = concat(nano_digital_row, nano_analog_row)) let(p = nano_pin(n))
+         y_cyl(p, 0.8, nano_y1, nano_y1 + 1.5);
 }
 
 module wire(path, d = 1.4) {
@@ -762,28 +778,23 @@ module wire(path, d = 1.4) {
       }
 }
 
-// Cat5 out of the tube, tied onto the block, the wires to the control row;
-// a wire from each button down the arm and along the bar to the channel row
+// The USB cable out of the tube, tied onto the block, plugged into the
+// Nano; a wire from each button down the arm and along the bar to its pin
 module wiring_part() {
    yt = y_in_aft + tie_block.z - tie_groove + cable_d / 2;   // cable axis on the block
-   z_end = tie_z - tie_block.x / 2 - 1;                     // jacket end
-   color(c_cable)
+   z_plug = nano_z1 + usb_plug.z;                           // the plug's end
+   color(c_cable) {
       wire([[0, y_fwd + 40, z_shaft], [0, y_in_fwd - 2, z_shaft], [0, yt + 8, z_shaft - 2],
-            [0, yt + 1, tie_z + tie_block.x / 2 + 3], [0, yt, z_end]], cable_d);
+            [0, yt + 1, tie_z + tie_block.x / 2 + 3], [0, yt, tie_z - tie_block.x / 2], [0, usb_y, z_plug]], cable_d);
+      translate([-usb_plug.x / 2, usb_y - usb_plug.y / 2, nano_z1]) cube([usb_plug.x, usb_plug.y, usb_plug.z]);
+   }
    color("#f0f0f0")
       translate([0, yt, tie_z])
          difference() {
             cylinder(d = cable_d + 2 * tie.y, h = tie.x, center = true);
             cylinder(d = cable_d, h = tie.x + 1, center = true);
          }
-   for (j = [0 : len(mux_ctl_names) - 1]) {
-      p = mux_ctl_pin(mux_ctl_names[j]);
-      if (mux_ctl_names[j] != "EN")
-         color(c_wire[j])
-            wire([[(j - 3.5) * 0.8, yt, z_end], [p.x * 0.6, yt - 1, z_end - 3],
-                  [p.x, mux_y + mux_board_t + 2, p.y + 1]], 1);
-   }
-   // C0 left PTT, C1/C2 trim, C3 right PTT, down the inner side of the arm
+   // D2 left PTT, D3/D4 trim, D5 right PTT, down the inner side of the arm
    function arm_path(s, off) = [for (q = [arm_pt(10, off), arm_pt(-10, off), arm_pt(-50, off - 2),
                                          arm_pt(-85, off), arm_pt(-108, off + 8), [150, 30 + off / 3]])
                                 [s * q.x, q.y]];
@@ -791,19 +802,19 @@ module wiring_part() {
    for (k = [0 : len(runs) - 1]) {
       r = runs[k];
       s = r[0];
-      p = mux_ch_pin(r[1]);
+      p = nano_pin(input_pins[r[1]]);
       dy = -6 + k * 1.6;
       color(r[2])
          wire(concat([for (q = arm_path(s, -6)) [q.x, dy, q.y]],
                      [[s * 130, dy, bar_mid(130) + 2], [s * 48, dy, bar_mid(60) + 2],
-                      [p.x, dy, p.y - 6], [p.x, mux_y + mux_board_t + 2, p.y]]));
+                      [p.x - 6, dy, p.y], [p.x, nano_y1 + 1.5, p.y]]));
    }
    // the GND wire, daisy chained over the left buttons
-   gnd = mux_ctl_pin("GND");
+   gnd = nano_pin("GND");
    color("#222222")
       wire(concat([for (q = arm_path(-1, -9)) [q.x, -3, q.y]],
                   [[-130, -3, bar_mid(130) - 2], [-48, -3, bar_mid(60) - 2],
-                   [-mux_board.x / 2 - 4, -3, mux_z + mux_board.y / 2 + 3], [gnd.x, mux_y + mux_board_t + 2, gnd.y]]));
+                   [gnd.x - 6, -3, gnd.y], [gnd.x, nano_y1 + 1.5, gnd.y]]));
 }
 
 module collar_bolts_part() {
@@ -849,7 +860,7 @@ module assembled_view() {
 // The back pieces with everything in them, seen from the front
 module inside_view() {
    aft_parts();
-   mux_part();
+   nano_part();
    wiring_part();
    controls_part();
 }
@@ -864,7 +875,7 @@ module exploded_view(e = explode) {
    }
    translate([0, 2 * e, 0]) color(c_shell) center_fwd();
    color(c_shell2) center_aft();
-   mux_part();
+   nano_part();
    translate([0, 3 * e, 0]) {
       color(c_collar) collar();
       translate([0, e, 0]) tube_part();

@@ -25,7 +25,7 @@
 // digit boards with jumpers. The encoders and the pots are nutted onto the
 // face, the flip buttons press tactile switches on small perfboard pieces.
 // Everything goes to the second Mega (the radio stack's own MobiFlight
-// board, not the hub) on one cable out of the open back, tied onto
+// board) on one cable out of the open back, tied onto
 // tie_block.
 //
 // Coordinates: radio.inc.scad (installed: x right, y backwards, z up).
