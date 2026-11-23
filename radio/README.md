@@ -5,9 +5,10 @@
 The KMA 26 audio panel at the top, two KX155 NAV/COM
 radios (COM1/NAV1, then COM2/NAV2) and the KT 76C transponder at the
 bottom, stacked in one cut-out of the panel sheet like the real stack.
-The KX155s and the KT 76C are read and driven by a second Arduino Mega of
-their own, the audio panel by its own Arduino Nano (see
-[KMA 26](#kma-26)). All units are 224 mm wide (`unit_w`, the KX155's
+Every unit has an Arduino Nano of its own running MobiFlight, with a USB
+cable out of its open back to the powered USB hub (see
+[Connections](../hub/README.md#connections)), so each one is tested on
+its own. All units are 224 mm wide (`unit_w`, the KX155's
 width), each has its real height: the stack is 33 + 2 x 50.8 + 41.9 =
 176.5 mm high.
 
@@ -57,9 +58,9 @@ maker's logo.
   marker board (the lamp LEDs, the MUTE switch) and the button board (10
   switches, 10 LEDs), each LED with its resistor beside it. Behind them,
   in rails on the floor like the KX155's driver boards, the logic board.
-- **Its own board**: the KX155s and the KT 76C leave only 5 pins of the
-  stack's Mega, and the audio panel needs 20 inputs, 13 lamps and a pot.
-  So it runs MobiFlight on an Arduino Nano on the logic board, with a
+- **Its own board**: the audio panel needs 20 inputs, 13 lamps and a pot,
+  more than a Nano has pins. So it runs MobiFlight on an Arduino Nano on
+  the logic board, with a
   CD74HC4067 mux for 15 of the inputs and two chained 74HC595 shift
   registers for the lamps; its USB cable leaves through the open back,
   tied onto the tie block, to the powered USB hub. The Connector shows it
@@ -131,7 +132,7 @@ down to 470 Ohm, not lower (a 595 gives about 70 mA in all).
 D0 and D1 are the Nano's USB serial, A1..A6 are free (A6 and A7 are
 analog only; the Connector numbers A0..A7 as 14..21). D13 also drives the
 Nano's own LED, which flickers with the shift register clock. In the
-Connector, flash the Nano with the MobiFlight firmware like the Megas (it
+Connector, flash the Nano with the MobiFlight firmware like the others (it
 tries both bootloader speeds, so old bootloader clones work too). The
 Nano firmware takes up to 18 buttons, 6 multiplexers, 6 shift registers
 and 8 analog inputs, but has little memory for the configuration: keep
@@ -185,9 +186,14 @@ switches that radio off (a pot with a switch).
   (the nuts sit under the knob skirts). Each flip button presses a 6 x 6
   mm tactile switch on a small perfboard on two bosses behind it. The four
   MAX7219s are the cheap 8x8 matrix kit boards with the matrix left off,
-  slid into rails on the floor from the open back and wired to the digit
-  boards with jumpers from their matrix sockets. The cable leaves through
-  the open back, tied onto the tie block.
+  slid into rails on the floor from the open back (at the left wall) and
+  wired to the digit boards with jumpers from their matrix sockets.
+- **Its own board**: an Arduino Nano running MobiFlight lies in rails on
+  the floor right of the driver boards (it reaches under the NAV encoder,
+  lower than its body), its USB jack at the open back; it slides in from
+  there up to a stop (a dab of hot glue keeps it). Its USB cable to the
+  powered USB hub is tied onto the tie block beside it. Every line has a
+  pin of its own (see [Wiring](#wiring-1)).
 - **Knobs**: printed, ribbed like the real ones, pressed on: the outer and
   volume knobs onto round shafts (crush ribs in the bore), the inner knob
   onto the D shaft. Print them on their front.
@@ -214,44 +220,44 @@ Per KX155:
 | 2 | tactile switch, 6 x 6 mm, 5 mm high | flip-flop buttons |
 | 8 | 7 segment module, 0.28", 3 digits, common cathode, red (e.g. Lumex LDT-N2804RI) | the four frequencies |
 | 4 | MAX7219 8x8 dot matrix kit board (without the matrix) | digit drivers |
+| 1 | Arduino Nano (ATmega328P, 5 V), mini USB cable, cable tie | MobiFlight board of the unit |
 | 4 | red transparent acrylic, 2 mm, cut to the window plus 1.5 mm all round | display filters |
 | - | perfboard | 2 digit boards, 2 flip switch boards |
 | 4 | M3 x 10 pan head screw + nut | face flanges onto the sheet |
 | 8 | M3 x 8 self tapping screw | boards onto the bosses |
 
-For the stack: 1 Arduino Mega (the radio stack's MobiFlight board) and a
-USB cable to the powered USB hub.
 
 ### Wiring
 
-Every unit has its own cable to the stack's Mega (its box and the cable
-type are still open, they come with the frame's stack cut-out). Per
-unit, all inputs go to GND when active, like everywhere in the cockpit:
+All inputs go to GND when active, like everywhere in the cockpit (the
+Nano's internal pull-ups). Every line has a pin of the unit's Nano
+(`nano_pins` in `kx155.scad`), wired with hookup wire:
 
-| Signal | Wires | MobiFlight device |
-|--------|-------|-------------------|
-| 5 V, GND | 2 | |
-| MAX7219 DIN, CLK, CS | 3 | *LED Module*, 4 modules in the chain |
-| COM encoder outer A, B; inner A, B | 4 | 2 *Encoders* |
-| NAV encoder outer A, B; inner A, B | 4 | 2 *Encoders* |
-| COM and NAV encoder push | 2 | 2 *Buttons* |
-| COM and NAV flip button | 2 | 2 *Buttons* |
-| COM and NAV pot switch | 2 | 2 *Buttons* |
-| COM and NAV pot wiper | 2 | 2 *Analog inputs* (analog Mega pins) |
+| Nano pin | Signal | MobiFlight device |
+|----------|--------|-------------------|
+| D2, D3, D4 | MAX7219 DIN, CS, CLK | *LED Module*, 4 modules in the chain |
+| D5, D6; D7, D8 | COM encoder outer A, B; inner A, B | 2 *Encoders* |
+| D9, D10; D11, D12 | NAV encoder outer A, B; inner A, B | 2 *Encoders* |
+| A0, A1 | COM and NAV encoder push | 2 *Buttons* |
+| A2, A3 | COM and NAV flip button | 2 *Buttons* |
+| A4, A5 | COM and NAV pot switch | 2 *Buttons* |
+| A6, A7 | COM and NAV pot wiper | 2 *Analog inputs* (A6 and A7 are analog only) |
+| 5V, GND | the MAX7219s, the pots' ends, the switches' common | |
 
-That is 21 wires, 19 Mega pins per unit. With the KT 76C's 25 (see its
-Wiring section) the stack takes 63 of the Mega's 68 free
-pins (54 digital and 16 analog, without 0 and 1, the USB serial); the
-KMA 26 has its own board. The four
+That is 17 digital pins (D13 is free) and the 2 analog ones. Name the
+two units' Nanos apart in the Connector (e.g. COM1 and COM2); their
+configurations are the same but for the datarefs (`com1`/`nav1` or
+`com2`/`nav2`). The four
 MAX7219s are chained DOUT to DIN, in the order COM USE, COM STBY, NAV USE,
 NAV STBY. On each digit board, wire digit 0 of a MAX7219 to the leftmost
-digit of its frequency. The pots go between 5 V and GND, the wiper to the
-Mega.
+digit of its frequency. The pots go between 5 V and GND, the wiper to
+its pin.
 
-The MAX7219s take their current from the Mega's USB 5 V: keep the
-brightness low in the Connector (the real displays are not bright
-either). If the Mega resets, feed the digits from a separate 5 V supply,
-its GND joined to the Mega's.
+The MAX7219s take their current from the Nano's 5 V pin (USB, behind the
+Nano's diode): keep the brightness low in the Connector (the real
+displays are not bright either). If the Nano resets, feed the digits
+from the USB 5 V before the diode or a separate 5 V supply, its GND
+joined to the Nano's.
 
 ### In X-Plane
 
@@ -293,7 +299,7 @@ right the function selector knob: OFF, SBY, TST, ON, ALT.
 - **Annunciators**: the words are cut through a printed black display
   mask behind the red filter, as stencil letters (thin bridges hold the
   middles of A, O, D, B and R). Each word has its own cell in the mask
-  with a 3 mm red LED behind it, on its own Mega pin. The mask also has
+  with a 3 mm red LED behind it, on its own Nano pin. The mask also has
   the openings the digit modules sit in, and it is clamped between the
   filter and the front board.
 - **Buttons**: printed caps (cream or white, the engraved labels filled
@@ -301,15 +307,16 @@ right the function selector knob: OFF, SBY, TST, ON, ALT.
   flange, a post on their back presses a 6 x 6 mm tactile switch.
 - **Function selector**: a 1 pole 12 way rotary switch with its stop
   washer set to 5 positions (30 degrees apart), nutted onto the face,
-  every position on its own Mega pin, so the sim always follows the
+  every position on its own mux input, so the sim always follows the
   knob. The printed knob has a pointer line engraved for white paint.
 - **Inside**: one front perfboard, cut L shaped (its lower strip runs
   under the rotary switch to CLR and VFR), carries the digit modules, the
   LEDs and all 11 tactile switches; it is screwed onto three bosses on
   the plate back. The MAX7219 is the matrix kit board without the matrix
-  in rails on the floor, like the KX155's. The cable leaves through the
-  open back, tied onto the tie block.
-- **Size**: 224 x 41.9 mm (the real height, 1.65"), 57 mm deep; mounted
+  in rails on the floor, like the KX155's; left of it the logic board with
+  the unit's Nano and a mux (see [Wiring](#wiring-2)). Its USB cable
+  leaves through the open back, tied onto the tie block.
+- **Size**: 224 x 41.9 mm (the real height, 1.65"), 75 mm deep; mounted
   like the KX155s with two M3 screws in each end flange.
 
 The rotary switch (`rot_*`) and LED sizes are MEASURE values (the rotary
@@ -325,6 +332,9 @@ labels do not collide.
 | 11 | tactile switch, 6 x 6 mm, 5 mm high | IDT, 0..7, CLR, VFR |
 | 3 | 7 segment module, 0.28", 3 digits, common cathode, red (e.g. Lumex LDT-N2804RI) | flight level, code |
 | 1 | MAX7219 8x8 dot matrix kit board (without the matrix) | digit driver |
+| 1 | Arduino Nano (ATmega328P, 5 V), female headers, mini USB cable, cable tie | MobiFlight board of the unit |
+| 1 | CD74HC4067 16 channel mux breakout | the 16 buttons and selector positions |
+| 1 | perfboard, 72 x 50 mm (`lg_board`) | logic board: the Nano and the mux |
 | 6 | red LED, 3 mm, and a 1 kOhm resistor each | annunciators |
 | 1 | red transparent acrylic, 2 mm, 137 x 17 mm | display filter |
 | 1 | perfboard, 10 x 22 cm, cut to the front board | everything on the face |
@@ -341,21 +351,38 @@ display mask onto the filter. Solder the digit modules, LEDs and tactile
 switches onto the front board, the LEDs sitting on the board, and screw
 it onto the bosses: the digits go into the mask's openings and the LEDs
 into its cells. Face onto the plate, rotary switch through both from the
-back, nut on the front. Driver board into its rails, wiring, cable tied
-onto the tie block. Turn the switch fully left (OFF) and press the knob
+back, nut on the front. Driver board and logic board into their rails,
+wiring, the USB cable plugged in and tied onto the tie block. Turn the switch fully left (OFF) and press the knob
 on pointing at OFF. Into the sheet under the KX155s.
 
 ### Wiring
 
-| Signal | Wires | MobiFlight device |
-|--------|-------|-------------------|
-| 5 V, GND | 2 | |
-| MAX7219 DIN, CLK, CS | 3 | *LED Module*, 1 module (7 of its 8 digits) |
-| IDT, 0..7, CLR, VFR | 11 | 11 *Buttons* |
-| OFF, SBY, TST, ON, ALT | 5 | 5 *Buttons* (the rotary switch's common to GND) |
-| R, FL, ALT, ON, GND, SBY annunciators | 6 | 6 *Outputs* (LED anode through its resistor, cathode to GND) |
+The KT 76C has 16 buttons and selector positions, more inputs than its
+Nano has pins besides the display and the annunciators, so they go
+through a CD74HC4067 mux on the logic board, like the KMA 26's. The
+logic board (a perfboard, `lg_board`) lies in rails on the floor left of
+the driver board, the Nano on female headers at its back right (USB jack
+at the back edge), the mux at its front left. All inputs go to GND when
+active (the mux's SIG has the Nano's internal pull-up). `nano_pins` and
+`mux_inputs` in `kt76c.scad`:
 
-That is 27 wires, 25 Mega pins. On the MAX7219, digits 0..2 are the
+| Nano pin | Signal | MobiFlight device |
+|----------|--------|-------------------|
+| D2, D3, D4, D5 | mux S0..S3 | *Multiplexer* |
+| D6 | mux SIG | (its data pin) |
+| D7, D8, D9 | MAX7219 DIN, CS, CLK | *LED Module*, 1 module (7 of its 8 digits) |
+| D10, D11, D12, A0, A1, A2 | R, FL, ALT, ON, GND, SBY annunciators | 6 *Outputs* (LED anode through its resistor, cathode to GND) |
+| 5V, GND | the mux, the MAX7219, the switches' and the rotary switch's common | |
+
+| Mux | Input | Mux | Input |
+|-----|-------|-----|-------|
+| C0..C7 | code buttons 0..7 | C11 | OFF |
+| C8 | CLR | C12 | SBY |
+| C9 | VFR | C13 | TST |
+| C10 | IDT | C14 | ON |
+| | | C15 | ALT |
+
+The mux's EN goes to GND. D13 and A3..A7 are free. On the MAX7219, digits 0..2 are the
 flight level (left to right) and 3..6 the code; leave the two hidden
 digits of the last module unwired.
 

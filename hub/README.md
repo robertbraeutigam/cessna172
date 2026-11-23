@@ -3,8 +3,8 @@
 [Cessna 172 home cockpit](../README.md) / `hub/`
 
 How the components connect to the PC. There is no central box: every
-component has a board of its own running MobiFlight (an Arduino Nano,
-the radio stack a Mega), with one USB cable to a powered USB hub on the
+component has a board of its own running MobiFlight (an Arduino Nano;
+each radio unit too), with one USB cable to a powered USB hub on the
 desk, and one cable from there to the PC. This page is the overview
 (boards, MobiFlight, the USB hub and power); each component's README has
 its pins and wiring.
@@ -41,12 +41,12 @@ its pins and wiring.
 | flaps (not designed yet) | Nano | lever pot, indicator servo |
 | [compass](../compass/README.md) | Nano | card stepper, home sensor |
 | [instruments](../instruments/README.md) | a Nano each, on its board carrier | needle stepper(s), home sensor(s), the NAV indicators' OBS encoder |
-| [radio stack](../radio/README.md) | Mega (KX155s, KT 76C), Nano (KMA 26) | encoders, displays, buttons, lamps |
+| [radio stack](../radio/README.md) | a Nano per unit: KMA 26, the two KX155s, KT 76C (the KMA 26 and the KT 76C with a mux) | encoders, displays, buttons, lamps |
 | Saitek yoke, Saitek radio panel | their own USB | |
 
 The `hub/` directory once held a box with a Mega and RJ45 ports that
 every component was cabled to; it is not used any more (the Mega is a
-spare, e.g. for the radio stack).
+spare).
 
 ### MobiFlight
 
@@ -73,7 +73,8 @@ script in X-Plane does it (see [In X-Plane](../ignition/README.md#in-x-plane)).
 ### Powered USB hub
 
 Every board has its own USB cable, and the Saitek yoke and radio panel
-too: with the whole six-pack, the NAV indicators and the RPM about 20.
+too: with the whole six-pack, the NAV indicators, the RPM and the four
+radio units about 22.
 USB takes up to 127 devices, and hubs can be chained, so the count is no
 problem: a 16 port hub, or two hubs, one into the other, and one cable
 from the first to the PC. It stands on the desk right of the yoke (see
@@ -98,6 +99,8 @@ their power from USB too.
   Nano of its own each one has its own USB port. Put a 470 uF capacitor
   across its supply at the servo; if its Nano resets when it moves, feed
   it from the USB 5 V before the Nano's diode (the 5V pin is behind it).
+- **Displays**: the radio units' MAX7219 digits, at low brightness some
+  tens to a hundred mA per unit, each on its own port.
 - **The rest**: about 50 mA per Nano, a few hundred mA for the Saitek
   devices.
 

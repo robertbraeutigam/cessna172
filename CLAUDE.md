@@ -82,7 +82,7 @@ its own top-level directory; new components should follow the same layout.
     a command itself).
 
 - `hub/` — no parts: `README.md` is how everything connects. Every
-  MobiFlight component has its own Arduino Nano (the radio stack a Mega)
+  MobiFlight component has its own Arduino Nano (each radio unit too)
   with one USB cable to a powered USB hub on the desk right of the yoke,
   so each one stands and is tested on its own; switches go to GND on the
   Nano's internal pull-ups, no resistors, no muxes. The README has the
@@ -113,9 +113,10 @@ its own top-level directory; new components should follow the same layout.
 
 - `radio/` — the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs
   and the KT 76C transponder (top to bottom) stacked without gaps in one
-  cut-out of the sheet; the KX155s and KT 76C on a second Mega of their
-  own (not the hub: too many encoders and displays), the audio panel on
-  its own Arduino Nano (that Mega has 5 pins left).
+  cut-out of the sheet; every unit has its own Arduino Nano running
+  MobiFlight (USB out of its open back, tied onto `tie_block`).
+  `radio.inc.scad` has the Nano's sizes (`nano_*`), its floor rails
+  (`nano_rails`) and the mux board's size.
   - `radio.inc.scad` — the stack's standard, included by every unit:
     unit width (`unit_w`, the KX155's, which checks it; every unit is as
     wide), the KX155's height (`unit_h`, 2.00"; each unit has its real
@@ -131,8 +132,10 @@ its own top-level directory; new components should follow the same layout.
     the real one; dual concentric frequency knobs (outer MHz, inner kHz,
     printed outer, inner and volume knobs), volume pots with switch,
     flip buttons on tactile switches. `groups` drives the display layout,
-    `row` the bottom row. The `enc_*`, `pot_*`, `tact`, `drv_*` values are
-    MEASURE.
+    `row` the bottom row. Its Nano lies in floor rails right of the
+    driver boards (at the left wall), every line on a pin of its own
+    (`nano_pins`: 17 digital, the pots on A6/A7). The `enc_*`, `pot_*`,
+    `tact`, `drv_*` values are MEASURE.
   - `kt76c.scad` — the KT 76C transponder, 1.65" high: IDT, display
     (flight level from X-Plane's pressure altitude, 3 digits; code, 4
     digits of two 3 digit modules; one MAX7219), annunciators R, FL, ALT,
@@ -140,7 +143,10 @@ its own top-level directory; new components should follow the same layout.
     mask with a 3 mm LED cell each, code buttons 0..7, CLR, VFR (printed
     caps on tactile switches), function selector on a 12 way rotary switch
     limited to 5 positions. One L shaped front board carries the digits,
-    LEDs and switches. The `rot_*` values are MEASURE (guesses).
+    LEDs and switches. A logic board in floor rails (like the KMA 26's)
+    carries its Nano and a CD74HC4067 mux for the 16 buttons and selector
+    positions (`nano_pins`, `mux_inputs`). The `rot_*` values are MEASURE
+    (guesses).
   - `kma26.scad` — the KMA 26 audio panel, 1.30" high (`ap_h`): marker
     lamps O, M, I (printed lenses, a 3 mm LED in a cell each), MKR MUTE,
     two mini toggles (HI SENS/LO SENS/TEST, PILOT/CREW/ALL), INTERCOM
