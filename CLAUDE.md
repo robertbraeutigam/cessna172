@@ -189,6 +189,20 @@ its own top-level directory; new components should follow the same layout.
     KNOTS 40-200 on a non-linear scale (`asi_cal`, also the MobiFlight
     interpolation table in the README), MPH inside, the 172N's white,
     green and yellow arcs and red line at 160.
+  - `ai.scad` — the attitude indicator (the six-pack's top middle): the
+    standard's case front, then its own mechanism. A roll frame (the roll
+    dial with the bank marks, two arms, a back disc with the roll gear)
+    turns in a printed sleeve (front ring with the bank index and the
+    glued-in miniature airplane, legs to the back plate); a horizon drum
+    (`pitch_k` degrees per degree of pitch, a printed strip) turns across
+    it, driven through the roll axis: pitch axle with a sun gear, planet on
+    the roll frame, bevel pinion to a bevel gear in the drum (1:1 overall,
+    small gears rack-cut). Both 28BYJ-48s with the standard's 1:1 gears on
+    the back plate (roll right, pitch left), a hall sensor each (the
+    roll's on a post), two ULN2003s and a Nano on a carrier behind them;
+    MobiFlight adds the roll to the pitch motor. Prints `face` (roll dial)
+    and `drum` (strip). 118 mm deep (`ai_depth` in the frame: it stays
+    over the force feedback yoke's housing).
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the
