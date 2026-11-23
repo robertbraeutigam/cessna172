@@ -284,6 +284,10 @@ inst_cut_d = 81;             // their hole (cut_d)
 inst_body_d = 84;            // the case behind the sheet (case_d), its screw ears on the diagonals
 inst_ear = [46, 9];          // the screw ears: from the axis, diameter (ear_r, ear_d)
 inst_depth = 15;             // the case behind the sheet's back (instrument_depth echo)
+// The ASI (instruments/asi.scad) is in the "deep" layout: the motor and
+// the boards behind the case, within its outline, this deep behind the
+// sheet's back (instrument_depth echo)
+asi_depth = 46.6;
 // The RPM's drive (instruments/rpm.scad): its motor sits on an arm to the
 // right, beside the yoke housing, which is right behind the RPM. From the
 // axis, [x0, x1, half height]: the arm, as deep as the case, and what is
@@ -373,7 +377,7 @@ sheet_h = z_tl + ext;                        // left sheet's top above the desk 
 inst_c = concat([for (z = n172_six_dz, i = [-1 : 1]) [six_x + i * six_step, col_z + z]],
                 [for (z = n172_six_dz) [nav_x, col_z + z]],
                 [[six_x + six_step + n172_rpm[0], col_z + n172_rpm[1]]]);
-inst_names = ["ASI", "AI", "ALT", "TC", "HI", "VSI", "NAV 1", "NAV 2", "RPM"];
+inst_names = ["TC", "HI", "VSI", "ASI", "AI", "ALT", "NAV 1", "NAV 2", "RPM"];   // the lower row first
 inst_box = [min([for (c = inst_c) c.x]) - inst_cut_d / 2, min([for (c = inst_c) c.y]) - inst_cut_d / 2,
             max([for (c = inst_c) c.x]) + inst_cut_d / 2, max([for (c = inst_c) c.y]) + inst_cut_d / 2];
 // right top bar: over the instruments' top row (stage 2), at the glareshield
@@ -537,7 +541,8 @@ for (i = [0 : len(inst_c) - 1])
       for (j = [0 : len(inst_c) - 1])
          assert(i == j || norm(inst_c[i] - inst_c[j]) >= max(inst_cut_d + 3, inst_body_d + 1), str(inst_names[i], " (stage 2) runs into another instrument"));
       let(b = circ(inst_c[i], inst_body_d))
-         assert(!overlaps([b[0], b[2]], yoke_x) || b[1] >= max(yoke_housing.z, ffb_h) || inst_depth <= yoke_front_y - 3,
+         assert(!overlaps([b[0], b[2]], yoke_x) || b[1] >= max(yoke_housing.z, ffb_h)
+                || (inst_names[i] == "ASI" ? asi_depth : inst_depth) <= yoke_front_y - 3,
                 str(inst_names[i], " (stage 2) runs into the yoke housing"));
       assert(r[2] <= x_a || r[1] >= z_waist + 2 * ext, str(inst_names[i], " (stage 2) over the split upright"));
    }

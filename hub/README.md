@@ -214,7 +214,7 @@ Add a Servo device on D44 and D46 in the Connector.
   firmware and 6 RJ45 ports. A powered USB hub next to it takes the USB
   cables (Mega, Saitek yoke, Saitek radio panel, later the
   FFB yoke, the radio stack's Mega, the audio panel's Nano, the
-  compass's Nano and the RPM indicator's Nano), so
+  compass's Nano and the RPM and airspeed indicators' Nanos), so
   one USB cable runs to the PC.
 - Every MobiFlight component connects to its own hub port with one
   straight Cat5 patch cable, soldered straight to the component (see
@@ -236,10 +236,11 @@ Add a Servo device on D44 and D46 in the Connector.
   hub either: its stepper needs four outputs and a home input, and all
   three direct ports are taken. It runs MobiFlight on an Arduino Nano of
   its own, on a USB cable to the powered USB hub.
-- The **RPM indicator** (see [Instruments](../instruments/README.md)) is
-  the same: a stepper with a home input on a Nano of its own. When more
-  instruments follow, they get a board of their own together (a Mega
-  takes many steppers), and the RPM's wires move to it.
+- The **RPM indicator** and the **airspeed indicator** (see
+  [Instruments](../instruments/README.md)) are the same: a stepper with a
+  home input on a Nano of its own each. When more instruments follow,
+  they may get a board of their own together (a Mega takes many
+  steppers), and their wires move to it.
 
 ### MobiFlight
 

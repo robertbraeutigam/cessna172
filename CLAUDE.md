@@ -206,11 +206,19 @@ its own top-level directory; new components should follow the same layout.
     hub). The face is a colour `Make print`: drawn in `ink(colour)`,
     `print_page()` adds the glass template and the registration dots.
     The motor, board, sensor and magnet values are the compass's
-    (MEASURE); `frame/frame.inc.scad` repeats the case's sizes and the
-    RPM's arm.
-  - `rpm.scad` — the RPM indicator (tachometer): 0-35 hundred RPM over
+    (MEASURE); `frame/frame.inc.scad` repeats the case's sizes, the
+    RPM's arm and the ASI's depth.
+    Two layouts, set by each file (`layout`): `arm` (big gears, the motor
+    and boards on an arm to the right) and `deep` (small gears, the motor
+    behind the case over the axis, the carrier on posts behind it, all
+    within the case's outline, 47 mm deep; `asi_depth` in the frame).
+  - `rpm.scad` — the RPM indicator (tachometer, `arm`): 0-35 hundred RPM over
     240 degrees, the 172N's stepped green arc and red line at 2700, a
     dummy hour meter.
+  - `asi.scad` — the airspeed indicator (`deep`, the six-pack's top left):
+    KNOTS 40-200 on a non-linear scale (`asi_cal`, also the MobiFlight
+    interpolation table in the README), MPH inside, the 172N's white,
+    green and yellow arcs and red line at 160.
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the
