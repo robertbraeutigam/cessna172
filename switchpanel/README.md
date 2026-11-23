@@ -85,7 +85,7 @@ bracket is wider than the cut-out, so it goes on from behind the sheet.
 | 4 | M3 x 10 screw | pot straps onto the stands |
 | 1 | M3 x 6 set screw | knob onto the rod |
 | 4 | M3 x 10 pan head screw + nut | face flange onto the sheet |
-| - | 3 wires | pot to the switch panel's mux board |
+| - | 3 wires | pot to the switch panel's Nano |
 
 Printed: `primer_panel.stl` (front side down), `primer_face.stl` (front
 side up), `primer_knob.stl` (on the end of its stem), `primer_bracket.stl`
@@ -117,13 +117,12 @@ stiffer spring pops harder, the pot slider's friction works against it.
 
 ### Wiring and X-Plane
 
-The pot connects to the switch panel's mux board: its ends to 5 V and GND
-there, the wiper to the brown AUX wire of the Cat5 cable, which goes to
-the Mega's A13 at the hub (port 3, see [Ports](../hub/README.md#ports)). It is an analog
-input, not a mux input. Which end goes to 5 V decides the direction; swap
-them, or invert the range in the MobiFlight Connector.
+The pot connects to the switch panel's [Nano](#nano): its ends to 5 V
+and GND there, the wiper to A7 (an analog input). Which end goes to 5 V
+decides the direction; swap them, or invert the range in the MobiFlight
+Connector.
 
-In the MobiFlight Connector it is an analog input on A13 that writes the
+In the MobiFlight Connector it is an analog input on A7 that writes the
 primer's dataref. **VERIFY** which dataref the X-Plane 172 uses for the
 primer with DataRefTool while working the primer in the virtual cockpit.
 
@@ -161,11 +160,11 @@ it.
 | 1 | double rocker switch, 6 pin, black (there is no white one) | AVIONICS: BUS 1, BUS 2 |
 | 6 | toggle switch, M12 neck, 18 mm lever | PITOT HEAT, BCN, LAND, TAXI, NAV, STRB |
 | 6 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet (`mount_count`) |
-| 1 | CD74HC4067 16 channel mux breakout board | all inputs, see [Multiplexer](#multiplexer) |
-| 4 | M3 x 8 self tapping screw | mux onto its standoffs on the carrier, carrier (`switches_carrier.stl`) onto the panel |
+| 1 | Arduino Nano (ATmega328P, 5 V, mini USB) | all inputs, see [Nano](#nano) |
+| 2 | M3 x 8 self tapping screw | carrier (`switches_carrier.stl`) onto the panel |
 | 6 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
-| 1 | Cat5 patch cable, stranded copper (see [Cables](../hub/README.md#cables)) | to hub port 3, soldered to the mux |
-| 1 | cable tie, up to 3.6 mm wide | the cable onto its block (`tie`) |
+| 1 | mini USB cable, long enough to the powered USB hub | the Nano to the PC |
+| 1 | cable tie, up to 3.6 mm wide | the USB cable onto its block (`tie`) |
 | 1 | 7 pin Dupont or JST connector (optional) | ignition cable, so the panels can be separated, see [Wiring](#wiring) |
 | - | wire, heat shrink | see [Wiring](#wiring) |
 
@@ -242,117 +241,97 @@ two breakers. Real breakers
 panel, so making them functional later means a hole through the panel
 as well.
 
-### Multiplexer
+### Nano
 
-All switches and the ignition go to one CD74HC4067 breakout board on the
-back of the switch panel. MobiFlight reads it as a Multiplexer device: 16
-inputs through one Mega pin. So everything is soldered on the panels, and
-only one Cat5 cable runs to the hub (port 3).
+All switches, the ignition and the primer go to one Arduino Nano running
+MobiFlight on the back of the switch panel, each on a pin of its own
+(the Nano has enough of them: 15 inputs and the primer's analog pin). One
+USB cable runs from it to the powered USB hub (see
+[Connections](../hub/README.md#connections)), so the switch panel with
+the ignition and the primer can be tested on its own with nothing but
+that cable.
 
-The board sits on two standoffs on a small printed carrier plate
-(`switches_carrier.stl`, printed plate down), together with the block for
-the cable tie. The carrier is a part of its own, so the mux, the Cat5 cable
-and the ignition can be wired up before the switch panel is printed; it is
-then screwed with two M3 x 8 self tapping screws onto two bosses on the
-panel back, in the strip behind the breaker labels, on the left (pilot side)
-half, where the ignition cable comes in. Mount the mux with the chip
-outwards, so the solder joints face you; `assert`s check that the carrier
-clears the switches and fits inside the rim.
+The Nano lies in two rails on a small printed carrier plate
+(`switches_carrier.stl`, printed plate down), component side out, its
+USB jack to the right; it slides in from the jack's end up to a stop (a
+dab of hot glue keeps it there). Right of the plug is the block for the
+cable tie: the tie goes through the slot at the plate and around the
+cable in the groove on top, so pulling the cable does not lever the jack.
+The carrier is a part of its own, so the ignition and the primer can be
+wired up before the switch panel is printed; it is then screwed with two
+M3 x 8 self tapping screws onto two bosses on the panel back, in the
+strip behind the breaker labels, on the left (pilot side) half, where the
+ignition cable comes in. `assert`s check that the carrier clears the
+switches, fits inside the rim and holds the cable at the jack's height.
 
-**MEASURE** (`mux_*`): the board size (41 x 18 mm) is measured; the
-mounting holes (`mux_holes`, guessed on the center line 17.5 mm from the
-middle) and the order of the control pins (`mux_ctl_names`) are still
-guesses. It is screwed on with M3: its holes must be at least about 3.1 mm
-(`mux_hole_min`), drill them out if they are smaller. If it has no
-mounting holes, glue it onto the standoffs. The carrier is printed from
-the same values, so check the hole positions on the board before printing
-it.
+**MEASURE**: the USB plug (`usb_plug`: width, height and length with its
+strain relief, the tie block sits behind it) and the cable (`cable_d`,
+4 mm); the tie (`tie`, 3.6 x 1.3 mm). The Nano's values are the
+instruments' (`nano_*`).
 
 #### Inputs
 
-| Mux | Input | Mux | Input |
+| Pin | Input | Pin | Input |
 |-----|-------|-----|-------|
-| C0 | MASTER ALT | C8 | AVIONICS BUS 1 |
-| C1 | MASTER BAT | C9 | AVIONICS BUS 2 |
-| C2 | PITOT HEAT | C10 | free |
-| C3 | BCN | C11 | ignition OFF |
-| C4 | LAND | C12 | ignition R |
-| C5 | TAXI | C13 | ignition L |
-| C6 | NAV | C14 | ignition BOTH |
-| C7 | STRB | C15 | ignition START |
+| D2 | MASTER ALT | D10 | AVIONICS BUS 1 |
+| D3 | MASTER BAT | D11 | AVIONICS BUS 2 |
+| D4 | PITOT HEAT | D12 | free |
+| D5 | BCN | A0 | ignition OFF |
+| D6 | LAND | A1 | ignition R |
+| D7 | TAXI | A2 | ignition L |
+| D8 | NAV | A3 | ignition BOTH |
+| D9 | STRB | A4 | ignition START |
+| | | A7 | primer pot (analog) |
 
-The switches are in label order (the `groups` order), and the ignition
-positions are the last five (`ignition_c0`), where they were when the
-ignition was wired; C10 is free. In the MobiFlight Connector every
-channel is a button: a toggle or rocker sets its dataref to 1 on press and
-to 0 on release, an ignition position sets the key position on press, and
-START holds the starter while it is pressed through a FlyWithLua script
-(see [In X-Plane](../ignition/README.md#in-x-plane)). The OFF hall sensor is needed: a position is only set on press,
-so without it the key would stay on R in the sim when it is turned to OFF.
-
-#### Cable to the hub
-
-The mux goes to hub port 3 (see [Port pinout](../hub/README.md#port-pinout)) with a Cat5
-cable soldered straight into its control row (see [Cables](../hub/README.md#cables)):
-
-| Mux pin | Wire (T568B) | Mega (at the hub) |
-|---------|--------------|-------------------|
-| S0, S1, S2, S3 | white-orange, orange, white-green, green | pins 38, 40, 42, 48 (shared by all muxes) |
-| VCC | blue | 5 V |
-| GND | white-blue | GND |
-| SIG | white-brown | D28, the mux's data pin in the MobiFlight Connector |
-| EN | - | not to the hub: bridge it to GND on the board (enable is active low) |
-
-The brown wire (AUX) is the [primer](#primer) pot's wiper; the pot's
-other two wires go to VCC and GND on the board. The cable
-comes in over the top rim and is tied down with a cable tie on the block
-right of the mux on the carrier (`tie_block`: the tie goes through the slot
-at the plate and around the cable in the groove on top), so the wires fan out from
-there to the pins without any pull on them. The cable is 6 mm
-(`cable_d`, measured); **MEASURE** the tie (`tie`, 3.6 x 1.3 mm).
-
-The switches and the hall sensors have no pull-up resistors of their own:
-the 4.7 kOhm SIG pull-up on the hub's shield pulls whichever
-input is selected up (see [Port pinout](../hub/README.md#port-pinout)). Test it on
-the bench with one switch on the mux before soldering all of them.
+The switches are in label order (the `groups` order, `switch_pins`), the
+ignition positions on A0-A4 (`ignition_pins`, used as digital pins); D13
+is not used (its LED pulls an input down), A5 and A6 are free. In the
+MobiFlight Connector every switch and ignition position is a *Button*
+with the Nano's internal pull-up (the wires stay on the panels, they are
+short): a toggle or rocker sets its dataref to 1 on press and to 0 on
+release, an ignition position sets the key position on press, and START
+holds the starter while it is pressed through a FlyWithLua script (see
+[In X-Plane](../ignition/README.md#in-x-plane)). The OFF hall sensor is
+needed: a position is only set on press, so without it the key would
+stay on R in the sim when it is turned to OFF. Test it on the bench with
+one switch on the Nano before soldering all of them.
 
 ### Wiring
 
 Every input is wired like a switch to GND (active low, as MobiFlight expects):
 
-- **Toggle, 2 pin:** one lug to GND, the other to its mux input. Mount it so
+- **Toggle, 2 pin:** one lug to GND, the other to its Nano pin. Mount it so
   it is ON with the lever up.
 - **Toggle, 6 pin:** use one pole. Its middle lug (common) goes to GND, the
-  bottom lug to the mux input: lever up (ON) connects the common to the
+  bottom lug to the Nano pin: lever up (ON) connects the common to the
   bottom lug. Check with a multimeter.
 - **Rocker:** the two pins of each rocker that close when it is ON; one to
-  GND, the other to the mux input.
-- **Ignition:** the A3144 outputs go to C11..C15. The sensors also need 5 V
-  and GND: take them from the mux VCC and GND.
-- **Primer:** the pot's ends to the mux VCC and GND, its wiper to the Cat5
-  cable's brown AUX wire (not to the mux).
+  GND, the other to the Nano pin.
+- **Ignition:** the A3144 outputs go to A0..A4. The sensors also need 5 V
+  and GND: take them from the Nano's 5V and GND.
+- **Primer:** the pot's ends to the Nano's 5V and GND, its wiper to A7.
 
 So on the switch panel: one GND wire daisy chained over all 10 switches to
-the mux GND, and one signal wire from each switch to its C pin, soldered
-straight into the board. The ignition cable (5 signals, 5 V, GND) is
-soldered to the mux too; to be able to separate the two panels later, put
-a 7 pin Dupont or JST connector into it. GND and VCC get several wires (switch chain, EN bridge,
-ignition, primer, Cat5 cable): join the extra wires into one before the pin, with
-solder and heat shrink.
+a GND pin of the Nano (it has two), and one signal wire from each switch
+to its pin, soldered straight into the board. The ignition cable (5
+signals, 5 V, GND) is soldered to the Nano too; to be able to separate the
+two panels later, put a 7 pin Dupont or JST connector into it. GND and 5V
+get several wires (switch chain, ignition, primer): join the extra wires
+into one before the pin, with solder and heat shrink.
 
 ### Assembly
 
-1. Screw the mux onto the carrier's standoffs, solder the Cat5 cable to
-   the mux control row and tie it onto its block. The ignition cable (or
-   its connector) and the EN bridge can be soldered on now as well; the carrier
-   does not need the panel yet.
+1. Slide the Nano into its rails on the carrier. The ignition cable (or
+   its connector) and the primer can be soldered on now; the carrier does
+   not need the panel yet, and it can be tested on the bench over USB.
 2. Solder the wires to the switches; the rockers are hard to get out
    again once snapped in.
 3. Lay the face on the front, put the toggles in from the back and
    tighten their nuts.
 4. Snap the rockers in from the front.
 5. Screw the carrier onto its bosses on the panel back and solder the
-   switch wires to the mux.
+   switch wires to the Nano. Plug the USB cable in and tie it onto its
+   block.
 6. Glue the dummy breakers into their pockets.
 7. Mount the panel.
 
