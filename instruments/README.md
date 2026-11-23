@@ -274,10 +274,9 @@ housing, so the depth does not matter there (the frame checks it).
   and pointing down, with a slit down its middle where the dial's zero
   line shows; and the airplane: yellow wing bars, a Y and a dot on a stem
   from a light brown pedestal, which stands on a black mask over the
-  window's bottom. A dummy knob sits in front of the glass on the
-  window's bottom edge, over the mask, its stem glued into a boss of the
-  bezel that stands into the window behind it (the real one sets the
-  airplane's height). The
+  window's bottom. In front of the glass the bezel has a ledge over the
+  window's bottom, as high as the mask; a dummy knob sits on it, its stem
+  glued into the ledge (the real one sets the airplane's height). The
   dial turns with the horizon and the index reads its marks.
 - **Roll**: the dial is the front of the roll frame: two arms go back from
   it to a back disc with the roll gear. The frame turns in a printed
@@ -384,7 +383,7 @@ The slip ring's hole circle (`sr_holes`, 18 mm) is a guess: measure it.
 5. The airplane's mask into the notch in the sleeve's ring (glue). Glass
    into the case from behind, the sleeve behind it, the roll frame into
    the sleeve (the dial against the ring). The knob's stem into the
-   hole in the bezel's boss (glue).
+   hole in the bezel's ledge (glue).
 6. Slip ring through the back plate, its flange screwed on the front; the
    roll motor (ears countersunk from the front, nuts behind) and its
    sensor; the magnet into the roll motor gear's flange, the gear onto
