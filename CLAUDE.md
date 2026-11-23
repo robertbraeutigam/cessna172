@@ -189,21 +189,25 @@ its own top-level directory; new components should follow the same layout.
     KNOTS 40-200 on a non-linear scale (`asi_cal`, also the MobiFlight
     interpolation table in the README), MPH inside, the 172N's white,
     green and yellow arcs and red line at 160.
-  - `ai.scad` — the attitude indicator (the six-pack's top middle): the
-    standard's case front, then its own mechanism. A roll frame (the roll
-    dial with the bank marks, two arms, a back disc with the roll gear)
-    turns in a printed sleeve (front ring with the bank index and the
-    glued-in airplane on its mount with the bottom mask, a dummy knob in
-    front of the glass; legs to the back plate); a horizon drum
-    (`pitch_k` degrees per degree of pitch, a printed strip) turns across
-    it, driven through the roll axis: pitch axle with a sun gear, planet on
-    the roll frame, bevel pinion to a bevel gear in the drum (1:1 overall,
-    small gears rack-cut). Both 28BYJ-48s with the standard's 1:1 gears on
-    the back plate (roll right, pitch left), a hall sensor each (the
-    roll's on a post), two ULN2003s and a Nano on a carrier behind them;
-    MobiFlight adds the roll to the pitch motor. Prints `face` (roll dial)
-    and `drum` (strip). 120 mm deep (`ai_depth` in the frame: it stays
-    over the force feedback yoke's housing).
+  - `ai.scad` — the attitude indicator (the six-pack's top middle,
+    modelled on the X-Plane 172N's): the standard's case front, then its
+    own mechanism. A roll frame (a thin roll dial ring ending at the long
+    bank marks, two arms, a back disc with the roll gear) turns in a
+    printed sleeve (front ring with the bank index and the glued-in
+    airplane on its mount with the bottom mask, a dummy knob in front of
+    the glass; legs to the back plate). The horizon is a bowl (part of a
+    sphere, `bowl_r`, two halves in sky and ground filament glued at the
+    horizon, raised ribs painted white) on pivot pins in the arms, 1:1
+    with the pitch, ±`pitch_max`. The pitch motor rides on the roll frame
+    inside the bowl (bracket on the back disc, rack-cut pinion to a gear
+    sector on the bowl's hex hub, 3:1), homed by a magnet in the bowl's
+    side over a sensor in the right arm (`home_pitch`); its 7 wires cross
+    the roll axis through an MSM-12-08A capsule slip ring (`sr_*`, the
+    hole circle MEASURE) screwed onto the back plate. The roll motor is
+    alone on the back plate, its body beside its shaft, 1:1 to the roll
+    gear; two ULN2003s and a Nano on a carrier behind it. Print `face`
+    (roll dial). 116 mm deep (`ai_depth` in the frame: it stays over the
+    force feedback yoke's housing).
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the

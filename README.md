@@ -223,8 +223,9 @@ Arduino Nano of its own.
 The analogue instruments, built on one standard: a 3 1/8" case behind the
 panel, a colour printed face, a needle turned by a 28BYJ-48 stepper through
 two printed gears, the motor and boards behind the case. So far the RPM
-indicator, the airspeed indicator and the attitude indicator (its roll
-dial and horizon drum on two steppers, deeper than the others).
+indicator, the airspeed indicator and the attitude indicator (a thin
+roll dial and a horizon bowl, the pitch motor riding on the roll frame
+through a slip ring; deeper than the others).
 
 [![RPM indicator](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)
 

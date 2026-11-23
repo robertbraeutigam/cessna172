@@ -276,10 +276,10 @@ inst_ear = [46, 9];          // the screw ears: from the axis, diameter (ear_r, 
 // The standard instrument (instruments/instrument.inc.scad): the motor and the boards behind the case, within its
 // outline, this deep behind the sheet's back (instrument_depth echo)
 inst_depth = 46.6;
-// The attitude indicator (instruments/ai.scad) is deeper (its drum and two
+// The attitude indicator (instruments/ai.scad) is deeper (its bowl and two
 // motors, ai_depth echo): it must be in the top row, over the force
 // feedback yoke's housing
-ai_depth = 120.1;
+ai_depth = 115.5;
 
 // --- Layout, x ---
 x_sw0 = sheet_edge;                          // switch panel, left face edge
