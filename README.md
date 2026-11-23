@@ -15,14 +15,15 @@ wiring and the assembly:
 | [`switchpanel/`](switchpanel/README.md) | the 172N lower left switch panel: master, lights, avionics; the primer below it |
 | [`ignition/`](ignition/README.md) | the ignition key switch, the left end of the switch panel |
 | [`frame/`](frame/README.md) | the aluminium frame and panel sheet that everything mounts on |
-| [`hub/`](hub/README.md) | the box with the MobiFlight Mega and the Cat5 ports |
-| [`yoke/`](yoke/README.md) | the hollow control wheel: PTT, trim rocker, a mux inside |
+| [`hub/`](hub/README.md) | how everything connects: a Nano per component, the powered USB hub (no parts to print) |
+| [`yoke/`](yoke/README.md) | the hollow control wheel: PTT, trim rocker, a Nano inside |
 | [`compass/`](compass/README.md) | the magnetic compass over the panel: a printed card on a 28BYJ-48 stepper, on its own Nano |
 | [`instruments/`](instruments/README.md) | the analogue instruments: the RPM and airspeed indicators, a 28BYJ-48 stepper behind a colour printed face |
 | [`radio/`](radio/README.md) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, on their own Mega (the audio panel on its own Nano) |
 
-How the components connect to the computer (the hub's ports, their
-pinout and the cables) is in [the hub's Connections](hub/README.md#connections).
+Every component has its own Arduino Nano (the radio stack a Mega) running
+MobiFlight and one USB cable to a powered USB hub; see
+[Connections](hub/README.md#connections).
 
 The pictures are rendered from the current `master` by the
 [Build](.github/workflows/build.yml) workflow and published, together with
@@ -89,24 +90,24 @@ the panel sheets over it, laid out like the X-Plane 172N's panel.
 
 [![Cockpit frame](https://robertbraeutigam.github.io/cessna172/frame/frame_montage.png)](https://robertbraeutigam.github.io/cessna172/frame/frame_montage.png)
 
-### [Hub](hub/README.md)
+### [USB hub and connections](hub/README.md)
 
-The box with the MobiFlight Mega and 6 RJ45 ports: every component connects
-to its own port with one Cat5 cable.
-
-[![Hub](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)](https://robertbraeutigam.github.io/cessna172/hub/hub_montage.png)
+Every component has an Arduino Nano of its own running MobiFlight, with
+one USB cable to a powered USB hub on the desk, so each one is tested on
+its own with nothing but that cable. The page has the boards, the
+MobiFlight setup and how big the USB hub's supply has to be.
 
 ### [Throttle quadrant](throttle/README.md)
 
 Throttle, mixture and carb heat: 6 mm rods moving linear potentiometers in
-one box.
+one box, read by a Nano on its floor.
 
 [![Throttle quadrant](https://robertbraeutigam.github.io/cessna172/throttle/throttle_box_montage.png)](https://robertbraeutigam.github.io/cessna172/throttle/throttle_box_montage.png)
 
 ### [Switch panel](switchpanel/README.md)
 
 The 172N's lower left switch panel: master, avionics, lights and dummy
-circuit breakers on a mux, and the primer below the ignition key.
+circuit breakers on a Nano, and the primer below the ignition key.
 
 [![Switch panel](https://robertbraeutigam.github.io/cessna172/switchpanel/switches_montage.png)](https://robertbraeutigam.github.io/cessna172/switchpanel/switches_montage.png)
 
@@ -122,7 +123,7 @@ with a spring-return START and a hall sensor per position.
 ### [Yoke](yoke/README.md)
 
 The hollow Cessna control wheel with PTT buttons, an electric trim rocker
-and a mux inside.
+and a Nano inside.
 
 [![Yoke](https://robertbraeutigam.github.io/cessna172/yoke/yoke_montage.png)](https://robertbraeutigam.github.io/cessna172/yoke/yoke_montage.png)
 

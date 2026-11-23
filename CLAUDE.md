@@ -9,14 +9,14 @@ its own top-level directory; new components should follow the same layout.
 - `throttle/` — throttle quadrant: throttle, mixture and carb heat controls.
   - `throttle_box.scad` — the main box. Linear potentiometers sit on stands
     inside, 6 mm rods (one per control) exit the front. The pots are read
-    by MobiFlight on hub port 6 (direct port, lines A-C): one Cat5 cable
-    through the back wall, clamped in a cable cradle and soldered straight
-    to the pots, no board in the box. It is printed in one piece and has no lid: it goes
+    by MobiFlight on an Arduino Nano of its own in rails on the floor (A0
+    throttle, A1 mixture, A2 carb heat), its USB jack behind a window in
+    the back wall (`usb_plug`), the cable plugged in from outside. It is printed in one piece and has no lid: it goes
     through a cut-out in the frame's sheet (below the desk top), its front wall is the face with
     a flange (top and sides, `flange_w`) screwed onto the sheet, and two M5
     bolts through the floor go into the frame's throttle bar; `frame/frame.inc.scad`
     repeats these sizes.
-    Its views show the pots, rods with knobs, clamps, pins, cable and wiring
+    Its views show the pots, rods with knobs, clamps, pins, Nano, cable and wiring
     as view-only parts; the knob, clamp and pin shapes there are copies of
     the other files, keep them in sync.
   - `carb_heat_knob.scad`, `clamp.scad`, `pin.scad` — small parts (knob,
@@ -46,8 +46,8 @@ its own top-level directory; new components should follow the same layout.
     bracket behind it with the 75 mm linear pot (the carb heat type),
     driven like the throttle's (rod, carrier over the slider ear, the
     throttle's plain clamps as collars) and a spring on the rod that pops the
-    knob out when it is unlocked. The pot's wiper is on port 3's AUX
-    wire. `panel.inc.scad` takes the back's height (`h`) for it.
+    knob out when it is unlocked. The pot's wiper is on the switch
+    panel Nano's A7. `panel.inc.scad` takes the back's height (`h`) for it.
   - `switches.scad` — a separate panel with the switch row: a red double
     rocker for MASTER (ALT, BAT), M12 toggles in the middle (PITOT HEAT
     and the LIGHTS group) and a black double rocker for
@@ -55,12 +55,13 @@ its own top-level directory; new components should follow the same layout.
     copies the X-Plane 172N panel (rockers raised half way to the breakers,
     OFF under the toggles, ON beside the rockers). Above the
     toggles is a row of printed dummy circuit breakers (`breakers`, for
-    show only, glued into hex holes in the face). A CD74HC4067
-    input mux collects all switches and the ignition, so one Cat5 cable
-    runs to hub port 3 (soldered to the mux, tied onto `tie_block` next to
-    it); the mux and the tie block are on a separate printed carrier
-    (`mux_carrier`) screwed onto two bosses on the panel back, so it can be
-    wired before the panel exists. The switch list
+    show only, glued into hex holes in the face). An Arduino Nano reads
+    all switches (`switch_pins`, D2..), the ignition (`ignition_pins`,
+    A0..A4) and the primer (A7), each on a pin of its own; its USB cable
+    is tied onto `tie_block` behind the plug. The Nano (in rails) and the
+    tie block are on a separate printed carrier (`nano_carrier`) screwed
+    onto two bosses on the panel back, so it can be wired and tested
+    before the panel exists. The switch list
     (`groups`) drives the layout. The `rk_*` values come from the rocker
     listing; `tg_*` are guesses until the switches are measured.
 
@@ -80,39 +81,15 @@ its own top-level directory; new components should follow the same layout.
     while START is pressed (MobiFlight writes its dataref; it cannot hold
     a command itself).
 
-- `hub/` — `hub.scad`: the box (and lid) with the Arduino Mega running
-  MobiFlight (the Connector on the Windows PC talks to X-Plane; servos and
-  encoders go straight to Mega pins, encoders never through a mux) and 6 RJ45 breakout
-  boards, ports 1-3 along the front wall and 4-6 along the right wall (MobiFlight takes at most 6 muxes per Mega; more
-  ports means a second hub with its own Mega). Ports 1-3 are mux ports
-  (S0..S3, 5 V, GND, SIG, AUX), ports 4-6 direct ports (5 V and GND on
-  the same pins 4 and 5, the other six wires are lines to their own Mega
-  pins, a servo takes its power on the orange pair), for components
-  without a mux (servos, encoders, pots). On the Mega sits the shield, a
-  perfboard plugged onto its analog headers and double header (the
-  digital header is off the grid) and screwed onto floor posts at its
-  corners, double sided and plated through, wired on the bench (each
-  line to the Mega in its own row, its resistor or network pin beside the
-  Mega pin with a solder bridge on top onto it; bridges only between
-  neighbouring used pins, no wires (`sh_wires` is empty); layout
-  lists `sh_*`, the lines in `sh_lines`, drawn by the `shield` view; the
-  build checks that the Mega's pins land on its grid, that every hole has
-  one use and is on one net, and that every line connects): every RJ45 pin goes to it, each
-  port as one ribbon of female-female jumpers onto an 8 pin header in RJ45
-  order (some peeled off to loose pins beside what they go to,
-  `sh_loose_pins`), it joins 5 V and GND of all ports and S0..S3 of the mux ports
-  and carries every resistor (330 Ohm in series with S0..S3 and the servo
-  signals, 4.7 kOhm pull-ups on the mux SIG lines and the direct-port
-  switch/encoder lines, one bussed network; the components have none). No wire goes to the
-  Mega, nothing is soldered in the box. Power for big loads is not the
-  hub's job (an external PSU and 5 V bus, later). It stands on the
-  frame's desk part right of the yoke, its ears bolted into the
-  step upright's and the hub crossbar (`ear_slot_dx`; `frame/frame.inc.scad` repeats its sizes). Every MobiFlight component connects to
-  its own numbered port with one Cat5 cable, RJ45 plug at the hub and
-  soldered straight to the component (no connector there); the port
-  pinouts and the port list are in the Connections section of
-  `hub/README.md`, keep components and that section in sync with them. The `rj_*` and
-  shield board values are measured.
+- `hub/` — no parts: `README.md` is how everything connects. Every
+  MobiFlight component has its own Arduino Nano (the radio stack a Mega)
+  with one USB cable to a powered USB hub on the desk right of the yoke,
+  so each one stands and is tested on its own; switches go to GND on the
+  Nano's internal pull-ups, no resistors, no muxes. The README has the
+  board list, the MobiFlight setup, the USB hub's current (steppers with
+  their coils off at rest, the homing peak) and power. (The old hub, a
+  Mega with RJ45 ports and Cat5 cables, is retired; `hub.scad` is in the
+  git history.)
 
 - `yoke/` — `yoke.scad`: the hollow Cessna control wheel (trapezoid hub,
   bar with a sagging bottom, arms leaning inwards with block heads square
@@ -129,8 +106,9 @@ its own top-level directory; new components should follow the same layout.
   towards the pilot, concave round top, angled underside) is screwed onto
   each head's inner side. A printed collar bolted
   onto the hub front holds the bought aluminium control tube (cross
-  bolts); the cable runs through the tube. Inside: a CD74HC4067 mux on
-  standoffs in the hub (C0..C3, hub port 1) and a cable tie block. Only
+  bolts); the USB cable runs through the tube. Inside: an Arduino Nano
+  in a pocket in the hub (D2..D5), its jack up, and a cable tie block
+  over the plug. Only
   the wheel and the tube end, not the base the tube goes into.
 
 - `radio/` — the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs
@@ -186,8 +164,7 @@ its own top-level directory; new components should follow the same layout.
   motor; a printed paper strip (`card_print`, a `Make print`) is glued
   around it, numbers falling to the right like the real card. A magnet in
   the drum and an A3144 hall sensor on a post home it. MobiFlight on an
-  Arduino Nano of its own (the hub's direct ports are taken; USB to the
-  powered USB hub) drives the ULN2003 board. Parts: base (everything is
+  Arduino Nano of its own (USB to the powered USB hub) drives the ULN2003 board. Parts: base (everything is
   mounted on it), shell, bezel (window, lubber line, dummy compensator
   screws), drum, stand. The `motor_*`, `uln_*`, `nano_*`, sensor and
   magnet values are MEASURE.
@@ -252,9 +229,8 @@ its own top-level directory; new components should follow the same layout.
   bought 45 degree connectors). The front rail runs past the sheet at both
   ends (`ear_len`), where two bought screw clamps clamp it onto the desk
   (no printed parts in the load path: they creep under constant load).
-  The hub stands on the desk part right of the yoke (its ears in the
-  slots of the step upright's crossbar and the hub crossbar); the
-  crossbars are as long as it and the yoke need.
+  The powered USB hub stands on the desk right of the yoke (not bolted
+  down); the crossbars are as long as the yoke needs.
 
 ## Documentation
 
@@ -262,12 +238,12 @@ Every component has one `README.md` in its directory: it describes that
 component (working principle, hardware with shop links, wiring, assembly)
 and embeds its montage images. The top-level `README.md` is the overview:
 building, and a short description, the montage and a link per component.
-The connections between components (MobiFlight, port pinout, cables, the
-port list, power) are in the Connections section of `hub/README.md`; the
-other READMEs link there instead of repeating it. Links between READMEs are
-relative (`../hub/README.md#port-pinout`). Keep them in sync when a
-design, part list or wiring changes: the component's README, and
-`hub/README.md` too when a port, its pins or a cable changes, and the
+The connections between components (the boards, MobiFlight, the powered
+USB hub, power) are in `hub/README.md`; the other READMEs link there
+instead of repeating it. Links between READMEs are relative
+(`../hub/README.md#connections`). Keep them in sync when a design, part
+list or wiring changes: the component's README, and `hub/README.md` too
+when a component's board or its current changes, and the
 top-level overview when a component is added or its summary changes. A new
 component gets its own README and an entry in the top-level one; do not add
 other docs files. The scad header comments stay as the in-source summary.

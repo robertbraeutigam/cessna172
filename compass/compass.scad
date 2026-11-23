@@ -4,8 +4,8 @@
 // deep), standing on the frame's right top bar over the panel (frame/),
 // about where the windshield's middle is. The card is a drum turned by a
 // 28BYJ-48 geared stepper; the X-Plane compass heading comes from
-// MobiFlight on an Arduino Nano of its own (the hub has no direct port
-// left), which homes the card on a hall sensor at start.
+// MobiFlight on an Arduino Nano of its own (like every component), which
+// homes the card on a hall sensor at start.
 //
 // - The drum is an inverted cup (top disc and band) pressed onto the
 //   motor's shaft (double D bore, blind: the shaft end sets its height). It
