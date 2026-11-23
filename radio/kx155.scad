@@ -24,9 +24,11 @@
 // kit boards without the matrix, lying on the floor in rails, wired to the
 // digit boards with jumpers. The encoders and the pots are nutted onto the
 // face, the flip buttons press tactile switches on small perfboard pieces.
-// Everything goes to the second Mega (the radio stack's own MobiFlight
-// board) on one cable out of the open back, tied onto
-// tie_block.
+// Everything goes to an Arduino Nano of its own running MobiFlight, in
+// rails on the floor right of the driver boards (under the NAV encoder),
+// its USB jack at the open back; the USB cable to the powered USB hub is
+// tied onto tie_block beside it. Each pin is a line of its own
+// (nano_pins; the README has the table), so each unit is tested alone.
 //
 // Coordinates: radio.inc.scad (installed: x right, y backwards, z up).
 // Printed: the body front side down, the face front side up, the knobs on
@@ -38,6 +40,7 @@
 // - 2 tactile switches 6 x 6 mm, 5 mm high (tact)
 // - 8 7 segment modules, 0.28", 3 digits, common cathode, red (dig_*)
 // - 4 MAX7219 8x8 matrix kit boards (drv_board), leave the matrix off
+// - 1 Arduino Nano (ATmega328P, 5 V, nano_*), a mini USB cable, a cable tie
 // - 4 red transparent acrylic pieces, filter_t thick (filter_size)
 // - perfboard: 2 digit boards, 2 flip switch boards
 // - M3: 4x M3x10 pan head + nuts (face onto the sheet), 8x M3x8 self
@@ -47,8 +50,9 @@
 // onto their bosses (digits against the filters), flip caps in from the
 // back, their switch boards onto the bosses. Face onto the plate, then the
 // encoders and pots through both from the back, nuts on the front (the
-// face is clamped by them). Driver boards into their rails from the back,
-// wiring, cable tied onto the tie block. Knobs pressed on last. Into the
+// face is clamped by them). Driver boards and the Nano into their rails
+// from the back, wiring, the USB cable plugged in and tied onto the tie
+// block. Knobs pressed on last. Into the
 // sheet, the 4 screws through the end flanges.
 
 $fn = 64;
@@ -119,6 +123,12 @@ flip_boss_dx = 9;
 
 // --- Body ---
 drv_y0 = 22;                 // driver boards from here back
+// --- Nano pins, in the order of the README's table ---
+nano_pins = [["D2", "MAX7219 DIN"], ["D3", "MAX7219 CS"], ["D4", "MAX7219 CLK"],
+             ["D5", "COM outer A"], ["D6", "COM outer B"], ["D7", "COM inner A"], ["D8", "COM inner B"],
+             ["D9", "NAV outer A"], ["D10", "NAV outer B"], ["D11", "NAV inner A"], ["D12", "NAV inner B"],
+             ["A0", "COM push"], ["A1", "NAV push"], ["A2", "COM flip"], ["A3", "NAV flip"],
+             ["A4", "COM on/off"], ["A5", "NAV on/off"], ["A6", "COM volume"], ["A7", "NAV volume"]];
 
 // --- Calculated ---
 gw = dig_mods * dig_mod.x;
@@ -175,8 +185,11 @@ flip_cap_len = face_t + flip_out + plate_t;  // the part through the face
 
 drv_pitch = drv_board.x - 2 * drv_over + 2 * fit + rail.x;
 drv_span = drv_n * drv_pitch + rail.x;
-drv_x0 = (x_in0 + x_in1) / 2 - drv_span / 2;
+drv_x0 = x_in0 + 1;                          // driver boards at the left wall
 unit_d = drv_y0 + drv_board.y + 4;
+nano_x = drv_x0 + drv_span + 1 + nano_rail_w + 0.1 + nano_board.x / 2;   // right of them
+nano_y1 = unit_d - 0.3;                      // its USB jack at the open back
+tie_x = nano_x + nano_board.x / 2 + 0.1 + nano_rail_w + 3;
 
 bed = [255, 255];
 
@@ -219,6 +232,13 @@ assert(drv_span <= x_in1 - x_in0 - 1, "Driver boards do not fit side by side");
 assert(drv_y0 >= plate_t + max(pot_body[1], enc_body.y + enc_pins, flip_board_y + board_t) + 3, "Driver boards too close to the parts on the face");
 assert(wall + rail.y + drv_high <= board_z0 || drv_y0 >= board_y + board_t + 3, "Driver boards hit the digit boards");
 assert(dig_mods * dig_n >= groups[0][1] && dig_mods * dig_n >= groups[2][1], "Not enough digits for a frequency");
+assert(tie_x + tie_block.x <= x_in1 - 0.5, "Nano and tie block do not fit right of the driver boards");
+assert(nano_y1 - nano_board.y - nano_rail_w >= flip_board_y + board_t + 0.5, "Nano runs into the NAV flip switch board");
+assert(wall + nano_under + nano_t + 1.5 <= row_z - enc_body.z / 2 - 0.5
+       || nano_y1 - nano_board.y - nano_rail_w >= plate_t + enc_body.y + enc_pins + 0.5, "Nano runs into the NAV encoder");
+assert(nano_x - nano_board.x / 2 - nano_rail_w >= row_x(k_vol, 1) + pot_body[0] / 2 + 0.5
+       || nano_y1 - nano_board.y - nano_rail_w >= plate_t + pot_body[1] + 0.5, "Nano runs into the NAV pot");
+assert(len(nano_pins) == 19, "A pin per line: 17 digital, 2 analog");
 
 // --- 2D shapes in x/z ---
 
@@ -287,8 +307,10 @@ module unit_body() {
                cube([rail.x, unit_d - drv_y0 + 2, rail.y + 0.01]);
          translate([drv_x0, drv_y0 - 2, wall - 0.01])
             cube([drv_span, 2, rail.y + 0.01]);
-         // Cable tie block, at the back on the right
-         translate([x_in1 - tie_block.x - 4, unit_d - tie_block.y, wall - 0.01])
+         // The Nano's rails
+         nano_rails(nano_x, nano_y1);
+         // Cable tie block, at the back right of the Nano
+         translate([tie_x, unit_d - tie_block.y, wall - 0.01])
             cube(tie_block + [0, 0, 0.01]);
       }
       // Windows, a bit bigger than the face's
@@ -305,7 +327,7 @@ module unit_body() {
          translate([drv_x0 + i * drv_pitch - drv_over - fit, drv_y0, wall + rail.y - 1.6 - board_t - fit])
             cube([rail.x + 2 * (drv_over + fit), unit_d, board_t + 2 * fit]);
       // Tunnel for the cable tie
-      translate([x_in1 - tie_block.x - 5, unit_d - tie_block.y / 2 - 2, wall + 1.5])
+      translate([tie_x - 1, unit_d - tie_block.y / 2 - 2, wall + 1.5])
          cube([tie_block.x + 2, 4, 2]);
       // Version on the back of the right flange
       gitrev_cut(unit_w - flange_w / 2, unit_h / 2);
@@ -484,6 +506,7 @@ module parts_inside(freqs) {
    filters_part();
    boards_part();
    drivers_part();
+   nano_part(nano_x, nano_y1);
    for (h = [0, 1]) {
       encoder_part(row_x(k_freq, h));
       pot_part(row_x(k_vol, h));

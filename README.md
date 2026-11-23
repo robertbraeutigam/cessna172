@@ -19,9 +19,9 @@ wiring and the assembly:
 | [`yoke/`](yoke/README.md) | the hollow control wheel: PTT, trim rocker, a Nano inside |
 | [`compass/`](compass/README.md) | the magnetic compass over the panel: a printed card on a 28BYJ-48 stepper, on its own Nano |
 | [`instruments/`](instruments/README.md) | the analogue instruments: the RPM and airspeed indicators, a 28BYJ-48 stepper behind a colour printed face |
-| [`radio/`](radio/README.md) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, on their own Mega (the audio panel on its own Nano) |
+| [`radio/`](radio/README.md) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, each on its own Nano |
 
-Every component has its own Arduino Nano (the radio stack a Mega) running
+Every component has its own Arduino Nano running
 MobiFlight and one USB cable to a powered USB hub; see
 [Connections](hub/README.md#connections).
 
@@ -149,8 +149,8 @@ and boards behind the case, to fit the six-pack).
 
 ### [Radio stack](radio/README.md)
 
-The KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, on a
-Mega of their own (the audio panel on its own Nano).
+The KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, each
+on an Arduino Nano of its own.
 
 [![KMA 26](https://robertbraeutigam.github.io/cessna172/radio/kma26_montage.png)](https://robertbraeutigam.github.io/cessna172/radio/kma26_montage.png)
 

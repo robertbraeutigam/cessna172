@@ -28,8 +28,8 @@
 //   set to 5 positions; all nutted onto the face.
 // - Inside: two front perfboards on bosses on the plate back: the marker
 //   board (lamp LEDs, MKR MUTE switch) and the button board (10 switches,
-//   10 LEDs), every LED with its resistor beside it. The radio stack's Mega
-//   has only 5 pins left, so the audio panel has its own MobiFlight board:
+//   10 LEDs), every LED with its resistor beside it. Like every unit, the
+//   audio panel has its own MobiFlight board:
 //   an Arduino Nano on the logic board, a perfboard in rails on the
 //   floor (like the KX155's driver boards) with a CD74HC4067 mux for the
 //   inputs and two 74HC595 shift registers for the 13 lamps. Its USB
@@ -90,13 +90,6 @@ vol_shaft = [6, 15];         // diameter, length from the mounting face
 
 // --- Rectangular LED for the annunciator bars, MEASURE ---
 bar_led = [5, 2, 7];         // x, z, height over the board
-
-// --- Arduino Nano, MEASURE ---
-nano_board = [18, 45];       // x, y (the USB jack at the back end)
-nano_high = 14;              // over the logic board: female header, board, USB jack
-
-// --- CD74HC4067 breakout (switchpanel/switches.scad) ---
-mux_board = [41, 18];
 
 // --- Logic board ---
 lg_board = [72, 50];         // perfboard in the rails: x, y
