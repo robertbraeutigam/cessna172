@@ -45,8 +45,10 @@ frame's right top bar, about where the windshield's middle is (see
   is the simplest fit, like the audio panel's (see
   [Connections](../hub/README.md#connections)). The stepper takes about
   0.2 A at 5 V with its coils on, which USB supplies (the Nano's 5 V pin is
-  behind a 0.5 A diode). It gets warm while it holds the card: print the
-  base in PETG if PLA softens near the posts.
+  behind a 0.5 A diode). With the coils switched off at rest (see
+  [MobiFlight](#mobiflight)) it only draws that while the card turns and
+  stays cool; if it is left on, it gets warm while it holds the card:
+  then print the base in PETG if PLA softens near the posts.
 - **Parts**: the base is printed flat with everything on it, the shell top
   down (open front and bottom), the bezel back side down (the lubber bar on
   the bed), the drum top down, and the stand on its foot. All black except
@@ -149,6 +151,15 @@ as they change between versions.
   (`360-$`) or give it the pins the other way round (D5..D2).
 - **Pin order**: if the motor only hums or shakes, swap the middle pins
   (IN2 and IN3) in the stepper's settings.
+- **Coils off at rest**: tick *Disable stepper when at target position*
+  in the stepper's settings. The firmware then switches the coils off as
+  soon as the card is where it should be, and on again for the next
+  move; the 28BYJ-48's gearbox holds the card without power. The motor
+  draws current only while it steps (about 2.5 ms a step at the
+  firmware's 400 steps a second), so a card that swings all the time
+  in flight still takes only some 10-20 mA on average, and the motor and
+  the ULN2003 board stay cool (see
+  [Powered USB hub](../hub/README.md#powered-usb-hub)).
 - **Fine tuning**: if N is a little off the lubber line after homing,
   add an offset in the transform (e.g. `$+2`) rather than gluing the card
   again.

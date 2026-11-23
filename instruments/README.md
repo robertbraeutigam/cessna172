@@ -75,7 +75,8 @@ top bar is in the way.
   with an angled plug (bent back). It is a board of its own, like the compass's:
   the hub's direct ports are taken (see
   [Connections](../hub/README.md#connections)). The stepper takes about
-  0.2 A from USB.
+  0.25 A from USB while it moves, nothing at rest (see
+  [MobiFlight](#mobiflight)).
 - **Print orientation**: the case, the dial and the back plate are printed
   back side down, the gears and the needle front side down, the carrier
   flat (in `deep` its board side up, with the posts). The motor gear's
@@ -197,6 +198,21 @@ Flash the Nano with the MobiFlight firmware in the Connector. Add a
 *Stepper* on D2..D5 with D6 as its home (auto zero) input, and an output
 that follows the instrument's dataref (below). Check the names against
 the Connector's dialog, as they change between versions.
+
+- **Coils off at rest**: tick *Disable stepper when at target position*
+  in the stepper's settings. The firmware then switches the coils off as
+  soon as the needle is where it should be, and on again for the next
+  move; the 28BYJ-48's gearbox holds the needle without power. The motor
+  draws current only while it steps (about 2.5 ms a step at the
+  firmware's 400 steps a second), so a needle that twitches all the time
+  in flight still takes only some 10-20 mA on average, and the motor and
+  the ULN2003 board stay cool (see
+  [Powered USB hub](../hub/README.md#powered-usb-hub)).
+- **Twitching**: the Connector moves the needle on every whole step of
+  change (0.18 degrees of the needle: about 0.12 kt on the ASI), there is
+  no deadband. If a needle looks too nervous, round the value in the
+  output's transform before it becomes steps (e.g. to 0.5 kt); a value
+  right on a rounding boundary can still flip.
 
 ### RPM indicator
 

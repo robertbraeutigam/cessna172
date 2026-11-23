@@ -479,25 +479,27 @@ can be chained, so the count is no problem: a 10 or 16 port hub, or two
 The current is the limit: the steppers (28BYJ-48) take their power from USB too.
 One draws about 0.25 A while its coils are on, so an instrument with one
 stepper about 0.3 A with its Nano and one with two about 0.55 A, at the
-500 mA a USB 2.0 port is meant to give. With the compass and about 13
-steppers in the instruments that is 3.5-4 A in all, more than many cheap
-"powered" hubs give (their supply often has 2-3 A, shared by all ports;
-too little shows as boards resetting and needles losing their home).
-So the hub:
+500 mA a USB 2.0 port is meant to give. Every stepper has
+*Disable stepper when at target position* ticked in the Connector (see the
+[instruments' MobiFlight setup](../instruments/README.md#mobiflight)): its
+coils are on only while it steps, about 2.5 ms a step, so even a needle
+that twitches all through the flight takes some 10-20 mA on average, and
+the whole panel a few hundred mA. The peak is at start, when every needle
+homes at once for a few seconds: with the compass and about 13 steppers
+in the instruments 3.5-4 A, more than many cheap "powered" hubs give (their
+supply often has 2-3 A, shared by all ports; too little shows as boards
+resetting and needles losing their home). So the hub:
 
-- has a supply for the whole load: 5 V / 4 A or more, or better a 12 V
-  supply (the hub's own converter);
+- has a supply for the peak: 5 V / 4 A or more, or a 12 V supply (the
+  hub's own converter; 12 V / 3 A, 36 W, gives about 6 A at 5 V);
 - gives each port at least 500 mA (in its specs: BC 1.2 charging ports, or
   "x A per port"), so a two stepper instrument is not cut off;
 - stands on the desk next to the [hub](#connections), every board's cable
   short and of a decent gauge (the cheap thin ones drop voltage).
 
-Two things would cut the current a lot and are worth checking before
-more instruments are built: whether MobiFlight can switch a stepper's
-coils off when the needle stands still (the 28BYJ-48's gearbox holds it
-without power), and X27.168 gauge steppers (about 20 mA, no driver
-board, but an end stop inside: only for needles that do not turn round,
-like the ASI, VSI and RPM).
+X27.168 gauge steppers would cut even the peak (about 20 mA, no driver
+board), but they have an end stop inside: only for needles that do not
+turn round, like the ASI, VSI and RPM.
 
 ### Power (later)
 
