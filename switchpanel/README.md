@@ -54,8 +54,12 @@ over the pot's slider ear. The pot is the 75 mm one used for the carb heat.
   into a quarter turn pocket: fully in, the lug turns into it and the end of
   the keyway holds it (locked). Pulled out, the lug stops on the back of
   the panel plate.
-- **Rod:** a short M3 screw from the side of the knob's head, its head
-  sunk in a counterbore, holds the rod. The rod runs
+- **Knob:** two parts, since the stem's lug does not go through the face:
+  the stem goes into the tube from behind, the knob head is pushed onto
+  its front end from the front. A flat on the stem's end lines the two up.
+- **Rod:** a short M3 screw from the side of the knob head, through the
+  stem, its head sunk in a counterbore, holds the rod and the head on the
+  stem. The rod runs
   back through the bracket, whose front wall (screwed onto the end of the
   tube) and rear wall are two more bearings.
 - **Pot:** in the bracket the pot sits on two stands, held down by two
@@ -89,7 +93,8 @@ bracket is wider than the cut-out, so it goes on from behind the sheet.
 | - | 3 wires | pot to the switch panel's Nano |
 
 Printed: `primer_panel.stl` (front side down), `primer_face.stl` (front
-side up), `primer_knob.stl` (on the end of its stem), `primer_bracket.stl`
+side up), `primer_knob.stl` (the head, front down), `primer_stem.stl`
+(on its lug end), `primer_bracket.stl`
 (on its spine), `primer_strap.stl` (2x), `primer_carrier.stl`.
 
 The pot's travel (`pot_travel`) is measured: 60 mm, so the 45 mm stroke
@@ -104,14 +109,18 @@ stiffer spring pops harder, the pot slider's friction works against it.
 
 1. Paint the label, put the face on the panel, push the panel through its
    cut-out and screw the flange onto the sheet.
-2. From behind: put the knob's stem into the tube, the lug in the keyway.
+2. From behind: put the knob's stem into the tube, the lug in the keyway,
+   and push it in until its front end comes out of the face. Push the
+   knob head onto it from the front, the flats lined up (the screw holes
+   then line up too).
 3. Screw the bracket onto the end of the tube (hex key through the holes
    in its rear wall).
 4. Solder three wires to the pot, put it onto its stands and screw the
    straps on.
 5. Push the rod in from the back: through the rear wall, the spring, a collar, the
    carrier (its slot over the pot's ear), the other collar, the front wall
-   and into the knob, and tighten the knob screw.
+   and into the stem up to the head's front wall, and screw the knob screw
+   through the head and the stem onto the rod.
 6. With the knob out, slide the carrier to where the ear is 22.5 mm
    (`stroke / 2`) in front of the pot's middle, and tighten the collars
    against it so the rod still turns.

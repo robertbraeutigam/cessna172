@@ -14,8 +14,12 @@
 //   up. At the back of the tube the keyway opens into a quarter turn
 //   pocket: fully in, the lug turns into it and the keyway's end holds it
 //   (locked). Pulled out, the lug stops on the back of the panel plate.
-// - A 6 mm rod is screwed into the knob (a short M3 screw from the side,
-//   its head sunk in a counterbore) and runs back
+// - The knob is two parts, as the lug does not go through the face: the
+//   stem goes into the tube from behind, the head onto its front end from
+//   the front (a flat on it lines them up).
+// - A 6 mm rod is screwed into the knob (a short M3 screw from the side of
+//   the head, through the stem, its head sunk in a counterbore; it also
+//   holds the head on the stem) and runs back
 //   through a bracket: its front wall (screwed onto the end of the tube) and
 //   rear wall are the other two bearings.
 // - In the bracket the 75 mm linear pot left over from the carb heat sits
@@ -33,7 +37,7 @@
 // points backwards. x is to the pilot's left, y up (seen from the front,
 // positive rotation is clockwise). The panel is printed front side down,
 // its face front side up (panel.inc.scad), the bracket on its spine, the
-// knob on the end of its stem, the carrier on its end.
+// knob head front down, the stem on its lug end, the carrier on its end.
 //
 // Parts to buy:
 // - 75 mm linear pot (small_pot_*, the carb heat one), 6 mm rod (rod_len)
@@ -44,11 +48,14 @@
 // - compression spring over the 6 mm rod (pop_spring_*)
 //
 // Assembly: panel and face through the sheet, screw the flange on. From
-// behind: knob stem into the tube (lug in the keyway), bracket onto the
+// behind: knob stem into the tube (lug in the keyway) until its front end
+// comes out of the face, the head onto it from the front (flats lined up,
+// screw holes aligned), bracket onto the
 // tube (hex key through the holes in the rear wall), pot onto its stands
 // with the straps. Push the rod in from the back, through the rear
 // wall, the pop spring, a collar, the carrier (slot over the pot ear), a collar, the front
-// wall and into the knob; tighten the knob screw. With the knob pulled
+// wall and into the stem up to the head's front wall; screw the knob screw
+// through the head and the stem onto the rod. With the knob pulled
 // out, set the carrier so the ear is stroke / 2 before the pot's middle and
 // tighten the collars against it.
 
@@ -189,6 +196,8 @@ assert(tube_half - tube_screw - pilot_d / 2 >= 1.5, "Bracket screws too close to
 assert(knob_collar_d / 2 >= bore / 2 + 1.5, "Knob does not stop on the face");
 assert(knob_screw_floor + 0.5 + knob_screw[2] <= knob_d / 2 - 0.5, "Knob screw head sticks out of the knob");
 assert(knob_screw_floor - rod_hole / 2 >= 2.5, "Knob screw holds in too little plastic");
+assert(stem_d / 2 - 0.8 - rod_hole / 2 >= 1, "Stem wall too thin at the spigot flat");
+assert(knob_collar_d / 2 - stem_d / 2 - 0.15 >= 1.5, "Knob head wall too thin around the stem");
 assert(knob_screw_z + (knob_screw[1] + 0.6) / 2 <= -(knob_d - knob_collar_d) / 2 - 0.5
        && knob_screw_z - (knob_screw[1] + 0.6) / 2 >= -knob_len + 2.5, "Knob screw counterbore off the round part of the head");
 assert(knob_screw_z - knob_screw_pilot / 2 >= -knob_len + 2 + 0.5, "Knob screw misses the rod end");
@@ -285,45 +294,82 @@ module face() {
          }
 }
 
-// Knob, the back of its head at z=0, the stem to +z, the lug at angle 0
-// (turned into place by the caller)
-module knob() {
+// Knob: two parts, as the lug does not go through the face. The stem
+// (lug on its back end) goes into the tube from behind, its front end
+// through the face, the head is pushed onto that end from the front; the
+// knob screw goes through both onto the rod and holds them together. The
+// back of the head at z=0, the stem to +z, the lug and the screw at angle 0
+// (turned into place by the caller).
+spigot_len = knob_len - 2;   // the stem's front end in the head, to its front wall
+spigot_flat = 0.8;           // flat on it (at 180 degrees), lines the screw holes up
+spigot_play = 0.15;          // radial, a snug push fit
+
+module spigot_2d(d) {
+   intersection() {
+      circle(d = d);
+      translate([-(stem_d / 2 - spigot_flat) + (d - stem_d) / 2, -d])
+         square(2 * d);
+   }
+}
+
+// The knob screw's pilot and counterbore (the tip reaches the rod 0.5
+// before the head would sit on the floor)
+module knob_screw_hole() {
+   translate([0, 0, knob_screw_z])
+      rotate([0, 90, 0]) {
+         cylinder(d = knob_screw_pilot, h = knob_d);
+         translate([0, 0, knob_screw_floor])
+            cylinder(d = knob_screw[1] + 0.6, h = knob_d);
+      }
+}
+
+module knob_head() {
+   difference() {
+      // A ribbed round knob, its back a 45 degree cone down to the collar
+      // that stops on the face (printed front down)
+      rotate_extrude($fn = 90)
+         polygon([[0, 0], [knob_collar_d / 2, 0], [knob_d / 2, -(knob_d - knob_collar_d) / 2],
+                  [knob_d / 2, -knob_len + 2], [knob_d / 2 - 2, -knob_len], [0, -knob_len]]);
+      for (i = [0 : knob_ribs - 1])
+         rotate([0, 0, i * 360 / knob_ribs])
+            translate([knob_d / 2 + 0.3, 0, -knob_len - 1])
+               cylinder(d = 2.2, h = knob_len - (knob_d - knob_collar_d) / 2 + 1, $fn = 16);
+      // Socket for the stem's front end
+      translate([0, 0, -spigot_len])
+         linear_extrude(spigot_len + 1)
+            spigot_2d(stem_d + 2 * spigot_play);
+      knob_screw_hole();
+   }
+}
+
+module knob_stem() {
    difference() {
       union() {
-         // Head: a ribbed round knob, its back a 45 degree cone (prints
-         // without supports, stem down) down to the collar that stops on the face
-         rotate_extrude($fn = 90)
-            polygon([[0, 0], [knob_collar_d / 2, 0], [knob_d / 2, -(knob_d - knob_collar_d) / 2],
-                     [knob_d / 2, -knob_len + 2], [knob_d / 2 - 2, -knob_len], [0, -knob_len]]);
+         translate([0, 0, -spigot_len])
+            linear_extrude(spigot_len + 0.01)
+               spigot_2d(stem_d);
          cylinder(d = stem_d, h = stem_len);
          translate([0, 0, stem_len - lug_len])
             linear_extrude(lug_len)
                lug_2d(0, lug_w, stem_r + lug_h);
       }
-      for (i = [0 : knob_ribs - 1])
-         rotate([0, 0, i * 360 / knob_ribs])
-            translate([knob_d / 2 + 0.3, 0, -knob_len - 1])
-               cylinder(d = 2.2, h = knob_len - (knob_d - knob_collar_d) / 2 + 1, $fn = 16);
-      // Rod, up to 2 mm before the front
-      translate([0, 0, -knob_len + 2])
-         cylinder(d = rod_hole, h = knob_len + stem_len);
-      // Knob screw, from the side of the head: pilot to the rod, the
-      // counterbore for its head from the floor out (the tip reaches the
-      // rod 0.5 before the head would sit on the floor)
-      translate([0, 0, knob_screw_z])
-         rotate([0, 90, 0]) {
-            cylinder(d = knob_screw_pilot, h = knob_d);
-            translate([0, 0, knob_screw_floor])
-               cylinder(d = knob_screw[1] + 0.6, h = knob_d);
-         }
+      // Rod, all through: it ends on the head's front wall
+      translate([0, 0, -spigot_len - 1])
+         cylinder(d = rod_hole, h = spigot_len + stem_len + 2);
+      knob_screw_hole();
    }
+}
+
+module knob() {
+   knob_head();
+   knob_stem();
 }
 
 // Knob in place, pushed in by u, turned by t
 module knob_in_place(u, t) {
    translate([0, 0, -panel_t - (stroke - u)])
       rotate([0, 0, key_angle + t])
-         knob();
+         if ($children > 0) children(); else knob();
 }
 
 module stand(z) {
@@ -532,7 +578,8 @@ module section_view(u = stroke, locked = true) {
 module exploded_view(e = explode) {
    color(c_panel) translate([0, 0, -2 * e]) face();
    color(c_tube) panel();
-   color(c_knob) translate([0, 0, e]) knob_in_place(stroke, 0);
+   color(c_knob) translate([0, 0, -3 * e]) knob_in_place(stroke, 0) knob_head();
+   color(c_knob) translate([0, 0, e]) knob_in_place(stroke, 0) knob_stem();
    translate([0, 0, 2 * e]) {
       color(c_bracket) bracket();
       translate([0, 0, 0]) pot_part(0);
@@ -549,7 +596,8 @@ module installed() {
 
 translate([0, 0, -explode]) panel(); // Make module panel
 translate([0, 0, -2 * explode]) rotate([0, 180, 0]) face(); // Make module face
-translate([0, 0, stem_len]) rotate([180, 0, 0]) knob(); // Make module knob
+translate([0, 0, knob_len]) knob_head(); // Make module knob
+translate([knob_d, 0, stem_len]) rotate([180, 0, 0]) knob_stem(); // Make module stem
 translate([0, 0, -spine_x + spine_t]) rotate([0, -90, 0]) bracket(); // Make module bracket
 translate([0, 0, strap_t]) rotate([0, 90, 0]) strap(); // Make module strap
 carrier(); // Make module carrier
