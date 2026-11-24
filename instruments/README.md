@@ -12,13 +12,17 @@
 
 [![Altimeter](https://robertbraeutigam.github.io/cessna172/instruments/alt_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/alt_montage.png)
 
+[![Heading indicator](https://robertbraeutigam.github.io/cessna172/instruments/hi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/hi_montage.png)
+
 The analogue ("steam") instruments. They all follow one standard
 (`instrument.inc.scad`): a 3 1/8" case behind a round hole in the panel,
 a colour printed face, and a needle turned by a 28BYJ-48 geared stepper.
 So far: the RPM indicator (tachometer), the airspeed indicator (ASI),
-the vertical speed indicator (VSI), the attitude indicator (AI) and the altimeter (ALT); the last two have
+the vertical speed indicator (VSI), the attitude indicator (AI), the altimeter (ALT) and the
+heading indicator (HI); the last three have
 the standard's case front but mechanisms of their own (see
-[Attitude indicator](#attitude-indicator) and [Altimeter](#altimeter)). The instruments go into
+[Attitude indicator](#attitude-indicator), [Altimeter](#altimeter) and
+[Heading indicator](#heading-indicator)). The instruments go into
 the holes of the stage 2 left sheet (see
 [Cockpit frame](../frame/README.md)): the stage 1 sheet is lower and its
 top bar is in the way.
@@ -31,6 +35,7 @@ top bar is in the way.
 | `vsi.scad` | the vertical speed indicator: its face and the parts above; the face print |
 | `ai.scad` | the attitude indicator: the standard's case front, a roll frame with the horizon bowl and the pitch motor on it, a slip ring, the roll motor; the roll dial's print |
 | `alt.scad` | the altimeter: the standard's case front, three needles on concentric shafts with a motor each, the Kollsman window's disc, knob and pot; the face and Kollsman ring print |
+| `hi.scad` | the heading indicator: the standard's case front, a card on the axle and a bug disc behind it with a motor each, two knobs on rotary encoders; the card, bug ring and fixed ring print |
 
 ## How it works
 
@@ -643,3 +648,178 @@ rest), both following `sim/cockpit2/gauges/indicators/altitude_ft_pilot`
   (the Connector shows them) with 28.1 and 31.0 at the inHg index. About
   3 counts per 0.01 inHg; raise the input's sensitivity if the value
   flickers.
+
+## Heading indicator
+
+The six-pack's bottom middle instrument, the 172N's directional gyro:
+a compass card turning behind a white airplane, a fixed ring with the
+index (lubber line) at the top and marks every 45 degrees, an orange
+heading bug, and two knobs at the lower corners: the left one sets the
+gyro, the right one the bug. Its case front is the standard's (the 81 mm
+hole, the lip, the glass), but the lower screws' places are the knobs',
+so it has two screws, on the top diagonals. Behind it are two 28BYJ-48
+steppers side by side.
+
+It is under the attitude indicator, in the bottom row, over the force
+feedback yoke's housing only with its upper part: its board carrier is
+62 mm deep behind the sheet (`hi_depth`), but nothing deeper than the
+back plate reaches below 24 mm under its axis (`hi_deep_z`); below that
+it is 19 mm deep (`hi_low_depth`: the case, the back plate, the knobs'
+encoders). The frame checks both against the housing.
+
+### How it works
+
+- **Front to back**: the glass with the airplane (printed white, 0.8 mm,
+  glued onto its back), the mask (the fixed ring, a printed paper ring on
+  its front), the card (in the mask's opening), the bug disc behind the
+  card, the dial (a plate with a rim forward to the mask: it presses the
+  mask and the glass against the lip), the card's gears, the back plate.
+- **Card**: printed paper (N 3 6 E ... 33, a tick every 5 degrees) on a
+  56 mm printed disc, pressed onto a 3 mm steel axle, which turns in the
+  dial's hub and in the back plate. The axle's gear is turned 1:1 by
+  motor A's (26 teeth, module 1), like the standard's needle, and the
+  magnet in motor A's gear homes it on a sensor in the back plate. The
+  heading shows at the index: the card turns counter clockwise in a
+  right turn.
+- **Bug**: the bug disc is a disc behind the card, bigger than it: its
+  edge shows between the card and the fixed ring, black with the orange
+  bug (a paper ring). It turns on the dial's hub. An internal ring gear
+  on its back (80 teeth, module 0.8) is turned by motor B's pinion
+  (16 teeth): 5 motor turns a bug turn, so its home cannot be in the
+  motor's gear. The magnet is in a boss on the bug disc's back and the
+  sensor lies in a pocket in the dial's front, its legs in a groove out
+  to a hole, and its wires back through the gear layer and the back
+  plate: one home a bug turn. The bug follows the heading like the card
+  (MobiFlight turns it by the bug's heading minus the heading).
+- **Knobs**: two EC11 rotary encoders with push switches. Each sits in a
+  bracket of the case at its lower corner (49 mm from the axis, outside
+  the case's round wall): the bushing through the bracket, its nut in a
+  pocket in front of the bracket (behind the sheet), the shaft through a
+  7 mm hole in the sheet, a printed knurled knob on its D flat. The knob
+  stands 1 mm off the sheet, more than the push travel.
+- **Back**: the two motors lie on the back plate's back, their bodies
+  slanted (A to the upper left, B to the lower right) so that their wire
+  covers pass each other. Four posts carry the board carrier behind them:
+  the two ULN2003 boards upright either side, the Nano between them, all
+  facing back, the Nano's USB jack up. A straight mini USB plug fits
+  under the attitude indicator's case; the cable bends back over the
+  force feedback yoke's housing.
+- **Print orientation**: the case back side down (the motor gear's pocket
+  open to the sheet, the encoders' nut pockets open to the front), the
+  mask, card, bug disc, dial, back plate and carrier front down, the
+  gears flat, the pinion on its teeth, the knobs front down, the
+  airplane flat (white). Everything else black.
+
+The `assert`s check the faces (numbers, ticks, the airplane, the bug's
+room between the card and the fixed ring), the front stack (the papers
+covering the window, the bug disc under the mask and inside the dial's
+rim), the gears (the pinion in the ring, the shafts reaching through
+their gears, the magnet boss and the hubs clear of each other), the bug
+sensor's wires clear of the gears and motors, the two motors, their ears
+and covers clear of each other and of the screws, posts and sensors, the
+encoders outside the case's wall and clear of the neighbours, the knobs
+on their shafts, and the carrier between the neighbours' carriers (the
+TC and the VSI are standard instruments) and under the attitude
+indicator.
+
+### The print
+
+`make` writes `target/hi_face.pdf` (on the project page as
+[face](https://robertbraeutigam.github.io/cessna172/instruments/hi_face.pdf)):
+two fixed rings, the glass's template, two cards and two bug rings, in
+black, white and orange. Print at 100 % on matte photo paper and cut on
+the edges. Glue the fixed ring onto the mask's front (the index at the
+top), the card onto the card's disc, the bug ring onto the bug disc's
+front. The airplane is a printed part, not on the paper.
+
+### Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 2 | 28BYJ-48 stepper, 5 V, with its ULN2003 driver board | card and bug |
+| 1 | Arduino Nano (ATmega328P, 5 V), mini USB cable (straight plug) | MobiFlight board of the instrument |
+| 2 | A3144 hall sensor | homes |
+| 2 | disc magnet 6 x 3 mm | homes |
+| 2 | EC11 rotary encoder with push switch, 20 mm D shaft, M7 bushing, with its nut | the knobs |
+| 1 | 3 mm steel dowel pin, 16 mm | the card's axle |
+| 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
+| 1 | the fixed ring, card and bug ring, printed on photo paper | |
+| 2 | M3 x 8 button head, black | case through the sheet |
+| 3 | M3 x 8 countersunk self tapping screw | back plate into the case |
+| 4 | M3 x 8 countersunk self tapping screw | carrier onto the back plate's posts |
+| 4 | M3 x 8 countersunk screw + nut | motor ears |
+| 8 | M3 x 6 self tapping screw | ULN2003 boards |
+
+The encoder's sizes (`enc_*`: body, bushing, nut, shaft) and the axle's
+length are MEASURE values: check them before printing.
+
+### Assembly
+
+1. Magnets into motor gear A (back face) and into the bug disc's boss
+   (back face); check which face pulls each sensor low.
+2. Back plate: motors A and B (ears countersunk from the front, nuts
+   behind), sensor A into its pocket (flat face forward, legs bent back
+   through the slot). Motor gear A onto A's shaft, the pinion onto B's.
+3. Dial: the bug sensor into its pocket in the front (flat face
+   forward), its legs out along the groove, bent back through the hole;
+   wires through the back plate's hole. Fixed ring onto the mask, card
+   paper onto the card, bug ring onto the bug disc.
+4. The card onto the axle's front end (pressed, glue), the card's gear
+   onto the axle, its back face 2.2 mm from the axle's back end
+   (`gear_from_end` in the build's echo).
+5. Glass into the case from behind (the airplane glued on its back, nose
+   up, at the middle), the mask (the index at the top), the card with its
+   axle, the bug disc, the dial over the axle (its hub into the bug
+   disc's sleeve), then the back plate's stack, the axle into its
+   bearing and the gears meshing, the posts into the dial's holes:
+   screwed into the case (three screws).
+6. Encoders into their brackets from behind, the nuts on in the pockets.
+7. The carrier onto the back plate's posts (from its back; before the
+   boards: the screws are under them), the boards onto it, wire it
+   (below). Flash and set up MobiFlight, let it home, and set the card's
+   and the bug's offsets (the card shows N, the bug at the index).
+8. Into the panel: drill the two screw holes and the knobs' 7 mm holes
+   using the case as the template, the case into the hole from behind,
+   the two screws, the knobs onto the shafts (their flats).
+
+### Wiring
+
+| Signal | Nano pin | MobiFlight device |
+|--------|----------|-------------------|
+| motor A (card) ULN2003 IN1..IN4 | D2, D3, D4, D5 | *Stepper* card |
+| sensor A OUT | D6 | its home input |
+| motor B (bug) ULN2003 IN1..IN4 | D7, D8, D9, D10 | *Stepper* bug |
+| bug sensor OUT | D11 | its home input |
+| left encoder A, B | D12, A0 | *Encoder* gyro |
+| left encoder push | A1 | *Button* gyro sync |
+| right encoder A, B | A2, A3 | *Encoder* bug |
+| right encoder push | A4 | *Button* bug sync |
+| encoders' C and push commons, ULN2003 boards' -, sensors' GND | GND | |
+| ULN2003 boards' +, sensors' VCC | 5 V | |
+
+**USB**: one port on the powered USB hub, about 0.55 A while both motors
+move (two steppers, see [USB](#wiring) above).
+
+### MobiFlight
+
+Two *Steppers* (pins above, coils off at rest, *Compass mode*, so they
+turn the short way round):
+
+- **Card**: 2038 steps a turn, following
+  `sim/cockpit2/gauges/indicators/heading_vacuum_deg_mag_pilot` (the
+  vacuum gyro's heading), steps `$*2038/360`. The card turns the other
+  way from the motor; if it turns the wrong way, give the motor its pins
+  the other way round.
+- **Bug**: 10190 steps a turn (5 motor turns), following the bug minus
+  the heading: `sim/cockpit/autopilot/heading_mag` and the heading above,
+  steps `((($bug-$hdg)%360+360)%360)*10190/360` (in the Connector: the
+  bug's dataref as the output's value, the heading as a config
+  reference). The pinion and the ring turn the same way.
+- **Offsets**: after homing, set each stepper's offset so the card shows
+  N and the bug sits at the index.
+- **Knobs**: the left *Encoder* runs `sim/instruments/DG_sync_down` /
+  `sim/instruments/DG_sync_up`, its *Button* `sim/instruments/DG_sync_mag`
+  (to the magnetic compass); the right *Encoder* runs
+  `sim/autopilot/heading_down` / `sim/autopilot/heading_up`, its *Button*
+  `sim/autopilot/heading_sync`. Check the command names in X-Plane's
+  keyboard settings, they change between versions.

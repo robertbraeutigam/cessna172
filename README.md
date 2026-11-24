@@ -17,7 +17,7 @@ wiring and the assembly:
 | [`frame/`](frame/README.md) | the aluminium frame and panel sheet that everything mounts on |
 | [`yoke/`](yoke/README.md) | the hollow control wheel: PTT, trim rocker, a Nano inside |
 | [`compass/`](compass/README.md) | the magnetic compass over the panel: a printed card on a 28BYJ-48 stepper, on its own Nano |
-| [`instruments/`](instruments/README.md) | the analogue instruments: the RPM, airspeed, vertical speed and attitude indicators and the altimeter, 28BYJ-48 steppers behind colour printed faces |
+| [`instruments/`](instruments/README.md) | the analogue instruments: the RPM, airspeed, vertical speed, attitude and heading indicators and the altimeter, 28BYJ-48 steppers behind colour printed faces |
 | [`radio/`](radio/README.md) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, each on its own Nano |
 
 Every component has its own Arduino Nano running
@@ -227,7 +227,9 @@ indicator, the airspeed indicator, the vertical speed indicator, the attitude in
 roll dial and a horizon bowl, the pitch motor riding on the roll frame
 through a slip ring; deeper than the others) and the altimeter (two
 needles on concentric shafts, a motor each, and Kollsman windows in
-inHg and hPa set by its knob through a 10 turn pot; deeper too).
+inHg and hPa set by its knob through a 10 turn pot; deeper too) and the
+heading indicator (the card and an orange bug disc behind it, a motor
+each, two knobs on rotary encoders).
 
 [![RPM indicator](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)
 
@@ -238,6 +240,8 @@ inHg and hPa set by its knob through a 10 turn pot; deeper too).
 [![Attitude indicator](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)
 
 [![Altimeter](https://robertbraeutigam.github.io/cessna172/instruments/alt_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/alt_montage.png)
+
+[![Heading indicator](https://robertbraeutigam.github.io/cessna172/instruments/hi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/hi_montage.png)
 
 ### [Radio stack](radio/README.md)
 

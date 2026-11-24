@@ -240,6 +240,21 @@ its own top-level directory; new components should follow the same layout.
     and its legs press and key the dial. Boards on a carrier behind
     motor C. Print `face` (face and Kollsman ring). 98 mm deep
     (`alt_depth` in the frame: top row, over the housing).
+  - `hi.scad` — the heading indicator (the six-pack's bottom middle):
+    the standard's case front with two screws (top diagonals), the lower
+    corners are the knobs': EC11 rotary encoders with push switches in
+    brackets of the case (`enc_*`, MEASURE; left: gyro set, right: bug),
+    nut behind the sheet. A white printed airplane glued on the glass,
+    the mask (fixed ring: index, 45 degree marks) behind it, the card
+    (on the 3 mm axle, 1:1 to motor A like the standard's needle) in the
+    mask's opening, the bug disc behind the card (its edge shows the
+    orange bug) turning on the dial's hub, an internal ring gear on its
+    back turned by motor B's pinion (5:1), its magnet in the disc and the
+    sensor in the dial's front. The motors side by side on the back
+    plate, slanted so their covers pass; the carrier (two ULN2003s, the
+    Nano, USB up) behind them, facing back. 62 mm deep (`hi_depth`) only
+    above `hi_deep_z`, 19 mm under it (`hi_low_depth`): the frame checks
+    both against the housing. Print `face` (card, bug ring, fixed ring).
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the

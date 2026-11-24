@@ -132,7 +132,11 @@ VSI, NAV 1 and the RPM are in front of the housing). The
 deeper, 116 mm (`ai_depth`), and has a square 86 mm front bezel
 (`ai_bezel`, checked against its neighbours' holes), so it must stay in the top row, over the
 housing; so must the [altimeter](../instruments/README.md#altimeter),
-98 mm deep (`alt_depth`: two motors behind each other). The ADF's place in the 172N, under NAV 2 at the column's height,
+98 mm deep (`alt_depth`: two motors behind each other). The
+[heading indicator](../instruments/README.md#heading-indicator) is in
+the bottom row over the housing's top: its boards make it 62 mm deep
+(`hi_depth`), but only above 24 mm under its axis (`hi_deep_z`), which
+is over the housing; under that it is 19 mm deep (`hi_low_depth`). The ADF's place in the 172N, under NAV 2 at the column's height,
 is free as well.
 
 The frame overhangs the desk edge by 22 mm (`frame_overhang`: a 2020 and
