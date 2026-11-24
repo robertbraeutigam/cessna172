@@ -163,7 +163,7 @@ it.
 | 1 | Arduino Nano (ATmega328P, 5 V, mini USB) | all inputs, see [Nano](#nano) |
 | 2 | M3 x 8 self tapping screw | carrier (`switches_carrier.stl`) onto the panel |
 | 4 | M2 x 6 self tapping screw, pan head | the Nano onto the carrier |
-| 4 | printed rocker cap (`switches_caps_master.stl` in red, `switches_caps_avionics.stl` in white) + CA glue or epoxy | the Cessna look, see [Rocker caps](#rocker-caps) |
+| 4 | printed rocker cap (`switches_cap.stl`, 2 in red, 2 in white) + CA glue or epoxy | the Cessna look, see [Rocker caps](#rocker-caps) |
 | 6 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
 | 1 | mini USB cable, long enough to the powered USB hub | the Nano to the PC |
 | 1 | cable tie, up to 3.6 mm wide | the USB cable onto its block (`tie`) |
@@ -209,7 +209,7 @@ cover the paddles' lamps.
 
 The caps' underside is the paddle's concave top, so they seat in one
 place; glue them on with CA glue or epoxy. They
-are printed on their side, the profile on the bed (`switches_caps_*.stl`,
+are printed on their side, the profile on the bed (`switches_cap.stl`, all four the same,
 no supports).
 
 **MEASURE when the switches arrive (`rk_*` paddle values, now guesses

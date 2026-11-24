@@ -128,7 +128,6 @@ rk_rib_pitch = 1.2;
 rk_rib_w = 0.5;
 rk_rib_depth = 0.3;
 rk_rib_land = 1.5;           // smooth strip at the crease and the ends
-rk_cap_print_space = 4;      // between the caps on the print bed
 
 // --- Toggle switch ---
 toggle = "M12";              // "M12" (standard size, like the real ones) or "MTS-202" (mini, M6)
@@ -672,15 +671,12 @@ module rk_cap(side) {
       rk_cap_2d(rk_paddle.y / 2 - rk_rib_land);
 }
 
-// The two caps of a rocker as printed: each on its outer side, no
-// supports (the same for both rockers, one STL per color)
-module rocker_caps_plate() {
+// A rocker cap as printed: on its side, no supports. All four are the
+// same (print 2 red, 2 white)
+module rocker_cap() {
    translate([0, 0, rk_cap_x1])
       rotate([0, -90, 0])
          rk_cap(-1);
-   translate([rk_cap_print_space, 0, rk_cap_x1])
-      rotate([0, 90, 0])
-         rk_cap(1);
 }
 
 // --- Views (rendered to PNG by "make views") ---
@@ -1144,8 +1140,7 @@ rotate([0, 180, 0]) panel(); // Make module panel
 translate([0, 0, -30]) face(); // Make module face
 breakers_plate(); // Make module breakers
 nano_carrier(); // Make module carrier
-rocker_caps_plate(); // Make module caps_master
-rocker_caps_plate(); // Make module caps_avionics
+rocker_cap(); // Make module cap
 
 //switches_part(); // Ignore module
 
