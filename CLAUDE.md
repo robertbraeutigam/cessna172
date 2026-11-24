@@ -58,7 +58,7 @@ its own top-level directory; new components should follow the same layout.
     show only, glued into hex holes in the face). An Arduino Nano reads
     all switches (`switch_pins`, D2..), the ignition (`ignition_pins`,
     A0..A4) and the primer (A7), each on a pin of its own; its USB cable
-    is tied onto `tie_block` behind the plug. The Nano (in rails) and the
+    is tied onto `tie_block` behind the plug. The Nano (screwed onto posts through its mounting holes) and the
     tie block are on a separate printed carrier (`nano_carrier`) screwed
     onto two bosses on the panel back, so it can be wired and tested
     before the panel exists. The switch list
@@ -384,7 +384,8 @@ so a version can be embossed into a part. Files are rendered from the copy in
   repeats the `big_pot_*` values from `throttle_box.scad`).
 - Hole clearances used so far: 3.2–3.3 mm for M3 screws, 2.8 mm for M3 self
   tapping pilot holes, 2.1 mm for M2 pilot holes (only the ignition, built;
-  use M3 for new parts), 4.2 mm for M4 / the USB cable, 5.3 mm for M5 (frame), 6.2 mm for the 6 mm rods, 11.2 mm for
+  use M3 for new parts), 1.7 mm for M2 self tapping into the Nano's
+  mounting holes (1.8 mm, M3 does not fit; the switch panel carrier), 4.2 mm for M4 / the USB cable, 5.3 mm for M5 (frame), 6.2 mm for the 6 mm rods, 11.2 mm for
   the rod nuts.
 - The printer is an Anycubic Kobra 3 V2 with a 255 x 255 mm bed. Pieces must
   fit it; files with big parts check it with a `bed = [255, 255]` parameter.
