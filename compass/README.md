@@ -58,9 +58,10 @@ frame's right top bar, about where the windshield's middle is (see
   the Nano behind the motor), its bottom 25 mm over the top bar (`rise`).
 
 The motor, board, sensor and magnet sizes (`motor_*`, `uln_*`, `sensor`,
-`magnet`; the Nano's `nano_*` and its rails are the shared ones of
-[`lib/nano.inc.scad`](../lib/nano.inc.scad), here without their lips: it
-drops in from above) and the paper and window sheet thicknesses
+`magnet`: the shared ones of [`lib/stepper.inc.scad`](../lib/stepper.inc.scad),
+the instruments' too; the Nano's `nano_*` and its rails are the shared
+ones of [`lib/nano.inc.scad`](../lib/nano.inc.scad), here without their
+lips: it drops in from above) and the paper and window sheet thicknesses
 (`paper_t`, `glass_t`) are MEASURE values. The `assert`s check that the
 band clears the motor, its ears, wires and posts, the sensor post and the
 side walls; that the pad clears the hub, the band and the ear screws; that

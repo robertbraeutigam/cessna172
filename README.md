@@ -80,6 +80,10 @@ solder. The Makefile copies `lib/*.inc.scad` into every component's
 `target/` with its own includes, and changing one renders every
 component again. The rails are snug (0.15 mm a side): measure your Nano's
 width (`nano_board`) before printing, clones differ.
+[`lib/stepper.inc.scad`](lib/stepper.inc.scad) has the stepper drive of
+the compass and the instruments: the 28BYJ-48, the ULN2003 board (with
+the places of its standoffs), the A3144 hall sensor and the homing
+magnet, their sizes and view models.
 
 The printer is an Anycubic Kobra 3 V2 (255 x 255 mm bed). Large parts must
 fit on it, and the files check it. Values that depend on bought parts

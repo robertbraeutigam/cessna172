@@ -238,7 +238,7 @@ ai_arm = [-inst_pitch.x + drive_a, 0];               // the attitude indicator's
 vsi_c = [0, -inst_pitch.y];                           // the VSI under it
 uln_holes_a = [for (b = uln_xz, i = [0, 1], j = [0, 1])
    [b.x + uln_hole_in + i * (uln_board.x - 2 * uln_hole_in), b.y + uln_hole_in + j * (uln_board.y - 2 * uln_hole_in)]];
-alt_depth = y_kr[1] + max(uln_standoff + nano_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
+alt_depth = y_kr[1] + max(uln_standoff + uln_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
 baro_span = k_baro * (baro_range[1] - baro_range[0]);
 pot_span = pot_turns * 360 / k_ratio;                 // the disc's turn over the pot's 10 turns
 
@@ -622,9 +622,9 @@ module alt_carrier() {
    difference() {
       union() {
          along_y(y_kr[0], y1) translate([car_box[0], car_box[1]]) square([car_box[2] - car_box[0], car_box[3] - car_box[1]]);
-         for (h = uln_holes_a) along_xz(h, y1 - 0.01, y1 + uln_standoff) circle(d = 6);
+         for (h = uln_holes_a) along_xz(h, y1 - 0.01, y1 + uln_standoff) circle(d = uln_standoff_d);
          // Nano rails along z (lib/nano.inc.scad), a stop at the top end
-         on_nano_plate(alt_nano_c, y1, "down")
+         on_board_plate(alt_nano_c, y1, "down")
             nano_rails(y1 = nano_board.y / 2 + 1, far_stop = true);
       }
       for (h = uln_holes_a) along_xz(h, y1 - 1, y1 + uln_standoff + 1) circle(d = pilot_d);
@@ -744,12 +744,8 @@ module pot_part() {
 }
 
 module alt_boards_part() {
-   for (b = uln_xz) translate([b.x, y_kr[1] + uln_standoff, b.y]) {
-      color(c_uln) cube([uln_board.x, nano_t, uln_board.y]);
-      color("#202020") translate([8, nano_t, 6]) cube([19, 6, 7]);
-      color("#f0f0f0") translate([7, nano_t, uln_board.y - 9]) cube([12, 7, 6]);
-   }
-   on_nano_plate(alt_nano_c, y_kr[1], "down") nano_part(c_board);
+   for (b = uln_xz) on_board_plate(b + uln_board / 2, y_kr[1], "up") uln_part();
+   on_board_plate(alt_nano_c, y_kr[1], "down") nano_part(c_board);
 }
 
 module alt_shafts_part() {

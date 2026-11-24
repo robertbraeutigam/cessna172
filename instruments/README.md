@@ -94,8 +94,8 @@ top bar is in the way.
   over it. All of it is black but the needle: print
   that white, or paint it.
 
-The motor, board, sensor and magnet values are the compass's MEASURE
-values. The `assert`s check that the face covers the window, that the
+The motor, board, sensor and magnet values (MEASURE) are the shared ones
+of [`lib/stepper.inc.scad`](../lib/stepper.inc.scad), the compass's too. The `assert`s check that the face covers the window, that the
 posts, columns and sensor clear the gears, that the screws from the front
 and the back do not meet in the columns, that the magnet fits the gear,
 and that the motor, the carrier's

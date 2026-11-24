@@ -66,44 +66,25 @@ sheet_t = 3;
 cut_d = 81;                  // the instrument's hole (inst_cut_d)
 inst_pitch = [89, 88];       // check only: the six-pack's centres across and down (frame/)
 
-// --- 28BYJ-48 stepper, MEASURE (the compass's values) ---
-motor_d = 28;
-motor_h = 19;                // body: back face to the flange
-motor_flange_t = 1;          // the flange with the two ears
-motor_ear_dx = 17.5;         // ear holes from the body's middle (35 apart)
-motor_ear_w = 7;             // ear width (round ends)
-motor_ear_hole = 4.2;
-motor_shaft_dy = 8;          // shaft from the body's middle, away from the wire cover
-motor_boss = [9, 1.5];       // boss on the flange around the shaft: diameter, height
-shaft_d = 5;
-shaft_flat = 3;              // across the two flats
-shaft_len = 10;              // over the flange
-flat_len = 6;                // the flats, at its end
-motor_cover = [14.6, 17];    // blue wire cover: width, reach from the body's middle
-
+// --- The stepper drive (lib/stepper.inc.scad: the 28BYJ-48, the ULN2003
+// board, the A3144 sensor, the magnet) and the Nano (lib/nano.inc.scad) ---
+include <stepper.inc.scad>
 include <nano.inc.scad>
 
-// The Nano's own coordinates (lib/nano.inc.scad) on a board plate whose
-// face looks along +y at y: its middle at c ([x, z]), its USB jack pointing
-// "down", "up" or "left"
-function nano_plate_m(jack) =
-     jack == "down" ? [[1, 0, 0, 0], [0, 0, 1, 0], [0, -1, 0, 0], [0, 0, 0, 1]]
-   : jack == "up" ? [[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]
-   : assert(jack == "left") [[0, -1, 0, 0], [0, 0, 1, 0], [-1, 0, 0, 0], [0, 0, 0, 1]];
-module on_nano_plate(c, y, jack) {
+// A board's own coordinates (lib/: the Nano's, the ULN2003's; the board
+// on z=0, its parts up) on a plate whose face looks along +y at y: its
+// middle at c ([x, z]), its +y (the Nano's USB jack) pointing "down", "up",
+// "left" or "right". Proper rotations: a mirror would swap its sides.
+function board_plate_m(dir) =
+     dir == "down" ? [[1, 0, 0, 0], [0, 0, 1, 0], [0, -1, 0, 0], [0, 0, 0, 1]]
+   : dir == "up" ? [[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]
+   : dir == "right" ? [[0, 1, 0, 0], [0, 0, 1, 0], [1, 0, 0, 0], [0, 0, 0, 1]]
+   : assert(dir == "left") [[0, -1, 0, 0], [0, 0, 1, 0], [-1, 0, 0, 0], [0, 0, 0, 1]];
+module on_board_plate(c, y, dir) {
    translate([c.x, y, c.y])
-      multmatrix(nano_plate_m(jack))
+      multmatrix(board_plate_m(dir))
          children();
 }
-
-// --- ULN2003 board, Nano, sensor, magnet, MEASURE (the compass's values) ---
-uln_board = [35, 32];        // width, height
-uln_hole_in = 2.7;           // its 4 holes from the edges
-uln_parts = 14;              // the parts on its front
-uln_pins = 3;                // solder stubs behind it
-// the Nano: lib/nano.inc.scad (included below)
-sensor = [4.1, 1.6, 3.1];    // A3144 (TO-92S): width, thickness (flat face), height
-magnet = [6, 3];             // disc magnet: diameter, height
 
 // --- Other bought parts, MEASURE ---
 axle = [3, 12];              // steel dowel pin: diameter, length
@@ -157,7 +138,6 @@ motor_dir = -1;              // the motor's body left of its shaft (over the axi
 
 // --- Boards ---
 car_t = 2.5;                 // carrier plate
-uln_standoff = 4;
 car_post_d = 7;              // the carrier's posts
 board_gap = 2;               // motor cover to the ULN2003 board, boards apart
 
@@ -267,7 +247,7 @@ for (s = car_screws) {
           || abs(s.y) - car_post_d / 2 >= uln_board.y / 2 + 0.5, "A carrier post runs into the ULN2003 board");
 }
 assert(y_car0 - y_back1 - motor_flange_t - motor_h >= nano_under + nano_t + nano_usb[1] + 0.9, "Nano runs into the motor");
-assert(y_car0 - uln_standoff - nano_t - uln_parts >= y_back1 + 1, "ULN2003 board's parts run into the back plate");
+assert(y_car0 - uln_standoff - uln_t - uln_parts >= y_back1 + 1, "ULN2003 board's parts run into the back plate");
 assert(uln_x0 + uln_board.x + 1 <= cover_x1, "ULN2003 board runs into the motor's cover");
 // between the six-pack's neighbours (they are as big), clear of the case screws' heads
 assert(max(abs(car_x0), post_x + car_post_d / 2, car_x1) <= inst_pitch.x / 2 - 1 && car_h / 2 <= inst_pitch.y / 2 - 1,
@@ -451,10 +431,10 @@ module carrier() {
    on_carrier() difference() {
       union() {
          along_y(-car_t, 0) carrier_outline();
-         for (h = uln_holes) translate([h.x, -0.01, h.y]) rotate([-90, 0, 0]) cylinder(d = 6, h = uln_standoff + 0.01);
+         for (h = uln_holes) translate([h.x, -0.01, h.y]) rotate([-90, 0, 0]) cylinder(d = uln_standoff_d, h = uln_standoff + 0.01);
          // Nano rails (lib/nano.inc.scad), a stop at the top end; it slides
          // in from below, USB end last
-         on_nano_plate([nano_x, 0], 0, "down")
+         on_board_plate([nano_x, 0], 0, "down")
             nano_rails(y1 = nano_board.y / 2 + 1, far_stop = true);
          // the posts to the back plate
          for (s = car_screws) translate([s.x, -0.01, s.y]) rotate([-90, 0, 0]) cylinder(d = car_post_d, h = post_h + 0.01);
@@ -512,9 +492,7 @@ module print_page(title) {
 // --- View only ---
 c_case = "#1d1f22";
 c_steel = "#b9c0c8";
-c_motor_cover = "#2f6fc0";
 c_board = "#1d4fa0";
-c_uln = "#2f7d4a";
 c_glass = [0.75, 0.85, 0.95, 0.15];
 c_sheet = "#2a2d31";
 c_needle = "#f4f4f4";
@@ -527,36 +505,16 @@ module face_part(colors) {
       color(colors[i]) translate([0, y_face - 0.02 * i, 0]) rotate([90, 0, 0]) linear_extrude(0.02) let($ink = colors[i]) children();
 }
 
-module motor_local() {
-   // the flange's top at z = 0, the shaft at the origin pointing up, the body towards +y
-   color(c_steel) {
-      translate([0, motor_shaft_dy, -motor_flange_t - motor_h]) cylinder(d = motor_d, h = motor_h);
-      translate([0, motor_shaft_dy, -motor_flange_t]) linear_extrude(motor_flange_t) difference() {
-         hull() for (s = [-1, 1]) translate([s * motor_ear_dx, 0]) circle(d = motor_ear_w);
-         for (s = [-1, 1]) translate([s * motor_ear_dx, 0]) circle(d = motor_ear_hole);
-      }
-      cylinder(d = motor_boss[0], h = motor_boss[1]);
-      cylinder(d = shaft_d, h = shaft_len);
-   }
-   color(c_motor_cover) translate([-motor_cover[0] / 2, motor_shaft_dy, -motor_flange_t - motor_h])
-      cube([motor_cover[0], motor_cover[1], motor_h - 2]);
-}
-
 module motor_part() {
    translate([drive_a, y_back1, 0]) rotate([0, motor_dir > 0 ? 0 : 180, 0]) rotate([0, 90, 0]) rotate([90, 0, 0]) motor_local();
 }
 
-module uln_part() {
-   on_carrier() translate([uln_x0, uln_standoff, -uln_board.y / 2]) {
-      color(c_uln) cube([uln_board.x, nano_t, uln_board.y]);
-      color("#202020") translate([8, nano_t, 6]) cube([19, 6, 7]);
-      color("#f0f0f0") translate([7, nano_t, uln_board.y - 9]) cube([12, 7, 6]);
-      color("#c0392b") for (i = [0 : 3]) translate([uln_board.x - 6, nano_t, 6 + i * 4]) cube([2, 2, 2]);
-   }
+module carrier_uln_part() {
+   on_carrier() on_board_plate([uln_x0 + uln_board.x / 2, 0], 0, "up") uln_part();
 }
 
 module carrier_nano_part() {
-   on_carrier() on_nano_plate([nano_x, 0], 0, "down") nano_part(c_board);
+   on_carrier() on_board_plate([nano_x, 0], 0, "down") nano_part(c_board);
 }
 
 module sensor_part() {
@@ -596,7 +554,7 @@ module instrument_parts(a, colors, e = 0, with_case = true, with_back = true) {
    }
    translate([0, 5.5 * e, 0]) {
       color(c_case) carrier();
-      uln_part();
+      carrier_uln_part();
       carrier_nano_part();
    }
    translate([0, 2.5 * e, 0]) {

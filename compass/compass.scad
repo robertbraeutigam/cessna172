@@ -59,32 +59,14 @@ include <nano.inc.scad>
 view_heading = 30;
 explode = 30;
 
-// --- 28BYJ-48 stepper, MEASURE ---
-motor_d = 28;
-motor_h = 19;                // body: back face to the flange
-motor_flange_t = 1;          // the flange with the two ears
-motor_ear_dx = 17.5;         // ear holes from the body's middle (35 apart)
-motor_ear_w = 7;             // ear width (round ends)
-motor_ear_hole = 4.2;
-motor_shaft_dy = 8;          // shaft from the body's middle, away from the wire cover
-motor_boss = [9, 1.5];       // boss on the flange around the shaft: diameter, height
-shaft_d = 5;
-shaft_flat = 3;              // across the two flats
-shaft_len = 10;              // over the flange
-flat_len = 6;                // the flats, at its end
-motor_cover = [14.6, 17];    // blue wire cover: width, reach from the body's middle
-motor_wire_h = 6;            // the wires leave the cover up to this over its back face
+// --- The stepper drive (lib/stepper.inc.scad: the 28BYJ-48, the ULN2003
+// board, the A3144 sensor, the magnet) ---
+include <stepper.inc.scad>
+
 motor_screw_head = 2.5;      // pan head over the ears
 
-// --- ULN2003 driver board, Nano, sensor, magnet, MEASURE ---
-uln_board = [35, 32];        // width, height (it stands)
-uln_hole_in = 2.7;           // its 4 holes from the edges
-uln_parts = 14;              // the parts on its front (socket, chip, header pins)
-uln_pins = 3;                // solder stubs behind it
-// the Nano: lib/nano.inc.scad, along y, its USB jack at the back end
-usb_plug = [12, 9];          // the cable's plug body, through the back wall
-sensor = [4.1, 1.6, 3.1];    // A3144 (TO-92S): width, thickness (flat face up), height
-magnet = [6, 3];             // disc magnet: diameter, height
+// --- The Nano (lib/nano.inc.scad), along y, its USB jack at the back end ---
+usb_plug = [12, 9];          // MEASURE: the cable's plug body, through the back wall
 
 // --- Housing (the C2300's front, 2.57") ---
 body_w = 65;
@@ -144,7 +126,6 @@ spost = 7;                   // sensor post, square
 
 // --- Boards ---
 br_t = 3;                    // ULN2003 plate
-uln_standoff = 4;
 
 // --- Stand, on the frame's 2020 top bar ---
 rise = 25;                   // the compass's bottom over the bar
@@ -186,10 +167,10 @@ z_nano = z_floor + nano_under;               // Nano underside
 nano_top = z_nano + nano_t + nano_usb[1];
 usb_z = z_nano + nano_t + nano_usb[1] / 2;
 z_uln0 = nano_top + 1.5;                     // ULN2003 board bottom
-y_plate1 = y_bi - 0.5 - uln_parts - nano_t - uln_standoff;   // plate back
+y_plate1 = y_bi - 0.5 - uln_parts - uln_t - uln_standoff;   // plate back
 y_plate0 = y_plate1 - br_t;
-uln_holes = [for (x = [-1, 1], z = [0, 1])
-   [x * (uln_board.x / 2 - uln_hole_in), z_uln0 + uln_hole_in + z * (uln_board.y - 2 * uln_hole_in)]];
+uln_c = [0, z_uln0 + uln_board.y / 2];     // the ULN2003 board's middle, [x, z]
+uln_holes = [for (h = uln_hole_xy) uln_c + h];
 plate_w = uln_board.x + 2;
 z_plate1 = z_uln0 + uln_board.y + 1;
 sx = xi - block / 2;                         // bezel screws, x and z
@@ -366,7 +347,7 @@ module base() {
                   linear_extrude(2) polygon([[0, 0], [-8, 0], [0, 16]]);
          // ULN2003 standoffs, behind the plate
          for (h = uln_holes) translate([h.x, y_plate1 - 0.01, h.y]) rotate([-90, 0, 0])
-            cylinder(d = 6, h = uln_standoff + 0.01);
+            cylinder(d = uln_standoff_d, h = uln_standoff + 0.01);
          // front corner posts: the bezel's lower screws
          for (s = [-1, 1]) intersection() {
             translate([s * sx - block / 2, y_bz, z_floor - 0.01]) cube([block, block + 1, block + 0.01]);
@@ -479,28 +460,15 @@ c_card = "#111214";
 c_label = "#f4f4f4";
 c_lubber = "#f4f4f4";
 c_steel = "#b9c0c8";
-c_motor_cover = "#2f6fc0";
 c_board = "#1d4fa0";
-c_uln = "#2f7d4a";
 c_glass = [0.75, 0.85, 0.95, 0.12];
 c_stand = "#3d7bd9";
 c_alu = "#c3c9d0";
 c_magnet = "#8a8f96";
 
 module motor_part() {
-   translate([0, motor_y, 0]) {
-      color(c_steel) {
-         translate([0, 0, z_motor0]) cylinder(d = motor_d, h = motor_h);
-         translate([0, 0, z_ear0]) linear_extrude(motor_flange_t) difference() {
-            hull() for (s = [-1, 1]) translate([s * motor_ear_dx, 0]) circle(d = motor_ear_w);
-            for (s = [-1, 1]) translate([s * motor_ear_dx, 0]) circle(d = motor_ear_hole);
-         }
-         translate([0, -motor_y, z_flange]) cylinder(d = motor_boss[0], h = motor_boss[1]);
-         translate([0, -motor_y, z_flange]) cylinder(d = shaft_d, h = shaft_len);
-      }
-      color(c_motor_cover) translate([-motor_cover[0] / 2, 0, z_motor0]) cube([motor_cover[0], motor_cover[1], motor_h - 2]);
-      color("#d9d9d9") for (s = [-1, 1]) translate([s * motor_ear_dx, 0, z_flange]) cylinder(d = 5.5, h = motor_screw_head);
-   }
+   translate([0, 0, z_flange]) motor_local();
+   color("#d9d9d9") for (s = [-1, 1]) translate([s * motor_ear_dx, motor_y, z_flange]) cylinder(d = 5.5, h = motor_screw_head);
 }
 
 module compass_nano_part() {
@@ -508,13 +476,11 @@ module compass_nano_part() {
       nano_part(c_board);
 }
 
-module uln_part() {
-   translate([-uln_board.x / 2, y_plate1 + uln_standoff, z_uln0]) {
-      color(c_uln) cube([uln_board.x, nano_t, uln_board.y]);
-      color("#202020") translate([8, nano_t, 6]) cube([19, 6, 7]);
-      color("#f0f0f0") translate([7, nano_t, uln_board.y - 9]) cube([12, 7, 6]);
-      color("#c0392b") for (i = [0 : 3]) translate([uln_board.x - 6, nano_t, 6 + i * 4]) cube([2, 2, 2]);
-   }
+// the ULN2003 board standing on its plate, its parts back
+module compass_uln_part() {
+   translate([uln_c.x, y_plate1, uln_c.y])
+      multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
+         uln_part();
 }
 
 module sensor_part() {
@@ -567,7 +533,7 @@ module compass_parts(H, e = 0, with_shell = true) {
       color(c_body) base();
       motor_part();
       compass_nano_part();
-      uln_part();
+      compass_uln_part();
       sensor_part();
    }
    translate([0, 0, e]) {
