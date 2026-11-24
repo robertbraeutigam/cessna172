@@ -293,6 +293,46 @@ module gear_2d(z, m = gear_m, play = gear_play) {
                      [for (i = [len(flank) - 1 : -1 : 0]) flank[i][0] * [cos(flank[i][1]), sin(flank[i][1])]]));
 }
 
+// The instruments with mechanisms of their own (ai, alt, hi, tc) share these
+
+// a gear's tip and root radius
+function g_ra(z, m) = m * z / 2 + m;
+function g_rf(z, m) = m * z / 2 - 1.25 * m;
+// a motor m = [its shaft [x, z], the direction of its body from it]: the body's middle, a unit vector across, its ears
+function m_body(m) = m[0] + motor_shaft_dy * m[1];
+function m_perp(m) = [m[1].y, -m[1].x];
+function m_ears(m) = [for (s = [-1, 1]) m_body(m) + s * motor_ear_dx * m_perp(m)];
+// clear of a motor's wire cover: a circle of radius r at p
+function clear_cover(m, p, r) = let(d = p - m_body(m), t = d * m[1], s = d * m_perp(m))
+   t >= motor_cover[1] + r || t <= -r || abs(s) >= motor_cover[0] / 2 + r;
+// the cover's four corners
+function cover_pts(m) = [for (t = [0, motor_cover[1]], s = [-1, 1]) m_body(m) + t * m[1] + s * motor_cover[0] / 2 * m_perp(m)];
+
+// along y from y0 to y1, a 2D shape at p ([x, z])
+module along_xz(p, y0, y1) {
+   along_y(y0, y1) translate(p) children();
+}
+
+// motor m's flange on y = yf, its body behind it
+module motor_at(m, yf) {
+   translate([m[0].x, yf, m[0].y]) rotate([0, atan2(m[1].x, m[1].y), 0]) rotate([90, 0, 0]) motor_local();
+}
+
+// internal ring gear, teeth inward, out to radius ro
+module ring_gear_2d(z, m, ro) {
+   difference() {
+      circle(r = ro, $fn = 4 * z);
+      gear_2d(z, m, -gear_play);
+      circle(r = m * z / 2 - m, $fn = 4 * z);
+   }
+}
+
+// sensor: flat face towards -y at y, legs out along z (s: up or down) to the back
+module sensor_pocket(p, y, s, depth = back_t) {
+   translate([p.x - sensor.x / 2 - 0.15, y - 0.01, p.y - sensor.z / 2 - 0.15]) cube([sensor.x + 0.3, sensor.y + 0.11, sensor.z + 0.3]);
+   translate([p.x - sensor.x / 2 - 0.15, y - 1, s > 0 ? p.y + sensor.z / 2 - 1 : p.y - sensor.z / 2 - 1.5]) cube([sensor.x + 0.3, depth + 2, 2.5]);
+}
+
 // --- Outlines, x right, z up ---
 module case_outline() {
    hull() {

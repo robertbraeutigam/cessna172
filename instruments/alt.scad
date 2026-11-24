@@ -177,16 +177,8 @@ alt_nano_c = nano_xz + [nano_board.x / 2, nano_board.y / 2];   // its middle
 car_box = [-39, -49, 39, 40];   // carrier plate: x0, z0, x1, z1
 
 // --- Calculated ---
-function g_ra(z, m) = m * z / 2 + m;
-function g_rf(z, m) = m * z / 2 - 1.25 * m;
 function dir(a) = [cos(a), sin(a)];                   // a: from +x, counter clockwise
-function m_body(m) = m[0] + motor_shaft_dy * m[1];
-function m_perp(m) = [m[1].y, -m[1].x];
-function m_ears(m) = [for (s = [-1, 1]) m_body(m) + s * motor_ear_dx * m_perp(m)];
 function m_cover(m) = m_body(m) + motor_cover[1] * m[1];
-// clear of a motor's wire cover: a circle of radius r at p
-function clear_cover(m, p, r) = let(d = p - m_body(m), t = d * m[1], s = d * m_perp(m))
-   t >= motor_cover[1] + r || t <= -r || abs(s) >= motor_cover[0] / 2 + r;
 function baro_a(v) = 90 + k_baro * (v - baro_std);  // on the disc (clockwise from 12), at baro_std
 function hpa_a(v) = 270 + k_baro * (v / hpa_per_inhg - baro_std);
 
@@ -351,32 +343,9 @@ assert(abs(knob_c.x) + alt_knob[0] / 2 + 1 <= inst_pitch.x - 86 / 2, "Knob runs 
 for (i = [0, 1, 3]) assert(norm(knob_c - cols[i]) >= alt_knob[0] / 2 + head_d / 2 + 2, "Knob over a case screw");
 
 // --- Helpers ---
-module along_xz(p, y0, y1) {
-   along_y(y0, y1) translate(p) children();
-}
-
-module motor_at(m, yf) {
-   translate([m[0].x, yf, m[0].y]) rotate([0, atan2(m[1].x, m[1].y), 0]) rotate([90, 0, 0]) motor_local();
-}
-
-// internal ring gear, teeth inward, out to radius ro
-module ring_gear_2d(z, m, ro) {
-   difference() {
-      circle(r = ro, $fn = 4 * z);
-      gear_2d(z, m, -gear_play);
-      circle(r = m * z / 2 - m, $fn = 4 * z);
-   }
-}
-
 module win_2d(d = 0) {
    translate([win_hg[0] - d, -win_h / 2 - d]) square([win_hg[1] - win_hg[0] + 2 * d, win_h + 2 * d]);
    translate([-win_hpa[1] - d, -win_h / 2 - d]) square([win_hpa[1] - win_hpa[0] + 2 * d, win_h + 2 * d]);
-}
-
-// sensor: flat face towards -y at y, legs out along z (s: up or down) to the back
-module sensor_pocket(p, y, s, depth = back_t) {
-   translate([p.x - sensor.x / 2 - 0.15, y - 0.01, p.y - sensor.z / 2 - 0.15]) cube([sensor.x + 0.3, sensor.y + 0.11, sensor.z + 0.3]);
-   translate([p.x - sensor.x / 2 - 0.15, y - 1, s > 0 ? p.y + sensor.z / 2 - 1 : p.y - sensor.z / 2 - 1.5]) cube([sensor.x + 0.3, depth + 2, 2.5]);
 }
 
 // --- Outlines, x right, z up ---

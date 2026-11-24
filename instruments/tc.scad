@@ -130,16 +130,6 @@ usb_plug = 20;               // the plug over the Nano's end (a straight mini US
 hi_car_x0 = -45.1;           // the heading indicator's carrier's left edge from its axis (hi.scad's hi_car_x[0], keep in sync)
 
 // --- Calculated ---
-function g_ra(z, m) = m * z / 2 + m;
-function g_rf(z, m) = m * z / 2 - 1.25 * m;
-function m_body(m) = m[0] + motor_shaft_dy * m[1];
-function m_perp(m) = [m[1].y, -m[1].x];
-function m_ears(m) = [for (s = [-1, 1]) m_body(m) + s * motor_ear_dx * m_perp(m)];
-// clear of a motor's wire cover: a circle of radius r at p
-function clear_cover(m, p, r) = let(d = p - m_body(m), t = d * m[1], s = d * m_perp(m))
-   t >= motor_cover[1] + r || t <= -r || abs(s) >= motor_cover[0] / 2 + r;
-// the cover's four corners
-function cover_pts(m) = [for (t = [0, motor_cover[1]], s = [-1, 1]) m_body(m) + t * m[1] + s * motor_cover[0] / 2 * m_perp(m)];
 function plane_a(r) = r;                            // the airplane: clockwise from 12 o'clock, right wing down
 function ball_a(b) = -b;                            // the ball disc: the ball to the right turns it counter clockwise
 function text_w(s, size) = 0.78 * size * len(s);    // a word's width, about (Liberation Sans Bold)
@@ -283,30 +273,6 @@ assert(uln_xz[0].x >= tc_nano_x + nano_rail_hw + 1 && uln_xz[1].x + uln_r.x <= t
 assert(tc_car_x[1] <= inst_pitch.x + hi_car_x0 - 1, "Carrier runs into the heading indicator's carrier");
 // the airspeed indicator is above: the USB plug stays under its case
 assert(nano_z0 + nano_board.y + usb_plug <= inst_pitch.y - case_r - 1, "The USB plug runs into the airspeed indicator");
-
-// --- Helpers ---
-module along_xz(p, y0, y1) {
-   along_y(y0, y1) translate(p) children();
-}
-
-module motor_at(m, yf) {
-   translate([m[0].x, yf, m[0].y]) rotate([0, atan2(m[1].x, m[1].y), 0]) rotate([90, 0, 0]) motor_local();
-}
-
-// internal ring gear, teeth inward, out to radius ro
-module ring_gear_2d(z, m, ro) {
-   difference() {
-      circle(r = ro, $fn = 4 * z);
-      gear_2d(z, m, -gear_play);
-      circle(r = m * z / 2 - m, $fn = 4 * z);
-   }
-}
-
-// sensor: flat face towards -y at y, legs out along z (s: up or down) to the back
-module sensor_pocket(p, y, s, depth = back_t) {
-   translate([p.x - sensor.x / 2 - 0.15, y - 0.01, p.y - sensor.z / 2 - 0.15]) cube([sensor.x + 0.3, sensor.y + 0.11, sensor.z + 0.3]);
-   translate([p.x - sensor.x / 2 - 0.15, y - 1, s > 0 ? p.y + sensor.z / 2 - 1 : p.y - sensor.z / 2 - 1.5]) cube([sensor.x + 0.3, depth + 2, 2.5]);
-}
 
 // --- Outlines, x right, z up ---
 module tc_back_outline() {
