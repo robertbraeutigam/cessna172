@@ -252,7 +252,7 @@ leg_r = sleeve_id / 2 + 0.2;                  // legs: their inside (the outside
 sr_hole_xz = [for (a = sr_holes[2]) sr_holes[0] / 2 * [cos(a), sin(a)]];
 arm_screw = [x_arm + arm.x / 2, 0];           // the back disc's screws into the arms (both sides)
 pad_screws = [for (z = pad_z) [x_f + pad.x / 2, z]];
-ai_depth = y_cr1 + max(uln_standoff + nano_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
+ai_depth = y_cr1 + max(uln_standoff + uln_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
 
 echo(ai_depth = ai_depth, case_depth = y_bk1 - y_sheet1, pivot = y_p, back_disc = y_b0, window = 2 * vis_r,
      pitch_mm_per_10 = bowl_r * sin(10), pitch_steps_per_degree = 2038 * z_sector / z_pinion / 360);
@@ -725,9 +725,9 @@ module ai_carrier() {
    difference() {
       union() {
          along_y(y_cr0, y_cr1) translate([car_box[0], car_box[1]]) square([car_box[2] - car_box[0], car_box[3] - car_box[1]]);
-         for (h = ai_uln_holes) translate([h.x, y_cr1 - 0.01, h.y]) rotate([-90, 0, 0]) cylinder(d = 6, h = uln_standoff + 0.01);
+         for (h = ai_uln_holes) translate([h.x, y_cr1 - 0.01, h.y]) rotate([-90, 0, 0]) cylinder(d = uln_standoff_d, h = uln_standoff + 0.01);
          // Nano rails along x (lib/nano.inc.scad), a stop at the right end
-         on_nano_plate(ai_nano_c, y_cr1, "left")
+         on_board_plate(ai_nano_c, y_cr1, "left")
             nano_rails(y1 = nano_board.y / 2 + 1, far_stop = true);
       }
       for (h = ai_uln_holes) translate([h.x, y_cr1 - 1, h.y]) rotate([-90, 0, 0]) cylinder(d = pilot_d, h = uln_standoff + 2);
@@ -802,12 +802,8 @@ module slip_ring_part() {
 }
 
 module ai_boards_part() {
-   for (b = uln_xz) translate([b.x, y_cr1 + uln_standoff, b.y]) {
-      color(c_uln) cube([uln_board.x, nano_t, uln_board.y]);
-      color("#202020") translate([8, nano_t, 6]) cube([19, 6, 7]);
-      color("#f0f0f0") translate([7, nano_t, uln_board.y - 9]) cube([12, 7, 6]);
-   }
-   on_nano_plate(ai_nano_c, y_cr1, "left") nano_part(c_board);
+   for (b = uln_xz) on_board_plate(b + uln_board / 2, y_cr1, "up") uln_part();
+   on_board_plate(ai_nano_c, y_cr1, "left") nano_part(c_board);
 }
 
 module ai_sensors_part() {

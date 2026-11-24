@@ -166,8 +166,8 @@ its own top-level directory; new components should follow the same layout.
   the drum and an A3144 hall sensor on a post home it. MobiFlight on an
   Arduino Nano of its own (USB to the powered USB hub) drives the ULN2003 board. Parts: base (everything is
   mounted on it), shell, bezel (window, lubber line, dummy compensator
-  screws), drum, stand. The `motor_*`, `uln_*`, sensor and
-  magnet values are MEASURE.
+  screws), drum, stand. The motor, ULN2003, sensor and magnet values are
+  `lib/stepper.inc.scad`'s (MEASURE).
 
 - `instruments/` — the analogue instruments (stage 2 holes in the frame's
   left sheet, `inst_c`).
@@ -180,8 +180,8 @@ its own top-level directory; new components should follow the same layout.
     and an Arduino Nano of its own (MobiFlight, USB to the powered USB
     hub). The face is a colour `Make print`: drawn in `ink(colour)`,
     `print_page()` adds the glass template and the registration dots.
-    The motor, board, sensor and magnet values are the compass's
-    (MEASURE); `frame/frame.inc.scad` repeats the case's sizes and depth.
+    The motor, board, sensor and magnet values are `lib/stepper.inc.scad`'s
+    (MEASURE), the compass's too; `frame/frame.inc.scad` repeats the case's sizes and depth.
     Small gears, the motor behind the case over the axis, the carrier
     on posts behind it, all within the case's outline, 47 mm deep
     (`inst_depth` in the frame, which sets the force feedback yoke back
@@ -286,6 +286,14 @@ its own top-level directory; new components should follow the same layout.
     mirror swaps the pin rows). Every component with a Nano includes it:
     throttle, yoke, switch panel, compass, radio, instruments. Its names
     are global: do not reuse them in a component.
+  - `stepper.inc.scad` — the stepper drive of the compass and the
+    instruments: the 28BYJ-48 (`motor_*`, `shaft_*`, view model
+    `motor_local`: flange top at z=0, shaft up, body towards +y), the
+    ULN2003 board (`uln_*`, its standoffs `uln_standoff`,
+    `uln_standoff_d`, its holes `uln_hole_xy` from its middle, view model
+    `uln_part` on a plate at z=0), the A3144 (`sensor`) and the magnet
+    (`magnet`), all MEASURE. The holders (motor posts and plates,
+    carriers, sensor pockets) stay in the components.
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the

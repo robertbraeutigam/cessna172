@@ -172,7 +172,7 @@ y_sh = y_p[1] - shaft_len;                          // the motors' shafts' ends
 y_mb = y_p[1] + motor_flange_t + motor_h;           // their bodies' backs
 y_k = [y_mb + 1, y_mb + 1 + car_t];                 // the carrier
 y_ax = [y_pl[0] + needle_skin, y_pl[0] + needle_skin + tc_axle_len];
-tc_depth = y_k[1] + max(uln_standoff + nano_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
+tc_depth = y_k[1] + max(uln_standoff + uln_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
 tc_low_depth = y_p[1] - y_sheet1;                   // under tc_deep_z
 tc_deep_z = min(concat([tc_car_z[0]], [for (m = [mA, mB]) m_body(m).y - motor_d / 2],
                        [for (m = [mA, mB], e = m_ears(m)) e.y - motor_ear_w / 2],
@@ -483,9 +483,9 @@ module tc_carrier() {
    difference() {
       union() {
          along_y(y_k[0], y1) translate([tc_car_x[0], tc_car_z[0]]) square([tc_car_x[1] - tc_car_x[0], tc_car_z[1] - tc_car_z[0]]);
-         for (h = uln_holes_a) along_xz(h, y1 - 0.01, y1 + uln_standoff) circle(d = 6);
+         for (h = uln_holes_a) along_xz(h, y1 - 0.01, y1 + uln_standoff) circle(d = uln_standoff_d);
          // Nano rails along z (lib/nano.inc.scad), a stop at the bottom end
-         on_nano_plate([tc_nano_x, nano_zc], y1, "up")
+         on_board_plate([tc_nano_x, nano_zc], y1, "up")
             nano_rails(y1 = tc_car_z[1] - nano_zc, far_stop = true);
       }
       for (h = uln_holes_a) along_xz(h, y1 - 1, y1 + uln_standoff + 1) circle(d = pilot_d);
@@ -589,12 +589,8 @@ module tc_paper_part(y, a, colors) {
 }
 
 module tc_boards_part() {
-   for (b = uln_xz) translate([b.x, y_k[1] + uln_standoff, b.y]) {
-      color(c_uln) cube([uln_r.x, nano_t, uln_r.y]);
-      color("#202020") translate([6, nano_t, 8]) cube([7, 6, 19]);
-      color("#f0f0f0") translate([uln_r.x - 9, nano_t, 7]) cube([6, 7, 12]);
-   }
-   on_nano_plate([tc_nano_x, nano_zc], y_k[1], "up") nano_part(c_board);
+   for (b = uln_xz) on_board_plate(b + uln_r / 2, y_k[1], "right") uln_part();
+   on_board_plate([tc_nano_x, nano_zc], y_k[1], "up") nano_part(c_board);
 }
 
 // all parts at bank r, the ball at b; e: apart by this

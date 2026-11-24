@@ -191,7 +191,7 @@ y_ax = [y_c[0] + needle_skin, y_c[0] + needle_skin + hi_axle_len];
 y_em = y_sheet1 + enc_bush[1];                      // the encoders' mounting face (the bushing's front at the sheet's back)
 y_eb = y_sheet1 + enc_nut[1] + 0.3;                 // their brackets' front (the nut in front of it)
 knob_y0 = y_em - enc_shaft[2] - 1;                  // the knob's front (the shaft's end 1 mm inside)
-hi_depth = y_k[1] + max(uln_standoff + nano_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
+hi_depth = y_k[1] + max(uln_standoff + uln_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
 hi_low_depth = max(y_p[1], y_em + enc_body[1] + enc_body[2]) - y_sheet1;   // under hi_deep_z
 hi_deep_z = min(concat([hi_car_z[0]], [for (m = [mA, mB]) m_body(m).y - motor_d / 2],
                        [for (m = [mA, mB], e = m_ears(m)) e.y - motor_ear_w / 2],
@@ -507,9 +507,9 @@ module hi_carrier() {
    difference() {
       union() {
          along_y(y_k[0], y1) translate([hi_car_x[0], hi_car_z[0]]) square([hi_car_x[1] - hi_car_x[0], hi_car_z[1] - hi_car_z[0]]);
-         for (h = uln_holes_a) along_xz(h, y1 - 0.01, y1 + uln_standoff) circle(d = 6);
+         for (h = uln_holes_a) along_xz(h, y1 - 0.01, y1 + uln_standoff) circle(d = uln_standoff_d);
          // Nano rails along z (lib/nano.inc.scad), a stop at the bottom end
-         on_nano_plate([hi_nano_x, nano_zc], y1, "up")
+         on_board_plate([hi_nano_x, nano_zc], y1, "up")
             nano_rails(y1 = hi_car_z[1] - nano_zc, far_stop = true);
       }
       for (h = uln_holes_a) along_xz(h, y1 - 1, y1 + uln_standoff + 1) circle(d = pilot_d);
@@ -631,12 +631,8 @@ module enc_part(c) {
 }
 
 module hi_boards_part() {
-   for (b = uln_xz) translate([b.x, y_k[1] + uln_standoff, b.y]) {
-      color(c_uln) cube([uln_r.x, nano_t, uln_r.y]);
-      color("#202020") translate([6, nano_t, 8]) cube([7, 6, 19]);
-      color("#f0f0f0") translate([uln_r.x - 9, nano_t, 7]) cube([6, 7, 12]);
-   }
-   on_nano_plate([hi_nano_x, nano_zc], y_k[1], "up") nano_part(c_board);
+   for (b = uln_xz) on_board_plate(b + uln_r / 2, y_k[1], "right") uln_part();
+   on_board_plate([hi_nano_x, nano_zc], y_k[1], "up") nano_part(c_board);
 }
 
 // a piece of the sheet round the hole, the screws and the knobs' holes
