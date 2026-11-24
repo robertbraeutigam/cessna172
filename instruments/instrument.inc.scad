@@ -65,6 +65,7 @@
 sheet_t = 3;
 cut_d = 81;                  // the instrument's hole (inst_cut_d)
 inst_pitch = [89, 88];       // check only: the six-pack's centres across and down (frame/)
+nav_dx = 100;                // check only: the NAV indicators' column right of the six-pack's right one (frame's n172_nav_dx)
 
 // --- The stepper drive (lib/stepper.inc.scad: the 28BYJ-48, the ULN2003
 // board, the A3144 sensor, the magnet) and the Nano (lib/nano.inc.scad) ---
@@ -254,6 +255,32 @@ assert(max(abs(car_x0), post_x + car_post_d / 2, car_x1) <= inst_pitch.x / 2 - 1
        "Board carrier runs into the next instrument");
 for (i = [0 : 3]) let(c = cols[i], q = [min(max(c.x, car_x0), car_x1), min(max(c.y, -car_h / 2), car_h / 2)])
    assert(norm(c - q) >= csk_d / 2 + 2, "Board carrier over a case screw");
+
+// --- The carriers side by side (frame/): behind the cases, neighbours' board carriers share the width between their
+// axes. Each carrier's place, x from its own axis, is here; each instrument checks that its carrier is in it
+// (carrier_in_slot()), and here the neighbours are checked against each other (as if all were as deep). A new
+// instrument in a row gets its place here. ---
+inst_rows = [["TC", "HI", "VSI", "NAV 1"], ["ASI", "AI", "ALT", "NAV 2"]];   // the frame's inst_names, the lower row first
+inst_col_x = [-inst_pitch.x, 0, inst_pitch.x, inst_pitch.x + nav_dx];
+car_slot_gap = 1;            // between two neighbours' places
+std_car_x = [car_x0, max(car_x1, post_x + car_post_d / 2)];   // the standard's carrier
+carrier_slots = [["ASI", std_car_x], ["VSI", std_car_x],      // the standard
+                 ["TC", [-48, 42.7]],                         // tc.scad (tc_car_x), shifted left
+                 ["HI", [-45.2, 45.2]],                       // hi.scad (twin_car_x)
+                 ["AI", [-39, 39]],                           // ai.scad (car_box)
+                 ["ALT", [-39, 39]]];                         // alt.scad (car_box)
+function carrier_slot(name) = [for (s = carrier_slots) if (s[0] == name) s[1]][0];
+
+for (row = inst_rows, i = [0 : len(row) - 2]) let(a = carrier_slot(row[i]), b = carrier_slot(row[i + 1]))
+   if (a != undef && b != undef)
+      assert(a[1] + car_slot_gap <= inst_col_x[i + 1] - inst_col_x[i] + b[0], str(row[i], "'s carrier runs into ", row[i + 1], "'s"));
+
+// the instrument's carrier, from x[0] to x[1] (from its axis), in its place
+module carrier_in_slot(name, x) {
+   s = carrier_slot(name);
+   assert(s != undef, str("No carrier place for ", name));
+   assert(x[0] >= s[0] && x[1] <= s[1], str(name, "'s carrier off its place (carrier_slots)"));
+}
 
 // --- Helpers ---
 function pol(r, a) = [r * sin(a), r * cos(a)];        // a: clockwise from 12 o'clock, as on the face

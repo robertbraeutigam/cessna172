@@ -333,7 +333,7 @@ left_parts = concat([for (e = m_ears(mB)) [e, motor_ear_w / 2 + 1.5]], [[knob_c,
                            [idler_c, ki_boss], [[0, 0], rp_r]], [for (p = bp_posts) [p, car_post_d / 2]]);
 for (p = left_parts)
    assert(norm(p[0] - ai_arm) >= arm_r + p[1] + 1 && norm(p[0] - [-inst_pitch.x, 0]) >= case_r + p[1] + 1, "Runs into the attitude indicator");
-assert(car_box[0] >= -inst_pitch.x + 39 + 2, "Carrier runs into the attitude indicator's carrier");
+carrier_in_slot("ALT", [car_box[0], car_box[2]]);   // between the neighbours' (instrument.inc.scad)
 for (p = [[knob_c, pot_boss_r], [knob_c, ks_boss], [idler_c, ki_boss], [knob_c, pot_body[0] / 2]]) {
    assert(norm(p[0] - vsi_c) >= case_r + p[1] + 1, "Runs into the VSI's case");
    for (c = [for (i = [0 : 3]) cols[i] + vsi_c]) assert(norm(p[0] - c) >= ear_d / 2 + p[1] + 1, "Runs into a VSI ear");

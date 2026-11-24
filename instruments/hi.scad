@@ -121,7 +121,6 @@ front_cols = [cols[0], cols[1]];
 // --- Board carrier: on the back plate's posts behind the motors, the boards facing back ---
 twin_posts = [[34, 14], [32, -18], [-32, 18], [-34, -14]];
 twin_nano_x = 0;             // the Nano's middle, along z, the USB jack up
-tc_car_x1 = 42.6;            // the turn coordinator's carrier's right edge from its axis (tc.scad's tc_car_x[1], keep in sync)
 
 // --- Calculated ---
 function card_a(h) = -h;                            // the card: clockwise from 12 o'clock
@@ -187,10 +186,8 @@ assert(y_eb + 2 <= y_em, "Encoder bracket too thin");
 assert(knob_y0 + 1 <= -knob_gap - 5, "Encoder's shaft too short for the knob");
 assert(hi_knob[1] >= -knob_gap - knob_y0, "Knob shorter than the shaft in it");
 assert(knob_gap >= enc_push + 0.3, "The knob hits the sheet when pushed");
-// the carrier between the neighbours
-// the VSI right of it is a standard instrument (its carrier as deep as this one's front), the turn coordinator's is like this one
-assert(twin_car_x[1] <= inst_pitch.x + car_x0 - 1, "Carrier runs into the right neighbour's carrier");
-assert(twin_car_x[0] >= -inst_pitch.x + tc_car_x1 + 1, "Carrier runs into the turn coordinator's carrier");
+// the carrier between the neighbours' (instrument.inc.scad)
+carrier_in_slot("HI", twin_car_x);
 
 // --- Helpers ---
 module d_shaft_2d(d, flat) {

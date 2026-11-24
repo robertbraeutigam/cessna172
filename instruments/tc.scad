@@ -106,7 +106,6 @@ front_cols = cols;
 // --- Board carrier: on the back plate's posts behind the motors, the boards facing back ---
 twin_posts = [[34, 14], [32, -12], [-32, 18], [-34, -14]];
 twin_nano_x = -2.5;          // the Nano's middle, along z, the USB jack up (left of the axis: the HI's carrier is right)
-hi_car_x0 = -45.1;           // the heading indicator's carrier's left edge from its axis (hi.scad's hi_car_x[0], keep in sync)
 
 // --- Calculated ---
 function plane_a(r) = r;                            // the airplane: clockwise from 12 o'clock, right wing down
@@ -159,8 +158,8 @@ assert(ball_paper[1] <= bd_r && ball_paper[0] >= dhub_d / 2 + sleeve_w + 1, "The
 assert(y_pl[0] >= y_glass1 + 1, "The airplane against the glass");
 assert(y_d[0] - y_dh >= 2.5, "Dial's hub too short");
 assert(key[1] <= fp_t - 0.3, "The face plate's notch goes through it");
-// the heading indicator is right of it, its carrier as deep as this one; nothing left of the six-pack
-assert(tc_car_x[1] <= inst_pitch.x + hi_car_x0 - 1, "Carrier runs into the heading indicator's carrier");
+// the carrier between the neighbours' (instrument.inc.scad)
+carrier_in_slot("TC", tc_car_x);
 
 // --- Outlines, x right, z up (behind the sheet's back: twin_back_outline()) ---
 module tc_case_outline() {
