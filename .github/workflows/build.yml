@@ -73,8 +73,9 @@ jobs:
       # markers. Touch the markers of unchanged files so make skips them, and
       # remove the markers and outputs of changed or deleted files (and of
       # files whose names start with theirs, as the output globs cover them).
-      # A changed Makefile, *.inc.scad (included by the models) or OpenSCAD
-      # renders the whole component again.
+      # A changed Makefile, *.inc.scad (included by the models; the
+      # component's own and the shared ones in lib/) or OpenSCAD renders the
+      # whole component again.
       - name: Keep unchanged renders
         run: |
           for makefile in */Makefile; do
@@ -87,7 +88,7 @@ jobs:
               if ! awk '$2 == "Makefile"' "$sums" 2>/dev/null | sha256sum -c --status 2>/dev/null \
                 || ! grep -qx "$OPENSCAD_SHA256  openscad" "$sums" 2>/dev/null \
                 || { [ -n "$incs" ] && ! echo "$incs" | sha256sum -c --status 2>/dev/null; } \
-                || [ "$(ls *.inc.scad 2>/dev/null)" != "$(echo "$incs" | awk 'NF { print $2 }')" ]; then
+                || [ "$(ls *.inc.scad ../lib/*.inc.scad 2>/dev/null | sort)" != "$(echo "$incs" | awk 'NF { print $2 }' | sort)" ]; then
                 echo "$dir: Makefile or an include changed, rendering everything"
                 rm -rf target
                 exit 0
@@ -127,7 +128,7 @@ jobs:
           [ $status = 0 ] || exit 1
           for makefile in */Makefile; do
             (cd "$(dirname "$makefile")" && {
-              sha256sum *.scad Makefile
+              sha256sum *.scad ../lib/*.inc.scad Makefile
               echo "$OPENSCAD_SHA256  openscad"
             } > target/.sources.sha256)
           done

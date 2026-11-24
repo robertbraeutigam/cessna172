@@ -20,6 +20,8 @@
 
 $fn = 30;
 
+include <nano.inc.scad>
+
 // Box dimensions
 height = 50;
 depth = 170;
@@ -68,13 +70,8 @@ big_pot_full_width = 16;
 big_pot_module_height = 6;
 big_pot_full_length = 130;
 
-// Arduino Nano, MEASURE (instruments/instrument.inc.scad has the same values)
-nano_board = [18, 45];       // width, length; the mini USB jack at one end
-nano_t = 1.6;
-nano_under = 2.5;            // parts and solder stubs under the board
-nano_usb = [8, 4];           // jack: width, height over the board
+// Arduino Nano (lib/nano.inc.scad: the board, its pinout and its rails)
 usb_plug = [12, 9];          // MEASURE: the USB cable's plug body (width, height), through the back wall
-rail_w = 1.5;                // the Nano's rails on the floor
 nano_x = 46;                 // its middle, between the carb heat pot's legs and the throttle pot's
 
 // Small linear pot dimensions
@@ -113,7 +110,7 @@ module box_underside() {
          // Rod supports
          rod_supports();
          // The Nano's rails
-         nano_rails();
+         box_nano_rails();
       }
       // Face mount holes
       for (h = mount_holes)
@@ -171,28 +168,27 @@ module face() {
 }
 
 // The Nano: component side up, its USB jack against the back wall's
-// inside. It slides in from the front between two rails (a ledge under
-// each long edge, a lip over it); a dab of hot glue at its front end
-// keeps it there when the plug goes in.
+// inside. It slides in from the front, jack first, into its shallow rails
+// (lib/nano.inc.scad); a dab of hot glue at its front end keeps it there
+// when the plug goes in.
 back_in = depth + 2 * roundness - wall_thickness;   // the back wall's inside
 nano_y0 = back_in - 0.3 - nano_board.y;
 nano_z = wall_thickness + nano_under;               // the board's underside
 usb_z = nano_z + nano_t + nano_usb.y / 2;           // the jack's middle
 
-module nano_rails() {
-   for (s = [-1, 1]) {
-      xo = nano_x + s * (nano_board.x / 2 + 0.1);
-      translate([s > 0 ? xo : xo - rail_w, nano_y0, wall_thickness - 0.01])
-         cube([rail_w, nano_board.y, nano_under + nano_t + 0.8 + 0.01]);
-      translate([s > 0 ? xo - 1.2 : xo, nano_y0, wall_thickness - 0.01])
-         cube([1.2, nano_board.y, nano_under + 0.01]);
-      translate([s > 0 ? xo - 0.8 : xo, nano_y0, nano_z + nano_t + 0.1])
-         cube([0.8 + 0.01, nano_board.y, 0.7]);
-   }
+// The Nano's own coordinates (lib/nano.inc.scad) in the box
+module on_nano() {
+   translate([nano_x, nano_y0 + nano_board.y / 2, wall_thickness])
+      children();
+}
+
+module box_nano_rails() {
+   on_nano()
+      nano_rails();
 }
 
 // Between the carb heat pot's legs and the throttle pot's (with its legs)
-nano_rail_x = [nano_x - nano_board.x / 2 - 0.1 - rail_w, nano_x + nano_board.x / 2 + 0.1 + rail_w];
+nano_rail_x = [nano_x - nano_rail_hw, nano_x + nano_rail_hw];
 assert(nano_rail_x[0] >= roundness + end_gap + small_pot_full_width + 1, "Nano runs into the carb heat pot's legs");
 assert(nano_rail_x[1] <= roundness + end_gap + control_gap - big_pot_full_width + 3 - 1, "Nano runs into the throttle pot's legs");
 assert(nano_y0 >= 55 + small_pot_stand_distance + 2 + 10 + 1, "Nano runs into the carb heat pot's back legs");
@@ -567,28 +563,26 @@ module route(a, b, zr, c) {
    wire([a, [a.x, a.y, zr], [b.x, b.y, zr], b], c);
 }
 
-// The Nano's pins along its left edge (USB jack back, seen from above):
-// A0..A7, then 5 V and GND; k-th of [5 V, GND, A0, A1, A2] from the back
-function nano_pin(k) = [nano_x - nano_board.x / 2 + 1.3, back_in - 12 - 2.54 * k, nano_z + nano_t + 0.5];
+// The wired Nano pins, on its analog row (its left edge, the USB jack
+// back, seen from above): k-th of [5 V, GND, A0, A1, A2]
+function box_nano_pin(k) = let(p = nano_pin(["5V", "GND", "A0", "A1", "A2"][k], "analog"))
+   [nano_x + p.x, nano_y0 + nano_board.y / 2 + p.y, nano_z + nano_t + 0.5];
 
-module nano_part() {
-   translate([nano_x - nano_board.x / 2, nano_y0, nano_z]) {
-      color(c_nano) cube([nano_board.x, nano_board.y, nano_t]);
-      color("#202020") translate([nano_board.x / 2 - 3.5, 18, nano_t]) cube([7, 7, 1.2]);
-      color(c_steel) translate([nano_board.x / 2 - nano_usb.x / 2, nano_board.y - 8, nano_t]) cube([nano_usb.x, 9, nano_usb.y]);
-   }
+module box_nano_part() {
+   on_nano()
+      nano_part(c_nano);
 }
 
 module wires_part() {
    // 5 V and GND to the carb heat pot, each wiper to its pot
-   route(nano_pin(0), pot_tab(0, 0), 24, wire_colors[0]);
-   route(nano_pin(1), pot_tab(0, 1), 25.5, wire_colors[1]);
+   route(box_nano_pin(0), pot_tab(0, 0), 24, wire_colors[0]);
+   route(box_nano_pin(1), pot_tab(0, 1), 25.5, wire_colors[1]);
    for (i = [0 : 2])
-      route(nano_pin(2 + [2, 0, 1][i]), pot_tab(i, 2), 27 + 1.5 * i, wiper_colors[i]);
+      route(box_nano_pin(2 + [2, 0, 1][i]), pot_tab(i, 2), 27 + 1.5 * i, wiper_colors[i]);
    // 5 V and GND on from pot to pot
    for (i = [0 : 1], j = [0 : 1])
       route(pot_tab(i, j), pot_tab(i + 1, j), 32 + 1.5 * j, wire_colors[j]);
-   nano_part();
+   box_nano_part();
    // The USB cable, plugged in through the back wall
    color(c_cable) {
       translate([nano_x - usb_plug.x / 2 + 1, back_in - 1, usb_z - usb_plug.y / 2 + 1])
@@ -659,7 +653,7 @@ module exploded_view(e = 35) {
    }
    translate([0, 0, 2 * e]) pins_part();
    translate([0, 0, 2 * e]) small_pot_holder_part();
-   translate([0, 0, e]) nano_part();
+   translate([0, 0, e]) box_nano_part();
 }
 
 module small_pot_holder_part() {

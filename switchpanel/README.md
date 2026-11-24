@@ -297,14 +297,15 @@ The Nano lies in rails on a small printed carrier plate
 jack to the right, without screws (M2 screws do not go through its
 1.8 mm holes, and there is no room to drill them out). A wall along each
 long edge holds the board's edge in a shallow groove: the ledge under it
-and the lip over it reach only 0.35 mm over the board (`rail_reach`),
+and the lip over it reach only 0.35 mm over the board (`nano_rail_reach`),
 short of the pin rows' pads, so the solder joints pass them. The rails are
 open at the left end: the Nano slides in from there, USB end first, wires
 and all, up to the two stops beside the plug. It cannot come out of the
 rails up or sideways, and once the cable is plugged in and tied onto its
 block it cannot slide back out either; to take it off, cut the tie. The
-groove is tight on purpose (`rail_clear`, 0.15 mm a side): measure your
-Nano's width (`nano_board`), clones differ. Right of the plug is the block for the
+groove is tight on purpose (`nano_rail_clear`, 0.15 mm a side): measure
+your Nano's width (`nano_board`), clones differ. The rails are the shared
+ones of [`lib/nano.inc.scad`](../lib/nano.inc.scad). Right of the plug is the block for the
 cable tie: the tie goes through the slot at the plate and around the
 cable in the groove on top, so pulling the cable does not lever the jack.
 The carrier is a part of its own, so the ignition and the primer can be
@@ -316,8 +317,9 @@ switches, fits inside the rim and holds the cable at the jack's height.
 
 **MEASURE**: the USB plug (`usb_plug`: width, height and length with its
 strain relief, the tie block sits behind it) and the cable (`cable_d`,
-4 mm); the tie (`tie`, 3.6 x 1.3 mm). The Nano's values are the
-instruments' (`nano_*`); its mounting holes (`nano_holes`, `nano_hole_d`)
+4 mm); the tie (`tie`, 3.6 x 1.3 mm). The Nano's values, pinout and rails
+are in [`lib/nano.inc.scad`](../lib/nano.inc.scad) (`nano_*`), shared by
+every component; its mounting holes (`nano_holes`, `nano_hole_d`)
 are the official Nano's (1.8 mm, 40.64 x 15.24 mm, in line with the pin
 rows), only drawn in the views.
 

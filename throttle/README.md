@@ -48,9 +48,10 @@ throttle bar's top slot, so pulling a knob does not load the sheet alone.
 
 ## Wiring
 
-The Nano lies in two rails on the floor between the carb heat pot and the
-throttle pot, component side up, its USB jack against the back wall. It
-slides in from the front; a dab of hot glue at its front end keeps it
+The Nano lies in its rails (the shared ones of
+[`lib/nano.inc.scad`](../lib/nano.inc.scad)) on the floor between the carb
+heat pot and the throttle pot, component side up, its USB jack against the
+back wall. It slides in from the front; a dab of hot glue at its front end keeps it
 there when the plug goes in. The USB cable plugs in from behind, through
 a window in the back wall (`usb_plug` is the plug's body, measure it), so
 the box has no cable of its own: pulling the cable only unplugs it. The

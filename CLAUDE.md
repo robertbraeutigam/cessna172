@@ -109,8 +109,8 @@ its own top-level directory; new components should follow the same layout.
   and the KT 76C transponder (top to bottom) stacked without gaps in one
   cut-out of the sheet; every unit has its own Arduino Nano running
   MobiFlight (USB out of its open back, tied onto `tie_block`).
-  `radio.inc.scad` has the Nano's sizes (`nano_*`), its floor rails
-  (`nano_rails`) and the mux board's size.
+  `radio.inc.scad` places the Nano in its floor rails (`unit_nano_rails`,
+  the shared ones of `lib/`) and has the mux board's size.
   - `radio.inc.scad` — the stack's standard, included by every unit:
     unit width (`unit_w`, the KX155's, which checks it; every unit is as
     wide), the KX155's height (`unit_h`, 2.00"; each unit has its real
@@ -152,7 +152,7 @@ its own top-level directory; new components should follow the same layout.
     with an Arduino Nano running MobiFlight, a CD74HC4067 mux
     (inputs) and two 74HC595 (lamps), USB out the back. `labels` drives
     the face lettering (asserts keep it off everything else). The `tg_*`,
-    `vol_*`, `bar_led`, `nano_*` values are MEASURE (guesses).
+    `vol_*`, `bar_led`, `nano_high` values are MEASURE (guesses).
     The frame still has the Saitek radio panel, but its right part is
     already as high as the whole stack needs (`stack_units_h` in
     `frame/frame.inc.scad`).
@@ -166,7 +166,7 @@ its own top-level directory; new components should follow the same layout.
   the drum and an A3144 hall sensor on a post home it. MobiFlight on an
   Arduino Nano of its own (USB to the powered USB hub) drives the ULN2003 board. Parts: base (everything is
   mounted on it), shell, bezel (window, lubber line, dummy compensator
-  screws), drum, stand. The `motor_*`, `uln_*`, `nano_*`, sensor and
+  screws), drum, stand. The `motor_*`, `uln_*`, sensor and
   magnet values are MEASURE.
 
 - `instruments/` — the analogue instruments (stage 2 holes in the frame's
@@ -270,6 +270,23 @@ its own top-level directory; new components should follow the same layout.
     22 mm under it (`tc_low_depth`), checked by the frame. Print `face`
     (face and ball ring).
 
+- `lib/` — not a component (no Makefile, no README): bought parts that
+  every component uses, as `*.inc.scad` files the Makefiles copy into each
+  component's `target/` (a component's own include must not take one of
+  their names).
+  - `nano.inc.scad` — the Arduino Nano: its sizes (`nano_*`, MEASURE),
+    pinout (`nano_digital_row`, `nano_analog_row`, `nano_pin(name, row)`),
+    a view model (`nano_part`) and the shallow rails it slides into
+    (`nano_rails`: walls with a groove whose ledge and lip reach only
+    `nano_rail_reach` over the board, clear of the pin rows' solder;
+    `far_stop`, `jack_stop`, `lips = false` to drop it in from above),
+    fitted to a real board in the switch panel's carrier. In its own
+    coordinates (middle at the origin, on z=0, component side up, the
+    jack at +y); each component places it with a proper rotation (a
+    mirror swaps the pin rows). Every component with a Nano includes it:
+    throttle, yoke, switch panel, compass, radio, instruments. Its names
+    are global: do not reuse them in a component.
+
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the
   extrusion/sheet standard, the
@@ -336,8 +353,8 @@ and, on `master`, deploys the STLs, PNGs and PDFs to GitHub Pages at
 `https://robertbraeutigam.github.io/cessna172/<component>/<file>`; the
 READMEs link there. It caches each component's `target/` together with
 `target/.sources.sha256` (hashes of the sources it was made from), so only
-changed `.scad` files are rendered again; a changed Makefile re-renders the
-whole component. Unchanged parts therefore keep the `{{gitrev}}` and montage
+changed `.scad` files are rendered again; a changed Makefile or include
+(the component's own or `lib/`'s) re-renders the whole component. Unchanged parts therefore keep the `{{gitrev}}` and montage
 date of the build that last rendered them.
 
 ## Building
@@ -363,7 +380,9 @@ All projects share the same Makefile; keep the copies identical.
 component, which `include <name.inc.scad>` them. They are not rendered, the
 Makefile copies them into `target/` (models are rendered from there) and
 every model depends on them, and the build workflow renders the whole
-component again when one changes. Do not assign a variable again that the
+component again when one changes. The shared ones in `lib/` are copied
+the same way (included as `<nano.inc.scad>`), and a change to one renders
+every component again. Do not assign a variable again that the
 include already defines: OpenSCAD silently takes the last value.
 
 Output goes to `target/` (not committed). `target/<file>` and

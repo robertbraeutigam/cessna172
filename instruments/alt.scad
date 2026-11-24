@@ -173,6 +173,7 @@ rp_posts = [[28, 26], [-28, 26], [-28, -20], [5, -36]];  // the rear plate's (it
 rp_r = 42;                   // the rear plate
 uln_xz = [[-37, 6], [-37, -28]];   // the ULN2003 boards' lower left corners: B (1000), C (100)
 nano_xz = [12, -47];         // the Nano's lower left corner, along z, its USB jack down
+alt_nano_c = nano_xz + [nano_board.x / 2, nano_board.y / 2];   // its middle
 car_box = [-39, -49, 39, 40];   // carrier plate: x0, z0, x1, z1
 
 // --- Calculated ---
@@ -329,10 +330,10 @@ for (i = [0 : len(uln_xz) - 1]) let(b = uln_xz[i]) {
           "ULN2003 board off the carrier");
    for (j = [0 : len(uln_xz) - 1]) if (j > i) let(c = uln_xz[j])
       assert(abs(b.x - c.x) >= uln_board.x + 2 || abs(b.y - c.y) >= uln_board.y + 2, "ULN2003 boards overlap");
-   assert(b.x >= nano_xz.x + nano_board.x + 2 || b.x + uln_board.x + 2 <= nano_xz.x - rail_w
+   assert(b.x >= nano_xz.x + nano_board.x + 2 || b.x + uln_board.x + 2 <= alt_nano_c.x - nano_rail_hw
           || b.y >= nano_xz.y + nano_board.y + 2 || b.y + uln_board.y + 2 <= nano_xz.y, "A ULN2003 board over the Nano");
 }
-assert(nano_xz.x - rail_w - 0.5 >= car_box[0] && nano_xz.x + nano_board.x + rail_w + 0.5 <= car_box[2]
+assert(alt_nano_c.x - nano_rail_hw - 0.5 >= car_box[0] && alt_nano_c.x + nano_rail_hw + 0.5 <= car_box[2]
        && nano_xz.y - 1 >= car_box[1] && nano_xz.y + nano_board.y + 2 <= car_box[3], "Nano off the carrier");
 // the neighbours: the attitude indicator on the left (its case and motor gear pocket, as deep as this),
 // the VSI under it (the standard, its case and ears; only the case and the back plate are as far forward)
@@ -622,16 +623,9 @@ module alt_carrier() {
       union() {
          along_y(y_kr[0], y1) translate([car_box[0], car_box[1]]) square([car_box[2] - car_box[0], car_box[3] - car_box[1]]);
          for (h = uln_holes_a) along_xz(h, y1 - 0.01, y1 + uln_standoff) circle(d = 6);
-         // Nano rails along z: a ledge under each long edge, a lip over it, a stop at the top end
-         nx = [nano_xz.x - 0.1, nano_xz.x + nano_board.x + 0.1];
-         z0 = nano_xz.y - 1;
-         l = nano_board.y + 2;
-         for (i = [0, 1]) let(xo = nx[i], s = i == 0 ? -1 : 1) {
-            translate([s > 0 ? xo : xo - rail_w, y1 - 0.01, z0]) cube([rail_w, nano_under + nano_t + 0.8 + 0.01, l]);
-            translate([s > 0 ? xo - 1.2 : xo, y1 - 0.01, z0]) cube([1.2, nano_under + 0.01, l]);
-            translate([s > 0 ? xo - 0.8 : xo, y1 + nano_under + nano_t + 0.1, z0]) cube([0.8 + 0.01, 0.7, l]);
-         }
-         translate([nx[0], y1 - 0.01, nano_xz.y + nano_board.y + 0.1]) cube([nx[1] - nx[0], nano_under + nano_t + 0.01, 1.5]);
+         // Nano rails along z (lib/nano.inc.scad), a stop at the top end
+         on_nano_plate(alt_nano_c, y1, "down")
+            nano_rails(y1 = nano_board.y / 2 + 1, far_stop = true);
       }
       for (h = uln_holes_a) along_xz(h, y1 - 1, y1 + uln_standoff + 1) circle(d = pilot_d);
       for (p = rp_posts) translate([p.x, y1, p.y]) rotate([-90, 0, 0]) csk_hole();
@@ -755,11 +749,7 @@ module alt_boards_part() {
       color("#202020") translate([8, nano_t, 6]) cube([19, 6, 7]);
       color("#f0f0f0") translate([7, nano_t, uln_board.y - 9]) cube([12, 7, 6]);
    }
-   translate([nano_xz.x, y_kr[1] + nano_under, nano_xz.y]) {
-      color(c_board) cube([nano_board.x, nano_t, nano_board.y]);
-      color("#202020") translate([nano_board.x / 2 - 3.5, nano_t, 20]) cube([7, 1.2, 7]);
-      color(c_steel) translate([nano_board.x / 2 - nano_usb[0] / 2, nano_t, -1]) cube([nano_usb[0], nano_usb[1], 9]);
-   }
+   on_nano_plate(alt_nano_c, y_kr[1], "down") nano_part(c_board);
 }
 
 module alt_shafts_part() {

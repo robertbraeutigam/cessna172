@@ -2,9 +2,11 @@
 # to target/ (models are rendered from there), and every model of the
 # component depends on them. make removes the copies when it is done
 # (intermediate files), so a target/ restored by the build workflow is up to
-# date as long as its markers are.
+# date as long as its markers are. The shared ones in ../lib (bought parts
+# every component uses, like the Arduino Nano) are copied the same way.
 INCLUDE_SCADS=$(wildcard *.inc.scad)
-INCLUDE_COPIES=$(INCLUDE_SCADS:%=target/%)
+LIB_SCADS=$(wildcard ../lib/*.inc.scad)
+INCLUDE_COPIES=$(INCLUDE_SCADS:%=target/%) $(LIB_SCADS:../lib/%=target/%)
 MODEL_SCADS=$(filter-out $(INCLUDE_SCADS),$(wildcard *.scad))
 MODEL_MARKS=$(MODEL_SCADS:%.scad=target/%)
 VIEW_MARKS=$(MODEL_SCADS:%.scad=target/%.views)
@@ -49,6 +51,10 @@ models: $(MODEL_MARKS)
 views: $(VIEW_MARKS)
 
 target/%.inc.scad: %.inc.scad
+	@mkdir -p target/
+	@sed $(COMMENT_MARKERS) <$< >$@
+
+target/%.inc.scad: ../lib/%.inc.scad
 	@mkdir -p target/
 	@sed $(COMMENT_MARKERS) <$< >$@
 

@@ -81,15 +81,27 @@ shaft_len = 10;              // over the flange
 flat_len = 6;                // the flats, at its end
 motor_cover = [14.6, 17];    // blue wire cover: width, reach from the body's middle
 
+include <nano.inc.scad>
+
+// The Nano's own coordinates (lib/nano.inc.scad) on a board plate whose
+// face looks along +y at y: its middle at c ([x, z]), its USB jack pointing
+// "down", "up" or "left"
+function nano_plate_m(jack) =
+     jack == "down" ? [[1, 0, 0, 0], [0, 0, 1, 0], [0, -1, 0, 0], [0, 0, 0, 1]]
+   : jack == "up" ? [[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]]
+   : assert(jack == "left") [[0, -1, 0, 0], [0, 0, 1, 0], [-1, 0, 0, 0], [0, 0, 0, 1]];
+module on_nano_plate(c, y, jack) {
+   translate([c.x, y, c.y])
+      multmatrix(nano_plate_m(jack))
+         children();
+}
+
 // --- ULN2003 board, Nano, sensor, magnet, MEASURE (the compass's values) ---
 uln_board = [35, 32];        // width, height
 uln_hole_in = 2.7;           // its 4 holes from the edges
 uln_parts = 14;              // the parts on its front
 uln_pins = 3;                // solder stubs behind it
-nano_board = [18, 45];       // width, length; the USB jack at one end
-nano_t = 1.6;
-nano_under = 2.5;            // parts and solder stubs under the board
-nano_usb = [8, 4];           // jack: width, height over the board
+// the Nano: lib/nano.inc.scad (included below)
 sensor = [4.1, 1.6, 3.1];    // A3144 (TO-92S): width, thickness (flat face), height
 magnet = [6, 3];             // disc magnet: diameter, height
 
@@ -146,7 +158,6 @@ motor_dir = -1;              // the motor's body left of its shaft (over the axi
 // --- Boards ---
 car_t = 2.5;                 // carrier plate
 uln_standoff = 4;
-rail_w = 1.5;
 car_post_d = 7;              // the carrier's posts
 board_gap = 2;               // motor cover to the ULN2003 board, boards apart
 
@@ -193,8 +204,8 @@ cover_x1 = motor_c.x + motor_dir * motor_cover[1];      // the cover's end
 // both in front of the carrier
 uln_x0 = cover_x1 - board_gap - uln_board.x;
 car_x0 = uln_x0 - 1;
-nano_x = cover_x1 + rail_w + 0.1 + nano_board.x / 2;   // its middle; along z, USB down
-car_x1 = nano_x + nano_board.x / 2 + 0.1 + rail_w + 1;
+nano_x = cover_x1 + nano_rail_hw;   // its middle; along z, USB down
+car_x1 = nano_x + nano_rail_hw + 1;
 car_h = max(uln_board.y, nano_board.y + 3) + 4;
 y_car0 = y_back1 + motor_flange_t + motor_h + 1 + nano_under + nano_t + nano_usb[1];   // the carrier plate
 y_car1 = y_car0 + car_t;
@@ -441,18 +452,10 @@ module carrier() {
       union() {
          along_y(-car_t, 0) carrier_outline();
          for (h = uln_holes) translate([h.x, -0.01, h.y]) rotate([-90, 0, 0]) cylinder(d = 6, h = uln_standoff + 0.01);
-         // Nano rails: a ledge under each long edge, a lip over it, a stop at the top end
-         for (s = [-1, 1]) {
-            xo = nano_x + s * (nano_board.x / 2 + 0.1);
-            translate([s > 0 ? xo : xo - rail_w, -0.01, -nano_board.y / 2 - 1])
-               cube([rail_w, nano_under + nano_t + 0.8 + 0.01, nano_board.y + 2]);
-            translate([s > 0 ? xo - 1.2 : xo, -0.01, -nano_board.y / 2 - 1])
-               cube([1.2, nano_under + 0.01, nano_board.y + 2]);
-            translate([s > 0 ? xo - 0.8 : xo, nano_under + nano_t + 0.1, -nano_board.y / 2 - 1])
-               cube([0.8 + 0.01, 0.7, nano_board.y + 2]);
-         }
-         translate([nano_x - nano_board.x / 2 - 0.1, -0.01, nano_board.y / 2 + 0.1])
-            cube([nano_board.x + 0.2, nano_under + nano_t + 0.01, 1.5]);
+         // Nano rails (lib/nano.inc.scad), a stop at the top end; it slides
+         // in from below, USB end last
+         on_nano_plate([nano_x, 0], 0, "down")
+            nano_rails(y1 = nano_board.y / 2 + 1, far_stop = true);
          // the posts to the back plate
          for (s = car_screws) translate([s.x, -0.01, s.y]) rotate([-90, 0, 0]) cylinder(d = car_post_d, h = post_h + 0.01);
       }
@@ -552,12 +555,8 @@ module uln_part() {
    }
 }
 
-module nano_part() {
-   on_carrier() translate([nano_x - nano_board.x / 2, nano_under, -nano_board.y / 2]) {
-      color(c_board) cube([nano_board.x, nano_t, nano_board.y]);
-      color("#202020") translate([nano_board.x / 2 - 3.5, nano_t, 20]) cube([7, 1.2, 7]);
-      color(c_steel) translate([nano_board.x / 2 - nano_usb[0] / 2, nano_t, -1]) cube([nano_usb[0], nano_usb[1], 9]);
-   }
+module carrier_nano_part() {
+   on_carrier() on_nano_plate([nano_x, 0], 0, "down") nano_part(c_board);
 }
 
 module sensor_part() {
@@ -598,7 +597,7 @@ module instrument_parts(a, colors, e = 0, with_case = true, with_back = true) {
    translate([0, 5.5 * e, 0]) {
       color(c_case) carrier();
       uln_part();
-      nano_part();
+      carrier_nano_part();
    }
    translate([0, 2.5 * e, 0]) {
       color(c_case) render() needle_gear(a);
