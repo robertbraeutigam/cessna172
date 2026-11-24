@@ -193,6 +193,11 @@ its own top-level directory; new components should follow the same layout.
     KNOTS 40-200 on a non-linear scale (`asi_cal`, also the MobiFlight
     interpolation table in the README), MPH inside, the 172N's white,
     green and yellow arcs and red line at 160.
+  - `vsi.scad` — the vertical speed indicator (the six-pack's bottom
+    right, under the altimeter): 0 at 9 o'clock, UP over the top and DOWN
+    under it to 2000 ft/min, the 20s either side of 3 o'clock, on a
+    non-linear scale (`vsi_cal`, also the MobiFlight interpolation table
+    in the README); white on black. The standard, 47 mm deep.
   - `ai.scad` — the attitude indicator (the six-pack's top middle,
     modelled on the RC Allen 172 instrument: its dial and bowl markings,
     the yellow airplane on a pedestal, the index): the standard's case front, then its
@@ -216,6 +221,40 @@ its own top-level directory; new components should follow the same layout.
     gear; two ULN2003s and a Nano on a carrier behind it. Print `face`
     (roll dial). 116 mm deep (`ai_depth` in the frame: it stays over the
     force feedback yoke's housing).
+  - `alt.scad` — the altimeter (the six-pack's top right): the standard's
+    case front with three screws (the lower left place is the knob's),
+    then its own mechanism. Two needles on concentric shafts (100 ft on
+    the 3 mm axle, 1000 ft on a 4 mm brass tube, `tube` MEASURE; no
+    10000 ft needle, the airplane stays under 10000 ft), each with a
+    28BYJ-48 of its own and its own home: motor C on a rear plate drives
+    the axle directly (a coupler with the magnet), motor B on the back
+    plate turns the tube's gear (layer `y_l2`) through 28:14 gears, so
+    the motor's one home a turn is the needle's (the magnet in the motor
+    gear). The Kollsman windows: a disc
+    behind the dial (a printed paper ring: inHg 28.1-31.0 inside, shown
+    at 3 o'clock, hPa 952-1049 outside, shown at 9 o'clock) turned by the
+    knob through an idler and an internal ring gear (`z_k`, its gears in
+    layer `y_l1`), a 10 turn
+    pot on the knob's shaft (`pot_*`, MEASURE) gives MobiFlight the
+    setting absolutely (A7). The keeper holds the disc on the dial's hub
+    and its legs press and key the dial. Boards on a carrier behind
+    motor C. Print `face` (face and Kollsman ring). 98 mm deep
+    (`alt_depth` in the frame: top row, over the housing).
+  - `hi.scad` — the heading indicator (the six-pack's bottom middle):
+    the standard's case front with two screws (top diagonals), the lower
+    corners are the knobs': EC11 rotary encoders with push switches in
+    brackets of the case (`enc_*`, MEASURE; left: gyro set, right: bug),
+    nut behind the sheet. A white printed airplane glued on the glass,
+    the mask (fixed ring: index, 45 degree marks) behind it, the card
+    (on the 3 mm axle, 1:1 to motor A like the standard's needle) in the
+    mask's opening, the bug disc behind the card (its edge shows the
+    orange bug) turning on the dial's hub, an internal ring gear on its
+    back turned by motor B's pinion (5:1), its magnet in the disc and the
+    sensor in the dial's front. The motors side by side on the back
+    plate, slanted so their covers pass; the carrier (two ULN2003s, the
+    Nano, USB up) behind them, facing back. 62 mm deep (`hi_depth`) only
+    above `hi_deep_z`, 19 mm under it (`hi_low_depth`): the frame checks
+    both against the housing. Print `face` (card, bug ring, fixed ring).
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the

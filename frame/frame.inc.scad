@@ -281,6 +281,16 @@ inst_depth = 46.6;
 // feedback yoke's housing
 ai_depth = 115.5;
 ai_bezel = 86;               // its square front bezel, in front of the sheet (bezel[0])
+// The altimeter (instruments/alt.scad) is deeper too (two motors behind
+// each other, alt_depth echo): it must be in the top row as well
+alt_depth = 98.2;
+// The heading indicator (instruments/hi.scad) has two motors side by side
+// and its boards behind them (hi_depth echo), but only above hi_deep_z from
+// its axis; under that it is hi_low_depth deep (the case, the back plate,
+// the knobs' encoders): its lower edge may be in front of the housing
+hi_depth = 61.6;
+hi_deep_z = -24;
+hi_low_depth = 18.5;
 
 // --- Layout, x ---
 x_sw0 = sheet_edge;                          // switch panel, left face edge
@@ -532,6 +542,13 @@ let(i = search(["AI"], inst_names)[0])
 let(i = search(["AI"], inst_names)[0], b = circ(inst_c[i], inst_body_d))
    assert(!overlaps([b[0], b[2]], yoke_x) || b[1] >= ffb_h || ai_depth <= ffb_front_y - 3,
           "AI (stage 2) runs into the force feedback yoke's housing");
+let(i = search(["ALT"], inst_names)[0], b = circ(inst_c[i], inst_body_d))
+   assert(!overlaps([b[0], b[2]], yoke_x) || b[1] >= ffb_h || alt_depth <= ffb_front_y - 3,
+          "ALT (stage 2) runs into the force feedback yoke's housing");
+let(i = search(["HI"], inst_names)[0], b = circ(inst_c[i], inst_body_d))
+   assert(!overlaps([b[0], b[2]], yoke_x) || (inst_c[i].y + hi_deep_z >= ffb_h || hi_depth <= ffb_front_y - 3)
+                                           && (b[1] >= ffb_h || hi_low_depth <= ffb_front_y - 3),
+          "HI (stage 2) runs into the force feedback yoke's housing");
 for (i = [0 : 7])
    assert(inst_c[i].y - inst_cut_d / 2 >= sheet_h, str(inst_names[i], " hidden behind the stage 1 left sheet (the monitor shows it)"));
 assert(sheet_h <= sheet_h_max, "Left panel too high for the monitor");
