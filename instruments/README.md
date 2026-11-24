@@ -444,8 +444,9 @@ rest). The datarefs are the vacuum attitude indicator's,
 
 The six-pack's top right instrument, like the 172N's, but with two
 needles (100 ft and 1000 ft): the airplane stays under 10000 ft, so the
-10000 ft needle is left out. The Kollsman window (inHg) is at 3 o'clock
-and its setting knob at the lower left. Its case front is the
+10000 ft needle is left out. Like the dual scale altimeters, it has two
+Kollsman windows, inHg at 3 o'clock and hPa at 9 o'clock (for QNH in
+Europe), set by one knob at the lower left. Its case front is the
 standard's (the 81 mm hole, the lip, the glass), but the lower left
 screw's place is the knob's, so it has three screws. Behind it are two
 28BYJ-48 steppers, one behind the other, and it is 98 mm deep behind the
@@ -469,21 +470,26 @@ feedback yoke's housing (the frame checks it).
   plate. The needle turns twice per motor turn (0.10 steps a foot), so
   the motor's one home a turn is one place of the needle. The magnet in
   the motor gear passes a sensor in the back plate.
-- **Kollsman window**: a disc behind the dial with a printed paper ring
-  (28.1 to 31.0 inHg, numbers every 0.1, ticks every 0.02) shows through
-  a window in the dial; a white index on the face points at the setting.
+- **Kollsman windows**: a disc behind the dial carries a printed paper
+  ring with two scales of the same setting: inHg inside (28.1 to 31.0,
+  numbers every 0.1, ticks every 0.02) and hPa outside (952 to 1049,
+  numbers every 5, ticks every 1; 1 inHg is 33.86 hPa). Two windows in
+  the dial show them, each only over its own scale: inHg at 3 o'clock,
+  hPa at 9 o'clock. A white index beside each window points at the
+  setting (1013 hPa with 29.92 inHg).
   The knob turns it: the knob's pinion (14 teeth) turns an idler (23
   teeth, on a steel pin from the back plate; both in the gear layer in
   front of motor B's), whose pinion (13 teeth) turns an internal ring
   gear (90 teeth) on the disc's back, 3.2 knob turns per inHg. Clockwise
   raises the setting. The knob is on a 10 turn pot, read by MobiFlight:
-  it gives the setting absolutely, so the window and X-Plane never drift
-  apart, and the pot's end stops end the scale.
+  it gives the setting absolutely, so the windows and X-Plane never drift
+  apart, and the pot's end stops end the scales. X-Plane gets inHg; the
+  hPa window needs nothing of its own.
 - **Keeper**: the disc turns on a hub on the dial's back, the keeper
   holds it there. The keeper's two legs go back to the back plate (pins
   into it) and press the dial forward against a spacer ring and the
-  glass; pins on the dial's hub go into the keeper, so the window stays
-  at 3 o'clock.
+  glass; pins on the dial's hub go into the keeper, so the windows stay
+  at 3 and 9 o'clock.
 - **Back**: motor B on the back plate's back (beside the axle), the pot
   down left. Four posts carry the rear plate with motor C; four more
   carry the board carrier with the two ULN2003 boards and the Nano facing
@@ -496,8 +502,8 @@ feedback yoke's housing (the frame checks it).
   shaft standing on its pinion's end. Black, but the needles: print them
   white, or paint them.
 
-The `assert`s check the face (numerals, ticks and the window clear of
-each other), the gears (shafts reaching through them, the magnets in
+The `assert`s check the face (numerals, ticks and the windows clear of
+each other, each scale only in its window), the gears (shafts reaching through them, the magnets in
 them, the keeper's legs, the idler and the pot clear of them), the
 Kollsman scale against the pot's 10 turns, the motors, posts, pot and
 boards clear of each other, and the neighbours: the AI's case on the
@@ -509,8 +515,8 @@ left, the VSI's case and ears under it, the AI's bezel against the knob.
 [face](https://robertbraeutigam.github.io/cessna172/instruments/alt_face.pdf)):
 two faces, two Kollsman rings and the glass's template, black and white,
 like the other faces. Print at 100 % on matte photo paper. Cut the face
-on its edge, cut out the window and the hole on the white lines'
-inside, and glue it onto the dial, the window over the dial's. Cut the
+on its edge, cut out the two windows and the hole on the white lines'
+inside, and glue it onto the dial, the windows over the dial's. Cut the
 ring on its edges and glue it onto the disc's front.
 
 ### Hardware
@@ -551,7 +557,7 @@ MEASURE values: check them before printing.
    goes into the back plate). The axle through the back plate into the
    coupler, the tube over it into its bearing. Idler onto its pin.
 5. Face onto the dial, the Kollsman ring onto the disc. Glass into the
-   case from behind, the spacer ring, the dial (the window at 3
+   case from behind, the spacer ring, the dial (the inHg window at 3
    o'clock). Turn the knob's pot to its low stop and put the disc on
    the dial's hub with 28.1 a little below the index (it must reach 28.1
    before the stop), the keeper on it (its pins on the dial's hub's).
@@ -597,6 +603,6 @@ rest), both following `sim/cockpit2/gauges/indicators/altitude_ft_pilot`
 - **Kollsman**: an *Analog input* on A7 that sets
   `sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot` to
   `Round(28.1+($-L)*2.9/(H-L),2)`, where L and H are the input's values
-  (the Connector shows them) with 28.1 and 31.0 at the index. About
+  (the Connector shows them) with 28.1 and 31.0 at the inHg index. About
   3 counts per 0.01 inHg; raise the input's sensitivity if the value
   flickers.

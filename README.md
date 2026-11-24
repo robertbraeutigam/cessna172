@@ -226,8 +226,8 @@ two printed gears, the motor and boards behind the case. So far the RPM
 indicator, the airspeed indicator, the attitude indicator (a thin
 roll dial and a horizon bowl, the pitch motor riding on the roll frame
 through a slip ring; deeper than the others) and the altimeter (two
-needles on concentric shafts, a motor each, and a Kollsman window set
-by its knob through a 10 turn pot; deeper too).
+needles on concentric shafts, a motor each, and Kollsman windows in
+inHg and hPa set by its knob through a 10 turn pot; deeper too).
 
 [![RPM indicator](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)
 

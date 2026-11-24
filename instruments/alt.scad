@@ -4,8 +4,8 @@
 // indicator, over the VSI. It has the standard instrument's case front
 // (instrument.inc.scad: the hole, the lip, the glass, four screws on the
 // diagonals; the lower left one is the knob's place, like the real one),
-// two needles on concentric shafts, a Kollsman window at 3 o'clock and
-// its setting knob at the lower left. It is deeper than the standard
+// two needles on concentric shafts, Kollsman windows at 3 o'clock (inHg)
+// and 9 o'clock (hPa) and their setting knob at the lower left. It is deeper than the standard
 // (alt_depth echo), but it is in the top row, over the force feedback
 // yoke's housing (the frame's alt_depth checks it).
 //
@@ -22,8 +22,11 @@
 //     needle turns twice per motor turn, so the motor's one home a turn
 //     is one place of the needle. B's magnet passes a sensor in the back
 //     plate.
-// - The Kollsman window: a disc behind the dial (a printed paper ring on
-//   it, 28.1 to 31.0 inHg) shows through a window in the dial. The knob
+// - The Kollsman windows: a disc behind the dial (a printed paper ring on
+//   it: 28.1 to 31.0 inHg inside, the same in hPa, 952 to 1049, outside)
+//   shows through two windows in the dial, inHg at 3 o'clock, hPa at
+//   9 o'clock (each window only over its scale; both scales follow the
+//   one setting: 1 inHg is 33.86 hPa). The knob
 //   turns it through a gear train (the knob's pinion, an idler on a steel
 //   pin, an internal ring gear on the disc; their gears in the front
 //   layer), and a 10 turn pot on the knob's shaft tells MobiFlight where
@@ -31,7 +34,7 @@
 //   stops end the scale.
 // - The keeper (in front of the gear layers) holds the disc on the dial's
 //   hub, its two legs press the dial forward against the spacer ring and
-//   the glass and key it (the window stays at 3 o'clock).
+//   the glass and key it (the windows stay at 3 and 9 o'clock).
 // - A board carrier behind motor C holds the two ULN2003 boards and the
 //   Arduino Nano (MobiFlight, its own USB cable), facing back.
 //
@@ -78,7 +81,7 @@ $fn = 60;
 
 include <instrument.inc.scad>
 
-// Preview: the needles at this altitude, the window at this setting
+// Preview: the needles at this altitude, the windows at this setting
 view_ft = 3780;
 view_baro = 29.92;
 explode = 25;
@@ -91,8 +94,10 @@ tick_20 = [2.6, 0.5];        // every 20 ft: length, width
 tick_100 = [4.8, 0.9];       // every 100 ft
 label_size = 2.2;
 small_size = 1.5;
-win = [17, 30.5, 8];         // the Kollsman window: inner and outer radius (at 3 o'clock), height
-win_line = 0.35;             // the white line round it (cut on its inside)
+win_hg = [15.5, 23.5];       // the Kollsman windows: inHg at 3 o'clock (the disc's inner scale): inner and outer radius
+win_hpa = [24, 31.9];        // hPa at 9 o'clock (its outer scale)
+win_h = 8;                   // their height
+win_line = 0.35;             // the white line round them (cut on its inside)
 // colours, in the print's order (keep the print marker below the same)
 c_black = "black";
 c_white = "white";
@@ -119,9 +124,10 @@ lay_gap = 0.5;
 mag_rm = 7;                  // magnets from their shafts
 cp = [11, 5.5, 7, 6];        // the coupler: radius, disc width, hub diameter, hub length (the axle in it)
 
-// --- Kollsman window ---
+// --- Kollsman windows ---
 baro_range = [28.1, 31.0];   // inHg, the scale (numbers every 0.1, ticks every 0.02)
 baro_std = 29.92;
+hpa_per_inhg = 33.8639;      // the hPa scale: the same disc, the same setting
 k_baro = 100;                // degrees of the disc per inHg
 km = 0.8;                    // module of the knob's train
 z_k = [14, 23, 13, 90];      // knob pinion, idler gear, idler pinion, the disc's internal ring
@@ -135,10 +141,13 @@ kp_angles = [0, 180];        // clockwise from 12 o'clock (between motor gears A
 kp_d = 4;
 kpin = [2, 2];               // pins: the dial's hub into the keeper, the legs into the back plate: diameter, length
 keep_r = 16;                 // the keeper's disc (over the disc's plate's inner edge)
-ring_paper = [15.5, 32];     // the Kollsman ring's paper: inner and outer radius
-baro_num_r = 21.5;           // its numbers' inner end
-baro_num_size = 2.3;
-baro_tick = [[18.8, 20.5, 0.3], [17.4, 20.5, 0.45]];   // every 0.02, every 0.1: from, to, width
+ring_paper = [15, 32.5];     // the Kollsman ring's paper: inner and outer radius
+baro_num_r = 15.7;           // the inHg numbers' inner end (reading outwards at 3 o'clock)
+baro_num_size = 1.9;
+baro_tick = [[22, 23.3, 0.3], [21.3, 23.3, 0.45]];     // inHg, every 0.02, every 0.1: from, to, width (at the index, outside)
+hpa_num_r = 31.7;            // the hPa numbers' outer end (reading inwards at 9 o'clock)
+hpa_num_size = 1.8;
+hpa_tick = [[24.2, 25.2, 0.3], [24.2, 25.7, 0.45]];    // hPa, every 1, every 5 (numbered): from, to, width (at the index, inside)
 
 // --- 10 turn pot (3590S type), MEASURE ---
 pot_body = [22.5, 20];       // diameter, length behind its mounting face (with the lugs)
@@ -178,6 +187,7 @@ function m_cover(m) = m_body(m) + motor_cover[1] * m[1];
 function clear_cover(m, p, r) = let(d = p - m_body(m), t = d * m[1], s = d * m_perp(m))
    t >= motor_cover[1] + r || t <= -r || abs(s) >= motor_cover[0] / 2 + r;
 function baro_a(v) = 90 + k_baro * (v - baro_std);  // on the disc (clockwise from 12), at baro_std
+function hpa_a(v) = 270 + k_baro * (v / hpa_per_inhg - baro_std);
 
 a_drive = nm * (z_mg + z_ng) / 2 + gear_play;         // motor B from the axis
 mB = [[-a_drive, 0], [0, 1]];                         // 1000 ft, its body up
@@ -238,10 +248,16 @@ echo(alt_depth = alt_depth, case_depth = y_bp[1] - y_sheet1, axle_len = axle_len
 // --- Checks ---
 // the face
 assert(num_r + num_size / 2 + 0.5 <= r_tick - tick_100[0], "Numerals run into the ticks");
-assert(win[1] + win_line + 0.5 <= sqrt(pow(r_tick - tick_20[0], 2) - pow(win[2] / 2, 2)), "Kollsman window runs into the ticks");
-for (a = [72, 108]) assert(abs(pol(num_r, a).y) - num_size / 2 >= win[2] / 2 + win_line + 0.5, "The 2 or the 3 runs into the Kollsman window");
-assert(win[0] >= dhub_r + 1 && win[0] >= ring_paper[0] + 1 && win[1] <= ring_paper[1] - 1, "Window off the Kollsman ring");
-assert(baro_num_r + 0.78 * baro_num_size * 3.5 <= win[1] - 0.5 && baro_tick[1][0] >= win[0], "Kollsman numbers off the window");
+// the 20 ft ticks next to 3 and 9 o'clock (3.6 degrees off), within the windows' height
+let(t = pol(r_tick - tick_20[0], 90 - 3.6))
+   assert(t.y <= win_h / 2 + win_line && t.x - tick_20[1] / 2 - 0.3 >= max(win_hg[1], win_hpa[1]) + win_line, "A Kollsman window runs into the ticks");
+for (a = [72, 108, 252, 288]) assert(abs(pol(num_r, a).y) - num_size / 2 >= win_h / 2 + win_line + 0.5, "A numeral runs into a Kollsman window");
+assert(win_hg[0] >= dhub_r + 1 && win_hg[0] >= ring_paper[0] + 0.5 && win_hpa[1] <= ring_paper[1] - 0.5, "Windows off the Kollsman ring");
+assert(win_hg[1] + 0.3 <= win_hpa[0], "The inHg scale shows in the hPa window");
+assert(baro_num_r >= win_hg[0] && baro_num_r + 0.78 * baro_num_size * 3.5 <= baro_tick[1][0] - 0.2 && baro_tick[0][1] <= win_hg[1] - 0.1,
+       "inHg scale off its window");
+assert(hpa_num_r <= win_hpa[1] - 0.1 && hpa_num_r - 0.78 * hpa_num_size * 4 >= hpa_tick[1][1] + 0.2 && hpa_tick[0][0] >= win_hpa[0] + 0.1,
+       "hPa scale off its window");
 assert(nd100[0] <= r_tick, "100 ft needle past the ticks");
 assert(baro_span <= pot_span - 10 && baro_span <= 340, "Kollsman scale longer than the pot's turns or the disc");
 // needles, tubes
@@ -352,7 +368,8 @@ module ring_gear_2d(z, m, ro) {
 }
 
 module win_2d(d = 0) {
-   translate([win[0] - d, -win[2] / 2 - d]) square([win[1] - win[0] + 2 * d, win[2] + 2 * d]);
+   translate([win_hg[0] - d, -win_h / 2 - d]) square([win_hg[1] - win_hg[0] + 2 * d, win_h + 2 * d]);
+   translate([-win_hpa[1] - d, -win_h / 2 - d]) square([win_hpa[1] - win_hpa[0] + 2 * d, win_h + 2 * d]);
 }
 
 // sensor: flat face towards -y at y, legs out along z (s: up or down) to the back
@@ -413,7 +430,7 @@ module alt_spacer() {
    }
 }
 
-// --- Dial: flat, the window, the hub on its back (the disc on it), pins into the keeper ---
+// --- Dial: flat, the two windows, the hub on its back (the disc on it), pins into the keeper ---
 module alt_dial() {
    difference() {
       union() {
@@ -635,18 +652,21 @@ module alt_face_2d() {
       translate([0, -12.5]) text("1000 FEET", size = label_size, font = font, halign = "center", valign = "center");
       translate([0, -16.8]) text("CALIBRATED TO", size = small_size, font = font, halign = "center", valign = "center");
       translate([0, -19.3]) text("20,000 FEET", size = small_size, font = font, halign = "center", valign = "center");
-      // the window's line and the index at its inner edge
+      // the windows' lines
       difference() {
          win_2d(win_line);
          win_2d();
       }
-      polygon([[win[0] - 2.4, 1.3], [win[0] - 2.4, -1.3], [win[0], 0]]);
+      // the indexes at the ticks' side: inHg's outside, hPa's inside
+      polygon([[win_hg[1] + 2.4, 1.3], [win_hg[1] + 2.4, -1.3], [win_hg[1], 0]]);
+      polygon([[-win_hpa[0] + 2.4, 1.3], [-win_hpa[0] + 2.4, -1.3], [-win_hpa[0], 0]]);
       // the outer tube's hole, to punch
       circle(d = tube[0] + 0.3);
    }
 }
 
-// the Kollsman ring's paper (on the disc, at baro_std): ticks at the index, the numbers reading outwards at 3 o'clock
+// the Kollsman ring's paper (on the disc, at baro_std): inHg inside (shown at 3 o'clock), hPa outside (at 9 o'clock),
+// the ticks at their indexes, the numbers upright in their windows
 module alt_baro_2d() {
    ink(c_black) difference() {
       circle(r = ring_paper[1], $fn = 180);
@@ -659,6 +679,13 @@ module alt_baro_2d() {
          tick_2d(a, t[0], t[1], t[2]);
          if (h % 10 == 0) translate(pol(baro_num_r, a)) rotate(90 - a)
             text(str(floor(h / 100), ".", floor(h / 10) % 10), size = baro_num_size, font = font, halign = "left", valign = "center");
+      }
+      for (v = [ceil(baro_range[0] * hpa_per_inhg) : floor(baro_range[1] * hpa_per_inhg)]) {
+         t = v % 5 == 0 ? hpa_tick[1] : hpa_tick[0];
+         a = hpa_a(v);
+         tick_2d(a, t[0], t[1], t[2]);
+         if (v % 5 == 0) translate(pol(hpa_num_r, a)) rotate(270 - a)
+            text(str(v), size = hpa_num_size, font = font, halign = "left", valign = "center");
       }
       difference() {
          circle(r = ring_paper[1] + 0.4, $fn = 180);

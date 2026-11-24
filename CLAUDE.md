@@ -225,8 +225,9 @@ its own top-level directory; new components should follow the same layout.
     the axle directly (a coupler with the magnet), motor B on the back
     plate turns the tube's gear (layer `y_l2`) through 28:14 gears, so
     the motor's one home a turn is the needle's (the magnet in the motor
-    gear). The Kollsman window: a disc
-    behind the dial (a printed paper ring, 28.1-31.0 inHg) turned by the
+    gear). The Kollsman windows: a disc
+    behind the dial (a printed paper ring: inHg 28.1-31.0 inside, shown
+    at 3 o'clock, hPa 952-1049 outside, shown at 9 o'clock) turned by the
     knob through an idler and an internal ring gear (`z_k`, its gears in
     layer `y_l1`), a 10 turn
     pot on the knob's shaft (`pot_*`, MEASURE) gives MobiFlight the
