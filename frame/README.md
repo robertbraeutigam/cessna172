@@ -131,7 +131,8 @@ VSI, NAV 1 and the RPM are in front of the housing). The
 [attitude indicator](../instruments/README.md#attitude-indicator) is
 deeper, 116 mm (`ai_depth`), and has a square 86 mm front bezel
 (`ai_bezel`, checked against its neighbours' holes), so it must stay in the top row, over the
-housing. The ADF's place in the 172N, under NAV 2 at the column's height,
+housing; so must the [altimeter](../instruments/README.md#altimeter),
+101 mm deep (`alt_depth`: three motors behind it). The ADF's place in the 172N, under NAV 2 at the column's height,
 is free as well.
 
 The frame overhangs the desk edge by 22 mm (`frame_overhang`: a 2020 and

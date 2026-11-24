@@ -216,6 +216,23 @@ its own top-level directory; new components should follow the same layout.
     gear; two ULN2003s and a Nano on a carrier behind it. Print `face`
     (roll dial). 116 mm deep (`ai_depth` in the frame: it stays over the
     force feedback yoke's housing).
+  - `alt.scad` — the altimeter (the six-pack's top right): the standard's
+    case front with three screws (the lower left place is the knob's),
+    then its own mechanism. Three needles on concentric shafts (100 ft on
+    the 3 mm axle, 1000 ft on a 4 mm brass tube, 10000 ft on a 5 mm one,
+    `tubes` MEASURE), each with a 28BYJ-48 of its own and its own home:
+    motor C on a rear plate drives the axle directly (a coupler with the
+    magnet), motors A (10000) and B (1000) on the back plate turn the
+    tubes' gears in two layers (`y_l1`, `y_l2`) through 28:14 gears, so
+    the motor's one home a turn is the needle's (magnets in the motor
+    gears; A's sensor on the keeper's arm). The Kollsman window: a disc
+    behind the dial (a printed paper ring, 28.1-31.0 inHg) turned by the
+    knob through an idler and an internal ring gear (`z_k`), a 10 turn
+    pot on the knob's shaft (`pot_*`, MEASURE) gives MobiFlight the
+    setting absolutely (A7). The keeper holds the disc on the dial's hub
+    and its legs press and key the dial. Boards on a carrier behind
+    motor C. Print `face` (face and Kollsman ring). 101 mm deep
+    (`alt_depth` in the frame: top row, over the housing).
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the

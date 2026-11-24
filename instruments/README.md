@@ -8,12 +8,15 @@
 
 [![Attitude indicator](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)
 
+[![Altimeter](https://robertbraeutigam.github.io/cessna172/instruments/alt_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/alt_montage.png)
+
 The analogue ("steam") instruments. They all follow one standard
 (`instrument.inc.scad`): a 3 1/8" case behind a round hole in the panel,
 a colour printed face, and a needle turned by a 28BYJ-48 geared stepper.
-So far: the RPM indicator (tachometer), the airspeed indicator (ASI) and
-the attitude indicator (AI), which has the standard's case front but a
-mechanism of its own (see [Attitude indicator](#attitude-indicator)). The instruments go into
+So far: the RPM indicator (tachometer), the airspeed indicator (ASI),
+the attitude indicator (AI) and the altimeter (ALT); the last two have
+the standard's case front but mechanisms of their own (see
+[Attitude indicator](#attitude-indicator) and [Altimeter](#altimeter)). The instruments go into
 the holes of the stage 2 left sheet (see
 [Cockpit frame](../frame/README.md)): the stage 1 sheet is lower and its
 top bar is in the way.
@@ -24,6 +27,7 @@ top bar is in the way.
 | `rpm.scad` | the RPM indicator: its face and the parts above; the face print |
 | `asi.scad` | the airspeed indicator: its face and the parts above; the face print |
 | `ai.scad` | the attitude indicator: the standard's case front, a roll frame with the horizon bowl and the pitch motor on it, a slip ring, the roll motor; the roll dial's print |
+| `alt.scad` | the altimeter: the standard's case front, three needles on concentric shafts with a motor each, the Kollsman window's disc, knob and pot; the face and Kollsman ring print |
 
 ## How it works
 
@@ -435,3 +439,176 @@ rest). The datarefs are the vacuum attitude indicator's,
   transform until the dial is level, then fine tune the pitch so the
   horizon is under the airplane's wings. Check the names against the
   Connector's dialogs, as they change between versions.
+
+## Altimeter
+
+The six-pack's top right instrument, like the 172N's: three needles
+(100 ft, 1000 ft, 10000 ft), the Kollsman window at 3 o'clock (inHg) and
+its setting knob at the lower left. Its case front is the standard's
+(the 81 mm hole, the lip, the glass), but the lower left screw's place
+is the knob's, so it has three screws. Behind it are three 28BYJ-48
+steppers, and it is 101 mm deep behind the sheet (`alt_depth`): like
+the AI it is in the top row, over the force feedback yoke's housing (the
+frame checks it).
+
+### How it works
+
+- **Needles**: the 100 ft needle (long, in front) is pressed onto a 3 mm
+  steel axle, the 1000 ft needle (short and wide) onto a 4 mm brass tube
+  round the axle, the 10000 ft needle (thin, a triangle at the dial's
+  edge) onto a 5 mm tube round that (telescoping tubes, 0.45 mm wall:
+  each slides in the next). A real altimeter drives them all through
+  clockwork; here each has a motor of its own, so each one homes on its
+  own and a lost step never shows as the wrong thousands.
+- **100 ft**: the axle goes back through everything to motor C on the
+  rear plate, its shaft on the axis; a printed coupler joins them (no
+  gears: 2.04 steps a foot). A magnet in the coupler passes a sensor in
+  the rear plate.
+- **1000 ft and 10000 ft**: a 14 tooth gear on each tube, in two layers
+  behind the dial, turned by a 28 tooth gear on motor B (left, 1000 ft)
+  and motor A (right, 10000 ft) on the back plate. The needle turns
+  twice per motor turn (0.10 steps a foot on the 1000 ft needle, 0.010 on
+  the 10000 ft one), so the motor's one home a turn is one place of the
+  needle. The magnets are in the motor gears: B's passes a sensor in the
+  back plate; A's gear is in the front layer, its magnet passes a sensor
+  on the keeper's arm in front of it.
+- **Kollsman window**: a disc behind the dial with a printed paper ring
+  (28.1 to 31.0 inHg, numbers every 0.1, ticks every 0.02) shows through
+  a window in the dial; a white index on the face points at the setting.
+  The knob turns it: the knob's pinion (14 teeth) turns an idler (23
+  teeth, on a steel pin from the back plate), whose pinion (13 teeth)
+  turns an internal ring gear (90 teeth) on the disc's back, 3.2 knob
+  turns per inHg. Clockwise raises the setting. The knob is on a 10 turn
+  pot, read by MobiFlight: it gives the setting absolutely, so the
+  window and X-Plane never drift apart, and the pot's end stops end the
+  scale.
+- **Keeper**: the disc turns on a hub on the dial's back, the keeper
+  holds it there. The keeper's two legs go back to the back plate (pins
+  into it) and press the dial forward against a spacer ring and the
+  glass; pins on the dial's hub go into the keeper, so the window stays
+  at 3 o'clock.
+- **Back**: motors A and B on the back plate's back (their bodies leave
+  the axle room between them), the pot down left. Four posts carry the
+  rear plate with motor C; four more carry the board carrier with the
+  three ULN2003 boards and the Nano facing back, its USB jack down. The
+  carrier reaches below the case: the VSI under it is only 47 mm deep.
+- **Print orientation**: every part has its features on one side: the
+  dial, the disc, the keeper, the back and rear plates and the carrier
+  are printed front down, the case back side down (the knob's train's
+  pocket is open to the sheet), the idler on its big gear, the knob's
+  shaft standing on its pinion's end. Black, but the needles: print them
+  white, or paint them.
+
+The `assert`s check the face (numerals, ticks and the window clear of
+each other), the gear layers (shafts reaching through their gears,
+magnets in the gears, legs, idler and pot clear of the gears), the
+Kollsman scale against the pot's 10 turns, the motors, posts, pot and
+boards clear of each other, and the neighbours: the AI's case on the
+left, the VSI's case and ears under it, the AI's bezel against the knob.
+
+### The print
+
+`make` writes `target/alt_face.pdf` (on the project page as
+[face](https://robertbraeutigam.github.io/cessna172/instruments/alt_face.pdf)):
+two faces, two Kollsman rings and the glass's template, black and white,
+like the other faces. Print at 100 % on matte photo paper. Cut the face
+on its edge, cut out the window and the hole on the white lines'
+inside, and glue it onto the dial, the window over the dial's. Cut the
+ring on its edges and glue it onto the disc's front.
+
+### Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 3 | 28BYJ-48 stepper, 5 V, with its ULN2003 driver board | the three needles |
+| 1 | Arduino Nano (ATmega328P, 5 V), mini USB cable | MobiFlight board of the instrument |
+| 3 | A3144 hall sensor | homes |
+| 3 | disc magnet 6 x 3 mm | homes |
+| 1 | 10 turn pot 10k, 6.35 mm shaft, 3590S type (e.g. Bourns 3590S-2-103L or a clone) | the Kollsman knob |
+| 1 | 3 mm silver steel rod, 46 + 16 mm | the axle, the idler's pin |
+| 1 | brass tube 4 x 0.45 mm, 23 mm, and 5 x 0.45 mm, 14 mm (telescoping) | the 1000 ft and 10000 ft needles' shafts |
+| 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
+| 1 | the face and the Kollsman ring, printed on photo paper | |
+| 3 | M3 x 8 button head, black | case through the sheet |
+| 3 | M3 x 8 countersunk self tapping screw | back plate into the case |
+| 4 | M3 x 8 countersunk self tapping screw | rear plate onto the back plate's posts |
+| 4 | M3 x 8 countersunk self tapping screw | carrier onto the rear plate's posts |
+| 6 | M3 x 8 countersunk screw + nut | motor ears |
+| 12 | M3 x 6 self tapping screw | ULN2003 boards |
+
+The lengths come from the build's echo (`axle_len`, `pin_len`,
+`tube_len`). The pot's sizes (`pot_*`) and the tubes' (`tubes`) are
+MEASURE values: check them before printing.
+
+### Assembly
+
+1. Magnets into motor gears A (front face) and B (back face) and into the
+   coupler (back face); check which face pulls the sensor low.
+2. Back plate: motors A and B (ears countersunk from the front, nuts
+   behind), sensor B into its pocket (flat face forward, legs bent back
+   through the slot), the pot through its hole (nut on the front), the
+   idler's pin pressed into its hole. Gear B onto B's shaft, gear A
+   (with its long hub) onto A's.
+3. Rear plate: motor C and sensor C the same way, the coupler on C's
+   shaft. Screw the rear plate onto the back plate's posts (from its back).
+4. Sensor A into the keeper's arm (flat face back), its wires in the
+   groove and down the top leg's groove.
+5. Glue the needle gears onto the tubes: the 10000 ft gear onto the
+   5 mm tube flush with its back end, the 1000 ft gear onto the 4 mm
+   tube 2.5 mm from its back end (that end goes into the back plate). The
+   axle through the back plate into the coupler, the 4 mm tube over it
+   into its bearing, the 5 mm tube over that. Idler onto its pin.
+6. Face onto the dial, the Kollsman ring onto the disc. Glass into the
+   case from behind, the spacer ring, the dial (the window at 3
+   o'clock). Turn the knob's pot to its low stop and put the disc on
+   the dial's hub with 28.1 a little below the index (it must reach 28.1
+   before the stop), the keeper on it (its pins on the dial's hub's),
+   sensor A's wires through the back plate's hole as it goes on. Put the
+   back plate's stack on, the gears meshing, and screw it into the case.
+7. The knob's shaft onto the pot's shaft through the case's pocket
+   (glue), the carrier onto the rear plate's posts, the boards onto it,
+   wire it (below). Flash and set up MobiFlight, let it home, press the
+   needles on at 0.
+8. Into the panel like the standard instrument: drill the three screw
+   holes and the knob's 7 mm hole using the case as the template, the
+   case into the hole from behind, the knob's shaft through its hole,
+   the three screws, the knob onto the shaft (its flat).
+
+### Wiring
+
+| Signal | Nano pin | MobiFlight device |
+|--------|----------|-------------------|
+| motor C (100 ft) ULN2003 IN1..IN4 | D2, D3, D4, D5 | *Stepper* 100 ft |
+| sensor C OUT | D6 | its home input |
+| motor B (1000 ft) ULN2003 IN1..IN4 | D7, D8, D9, D10 | *Stepper* 1000 ft |
+| sensor B OUT | D11 | its home input |
+| motor A (10000 ft) ULN2003 IN1..IN4 | A0, A1, A2, A3 | *Stepper* 10000 ft |
+| sensor A OUT | A4 | its home input |
+| pot wiper (ends to 5 V and GND) | A7 | *Analog input* Kollsman |
+| the ULN2003 boards' + and -, sensors' VCC and GND | 5 V, GND | |
+
+**USB**: one port on the powered USB hub, about 0.8 A while all three
+motors move, at start when they home together (three steppers, see
+[USB](#wiring) above): the port must give 1 A (a BC 1.2 charging port).
+
+### MobiFlight
+
+Three *Steppers* (pins above, 2038 steps a turn, home inputs, coils off
+at rest), all following `sim/cockpit2/gauges/indicators/altitude_ft_pilot`
+(it already has the Kollsman setting in it):
+
+- **100 ft**: tick *Compass mode*, so it turns the short way round past
+  0; steps = (feet mod 1000) x 2.038, `((($%1000)+1000)%1000)*2.038`.
+  The needle turns with the motor (no gears).
+- **1000 ft**: `$*0.1019` (the needle turns twice per motor turn: 20000 ft
+  a motor turn). The needle turns the other way from the motor.
+- **10000 ft**: `$*0.01019`, the same way.
+- **Direction and offsets**: if a needle turns the wrong way, give its
+  motor its pins the other way round. After homing, press the needles
+  on at 0; fine tune with an offset in the transform.
+- **Kollsman**: an *Analog input* on A7 that sets
+  `sim/cockpit2/gauges/actuators/barometer_setting_in_hg_pilot` to
+  `Round(28.1+($-L)*2.9/(H-L),2)`, where L and H are the input's values
+  (the Connector shows them) with 28.1 and 31.0 at the index. About
+  3 counts per 0.01 inHg; raise the input's sensitivity if the value
+  flickers.

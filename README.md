@@ -143,15 +143,16 @@ and one cable from the first to the PC.
 The current is the limit. At rest it is small: every stepper has its
 coils off when it is at its target, so the whole panel takes a few
 hundred mA. The peak is at start, when every needle homes at once for a
-few seconds: with the compass and about 13 steppers in the instruments
-3.5-4 A. That is more than many cheap "powered" hubs give (their supply
+few seconds: with the compass and about 15 steppers in the instruments
+4-4.5 A. That is more than many cheap "powered" hubs give (their supply
 often has 2-3 A, shared by all ports; too little shows as boards
 resetting and needles losing their home). So the hub:
 
-- has a supply for the peak: 5 V / 4 A or more, or a 12 V supply (the
+- has a supply for the peak: 5 V / 5 A or more, or a 12 V supply (the
   hub's own converter; 12 V / 3 A, 36 W, gives about 6 A at 5 V);
-- gives each port at least 500 mA (in its specs: BC 1.2 charging ports, or
-  "x A per port"), so a two stepper instrument is not cut off;
+- gives each port at least 1 A (in its specs: BC 1.2 charging ports, or
+  "x A per port"), so the altimeter's three steppers (about 0.8 A) are
+  not cut off;
 - has every board's cable short and of a decent gauge (the cheap thin ones
   drop voltage).
 
@@ -223,15 +224,19 @@ Arduino Nano of its own.
 The analogue instruments, built on one standard: a 3 1/8" case behind the
 panel, a colour printed face, a needle turned by a 28BYJ-48 stepper through
 two printed gears, the motor and boards behind the case. So far the RPM
-indicator, the airspeed indicator and the attitude indicator (a thin
+indicator, the airspeed indicator, the attitude indicator (a thin
 roll dial and a horizon bowl, the pitch motor riding on the roll frame
-through a slip ring; deeper than the others).
+through a slip ring; deeper than the others) and the altimeter (three
+needles on concentric shafts, a motor each, and a Kollsman window set
+by its knob through a 10 turn pot; deeper too).
 
 [![RPM indicator](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)
 
 [![Airspeed indicator](https://robertbraeutigam.github.io/cessna172/instruments/asi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/asi_montage.png)
 
 [![Attitude indicator](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)
+
+[![Altimeter](https://robertbraeutigam.github.io/cessna172/instruments/alt_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/alt_montage.png)
 
 ### [Radio stack](radio/README.md)
 

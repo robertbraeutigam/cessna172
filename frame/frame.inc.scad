@@ -281,6 +281,9 @@ inst_depth = 46.6;
 // feedback yoke's housing
 ai_depth = 115.5;
 ai_bezel = 86;               // its square front bezel, in front of the sheet (bezel[0])
+// The altimeter (instruments/alt.scad) is deeper too (three motors, alt_depth
+// echo): it must be in the top row as well
+alt_depth = 100.3;
 
 // --- Layout, x ---
 x_sw0 = sheet_edge;                          // switch panel, left face edge
@@ -532,6 +535,9 @@ let(i = search(["AI"], inst_names)[0])
 let(i = search(["AI"], inst_names)[0], b = circ(inst_c[i], inst_body_d))
    assert(!overlaps([b[0], b[2]], yoke_x) || b[1] >= ffb_h || ai_depth <= ffb_front_y - 3,
           "AI (stage 2) runs into the force feedback yoke's housing");
+let(i = search(["ALT"], inst_names)[0], b = circ(inst_c[i], inst_body_d))
+   assert(!overlaps([b[0], b[2]], yoke_x) || b[1] >= ffb_h || alt_depth <= ffb_front_y - 3,
+          "ALT (stage 2) runs into the force feedback yoke's housing");
 for (i = [0 : 7])
    assert(inst_c[i].y - inst_cut_d / 2 >= sheet_h, str(inst_names[i], " hidden behind the stage 1 left sheet (the monitor shows it)"));
 assert(sheet_h <= sheet_h_max, "Left panel too high for the monitor");
