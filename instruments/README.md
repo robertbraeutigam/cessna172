@@ -6,6 +6,8 @@
 
 [![Airspeed indicator](https://robertbraeutigam.github.io/cessna172/instruments/asi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/asi_montage.png)
 
+[![Vertical speed indicator](https://robertbraeutigam.github.io/cessna172/instruments/vsi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/vsi_montage.png)
+
 [![Attitude indicator](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)
 
 [![Altimeter](https://robertbraeutigam.github.io/cessna172/instruments/alt_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/alt_montage.png)
@@ -14,7 +16,7 @@ The analogue ("steam") instruments. They all follow one standard
 (`instrument.inc.scad`): a 3 1/8" case behind a round hole in the panel,
 a colour printed face, and a needle turned by a 28BYJ-48 geared stepper.
 So far: the RPM indicator (tachometer), the airspeed indicator (ASI),
-the attitude indicator (AI) and the altimeter (ALT); the last two have
+the vertical speed indicator (VSI), the attitude indicator (AI) and the altimeter (ALT); the last two have
 the standard's case front but mechanisms of their own (see
 [Attitude indicator](#attitude-indicator) and [Altimeter](#altimeter)). The instruments go into
 the holes of the stage 2 left sheet (see
@@ -26,6 +28,7 @@ top bar is in the way.
 | `instrument.inc.scad` | the standard: case, dial, needle, gears, back plate, board carrier; the face's colour layers and print page |
 | `rpm.scad` | the RPM indicator: its face and the parts above; the face print |
 | `asi.scad` | the airspeed indicator: its face and the parts above; the face print |
+| `vsi.scad` | the vertical speed indicator: its face and the parts above; the face print |
 | `ai.scad` | the attitude indicator: the standard's case front, a roll frame with the horizon bowl and the pitch motor on it, a slip ring, the roll motor; the roll dial's print |
 | `alt.scad` | the altimeter: the standard's case front, three needles on concentric shafts with a motor each, the Kollsman window's disc, knob and pot; the face and Kollsman ring print |
 
@@ -92,9 +95,11 @@ the case screws.
 
 ## The faces
 
-`make` writes `target/rpm_face.pdf` and `target/asi_face.pdf` (also on the
+`make` writes `target/rpm_face.pdf`, `target/asi_face.pdf` and
+`target/vsi_face.pdf` (also on the
 project page: [RPM](https://robertbraeutigam.github.io/cessna172/instruments/rpm_face.pdf),
-[ASI](https://robertbraeutigam.github.io/cessna172/instruments/asi_face.pdf)),
+[ASI](https://robertbraeutigam.github.io/cessna172/instruments/asi_face.pdf),
+[VSI](https://robertbraeutigam.github.io/cessna172/instruments/vsi_face.pdf)),
 each two faces and a cut template for the glass on an A4 page (landscape), in
 colour, 1:1, with OpenSCAD's scale bar along the edges. It is made the
 same way as the [compass card](../compass/README.md#the-card), but in
@@ -130,6 +135,18 @@ MPH ring uses the same curve. The 172N's markings (KIAS): the white flap
 arc 41 to 85, on the inside of the others, green 47 to 128, yellow 128 to
 160 and the red line at 160 (`white_arc`, `green_arc`, `yellow_arc`, `red_line`).
 AIRSPEED and KNOTS are over and under the hub.
+
+The VSI face, like the 172N's: 0 at 9 o'clock, UP clockwise over the
+top and DOWN counterclockwise under it, to 2000 ft/min each way, so the
+two 20s stand either side of 3 o'clock. The scale is wider up to 1000
+(a tick every 100) and narrower above it (a tick every 250), with the
+numbers 0, 5, 10, 15, 20 (hundreds of ft/min); `vsi_cal` in `vsi.scad`
+gives the needle's angle from 0 (500 at 50 degrees, 1000 at 96, 1500 at
+136, 2000 at 170). UP and DOWN with their arrows are inside the scale on
+the left, VERTICAL SPEED and 100 FEET PER MINUTE right of the hub. It is
+white on black only (`Make print face black,white`). It sits in the
+six-pack's bottom right hole, under the altimeter, in front of the force
+feedback yoke's housing: it is the standard, 47 mm deep.
 
 ## Hardware
 
@@ -252,6 +269,26 @@ the output uses the Connector's *Interpolation* (on the output's
 Above 170 kts it stays at 1863 (the needle must not run round past 0).
 Direction, pin order and fine tuning as for the RPM indicator. If
 `asi_cal` changes, change this table too.
+
+### Vertical speed indicator
+
+The dataref is `sim/cockpit2/gauges/indicators/vvi_fpm_pilot`. Set the
+steps per revolution to 2038. The needle's home is 0 ft/min (9 o'clock):
+climbs are positive steps (clockwise), descents negative. The scale is
+not linear, so the output uses the *Interpolation* with the points of
+`vsi_cal`, both ways (steps = degrees x 2038 / 360):
+
+| ft/min | -2000 | -1500 | -1000 | -500 | 0 | 500 | 1000 | 1500 | 2000 |
+|--------|---|---|---|---|---|---|---|---|---|
+| degrees | -170 | -136 | -96 | -50 | 0 | 50 | 96 | 136 | 170 |
+| steps | -962 | -770 | -543 | -283 | 0 | 283 | 543 | 770 | 962 |
+
+Beyond 2000 either way it stays at the end (the needle must not run
+round past the 20s into the other side). After homing press the needle
+on pointing at 0. If the Connector does not move the stepper to negative
+positions, add 962 to every step value and press the needle on at
+DOWN 20 instead. Direction, pin order and fine tuning as for the RPM
+indicator. If `vsi_cal` changes, change this table too.
 
 ## Attitude indicator
 

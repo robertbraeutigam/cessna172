@@ -193,6 +193,11 @@ its own top-level directory; new components should follow the same layout.
     KNOTS 40-200 on a non-linear scale (`asi_cal`, also the MobiFlight
     interpolation table in the README), MPH inside, the 172N's white,
     green and yellow arcs and red line at 160.
+  - `vsi.scad` — the vertical speed indicator (the six-pack's bottom
+    right, under the altimeter): 0 at 9 o'clock, UP over the top and DOWN
+    under it to 2000 ft/min, the 20s either side of 3 o'clock, on a
+    non-linear scale (`vsi_cal`, also the MobiFlight interpolation table
+    in the README); white on black. The standard, 47 mm deep.
   - `ai.scad` — the attitude indicator (the six-pack's top middle,
     modelled on the RC Allen 172 instrument: its dial and bowl markings,
     the yellow airplane on a pedestal, the index): the standard's case front, then its

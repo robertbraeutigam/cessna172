@@ -17,7 +17,7 @@ wiring and the assembly:
 | [`frame/`](frame/README.md) | the aluminium frame and panel sheet that everything mounts on |
 | [`yoke/`](yoke/README.md) | the hollow control wheel: PTT, trim rocker, a Nano inside |
 | [`compass/`](compass/README.md) | the magnetic compass over the panel: a printed card on a 28BYJ-48 stepper, on its own Nano |
-| [`instruments/`](instruments/README.md) | the analogue instruments: the RPM, airspeed and attitude indicators, 28BYJ-48 steppers behind colour printed faces |
+| [`instruments/`](instruments/README.md) | the analogue instruments: the RPM, airspeed, vertical speed and attitude indicators and the altimeter, 28BYJ-48 steppers behind colour printed faces |
 | [`radio/`](radio/README.md) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, each on its own Nano |
 
 Every component has its own Arduino Nano running
@@ -223,7 +223,7 @@ Arduino Nano of its own.
 The analogue instruments, built on one standard: a 3 1/8" case behind the
 panel, a colour printed face, a needle turned by a 28BYJ-48 stepper through
 two printed gears, the motor and boards behind the case. So far the RPM
-indicator, the airspeed indicator, the attitude indicator (a thin
+indicator, the airspeed indicator, the vertical speed indicator, the attitude indicator (a thin
 roll dial and a horizon bowl, the pitch motor riding on the roll frame
 through a slip ring; deeper than the others) and the altimeter (two
 needles on concentric shafts, a motor each, and Kollsman windows in
@@ -232,6 +232,8 @@ inHg and hPa set by its knob through a 10 turn pot; deeper too).
 [![RPM indicator](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)
 
 [![Airspeed indicator](https://robertbraeutigam.github.io/cessna172/instruments/asi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/asi_montage.png)
+
+[![Vertical speed indicator](https://robertbraeutigam.github.io/cessna172/instruments/vsi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/vsi_montage.png)
 
 [![Attitude indicator](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/ai_montage.png)
 
