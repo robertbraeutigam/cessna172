@@ -62,7 +62,7 @@ its own top-level directory; new components should follow the same layout.
     show only, glued into hex holes in the face). An Arduino Nano reads
     all switches (`switch_pins`, D2..), the ignition (`ignition_pins`,
     A0..A4) and the primer (A7), each on a pin of its own; its USB cable
-    is tied onto `tie_block` behind the plug. The Nano (in rails: posts, side walls, corner lips; tilted in) and the
+    is tied onto `tie_block` behind the plug. The Nano (slid into shallow rails from the left, held by the tied cable) and the
     tie block are on a separate printed carrier (`nano_carrier`) screwed
     onto two bosses on the panel back, so it can be wired and tested
     before the panel exists. The switch list
