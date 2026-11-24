@@ -172,7 +172,6 @@ it.
 | 6 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet (`mount_count`) |
 | 1 | Arduino Nano (ATmega328P, 5 V, mini USB) | all inputs, see [Nano](#nano) |
 | 2 | M3 x 8 self tapping screw | carrier (`switches_carrier.stl`) onto the panel |
-| 4 | M2 x 6 self tapping screw, pan head | the Nano onto the carrier |
 | 4 | printed rocker cap (`switches_cap.stl`, 2 in red, 2 in white) + CA glue or epoxy | the Cessna look, see [Rocker caps](#rocker-caps) |
 | 6 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
 | 1 | mini USB cable, long enough to the powered USB hub | the Nano to the PC |
@@ -293,15 +292,19 @@ that cable.
 ignition and the primer: the Nano about 50 mA, the ignition's five hall
 sensors a few mA each, under 100 mA in all.
 
-The Nano is screwed through its four mounting holes onto posts on a
-small printed carrier plate (`switches_carrier.stl`, printed plate down),
-component side out, its USB jack to the right, with four M2 x 6 self
-tapping screws. It goes on and off straight from above, so it can be
-taken off with its wires soldered on (rails would jam on the solder
-joints, which sit right at the board's long edges). The posts are cut back
-around the pads of the pins at the rows' ends; those pins (D12, D13, TX1,
-VIN) stay free, as the screw heads are next to them (an `assert` checks
-it). Right of the plug is the block for the
+The Nano lies in rails on a small printed carrier plate
+(`switches_carrier.stl`, printed plate down), component side out, its USB
+jack to the right, without screws (M2 screws do not go through its
+1.8 mm holes, and there is no room to drill them out). It stands on four
+posts under its mounting holes (cut back around the end pins' pads),
+between two side walls that stand over its top but do not touch it, and
+its left end goes under a lip over each corner of a stop wall. The lips
+only cover the bare strip beyond the pin rows: rails along the long edges
+would sit on the solder joints there. To put it in, tilt the left end in
+under the lips, then lower the USB end: nothing slides over the solder,
+so it goes in and out with its wires soldered on. Once the plug is in and
+its cable tied onto the block, the board cannot lift or slide out; to
+take it off, cut the tie. Right of the plug is the block for the
 cable tie: the tie goes through the slot at the plate and around the
 cable in the groove on top, so pulling the cable does not lever the jack.
 The carrier is a part of its own, so the ignition and the primer can be
@@ -316,7 +319,7 @@ strain relief, the tie block sits behind it) and the cable (`cable_d`,
 4 mm); the tie (`tie`, 3.6 x 1.3 mm). The Nano's values are the
 instruments' (`nano_*`); its mounting holes (`nano_holes`, `nano_hole_d`)
 are the official Nano's (1.8 mm, 40.64 x 15.24 mm, in line with the pin
-rows): check them on yours, clones differ.
+rows), the posts stand under them: check them on yours, clones differ.
 
 #### Inputs
 
@@ -370,7 +373,8 @@ into one before the pin, with solder and heat shrink.
 
 ### Assembly
 
-1. Screw the Nano onto the carrier. The ignition cable (or
+1. Tilt the Nano into its rails on the carrier (left end under the lips
+   first); the plug and the tied cable hold it. The ignition cable (or
    its connector) and the primer can be soldered on now; the carrier does
    not need the panel yet, and it can be tested on the bench over USB.
 2. Solder the wires to the switches; the rockers are hard to get out
