@@ -30,7 +30,7 @@
 // selector positions through a CD74HC4067 mux (more inputs than the Nano
 // has pins), the MAX7219 and the 6 annunciator LEDs on pins of their own
 // (nano_pins, mux_inputs; the README has the tables). Its USB cable to the
-// powered USB hub runs out of the open back, tied onto tie_block.
+// powered USB hub runs out of the open back, tied onto `tie_post`.
 //
 // Coordinates: radio.inc.scad (installed: x right, y backwards, z up).
 // Printed: the body front side down, the face front side up, the display
@@ -58,7 +58,7 @@
 // digits go into the mask's openings and the LEDs into its cells). Face
 // onto the plate, rotary switch through both from the back, nut on the
 // front. Driver board and logic board into their rails, wiring, the USB
-// cable plugged in and tied onto the tie block. Knob on last, pointing at OFF with the switch turned fully left.
+// cable plugged in and tied onto the tie post. Knob on last, pointing at OFF with the switch turned fully left.
 // Into the sheet under the KX155s, the 4 screws through the end flanges.
 
 $fn = 64;
@@ -245,7 +245,7 @@ assert(btn_stem >= 0.5, "Front board too close to the plate for the tactile swit
 assert(drv_x >= x_in0 + 0.5 && drv_x + 2 * rail.x + drv_board.x <= x_in1 - 0.5, "Driver board does not fit");
 assert(board_size.x <= 220 && board_size.y <= 100, "Front board does not fit a 10 x 22 cm perfboard");
 assert(len(mod_xs) * dig_n - (dig_n * code_mods - code_shown) <= 8, "More than 8 digits for one MAX7219");
-assert(tie_x + tie_block.x <= x_in1 - 0.5, "Logic board, driver board and tie block do not fit side by side");
+assert(tie_x + tie_post.x <= x_in1 - 0.5, "Logic board, driver board and tie post do not fit side by side");
 assert(lg_board_z + board_t + max(lg_high, nano_high) <= xp_h - wall - 0.5, "Parts on the logic board hit the top");
 assert(nano_board.x + mux_board.x + 6 <= lg_board.x && nano_board.y + 4 <= lg_board.y, "Nano and mux do not fit the logic board");
 assert(len(mux_inputs) == 16 && len(nano_pins) <= 18, "16 mux inputs, at most 18 Nano pins");
@@ -322,9 +322,9 @@ module unit_body() {
             translate([r[0], drv_y0 - 2, wall - 0.01])
                cube([r[1] + rail.x, 2, rail.y + 0.01]);
          }
-         // Cable tie block, at the back
-         translate([tie_x, unit_d - tie_block.y, wall - 0.01])
-            cube(tie_block + [0, 0, 0.01]);
+         // Cable tie post, at the back
+         translate([tie_x + tie_post.x / 2, unit_d - tie_post.y / 2, wall])
+            tie_post();
       }
       // Window, a bit bigger than the face's
       ext_y(-1, plate_t + 1.01)
@@ -339,9 +339,6 @@ module unit_body() {
       for (r = [[drv_x, drv_pitch], [lg_x, lg_pitch]], i = [0, 1])
          translate([r[0] + i * r[1] - drv_over - fit, drv_y0, wall + rail.y - 1.6 - board_t - fit])
             cube([rail.x + 2 * (drv_over + fit), unit_d, board_t + 2 * fit]);
-      // Tunnel for the cable tie
-      translate([tie_x - 1, unit_d - tie_block.y / 2 - 2, wall + 1.5])
-         cube([tie_block.x + 2, 4, 2]);
       gitrev_cut(unit_w - flange_w / 2, xp_h / 2);
    }
 }

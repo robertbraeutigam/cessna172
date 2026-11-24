@@ -108,7 +108,7 @@ its own top-level directory; new components should follow the same layout.
 - `radio/` — the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs
   and the KT 76C transponder (top to bottom) stacked without gaps in one
   cut-out of the sheet; every unit has its own Arduino Nano running
-  MobiFlight (USB out of its open back, tied onto `tie_block`).
+  MobiFlight (USB out of its open back, tied onto `tie_post`).
   `radio.inc.scad` places the Nano in its floor rails (`unit_nano_rails`,
   the shared ones of `lib/`) and has the mux board's size.
   - `radio.inc.scad` — the stack's standard, included by every unit:
@@ -294,6 +294,16 @@ its own top-level directory; new components should follow the same layout.
     `uln_part` on a plate at z=0), the A3144 (`sensor`) and the magnet
     (`magnet`), all MEASURE. The holders (motor posts and plates,
     carriers, sensor pockets) stay in the components.
+  - `usb.inc.scad` — the USB cable: plug (`usb_plug`), cable (`cable_d`)
+    and tie (`tie`, `tie_slot`) sizes (MEASURE), and what it is tied onto:
+    `tie_block` (in line behind the plug, the cable in a groove on its
+    top at `tie_cable_h`, the tie through a slot at its foot; switch
+    panel, yoke), `tie_post` (beside the cable with a tunnel along it;
+    the radio units), a view of the tie (`tie_part`). Both in their own
+    coordinates (foot on z=0, middle over the origin, cable along x).
+    The throttle and the compass take `usb_plug` for their back wall
+    windows; the instruments do not include it (their `usb_plug` is a
+    length).
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the

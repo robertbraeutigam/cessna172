@@ -48,6 +48,8 @@ drv_high = 14;               // the parts on it, above the board
 // open back to the powered USB hub (README.md, Connections); along y, the
 // USB jack at the back end
 include <nano.inc.scad>
+// The USB cable, tied onto a tie post beside the Nano (lib/usb.inc.scad)
+include <usb.inc.scad>
 nano_high = 14;              // MEASURE: on a logic board: female header, board, USB jack
 
 // --- CD74HC4067 breakout, MEASURE ---
@@ -70,7 +72,6 @@ pilot_d = 2.8;               // M3 self tapping
 boss_d = 5.6;
 rail = [3, 5, 1];            // driver board rails: width, height, groove depth
 drv_over = 1;                // driver board edge in the groove
-tie_block = [10, 6, 6];      // x, y, z
 rib_w = 0.8;                 // knob ribs
 rib_depth = 0.6;
 bore_play = 0.15;            // D bore

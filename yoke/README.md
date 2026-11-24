@@ -118,7 +118,8 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
 hole, body length, nut size; the head's 2.5 mm top must be within their
 panel range), the rocker (`trim_*`: cut-out and body depth), the USB
 plug and cable (`usb_plug`, `cable_d`; the plug sits between the Nano and
-the tie block); the Nano's values are in
+the tie block: they and the block are in
+[`lib/usb.inc.scad`](../lib/usb.inc.scad)); the Nano's values are in
 [`lib/nano.inc.scad`](../lib/nano.inc.scad) (`nano_*`).
 
 ## Assembly

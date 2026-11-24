@@ -53,7 +53,8 @@ The Nano lies in its rails (the shared ones of
 heat pot and the throttle pot, component side up, its USB jack against the
 back wall. It slides in from the front; a dab of hot glue at its front end keeps it
 there when the plug goes in. The USB cable plugs in from behind, through
-a window in the back wall (`usb_plug` is the plug's body, measure it), so
+a window in the back wall (`usb_plug` is the plug's body, measure it; it
+is in [`lib/usb.inc.scad`](../lib/usb.inc.scad), shared), so
 the box has no cable of its own: pulling the cable only unplugs it. The
 pots are wired straight to the Nano's pins:
 

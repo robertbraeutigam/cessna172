@@ -65,7 +65,7 @@ maker's logo.
   the logic board, with a
   CD74HC4067 mux for 15 of the inputs and two chained 74HC595 shift
   registers for the lamps; its USB cable leaves through the open back,
-  tied onto the tie block, to the powered USB hub. The Connector shows it
+  tied onto the tie post, to the powered USB hub. The Connector shows it
   as a board of its own.
 - **Size**: 224 x 33 mm (the real 1.30"), 75 mm deep; mounted like the
   KX155s with two M3 screws in each end flange, on top of the stack.
@@ -105,7 +105,7 @@ clamps them). Button caps and the MUTE cap in from the back. Solder the
 switches, LEDs (standing on the board) and resistors onto the front
 boards and screw them onto their bosses. Toggles, pot and rotary switch
 through plate and face from the back, nuts on the front. Logic board into
-its rails, wiring, USB cable tied onto the tie block. Turn the rotary
+its rails, wiring, USB cable tied onto the tie post. Turn the rotary
 switch fully left (EMG) and press the MIC knob on pointing at EMG, then
 the INTERCOM knob. Into the sheet over the KX155s.
 
@@ -195,7 +195,8 @@ switches that radio off (a pot with a switch).
   lower than its body), its USB jack at the open back; it slides in from
   there up to a stop (a dab of hot glue keeps it; the rails are the shared
   ones of [`lib/nano.inc.scad`](../lib/nano.inc.scad)). Its USB cable to the
-  powered USB hub is tied onto the tie block beside it. Every line has a
+  powered USB hub is tied onto the tie post beside it (`tie_post`, in
+  [`lib/usb.inc.scad`](../lib/usb.inc.scad)). Every line has a
   pin of its own (see [Wiring](#wiring-1)).
 - **Knobs**: printed, ribbed like the real ones, pressed on: the outer and
   volume knobs onto round shafts (crush ribs in the bore), the inner knob
@@ -318,7 +319,7 @@ right the function selector knob: OFF, SBY, TST, ON, ALT.
   the plate back. The MAX7219 is the matrix kit board without the matrix
   in rails on the floor, like the KX155's; left of it the logic board with
   the unit's Nano and a mux (see [Wiring](#wiring-2)). Its USB cable
-  leaves through the open back, tied onto the tie block.
+  leaves through the open back, tied onto the tie post.
 - **Size**: 224 x 41.9 mm (the real height, 1.65"), 75 mm deep; mounted
   like the KX155s with two M3 screws in each end flange.
 
@@ -355,7 +356,7 @@ switches onto the front board, the LEDs sitting on the board, and screw
 it onto the bosses: the digits go into the mask's openings and the LEDs
 into its cells. Face onto the plate, rotary switch through both from the
 back, nut on the front. Driver board and logic board into their rails,
-wiring, the USB cable plugged in and tied onto the tie block. Turn the switch fully left (OFF) and press the knob
+wiring, the USB cable plugged in and tied onto the tie post. Turn the switch fully left (OFF) and press the knob
 on pointing at OFF. Into the sheet under the KX155s.
 
 ### Wiring

@@ -72,6 +72,7 @@
 $fn = 48;
 
 include <nano.inc.scad>
+include <usb.inc.scad>
 
 bed = [255, 255];
 explode = 40;
@@ -179,15 +180,9 @@ trim_bezel = [15, 21, 2];    // view only
 // from the front (the panel side), the jack up, the digital row is on the
 // right (-x).
 input_pins = ["D2", "D3", "D4", "D5"];   // left PTT, trim nose down, trim nose up, right PTT
-usb_plug = [12, 9, 28];      // MEASURE: the USB cable's plug: width, height, length with its strain relief
 
-// --- USB cable: tied down between the plug and the tube ---
-cable_d = 4;                 // MEASURE: the USB cable
-tie = [3.6, 1.3];            // cable tie, width x thickness
-tie_clear = 0.6;
-tie_block = [10, 13, 6];     // along the cable (z) x across (x) x height off the wall
-tie_groove = 1.5;
-tie_gap = 2;                 // the plug's end to the block
+// --- USB cable (lib/usb.inc.scad): tied onto a tie block between the plug
+// and the tube, the cable along z on it ---
 
 gitrev_depth = 0.6;
 
@@ -245,7 +240,6 @@ bosses_right = concat(
 bosses = concat(bosses_right, [for (b = bosses_right) [-b.x, b.y]]);
 screw_tip = screw_seat - screw_len;
 
-tie_slot = tie + [tie_clear, tie_clear];
 // The tie block as high as the tube's hole lets it, the plug under it, the
 // Nano under that
 tie_z = z_shaft - cable_hole / 2 - 2 - tie_block.x / 2;
@@ -324,7 +318,7 @@ assert(min([for (b = bosses, c = collar_bolts) norm(b - c)]) >= boss_d / 2 + m4_
 assert(cable_hole < tube_od - 1, "The tube does not stand on the hub front");
 assert(nano_box[0] >= -(hub_hw(hub_z0) - wall - edge_r) && nano_box[1] >= bar_bottom(nano_box[2]) + wall + edge_r,
        "Nano does not fit the hub and the bar");
-assert(abs(y_in_aft + tie_block.z - tie_groove + cable_d / 2 - usb_y) <= 2, "The tie block holds the cable off the jack");
+assert(abs(y_in_aft + tie_cable_h - usb_y) <= 2, "The tie block holds the cable off the jack");
 assert(usb_y + usb_plug.y / 2 <= y_in_fwd - 2, "USB plug runs into the front wall");
 for (b = bosses)
    assert(norm([max(0, nano_box[0] - b.x, b.x - nano_box[2]), max(0, nano_box[1] - b.y, b.y - tie_z - tie_block.x / 2)])
@@ -393,19 +387,13 @@ module y_cyl(p, d, y0, y1) {
          cylinder(d = d, h = y1 - y0);
 }
 
-// Cable tie block on the back wall, the cable along z on it
-module tie_block() {
-   translate([0, y_in_aft - 0.01, tie_z])
+// The cable tie block's own coordinates (lib/usb.inc.scad) on the back
+// wall, the cable along z on it
+module on_tie_block() {
+   translate([0, y_in_aft, tie_z])
       rotate([-90, 0, 0])
          rotate([0, 0, 90])
-            difference() {
-               translate([-tie_block.x / 2, -tie_block.y / 2, 0])
-                  cube(tie_block + [0, 0, 0.01]);
-               translate([-tie_slot.x / 2, -tie_block.y / 2 - 1, -1])
-                  cube([tie_slot.x, tie_block.y + 2, tie_slot.y + 1]);
-               translate([-tie_block.x / 2 - 1, 0, tie_block.z + cable_d / 2 - tie_groove])
-                  rotate([0, 90, 0]) cylinder(d = cable_d, h = tie_block.x + 2);
-            }
+            children();
 }
 
 // The Nano's pocket on the back wall: its rails without lips (lib/
@@ -428,7 +416,7 @@ module inner_parts() {
       }
    }
    nano_pocket();
-   tie_block();
+   on_tie_block() tie_block();
 }
 
 module holes() {
@@ -766,19 +754,14 @@ module wire(path, d = 1.4) {
 // The USB cable out of the tube, tied onto the block, plugged into the
 // Nano; a wire from each button down the arm and along the bar to its pin
 module wiring_part() {
-   yt = y_in_aft + tie_block.z - tie_groove + cable_d / 2;   // cable axis on the block
+   yt = y_in_aft + tie_cable_h;                             // cable axis on the block
    z_plug = nano_z1 + usb_plug.z;                           // the plug's end
    color(c_cable) {
       wire([[0, y_fwd + 40, z_shaft], [0, y_in_fwd - 2, z_shaft], [0, yt + 8, z_shaft - 2],
             [0, yt + 1, tie_z + tie_block.x / 2 + 3], [0, yt, tie_z - tie_block.x / 2], [0, usb_y, z_plug]], cable_d);
       translate([-usb_plug.x / 2, usb_y - usb_plug.y / 2, nano_z1]) cube([usb_plug.x, usb_plug.y, usb_plug.z]);
    }
-   color("#f0f0f0")
-      translate([0, yt, tie_z])
-         difference() {
-            cylinder(d = cable_d + 2 * tie.y, h = tie.x, center = true);
-            cylinder(d = cable_d, h = tie.x + 1, center = true);
-         }
+   on_tie_block() tie_part();
    // D2 left PTT, D3/D4 trim, D5 right PTT, down the inner side of the arm
    function arm_path(s, off) = [for (q = [arm_pt(10, off), arm_pt(-10, off), arm_pt(-50, off - 2),
                                          arm_pt(-85, off), arm_pt(-108, off + 8), [150, 30 + off / 3]])
