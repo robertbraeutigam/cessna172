@@ -72,7 +72,14 @@ so the version is embossed into the parts.
 
 Values and modules shared by several files of a component go into a
 `*.inc.scad` file that the others `include`. It is not rendered itself, and
-changing it renders the whole component again.
+changing it renders the whole component again. Bought parts that every
+component uses are in [`lib/`](lib/): [`lib/nano.inc.scad`](lib/nano.inc.scad)
+has the Arduino Nano (its sizes, pinout and a view model) and the shallow
+rails it slides into, whose ledges and lips stay clear of the pin rows'
+solder. The Makefile copies `lib/*.inc.scad` into every component's
+`target/` with its own includes, and changing one renders every
+component again. The rails are snug (0.15 mm a side): measure your Nano's
+width (`nano_board`) before printing, clones differ.
 
 The printer is an Anycubic Kobra 3 V2 (255 x 255 mm bed). Large parts must
 fit on it, and the files check it. Values that depend on bought parts

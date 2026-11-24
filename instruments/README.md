@@ -80,7 +80,8 @@ top bar is in the way.
 - **Electronics**: the ULN2003 driver board and an Arduino Nano running
   MobiFlight are on a printed carrier, screwed onto the back plate (on
   posts behind the motor), so it can be wired on
-  the bench. The Nano slides into rails with its USB jack down. In the
+  the bench. The Nano slides into its rails (the shared ones of
+  [`lib/nano.inc.scad`](../lib/nano.inc.scad)) with its USB jack down. In the
   six-pack the next instrument is right under it: use a mini USB cable
   with an angled plug (bent back). It is a board of its own, like every
   component's (see [Connections](../README.md#connections)). The stepper takes about

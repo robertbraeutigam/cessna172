@@ -187,9 +187,9 @@ drv_pitch = drv_board.x - 2 * drv_over + 2 * fit + rail.x;
 drv_span = drv_n * drv_pitch + rail.x;
 drv_x0 = x_in0 + 1;                          // driver boards at the left wall
 unit_d = drv_y0 + drv_board.y + 4;
-nano_x = drv_x0 + drv_span + 1 + nano_rail_w + 0.1 + nano_board.x / 2;   // right of them
+nano_x = drv_x0 + drv_span + 1 + nano_rail_hw;   // right of them
 nano_y1 = unit_d - 0.3;                      // its USB jack at the open back
-tie_x = nano_x + nano_board.x / 2 + 0.1 + nano_rail_w + 3;
+tie_x = nano_x + nano_rail_hw + 3;
 
 bed = [255, 255];
 
@@ -233,11 +233,11 @@ assert(drv_y0 >= plate_t + max(pot_body[1], enc_body.y + enc_pins, flip_board_y 
 assert(wall + rail.y + drv_high <= board_z0 || drv_y0 >= board_y + board_t + 3, "Driver boards hit the digit boards");
 assert(dig_mods * dig_n >= groups[0][1] && dig_mods * dig_n >= groups[2][1], "Not enough digits for a frequency");
 assert(tie_x + tie_block.x <= x_in1 - 0.5, "Nano and tie block do not fit right of the driver boards");
-assert(nano_y1 - nano_board.y - nano_rail_w >= flip_board_y + board_t + 0.5, "Nano runs into the NAV flip switch board");
+assert(nano_y1 - nano_board.y / 2 - nano_rail_end >= flip_board_y + board_t + 0.5, "Nano runs into the NAV flip switch board");
 assert(wall + nano_under + nano_t + 1.5 <= row_z - enc_body.z / 2 - 0.5
-       || nano_y1 - nano_board.y - nano_rail_w >= plate_t + enc_body.y + enc_pins + 0.5, "Nano runs into the NAV encoder");
-assert(nano_x - nano_board.x / 2 - nano_rail_w >= row_x(k_vol, 1) + pot_body[0] / 2 + 0.5
-       || nano_y1 - nano_board.y - nano_rail_w >= plate_t + pot_body[1] + 0.5, "Nano runs into the NAV pot");
+       || nano_y1 - nano_board.y / 2 - nano_rail_end >= plate_t + enc_body.y + enc_pins + 0.5, "Nano runs into the NAV encoder");
+assert(nano_x - nano_rail_hw >= row_x(k_vol, 1) + pot_body[0] / 2 + 0.5
+       || nano_y1 - nano_board.y / 2 - nano_rail_end >= plate_t + pot_body[1] + 0.5, "Nano runs into the NAV pot");
 assert(len(nano_pins) == 19, "A pin per line: 17 digital, 2 analog");
 
 // --- 2D shapes in x/z ---
@@ -308,7 +308,7 @@ module unit_body() {
          translate([drv_x0, drv_y0 - 2, wall - 0.01])
             cube([drv_span, 2, rail.y + 0.01]);
          // The Nano's rails
-         nano_rails(nano_x, nano_y1);
+         unit_nano_rails(nano_x, nano_y1);
          // Cable tie block, at the back right of the Nano
          translate([tie_x, unit_d - tie_block.y, wall - 0.01])
             cube(tie_block + [0, 0, 0.01]);
@@ -506,7 +506,7 @@ module parts_inside(freqs) {
    filters_part();
    boards_part();
    drivers_part();
-   nano_part(nano_x, nano_y1);
+   unit_nano_part(nano_x, nano_y1);
    for (h = [0, 1]) {
       encoder_part(row_x(k_freq, h));
       pot_part(row_x(k_vol, h));

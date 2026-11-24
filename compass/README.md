@@ -57,8 +57,10 @@ frame's right top bar, about where the windshield's middle is (see
 - **Size**: 65 x 65 mm front, 108 mm deep (4 mm more than the C2300, for
   the Nano behind the motor), its bottom 25 mm over the top bar (`rise`).
 
-The motor, board, sensor and magnet sizes (`motor_*`, `uln_*`, `nano_*`,
-`sensor`, `magnet`) and the paper and window sheet thicknesses
+The motor, board, sensor and magnet sizes (`motor_*`, `uln_*`, `sensor`,
+`magnet`; the Nano's `nano_*` and its rails are the shared ones of
+[`lib/nano.inc.scad`](../lib/nano.inc.scad), here without their lips: it
+drops in from above) and the paper and window sheet thicknesses
 (`paper_t`, `glass_t`) are MEASURE values. The `assert`s check that the
 band clears the motor, its ears, wires and posts, the sensor post and the
 side walls; that the pad clears the hub, the band and the ear screws; that

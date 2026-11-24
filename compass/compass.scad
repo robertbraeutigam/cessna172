@@ -53,6 +53,8 @@
 
 $fn = 60;
 
+include <nano.inc.scad>
+
 // Preview: card at this heading, parts apart by explode
 view_heading = 30;
 explode = 30;
@@ -79,10 +81,7 @@ uln_board = [35, 32];        // width, height (it stands)
 uln_hole_in = 2.7;           // its 4 holes from the edges
 uln_parts = 14;              // the parts on its front (socket, chip, header pins)
 uln_pins = 3;                // solder stubs behind it
-nano_board = [18, 45];       // x, y; the USB jack at the back end
-nano_t = 1.6;
-nano_under = 2.5;            // parts and solder stubs under the board
-nano_usb = [8, 4];           // jack: width, height over the board
+// the Nano: lib/nano.inc.scad, along y, its USB jack at the back end
 usb_plug = [12, 9];          // the cable's plug body, through the back wall
 sensor = [4.1, 1.6, 3.1];    // A3144 (TO-92S): width, thickness (flat face up), height
 magnet = [6, 3];             // disc magnet: diameter, height
@@ -146,7 +145,6 @@ spost = 7;                   // sensor post, square
 // --- Boards ---
 br_t = 3;                    // ULN2003 plate
 uln_standoff = 4;
-rail_w = 1.5;
 
 // --- Stand, on the frame's 2020 top bar ---
 rise = 25;                   // the compass's bottom over the bar
@@ -180,6 +178,8 @@ y_face = y_bz - bezel_t;
 motor_y = motor_shaft_dy;                    // the motor body's middle
 nano_y0 = motor_y + motor_cover[1] + 1;      // behind the wire cover
 y_bi = nano_y0 + nano_board.y;               // back wall, inside
+nano_c = [0, nano_y0 + nano_board.y / 2];    // the Nano's middle
+nano_rail_y0 = nano_c.y - nano_rail_end;     // the front of the stop in front of it
 y_back = y_bi + wall;
 depth = y_back - y_face;
 z_nano = z_floor + nano_under;               // Nano underside
@@ -221,7 +221,7 @@ assert(norm([spost / 2, mag_r + spost / 2]) <= band_ri - 0.5, "Sensor post runs 
 assert(mag_r - spost / 2 >= motor_d / 2 - motor_y + 0.5, "Sensor post runs into the motor");
 assert(sensor.z + 0.3 <= spost && sensor.x + 0.3 <= spost - 1, "Sensor does not fit its post");
 assert(z_motor0 >= z_floor + 0.5, "Motor stands on the floor");
-assert(nano_board.x / 2 + rail_w + 0.2 <= motor_ear_dx - post_d / 2 || nano_y0 - 2 >= motor_y + post_d / 2,
+assert(nano_rail_hw + 0.2 <= motor_ear_dx - post_d / 2 || nano_rail_y0 >= motor_y + post_d / 2,
        "Nano rails run into the motor posts");
 assert(z_plate1 <= z_ceil - 1, "ULN2003 board too high");
 assert(y_plate0 - 8 >= card_ro + 1, "ULN2003 plate's gussets run into the card");
@@ -233,10 +233,10 @@ assert(sx - block / 2 >= z_top + 0.5, "Bezel screw blocks run into the card");
 for (s = stand_screws)
    assert(abs(s.x) + csk_d / 2 <= motor_ear_dx - post_d / 2 || abs(s.y - motor_y) >= post_d / 2 + csk_d / 2,
           "Stand screws under the motor posts")
-   assert(s.y + csk_d / 2 <= nano_y0 - 2 || abs(s.x) - csk_d / 2 >= nano_board.x / 2 + rail_w + 0.2,
+   assert(s.y + csk_d / 2 <= nano_rail_y0 || abs(s.x) - csk_d / 2 >= nano_rail_hw + 0.2,
           "Stand screws under the Nano rails")
    assert(norm(s - spost_c) >= spost / 2 + csk_d / 2, "Stand screws under the sensor post");
-assert(stand_dy + stand_screw.y + csk_d / 2 <= nano_y0 - 2, "Stand screws under the Nano");
+assert(stand_dy + stand_screw.y + csk_d / 2 <= nano_rail_y0, "Stand screws under the Nano");
 assert(foot.y <= 20 && foot_bolt_dx - m5_head_d / 2 >= neck.x / 2 + 1, "M5 heads run into the neck");
 assert(abs(stand_screw.x) + 3 <= neck.x / 2 && abs(stand_screw.y) + 3 <= neck.y / 2, "Stand screws off the neck");
 assert(rise - foot.z >= screw_depth + 2, "Stand neck too short for the screws");
@@ -349,20 +349,16 @@ module base() {
          // sensor post
          translate([spost_c.x - spost / 2, spost_c.y - spost / 2, z_floor - 0.01])
             cube([spost, spost, z_spost - z_floor + 0.01]);
-         // Nano rails and the stop in front of it
-         for (s = [-1, 1])
-            translate([s * (nano_board.x / 2 + 0.1 + rail_w / 2) - rail_w / 2, nano_y0 - 2, z_floor - 0.01])
-               cube([rail_w, y_plate0 - nano_y0 + 2, nano_under + nano_t + 0.01]);
-         for (s = [-1, 1])     // the ledges it lies on
-            translate([s * (nano_board.x / 2 - 0.6) - 0.7, nano_y0 - 2, z_floor - 0.01])
-               cube([1.4, y_plate0 - nano_y0 + 2, nano_under + 0.01]);
-         translate([-nano_board.x / 2 - 0.1, nano_y0 - 2, z_floor - 0.01])
-            cube([nano_board.x + 0.2, 2 - 0.1, nano_under + nano_t + 0.01]);
+         // Nano rails (no lips, it drops in from above as before; the plug
+         // through the back wall holds it) up to the ULN2003 plate, and the
+         // stop in front of it
+         translate([nano_c.x, nano_c.y, z_floor])
+            nano_rails(y1 = y_plate0 - nano_c.y, far_stop = true, lips = false);
          // ULN2003 plate: the Nano through a notch under it, gussets in front
          difference() {
             translate([-plate_w / 2, y_plate0, z_floor - 0.01]) cube([plate_w, br_t, z_plate1 - z_floor + 0.01]);
-            translate([-nano_board.x / 2 - rail_w - 0.6, y_plate0 - 1, z_floor - 1])
-               cube([nano_board.x + 2 * rail_w + 1.2, br_t + 2, z_uln0 - 1 - z_floor + 1]);
+            translate([-nano_rail_hw - 0.5, y_plate0 - 1, z_floor - 1])
+               cube([2 * nano_rail_hw + 1, br_t + 2, z_uln0 - 1 - z_floor + 1]);
          }
          for (s = [-1, 1])
             translate([s * (plate_w / 2 - 1), y_plate0 + 0.01, z_floor - 0.01])
@@ -507,12 +503,9 @@ module motor_part() {
    }
 }
 
-module nano_part() {
-   translate([-nano_board.x / 2, nano_y0, z_nano]) {
-      color(c_board) cube([nano_board.x, nano_board.y, nano_t]);
-      color("#202020") translate([nano_board.x / 2 - 3.5, 15, nano_t]) cube([7, 7, 1.2]);
-      color(c_steel) translate([nano_board.x / 2 - nano_usb[0] / 2, nano_board.y - 8, nano_t]) cube([nano_usb[0], 9, nano_usb[1]]);
-   }
+module compass_nano_part() {
+   translate([nano_c.x, nano_c.y, z_floor])
+      nano_part(c_board);
 }
 
 module uln_part() {
@@ -573,7 +566,7 @@ module compass_parts(H, e = 0, with_shell = true) {
    translate([0, 0, -e]) {
       color(c_body) base();
       motor_part();
-      nano_part();
+      compass_nano_part();
       uln_part();
       sensor_part();
    }

@@ -76,9 +76,11 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
   real wheel (the right pad is blank, room for one more button). Their nuts are inside the heads; the wires run down the inner
   side of the arms and along the bar into the hub.
 - **Nano:** an Arduino Nano running MobiFlight stands in a pocket on the
-  back center piece's inside, under the tube's hole, its USB jack up (a
-  ledge under each long edge, a wall beside it and a stop under it; it
-  goes in from the front and a dab of hot glue holds it). Inputs, all to
+  back center piece's inside, under the tube's hole, its USB jack up (the
+  shared rails of [`lib/nano.inc.scad`](../lib/nano.inc.scad) without
+  their lips: a shallow ledge under each long edge, clear of the pin rows'
+  solder, a wall beside it, and a stop under it; it goes in from the front
+  and a dab of hot glue holds it). Inputs, all to
   GND (active low, the Nano's internal pull-ups): D2 left PTT, D3 trim
   nose down, D4 trim nose up, D5 right PTT. The other pins are free (an
   analog one, e.g. A0, could take a map light dimmer pot). So the yoke is
@@ -116,7 +118,8 @@ The wheel is a 2.5 mm shell, hollow from one head to the other:
 hole, body length, nut size; the head's 2.5 mm top must be within their
 panel range), the rocker (`trim_*`: cut-out and body depth), the USB
 plug and cable (`usb_plug`, `cable_d`; the plug sits between the Nano and
-the tie block); the Nano's values are the instruments' (`nano_*`).
+the tie block); the Nano's values are in
+[`lib/nano.inc.scad`](../lib/nano.inc.scad) (`nano_*`).
 
 ## Assembly
 

@@ -163,11 +163,12 @@ bd_r = ring_R + 1.25 * rm + ring_wall;              // the bug disc
 enc_c = [for (a = enc_a) pol(enc_r, a)];
 bsens = pol(bmag[0], bmag[1]);                      // the bug's sensor in the dial (the magnet passes it at bug 0)
 bsens_hole = pol(bsens_out, bmag[1]);
-uln_xz = [[hi_nano_x + nano_board.x / 2 + 0.1 + rail_w + 1.5, hi_car_z[0] + 1],           // A (card), right
-          [hi_nano_x - nano_board.x / 2 - 0.1 - rail_w - 1.5 - uln_r.x, hi_car_z[0] + 1]]; // B (bug), left
+uln_xz = [[hi_nano_x + nano_rail_hw + 1.5, hi_car_z[0] + 1],           // A (card), right
+          [hi_nano_x - nano_rail_hw - 1.5 - uln_r.x, hi_car_z[0] + 1]]; // B (bug), left
 uln_holes_a = [for (b = uln_xz, i = [0, 1], j = [0, 1])
    [b.x + uln_hole_in + i * (uln_r.x - 2 * uln_hole_in), b.y + uln_hole_in + j * (uln_r.y - 2 * uln_hole_in)]];
 nano_z0 = hi_car_z[0] + 2;                          // the Nano's bottom end (on the stop)
+nano_zc = nano_z0 + nano_board.y / 2;               // its middle
 hi_car_x = [uln_xz[1].x - 1, uln_xz[0].x + uln_r.x + 1];
 
 // y, front to back
@@ -301,11 +302,11 @@ for (p = hi_posts) {
    assert(p.x - car_post_d / 2 >= hi_car_x[0] && p.x + car_post_d / 2 <= hi_car_x[1] && p.y - car_post_d / 2 >= hi_car_z[0]
           && p.y + car_post_d / 2 <= hi_car_z[1], "A carrier post off the carrier");
    assert(min([for (h = uln_holes_a) norm(p - h)]) >= csk_d / 2 + 3.5, "A carrier screw runs into a ULN2003 standoff");
-   assert(abs(p.x - hi_nano_x) - csk_d / 2 >= nano_board.x / 2 + rail_w + 1, "A carrier screw under the Nano's rails");
+   assert(abs(p.x - hi_nano_x) - csk_d / 2 >= nano_rail_hw + 1, "A carrier screw under the Nano's rails");
 }
 for (b = uln_xz) assert(b.y >= hi_car_z[0] + 0.5 && b.y + uln_r.y <= hi_car_z[1] - 0.5, "ULN2003 board off the carrier");
 assert(nano_z0 + nano_board.y <= hi_car_z[1] + 1, "Nano off the carrier");
-assert(uln_xz[0].x >= hi_nano_x + nano_board.x / 2 + rail_w + 1 && uln_xz[1].x + uln_r.x <= hi_nano_x - nano_board.x / 2 - rail_w - 1,
+assert(uln_xz[0].x >= hi_nano_x + nano_rail_hw + 1 && uln_xz[1].x + uln_r.x <= hi_nano_x - nano_rail_hw - 1,
        "A ULN2003 board over the Nano's rails");
 // the VSI right of it is a standard instrument (its carrier as deep as this one's front), the turn coordinator's is like this one
 assert(hi_car_x[1] <= inst_pitch.x + car_x0 - 1, "Carrier runs into the right neighbour's carrier");
@@ -507,16 +508,9 @@ module hi_carrier() {
       union() {
          along_y(y_k[0], y1) translate([hi_car_x[0], hi_car_z[0]]) square([hi_car_x[1] - hi_car_x[0], hi_car_z[1] - hi_car_z[0]]);
          for (h = uln_holes_a) along_xz(h, y1 - 0.01, y1 + uln_standoff) circle(d = 6);
-         // Nano rails along z: a ledge under each long edge, a lip over it, a stop at the bottom end
-         nx = [hi_nano_x - nano_board.x / 2 - 0.1, hi_nano_x + nano_board.x / 2 + 0.1];
-         z0 = nano_z0 - 0.1;
-         l = hi_car_z[1] - z0;
-         for (i = [0, 1]) let(xo = nx[i], s = i == 0 ? -1 : 1) {
-            translate([s > 0 ? xo : xo - rail_w, y1 - 0.01, z0]) cube([rail_w, nano_under + nano_t + 0.8 + 0.01, l]);
-            translate([s > 0 ? xo - 1.2 : xo, y1 - 0.01, z0]) cube([1.2, nano_under + 0.01, l]);
-            translate([s > 0 ? xo - 0.8 : xo, y1 + nano_under + nano_t + 0.1, z0]) cube([0.8 + 0.01, 0.7, l]);
-         }
-         translate([nx[0] - rail_w, y1 - 0.01, hi_car_z[0]]) cube([nx[1] - nx[0] + 2 * rail_w, nano_under + nano_t + 0.01, z0 - hi_car_z[0]]);
+         // Nano rails along z (lib/nano.inc.scad), a stop at the bottom end
+         on_nano_plate([hi_nano_x, nano_zc], y1, "up")
+            nano_rails(y1 = hi_car_z[1] - nano_zc, far_stop = true);
       }
       for (h = uln_holes_a) along_xz(h, y1 - 1, y1 + uln_standoff + 1) circle(d = pilot_d);
       for (p = hi_posts) translate([p.x, y1, p.y]) rotate([-90, 0, 0]) csk_hole();
@@ -642,11 +636,7 @@ module hi_boards_part() {
       color("#202020") translate([6, nano_t, 8]) cube([7, 6, 19]);
       color("#f0f0f0") translate([uln_r.x - 9, nano_t, 7]) cube([6, 7, 12]);
    }
-   translate([hi_nano_x - nano_board.x / 2, y_k[1] + nano_under, nano_z0]) {
-      color(c_board) cube([nano_board.x, nano_t, nano_board.y]);
-      color("#202020") translate([nano_board.x / 2 - 3.5, nano_t, 18]) cube([7, 1.2, 7]);
-      color(c_steel) translate([nano_board.x / 2 - nano_usb[0] / 2, nano_t, nano_board.y - 8]) cube([nano_usb[0], nano_usb[1], 9]);
-   }
+   on_nano_plate([hi_nano_x, nano_zc], y_k[1], "up") nano_part(c_board);
 }
 
 // a piece of the sheet round the hole, the screws and the knobs' holes

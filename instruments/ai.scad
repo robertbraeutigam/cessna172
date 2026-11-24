@@ -203,6 +203,7 @@ mflange_r = 12.5;            // the roll motor gear's flange behind its teeth, t
 posts = [[22, 26], [-31, 18], [-31, -12], [0, -34]];   // the carrier's posts on the back plate
 uln_xz = [[2, 7], [-37, 7]]; // the ULN2003 boards' lower left corners (x, z): right (roll), left (pitch)
 nano_xz = [-26.5, -27];      // the Nano's lower left corner, lying along x, its USB jack left
+ai_nano_c = nano_xz + [nano_board.y / 2, nano_board.x / 2];   // its middle
 car_box = [-39, -38, 39, 41];   // carrier plate: x0, z0, x1, z1
 
 // --- Calculated ---
@@ -725,16 +726,9 @@ module ai_carrier() {
       union() {
          along_y(y_cr0, y_cr1) translate([car_box[0], car_box[1]]) square([car_box[2] - car_box[0], car_box[3] - car_box[1]]);
          for (h = ai_uln_holes) translate([h.x, y_cr1 - 0.01, h.y]) rotate([-90, 0, 0]) cylinder(d = 6, h = uln_standoff + 0.01);
-         // Nano rails along x: a ledge under each long edge, a lip over it, a stop at the right end
-         nz = [nano_xz.y - 0.1, nano_xz.y + nano_board.x + 0.1];
-         x0 = nano_xz.x - 1;
-         l = nano_board.y + 2;
-         for (i = [0, 1]) let(zo = nz[i], s = i == 0 ? -1 : 1) {
-            translate([x0, y_cr1 - 0.01, s > 0 ? zo : zo - rail_w]) cube([l, nano_under + nano_t + 0.8 + 0.01, rail_w]);
-            translate([x0, y_cr1 - 0.01, s > 0 ? zo - 1.2 : zo]) cube([l, nano_under + 0.01, 1.2]);
-            translate([x0, y_cr1 + nano_under + nano_t + 0.1, s > 0 ? zo - 0.8 : zo]) cube([l, 0.7, 0.8 + 0.01]);
-         }
-         translate([nano_xz.x + nano_board.y + 0.1, y_cr1 - 0.01, nz[0]]) cube([1.5, nano_under + nano_t + 0.01, nz[1] - nz[0]]);
+         // Nano rails along x (lib/nano.inc.scad), a stop at the right end
+         on_nano_plate(ai_nano_c, y_cr1, "left")
+            nano_rails(y1 = nano_board.y / 2 + 1, far_stop = true);
       }
       for (h = ai_uln_holes) translate([h.x, y_cr1 - 1, h.y]) rotate([-90, 0, 0]) cylinder(d = pilot_d, h = uln_standoff + 2);
       for (p = posts) translate([p.x, y_cr1, p.y]) rotate([-90, 0, 0]) csk_hole();
@@ -813,11 +807,7 @@ module ai_boards_part() {
       color("#202020") translate([8, nano_t, 6]) cube([19, 6, 7]);
       color("#f0f0f0") translate([7, nano_t, uln_board.y - 9]) cube([12, 7, 6]);
    }
-   translate([nano_xz.x, y_cr1 + nano_under, nano_xz.y]) {
-      color(c_board) cube([nano_board.y, nano_t, nano_board.x]);
-      color("#202020") translate([20, nano_t, nano_board.x / 2 - 3.5]) cube([7, 1.2, 7]);
-      color(c_steel) translate([-1, nano_t, nano_board.x / 2 - nano_usb[0] / 2]) cube([9, nano_usb[1], nano_usb[0]]);
-   }
+   on_nano_plate(ai_nano_c, y_cr1, "left") nano_part(c_board);
 }
 
 module ai_sensors_part() {

@@ -193,7 +193,8 @@ switches that radio off (a pot with a switch).
 - **Its own board**: an Arduino Nano running MobiFlight lies in rails on
   the floor right of the driver boards (it reaches under the NAV encoder,
   lower than its body), its USB jack at the open back; it slides in from
-  there up to a stop (a dab of hot glue keeps it). Its USB cable to the
+  there up to a stop (a dab of hot glue keeps it; the rails are the shared
+  ones of [`lib/nano.inc.scad`](../lib/nano.inc.scad)). Its USB cable to the
   powered USB hub is tied onto the tie block beside it. Every line has a
   pin of its own (see [Wiring](#wiring-1)).
 - **Knobs**: printed, ribbed like the real ones, pressed on: the outer and

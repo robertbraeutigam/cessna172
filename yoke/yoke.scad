@@ -71,6 +71,8 @@
 
 $fn = 48;
 
+include <nano.inc.scad>
+
 bed = [255, 255];
 explode = 40;
 
@@ -172,21 +174,11 @@ trim_cut = [13, 19];         // panel cut-out, across x along the 45 degree pad
 trim_depth = 20;             // body behind the face
 trim_bezel = [15, 21, 2];    // view only
 
-// --- Arduino Nano, MEASURE (instruments/instrument.inc.scad has the same values) ---
-// Standing on the back wall, its USB jack up, component side forward.
-nano_board = [18, 45];       // across (x) x along z, the jack at the top
-nano_t = 1.6;
-nano_under = 2.5;            // parts and solder stubs under the board
-nano_usb = [8, 4];           // jack: width, height over the board
-nano_row = 15.24;            // between the two pin rows
-nano_pin_pitch = 2.54;
-nano_pins = 15;              // per row
-// The rows, each from the USB end (the Nano's pinout); seen from the
-// front (the panel side), the jack up, the digital row is on the right (-x)
-nano_digital_row = ["D12", "D11", "D10", "D9", "D8", "D7", "D6", "D5", "D4", "D3", "D2", "GND", "RST", "RX0", "TX1"];
-nano_analog_row = ["D13", "3V3", "REF", "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "5V", "RST", "GND", "VIN"];
+// --- Arduino Nano (lib/nano.inc.scad: the board, its pinout and its rails) ---
+// Standing on the back wall, its USB jack up, component side forward; seen
+// from the front (the panel side), the jack up, the digital row is on the
+// right (-x).
 input_pins = ["D2", "D3", "D4", "D5"];   // left PTT, trim nose down, trim nose up, right PTT
-rail_w = 1.5;                // the pocket's side walls
 usb_plug = [12, 9, 28];      // MEASURE: the USB cable's plug: width, height, length with its strain relief
 
 // --- USB cable: tied down between the plug and the tube ---
@@ -262,12 +254,16 @@ nano_z0 = nano_z1 - nano_board.y;
 nano_y = y_in_aft + nano_under;              // the board's back
 nano_y1 = nano_y + nano_t;                   // its component side
 usb_y = nano_y1 + nano_usb.y / 2;            // the jack's middle
-nano_box = [-nano_board.x / 2 - 0.1 - rail_w, nano_z0 - 0.1 - rail_w,
-            nano_board.x / 2 + 0.1 + rail_w, nano_z1];   // the pocket, [x0, z0, x1, z1]
-function nano_pin(name) =
-   let(d = search([name], nano_digital_row)[0], a = search([name], nano_analog_row)[0])
-   [(d != [] ? -1 : 1) * nano_row / 2, nano_z0 + nano_board.y / 2 + (nano_pins - 1) / 2 * nano_pin_pitch
-                                       - (d != [] ? d : a) * nano_pin_pitch];
+nano_zc = nano_z0 + nano_board.y / 2;        // its middle
+nano_box = [-nano_rail_hw, nano_zc - nano_rail_end, nano_rail_hw, nano_z1];   // the pocket, [x0, z0, x1, z1]
+// The Nano's own coordinates (lib/nano.inc.scad) on the back wall
+module on_nano() {
+   translate([0, y_in_aft, nano_zc])
+      multmatrix([[-1, 0, 0, 0], [0, 0, 1, 0], [0, 1, 0, 0], [0, 0, 0, 1]])
+         children();
+}
+// A pin, [x, z] on the back wall
+function yoke_nano_pin(name) = let(p = nano_pin(name)) [-p.x, nano_zc + p.y];
 
 collar_bore = tube_od + tube_clear;
 collar_od = tube_od + 2 * collar_wall;
@@ -412,19 +408,12 @@ module tie_block() {
             }
 }
 
-// The Nano's pocket on the back wall: a ledge under each long edge, a side
-// wall beside it and a stop under the bottom end; it goes in from the
-// front, hot glue holds it
+// The Nano's pocket on the back wall: its rails without lips (lib/
+// nano.inc.scad: shallow ledges, side walls) and a stop under the bottom
+// end; it goes in from the front, hot glue holds it
 module nano_pocket() {
-   for (s = [-1, 1]) {
-      xo = s * (nano_board.x / 2 + 0.1);
-      translate([s > 0 ? xo : xo - rail_w, y_in_aft - 0.01, nano_z0 - 0.1 - rail_w])
-         cube([rail_w, nano_under + nano_t + 0.01, nano_board.y + 0.1 + rail_w]);
-      translate([s > 0 ? xo - 1.2 : xo, y_in_aft - 0.01, nano_z0 - 0.1])
-         cube([1.2, nano_under + 0.01, nano_board.y + 0.1]);
-   }
-   translate([nano_box[0], y_in_aft - 0.01, nano_box[1]])
-      cube([nano_box[2] - nano_box[0], nano_under + nano_t + 0.01, rail_w]);
+   on_nano()
+      nano_rails(far_stop = true, lips = false);
 }
 
 // Solid additions inside the shell
@@ -761,13 +750,9 @@ module controls_part(sides = [-1, 1]) {
 }
 
 // The Nano: component side forward, its jack up
-module nano_part() {
-   color(c_pcb) translate([-nano_board.x / 2, nano_y, nano_z0]) cube([nano_board.x, nano_t, nano_board.y]);
-   color(c_body) translate([0, nano_y1 + 0.6, nano_z0 + 18]) rotate([0, 45, 0]) cube([7, 1.2, 7], center = true);
-   color(c_steel) translate([-nano_usb.x / 2, nano_y1, nano_z1 - 8]) cube([nano_usb.x, nano_usb.y, 9]);
-   color("#d9b24a")
-      for (n = concat(nano_digital_row, nano_analog_row)) let(p = nano_pin(n))
-         y_cyl(p, 0.8, nano_y1, nano_y1 + 1.5);
+module yoke_nano_part() {
+   on_nano()
+      nano_part(c_pcb);
 }
 
 module wire(path, d = 1.4) {
@@ -802,7 +787,7 @@ module wiring_part() {
    for (k = [0 : len(runs) - 1]) {
       r = runs[k];
       s = r[0];
-      p = nano_pin(input_pins[r[1]]);
+      p = yoke_nano_pin(input_pins[r[1]]);
       dy = -6 + k * 1.6;
       color(r[2])
          wire(concat([for (q = arm_path(s, -6)) [q.x, dy, q.y]],
@@ -810,7 +795,7 @@ module wiring_part() {
                       [p.x - 6, dy, p.y], [p.x, nano_y1 + 1.5, p.y]]));
    }
    // the GND wire, daisy chained over the left buttons
-   gnd = nano_pin("GND");
+   gnd = yoke_nano_pin("GND");
    color("#222222")
       wire(concat([for (q = arm_path(-1, -9)) [q.x, -3, q.y]],
                   [[-130, -3, bar_mid(130) - 2], [-48, -3, bar_mid(60) - 2],
@@ -860,7 +845,7 @@ module assembled_view() {
 // The back pieces with everything in them, seen from the front
 module inside_view() {
    aft_parts();
-   nano_part();
+   yoke_nano_part();
    wiring_part();
    controls_part();
 }
@@ -875,7 +860,7 @@ module exploded_view(e = explode) {
    }
    translate([0, 2 * e, 0]) color(c_shell) center_fwd();
    color(c_shell2) center_aft();
-   nano_part();
+   yoke_nano_part();
    translate([0, 3 * e, 0]) {
       color(c_collar) collar();
       translate([0, e, 0]) tube_part();
