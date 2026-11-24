@@ -295,16 +295,16 @@ sensors a few mA each, under 100 mA in all.
 The Nano lies in rails on a small printed carrier plate
 (`switches_carrier.stl`, printed plate down), component side out, its USB
 jack to the right, without screws (M2 screws do not go through its
-1.8 mm holes, and there is no room to drill them out). It stands on four
-posts under its mounting holes (cut back around the end pins' pads),
-between two side walls that stand over its top but do not touch it, and
-its left end goes under a lip over each corner of a stop wall. The lips
-only cover the bare strip beyond the pin rows: rails along the long edges
-would sit on the solder joints there. To put it in, tilt the left end in
-under the lips, then lower the USB end: nothing slides over the solder,
-so it goes in and out with its wires soldered on. Once the plug is in and
-its cable tied onto the block, the board cannot lift or slide out; to
-take it off, cut the tie. Right of the plug is the block for the
+1.8 mm holes, and there is no room to drill them out). A wall along each
+long edge holds the board's edge in a shallow groove: the ledge under it
+and the lip over it reach only 0.35 mm over the board (`rail_reach`),
+short of the pin rows' pads, so the solder joints pass them. The rails are
+open at the left end: the Nano slides in from there, USB end first, wires
+and all, up to the two stops beside the plug. It cannot come out of the
+rails up or sideways, and once the cable is plugged in and tied onto its
+block it cannot slide back out either; to take it off, cut the tie. The
+groove is tight on purpose (`rail_clear`, 0.15 mm a side): measure your
+Nano's width (`nano_board`), clones differ. Right of the plug is the block for the
 cable tie: the tie goes through the slot at the plate and around the
 cable in the groove on top, so pulling the cable does not lever the jack.
 The carrier is a part of its own, so the ignition and the primer can be
@@ -319,7 +319,7 @@ strain relief, the tie block sits behind it) and the cable (`cable_d`,
 4 mm); the tie (`tie`, 3.6 x 1.3 mm). The Nano's values are the
 instruments' (`nano_*`); its mounting holes (`nano_holes`, `nano_hole_d`)
 are the official Nano's (1.8 mm, 40.64 x 15.24 mm, in line with the pin
-rows), the posts stand under them: check them on yours, clones differ.
+rows), only drawn in the views.
 
 #### Inputs
 
@@ -373,8 +373,9 @@ into one before the pin, with solder and heat shrink.
 
 ### Assembly
 
-1. Tilt the Nano into its rails on the carrier (left end under the lips
-   first); the plug and the tied cable hold it. The ignition cable (or
+1. Slide the Nano into its rails on the carrier from the left end, USB
+   end first, up to the stops; plug the cable in and tie it onto its
+   block, which keeps the Nano in. The ignition cable (or
    its connector) and the primer can be soldered on now; the carrier does
    not need the panel yet, and it can be tested on the bench over USB.
 2. Solder the wires to the switches; the rockers are hard to get out

@@ -39,10 +39,10 @@
 // - An Arduino Nano running MobiFlight reads all of it (the switches, the
 //   ignition and the primer): it lies in rails on a separate carrier
 //   plate (`nano_carrier`), with a block for a cable tie next to its USB
-//   jack. It stands on posts under its mounting holes, between two side
-//   walls; its left end goes under two corner lips of a stop wall, then
-//   its USB end is lowered (tilted in, wires and all: nothing slides past
-//   the solder joints). The plug and the tied cable hold that end down.
+//   jack. It slides in from the left end, USB end first, wires and all,
+//   up to two stops beside the plug: the rails hold its long edges only
+//   in a shallow groove, outside the pin rows' solder. Once the cable is
+//   plugged in and tied, it cannot slide back out.
 //   One USB cable runs to the powered USB hub (README.md,
 //   Connections); it plugs into the Nano and the tie holds it on the
 //   block, so pulling the cable does not lever the jack. The carrier can
@@ -71,7 +71,7 @@
 // - glue for the printed dummy breakers and the rocker caps (CA or epoxy)
 // - wire: one GND wire daisy chained over all switches, one wire per switch
 //
-// Assembly: tilt the Nano into its rails on the carrier (the ignition and
+// Assembly: slide the Nano into its rails on the carrier (the ignition and
 // the primer can be soldered on now too). Then solder the wires to the
 // switches (the rockers are hard to get out again), glue the caps onto
 // the rocker paddles, put the toggles in
@@ -173,23 +173,22 @@ ignition_inputs = 5;         // OFF, R, L, BOTH, START
 ignition_pins = ["A0", "A1", "A2", "A3", "A4"];
 primer_pin = "A7";           // analog only
 // Its 4 mounting holes (the official Nano: in line with the pin rows, one
-// pitch beyond their ends, 40.64 x 15.24 mm): the board is bare around
-// them, it stands on posts there
+// pitch beyond their ends, 40.64 x 15.24 mm; M2 does not go through
+// them), only drawn in the views
 nano_holes = [for (sx = [-1, 1], sy = [-1, 1]) [sx * (nano_pins + 1) / 2 * nano_pin_pitch, sy * nano_row / 2]];
 nano_hole_d = 1.8;
 nano_pad_d = 1.8;            // pin pads (and their solder) on both sides of the board
-nano_post_d = 3.6;           // posts under the holes, nano_under high
-nano_pad_clear = 0.3;        // the posts are cut back around the end pins' pads
-// Its rails: side walls along the long edges, a stop wall at the left end
-// with a lip over each corner (beyond the pin rows, where the board is bare)
-rail_w = 1.5;                // walls
-rail_clear = 0.2;            // the board's long edges to the side walls
-rail_over = 1.5;             // the walls stand this much over the board's top
-nano_end_clear = 0.5;        // the board's left end to the stop wall, room to tilt it in
-lip_len = 2.5;               // from the stop wall, along x
-lip_w = 4;                   // from the side walls, across
-lip_t = 0.8;
-lip_gap = 0.4;               // the board's top to the lips
+// Its rails: a wall along each long edge with a shallow groove for the
+// board's edge (a ledge under it, a lip over it), open at the left end,
+// a stop beside the plug at the USB end. The ledges and lips only reach
+// rail_reach over the board, short of the pin rows' pads and solder.
+rail_w = 1.5;                // walls, beyond the groove
+rail_clear = 0.15;           // the board's long edges to the groove bottoms
+rail_reach = 0.35;           // ledges and lips over the board's edges
+rail_gap = 0.15;             // the board's top to the lips
+rail_lip_t = 0.8;
+rail_stop = 1.5;             // the stops at the USB end, along x
+rail_end_clear = 0.2;        // the board's USB end to the stops
 usb_plug = [12, 9, 28];      // MEASURE: the USB cable's plug: width, height, length with its strain relief
 nano_x = 45;                 // board center; left half, the ignition is left of the panel
 nano_clear = 0.3;
@@ -368,11 +367,13 @@ mount_count = len(mount_holes);
 // Nano carrier. Its own coordinates: the Nano's middle at x=y=0, the
 // plate's panel side at z=0, +z away from the panel (as printed). On the
 // panel it is as high as the rim allows; carrier_z is its panel side.
-nano_stop_x = -nano_board.x / 2 - nano_end_clear - rail_w;   // the stop wall's outer face, at the left end
-nano_wall_y = nano_board.y / 2 + rail_clear;                  // the side walls' inner faces, |y|
-nano_rail_h = nano_under + nano_t + rail_over;                // the walls, over the plate
+nano_wall_y = nano_board.y / 2 + rail_clear;                  // the groove bottoms, |y|
+nano_tip_y = nano_board.y / 2 - rail_reach;                   // the ledges' and lips' edges, |y|
+nano_rail_h = nano_under + nano_t + rail_gap + rail_lip_t;    // the walls, over the plate
+nano_stop_x = nano_board.x / 2 + rail_end_clear;              // the stops' inner faces
+nano_stop_y = usb_plug.x / 2 + 0.5;                           // the stops' inner ends, |y|, clear of the plug
 tie_lx = nano_board.x / 2 + usb_plug.z + tie_gap + tie_block.x / 2;   // tie block center
-carrier_x0 = nano_stop_x - carrier_end;
+carrier_x0 = -nano_board.x / 2 - carrier_end;
 carrier_size = [tie_lx + tie_block.x / 2 + carrier_end - carrier_x0, 2 * (nano_wall_y + rail_w + carrier_rim)];
 carrier_holes = [[carrier_x0 + carrier_end / 2, 0], [carrier_x0 + carrier_size.x - carrier_end / 2, 0]];
 nano_y = panel_y1 - rim_w - nano_clear - carrier_size.y / 2;
@@ -393,7 +394,6 @@ tie_x = nano_x + tie_lx;
 tie_y = nano_y;
 tie_z = carrier_z - carrier_t;   // foot of the block
 tie_slot = tie + [tie_clear, tie_clear];
-nano_end_pad_x = (nano_pins - 1) / 2 * nano_pin_pitch + nano_pad_d / 2;   // the end pins' pads reach out to here, |x|
 
 // Distance from a point to a centered box
 function box_dist(p, c, size) = norm([max(0, abs(p.x - c.x) - size.x / 2), max(0, abs(p.y - c.y) - size.y / 2)]);
@@ -448,12 +448,10 @@ assert(carrier_size.y >= carrier_boss_d && carrier_size.y >= tie_block.y, "Carri
 assert(carrier_boss_d >= carrier_pilot + 3, "Carrier boss wall too thin");
 assert(carrier_screw_len - carrier_t >= 4 && carrier_screw_len - carrier_t <= carrier_pilot_len - 0.5,
        "Carrier screws too short for the bosses or too long for the pilot holes");
-assert(nano_pin_pitch - nano_pad_d / 2 - nano_pad_clear >= 1.2, "Nano posts too thin next to the end pins' pads");
-assert(max([for (h = nano_holes) abs(h.x)]) + nano_post_d / 2 <= nano_board.x / 2, "Nano posts off the board's ends, check nano_holes");
-assert(lip_len - nano_end_clear >= 1.5, "The stop wall's lips hold too little of the Nano");
-assert(nano_stop_x + rail_w + lip_len <= -nano_end_pad_x - 0.5, "The stop wall's lips run onto the end pins' solder");
-assert(lip_w <= nano_wall_y - nano_usb.x / 2 && lip_w >= 2.5, "The stop wall's lips too narrow, or reaching into the board's middle");
-assert(rail_over >= lip_gap + lip_t, "The rails too low for the lips");
+assert(nano_tip_y >= nano_row / 2 + nano_pad_d / 2 + 0.1, "The Nano's rails reach onto the pin rows' solder, make rail_reach smaller");
+assert(rail_reach - rail_clear >= 0.15, "The Nano can slip out of its rails sideways, make rail_clear smaller");
+assert(nano_wall_y - nano_stop_y >= 1.5, "The Nano's stops too narrow beside the plug");
+assert(tie_lx - tie_block.x / 2 >= nano_stop_x + rail_stop, "Tie block runs into the Nano's stops");
 assert(tie_lx - tie_block.x / 2 >= nano_board.x / 2 + nano_usb.y, "Tie block runs into the Nano");
 assert(tie_block.y >= cable_d + 2 * tie_slot.y + 2, "Cable tie block too narrow for the cable");
 assert(tie_block.z - tie_groove - tie_slot.y >= 2, "Cable tie block too thin above the slot");
@@ -834,32 +832,29 @@ module tie_block() {
 }
 
 // Nano carrier in its own coordinates (see carrier_size), as printed:
-// plate on the bed, the Nano's rails (a post under each of its mounting
-// holes, cut back around the end pins' pads; side walls; a stop wall at
-// the left end with a lip over each corner) and the tie block on top. The
-// Nano's left end is tilted in under the lips, then its USB end lowered,
-// wires and all: nothing runs over the solder joints.
+// plate on the bed, the Nano's rails (a wall along each long edge, a
+// shallow groove in it for the board's edge, open at the left end, a stop
+// beside the plug at the USB end) and the tie block on top. The Nano
+// slides in from the left, USB end first, wires and all: the ledges and
+// lips stay outside the pin rows' solder.
 module nano_carrier() {
    difference() {
       union() {
          translate([carrier_x0 + carrier_size.x / 2, 0, 0])
             linear_extrude(carrier_t)
                rrect(carrier_size, carrier_r);
-         for (h = nano_holes)
-            translate([h.x, h.y, carrier_t - 0.01])
-               difference() {
-                  cylinder(d = nano_post_d, h = nano_under + 0.01);
-                  translate([-sign(h.x) * nano_pin_pitch, 0, -1])
-                     cylinder(d = nano_pad_d + 2 * nano_pad_clear, h = nano_under + 2);
-               }
-         for (s = [-1, 1])
-            translate([nano_stop_x, s > 0 ? nano_wall_y : -nano_wall_y - rail_w, carrier_t - 0.01])
-               cube([nano_board.x / 2 - nano_stop_x, rail_w, nano_rail_h + 0.01]);
-         translate([nano_stop_x, -nano_wall_y - rail_w, carrier_t - 0.01])
-            cube([rail_w, 2 * (nano_wall_y + rail_w), nano_rail_h + 0.01]);
-         for (s = [-1, 1])
-            translate([nano_stop_x + rail_w - 0.01, s > 0 ? nano_wall_y - lip_w : -nano_wall_y - 0.01, carrier_t + nano_under + nano_t + lip_gap])
-               cube([lip_len + 0.01, lip_w + 0.01, lip_t]);
+         for (s = [-1, 1]) mirror([0, s > 0 ? 0 : 1, 0]) {
+            // wall, ledge under the board's edge, lip over it
+            translate([-nano_board.x / 2, nano_wall_y, carrier_t - 0.01])
+               cube([nano_stop_x + rail_stop + nano_board.x / 2, rail_w, nano_rail_h + 0.01]);
+            translate([-nano_board.x / 2, nano_tip_y, carrier_t - 0.01])
+               cube([nano_stop_x + rail_stop + nano_board.x / 2, nano_wall_y - nano_tip_y + 0.01, nano_under + 0.01]);
+            translate([-nano_board.x / 2, nano_tip_y, carrier_t + nano_under + nano_t + rail_gap])
+               cube([nano_stop_x + rail_stop + nano_board.x / 2, nano_wall_y - nano_tip_y + 0.01, rail_lip_t]);
+            // stop at the USB end, beside the plug
+            translate([nano_stop_x, nano_stop_y, carrier_t - 0.01])
+               cube([rail_stop, nano_wall_y - nano_stop_y + 0.01, nano_rail_h + 0.01]);
+         }
          translate([tie_lx, 0, carrier_t])
             tie_block();
       }
