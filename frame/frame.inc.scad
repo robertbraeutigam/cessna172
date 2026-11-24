@@ -291,6 +291,12 @@ alt_depth = 98.2;
 hi_depth = 61.6;
 hi_deep_z = -24;
 hi_low_depth = 18.5;
+// The turn coordinator (instruments/tc.scad) is built like it: two motors
+// side by side and its boards behind them (tc_depth echo) above tc_deep_z,
+// tc_low_depth deep under it (the case and the back plate)
+tc_depth = 64.8;
+tc_deep_z = -24;
+tc_low_depth = 21.7;
 
 // --- Layout, x ---
 x_sw0 = sheet_edge;                          // switch panel, left face edge
@@ -549,6 +555,10 @@ let(i = search(["HI"], inst_names)[0], b = circ(inst_c[i], inst_body_d))
    assert(!overlaps([b[0], b[2]], yoke_x) || (inst_c[i].y + hi_deep_z >= ffb_h || hi_depth <= ffb_front_y - 3)
                                            && (b[1] >= ffb_h || hi_low_depth <= ffb_front_y - 3),
           "HI (stage 2) runs into the force feedback yoke's housing");
+let(i = search(["TC"], inst_names)[0], b = circ(inst_c[i], inst_body_d))
+   assert(!overlaps([b[0], b[2]], yoke_x) || (inst_c[i].y + tc_deep_z >= ffb_h || tc_depth <= ffb_front_y - 3)
+                                           && (b[1] >= ffb_h || tc_low_depth <= ffb_front_y - 3),
+          "TC (stage 2) runs into the force feedback yoke's housing");
 for (i = [0 : 7])
    assert(inst_c[i].y - inst_cut_d / 2 >= sheet_h, str(inst_names[i], " hidden behind the stage 1 left sheet (the monitor shows it)"));
 assert(sheet_h <= sheet_h_max, "Left panel too high for the monitor");
