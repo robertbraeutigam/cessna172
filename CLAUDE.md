@@ -53,7 +53,7 @@ its own top-level directory; new components should follow the same layout.
     and the LIGHTS group) and a black double rocker for
     AVIONICS (BUS 1, BUS 2), with the labels on its face; printed caps
     glued onto the rocker paddles (`rk_cap_*`, red and white, a V top
-    with ribs, the ALT cap's interlock pad over BAT) give them the Carling
+    with ribs) give them the Carling
     look, the paddle values (`rk_paddle_*`, `rk_top_r`, `rk_pivot_d`)
     are guesses; the layout
     copies the X-Plane 172N panel (rockers raised half way to the breakers,

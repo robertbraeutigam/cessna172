@@ -207,14 +207,8 @@ one switch cut in two. MASTER gets red caps, AVIONICS white ones on the
 black switch, whose black lip then matches the real frame. The caps
 cover the paddles' lamps.
 
-The MASTER's ALT (left) cap has the real switch's interlock: a pad on its
-top end reaches over the BAT cap. Pressing ALT on pushes BAT on with it,
-pressing BAT off lifts ALT off; ALT can be off with BAT on. That takes a
-little more force, since it flips two switches at once.
-
 The caps' underside is the paddle's concave top, so they seat in one
-place; glue them on with CA glue or epoxy, both paddles of a switch in
-the same position (the interlock pad then just clears the BAT cap). They
+place; glue them on with CA glue or epoxy. They
 are printed on their side, the profile on the bed (`switches_caps_*.stl`,
 no supports).
 
@@ -382,6 +376,6 @@ into one before the pin, with solder and heat shrink.
 
 ### Notes
 
-- ALT and BAT are two separate contacts; like in the real split master,
-  the caps' interlock pad couples them (ALT pushes BAT on, BAT pushes ALT
-  off).
+- ALT and BAT are two independent switches. The real split master has an
+  interlock (ALT pushes BAT on, BAT pushes ALT off); X-Plane does not need
+  it.
