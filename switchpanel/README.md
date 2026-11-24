@@ -134,7 +134,7 @@ primer with DataRefTool while working the primer in the virtual cockpit.
 172N (which differs from a real one, e.g. in the split AVIONICS). The
 red split MASTER (ALT, BAT) on the left, toggle switches in the middle
 (PITOT HEAT, then the LIGHTS group: BCN, LAND, TAXI, NAV, STRB) and the
-black split AVIONICS (BUS 1, BUS 2) on the right; the panel ends there.
+black split AVIONICS (BUS 1, BUS 2, with white caps) on the right; the panel ends there.
 Up is ON, like in the airplane: every toggle has OFF under it, the rockers
 ON beside their top half, towards the toggles. The rockers have their name
 above and the two switch names below them, and sit higher than the
@@ -157,12 +157,13 @@ it.
 | Qty | Part | Use |
 |-----|------|-----|
 | 1 | double rocker switch, 6 pin, red | MASTER: ALT, BAT |
-| 1 | double rocker switch, 6 pin, black (there is no white one) | AVIONICS: BUS 1, BUS 2 |
+| 1 | double rocker switch, 6 pin, black (there is no white one; printed white caps) | AVIONICS: BUS 1, BUS 2 |
 | 6 | toggle switch, M12 neck, 18 mm lever | PITOT HEAT, BCN, LAND, TAXI, NAV, STRB |
 | 6 | M3 x 10 pan head screw + nut | panel onto the cockpit sheet (`mount_count`) |
 | 1 | Arduino Nano (ATmega328P, 5 V, mini USB) | all inputs, see [Nano](#nano) |
 | 2 | M3 x 8 self tapping screw | carrier (`switches_carrier.stl`) onto the panel |
 | 4 | M2 x 6 self tapping screw, pan head | the Nano onto the carrier |
+| 4 | printed rocker cap (`switches_caps_master.stl` in red, `switches_caps_avionics.stl` in white) + CA glue or epoxy | the Cessna look, see [Rocker caps](#rocker-caps) |
 | 6 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
 | 1 | mini USB cable, long enough to the powered USB hub | the Nano to the PC |
 | 1 | cable tie, up to 3.6 mm wide | the USB cable onto its block (`tie`) |
@@ -192,6 +193,38 @@ pin positions.
 The lamps are neon (250 V) and will not light on 5 V; leave the lamp pin
 unconnected. Each rocker has 3 pins: find the two that close when the
 rocker is ON with a multimeter.
+
+### Rocker caps
+
+The bought switches have lit, curved paddles with O and I on them and
+come only in red and black. Printed caps glued onto the paddles give
+them the look of the real Carling split switches: each cap's top is a V
+(two faces rising 12° from a crease across the middle, `rk_cap_v`), so
+the pressed half lies almost flat and the other sticks out with a sharp
+end, with ribs across it. The two caps of a switch reach over the bar
+between the paddles to a 0.6 mm split (`rk_cap_gap`), so it looks like
+one switch cut in two. MASTER gets red caps, AVIONICS white ones on the
+black switch, whose black lip then matches the real frame. The caps
+cover the paddles' lamps.
+
+The MASTER's ALT (left) cap has the real switch's interlock: a pad on its
+top end reaches over the BAT cap. Pressing ALT on pushes BAT on with it,
+pressing BAT off lifts ALT off; ALT can be off with BAT on. That takes a
+little more force, since it flips two switches at once.
+
+The caps' underside is the paddle's concave top, so they seat in one
+place; glue them on with CA glue or epoxy, both paddles of a switch in
+the same position (the interlock pad then just clears the BAT cap). They
+are printed on their side, the profile on the bed (`switches_caps_*.stl`,
+no supports).
+
+**MEASURE when the switches arrive (`rk_*` paddle values, now guesses
+from photos):** the paddle's width and length (`rk_paddle_clear` to the
+lip's window), how far its top stands in front of the lip at its middle
+(`rk_paddle_h`), the curve of its top (`rk_top_r`), the throw
+(`rk_rocker_tilt`) and the pivot depth (`rk_pivot_d`; from the height of
+the two ends when ON and OFF). An assert checks that a cap clears the lip
+when its end is pressed in.
 
 ### Toggle switches
 
@@ -337,7 +370,7 @@ into one before the pin, with solder and heat shrink.
    its connector) and the primer can be soldered on now; the carrier does
    not need the panel yet, and it can be tested on the bench over USB.
 2. Solder the wires to the switches; the rockers are hard to get out
-   again once snapped in.
+   again once snapped in. Glue the caps onto the rocker paddles.
 3. Lay the face on the front, put the toggles in from the back and
    tighten their nuts.
 4. Snap the rockers in from the front.
@@ -349,6 +382,6 @@ into one before the pin, with solder and heat shrink.
 
 ### Notes
 
-- ALT and BAT are two independent switches. The real split master has an
-  interlock (ALT pushes BAT on, BAT pushes ALT off); X-Plane does not need
-  it.
+- ALT and BAT are two separate contacts; like in the real split master,
+  the caps' interlock pad couples them (ALT pushes BAT on, BAT pushes ALT
+  off).

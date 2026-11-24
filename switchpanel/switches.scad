@@ -12,7 +12,12 @@
 // - MASTER and AVIONICS are double rocker switches (two independent
 //   rockers in one housing, 6 pins). They snap into a cutout from the
 //   front: ramps on their top and bottom end catch behind the panel, which
-//   is thinned to rk_grip there by a pocket in the back.
+//   is thinned to rk_grip there by a pocket in the back. Printed caps
+//   glued onto their paddles give them the look of the Cessna's Carling
+//   switches: a V top with ribs across it, the two caps of a switch split
+//   only by a thin line, red for MASTER and white for AVIONICS (the bought
+//   switch is black). The MASTER's ALT cap has the real switch's interlock
+//   pad over the BAT cap. The rk_* paddle values are guesses (MEASURE).
 // - The middle switches are toggle switches with an M12 neck and an 18 mm
 //   lever, about the size of the real ones. They go in from the back and
 //   a nut on the front clamps them. Their body sits in a shallow pocket in
@@ -46,8 +51,9 @@
 //
 // Wiring: every switch closes one contact: one side to a common GND wire,
 // the other to its own Nano pin (active low, like any switch to GND; the
-// Nano's internal pull-ups). ALT and BAT are independent, there is no
-// mechanical interlock between them. The switches in label order are on
+// Nano's internal pull-ups). ALT and BAT are separate contacts, only the
+// caps' interlock pad couples them (ALT on pushes BAT on, BAT off pushes
+// ALT off). The switches in label order are on
 // D2.. (switch_pins), the ignition positions on A0..A4 (ignition_pins),
 // the primer pot on A7 (details in the README).
 //
@@ -63,12 +69,13 @@
 //   powered USB hub, a cable tie
 // - 2 x M3 x 8 self tapping screws: carrier onto the panel
 // - 4 x M2 x 6 self tapping screws: Nano onto the carrier
-// - glue for the printed dummy breakers
+// - glue for the printed dummy breakers and the rocker caps (CA or epoxy)
 // - wire: one GND wire daisy chained over all switches, one wire per switch
 //
 // Assembly: screw the Nano onto the carrier (the ignition and
 // the primer can be soldered on now too). Then solder the wires to the
-// switches (the rockers are hard to get out again), put the toggles in
+// switches (the rockers are hard to get out again), glue the caps onto
+// the rocker paddles (both in the same position), put the toggles in
 // from the back and tighten their nuts, snap the rockers in from the
 // front, screw the carrier onto its bosses, solder the other wire ends to
 // the Nano, plug the USB cable in and tie it onto its block, glue the
@@ -98,8 +105,38 @@ rk_pin_pitch = 7;            // 3 tabs per rocker, in a column (guess)
 rk_grip = 1.5;               // MEASURE: panel thickness the ramps snap behind
 rk_clip_room = [0, 1.5];     // room for the ramps behind the panel, per side
 rk_frame = 1.5;              // lip around and between the two rockers
-rk_rocker_h = 3;             // rocker center height in front of the lip
-rk_rocker_tilt = 10;
+rk_rocker_tilt = 10;         // MEASURE: paddle throw, each way from the middle
+// The paddles (MEASURE, guesses from photos): rk_paddle_clear inside the
+// lip's windows on every side, a concave top (an arc of rk_top_r along
+// the paddle) rk_paddle_h in front of the lip in its middle when the
+// paddle is half way, turning about an axis rk_pivot_d behind the front
+// of the panel.
+rk_paddle_clear = 0.3;
+rk_top_r = 60;
+rk_paddle_h = 2.5;
+rk_pivot_d = 6;
+
+// --- Rocker caps: the Cessna (Carling) look, glued onto the paddles ---
+// A cap's underside is the paddle's top, its top a V (two faces rising
+// rk_cap_v from the crease across its middle, so the pressed half lies
+// almost flat and the other sticks out) with ribs across it. The two caps
+// of a switch reach over the bar between the paddles up to rk_cap_gap.
+// Printed on their side, the profile on the bed.
+rk_cap_t = 1.2;              // at the crease
+rk_cap_v = 12;               // each face, degrees from flat
+rk_cap_gap = 0.6;            // between the two caps of a switch
+rk_cap_clear = 0.5;          // cap to the lip at full throw
+rk_rib_pitch = 1.2;
+rk_rib_w = 0.5;
+rk_rib_depth = 0.3;
+rk_rib_land = 1.5;           // smooth strip at the crease and the ends
+// Interlock (MASTER): a pad on the left cap's top end (ALT) reaches over
+// the right cap (BAT): ALT on pushes BAT on, BAT off pushes ALT off.
+rk_lug_len = 4;              // along the paddle
+rk_lug_t = 1.5;
+rk_lug_over = 3;             // over the right cap
+rk_lug_clear = 0.2;          // above the right cap when both are in the same position
+rk_cap_print_space = 4;      // between the caps on the print bed
 
 // --- Toggle switch ---
 toggle = "M12";              // "M12" (standard size, like the real ones) or "MTS-202" (mini, M6)
@@ -181,13 +218,15 @@ carrier_pilot = 2.8;         // M3 self tapping, in the bosses
 // Groups from left to right: group label, type ("rocker2" or "toggle"),
 // switch labels (one list of lines each, top line first), color. A rocker2
 // group is one double rocker, so it has exactly two switches; its label is
-// above it, the switch labels below. A toggle group's label is above its
-// switch labels, between two lines.
+// above it, the switch labels below. It also has the color of its caps
+// ("" for none, the bare paddles) and whether its left cap interlocks the
+// right one. A toggle group's label is above its switch labels, between
+// two lines.
 groups = [
-   ["MASTER", "rocker2", [["ALT"], ["BAT"]], "red"],
+   ["MASTER", "rocker2", [["ALT"], ["BAT"]], "red", "red", true],
    ["", "toggle", [["PITOT", "HEAT"]], "chrome"],
    ["LIGHTS", "toggle", [["BCN"], ["LAND"], ["TAXI"], ["NAV"], ["STRB"]], "chrome"],
-   ["AVIONICS", "rocker2", [["BUS", "1"], ["BUS", "2"]], "black"],
+   ["AVIONICS", "rocker2", [["BUS", "1"], ["BUS", "2"]], "black", "white", false],
 ];
 group_space = 6;             // between a rocker and the toggles; toggle groups are tg_pitch apart
 
@@ -243,12 +282,13 @@ function group_w(g) = groups[g][1] == "rocker2" ? rk_bezel.x : len(groups[g][2])
 function space_before(g) = groups[g - 1][1] == "toggle" && groups[g][1] == "toggle" ? 0 : group_space;
 function group_left(g) = g == 0 ? 0 : group_left(g - 1) + group_w(g - 1) + space_before(g);
 
-// One entry per switch unit: [x, type, labels, color, index of its first switch]
+// One entry per switch unit: [x, type, labels, color, index of its first
+// switch, cap color, interlock]
 units = [for (g = [0 : len(groups) - 1])
             for (u = groups[g][1] == "rocker2" ? [0] : [for (i = [0 : len(groups[g][2]) - 1]) i])
                groups[g][1] == "rocker2"
-                  ? [group_left(g) + rk_bezel.x / 2, "rocker2", groups[g][2], groups[g][3], count_before(g)]
-                  : [group_left(g) + (u + 0.5) * tg_pitch, "toggle", [groups[g][2][u]], groups[g][3], count_before(g) + u]];
+                  ? [group_left(g) + rk_bezel.x / 2, "rocker2", groups[g][2], groups[g][3], count_before(g), groups[g][4], groups[g][5]]
+                  : [group_left(g) + (u + 0.5) * tg_pitch, "toggle", [groups[g][2][u]], groups[g][3], count_before(g) + u, "", false]];
 switch_count = count_before(len(groups));
 
 function is_rocker(u) = u[1] == "rocker2";
@@ -257,6 +297,22 @@ function unit_label_xs(u) = is_rocker(u) ? [u[0] - rk_dx, u[0] + rk_dx] : [u[0]]
 function unit_pocket(u) = is_rocker(u) ? rk_pocket : tg_pocket;
 function unit_front_w(u) = is_rocker(u) ? rk_bezel.x : 2 * tg_front_r;
 tg_xs = [for (u = units) if (!is_rocker(u)) u[0]];
+rocker_units = [for (u = units) if (is_rocker(u)) u];
+
+// Rocker paddles and caps, in a unit's coordinates with the paddle half
+// way (y along the paddle, z out of the panel)
+rk_paddle = rk_window - 2 * [rk_paddle_clear, rk_paddle_clear];
+rk_top_z = rk_bezel_t + rk_paddle_h;               // the paddle top's middle
+rk_pivot_z = -rk_pivot_d;
+function rk_paddle_top(y) = rk_top_z + rk_top_r - sqrt(rk_top_r * rk_top_r - y * y);
+function rk_cap_top(y) = rk_top_z + rk_cap_t + abs(y) * tan(rk_cap_v);
+rk_cap_x0 = rk_cap_gap / 2;                        // a cap's inner edge
+rk_cap_x1 = rk_dx + rk_paddle.x / 2;               // its outer edge, the paddle's
+rk_cap_end_t = rk_cap_top(rk_paddle.y / 2) - rk_paddle_top(rk_paddle.y / 2);
+// A point [y, z] of the paddle turned by a about the pivot
+function rk_turn(p, a) = [p[0] * cos(a) - (p[1] - rk_pivot_z) * sin(a), p[0] * sin(a) + (p[1] - rk_pivot_z) * cos(a) + rk_pivot_z];
+// The pressed end of a cap's underside (the paddle's top), over the lip
+rk_cap_low = rk_turn([rk_paddle.y / 2, rk_paddle_top(rk_paddle.y / 2)], -rk_rocker_tilt)[1];
 function text_w(str, size) = len(str) * size * 0.75;   // estimate, for the checks and the group lines
 
 // Toggles: their labels above (tg_label_y is the lowest line), OFF below,
@@ -408,6 +464,13 @@ assert(len(breakers) <= len(tg_xs), "More breakers than toggles below them");
 assert(min_on_dist >= 1 && min_on_cb_dist >= 1, "A rocker's ON label runs into a toggle or a breaker, increase group_space");
 assert(min_cb_rk_dist >= 1, "A breaker runs into a rocker, increase group_space or lower rk_raise");
 assert(rk_label_bottom - label_line >= panel_y0 + rim_w, "Rocker labels too low");
+assert([for (g = groups) if (g[1] == "rocker2" && len(g) != 6) g] == [], "A rocker2 group needs its cap color and interlock");
+assert(rk_cap_low >= rk_bezel_t + rk_cap_clear, "A rocker cap hits the lip when pressed, check the rk_* paddle values");
+assert(rk_cap_t - rk_rib_depth >= 0.8 && rk_cap_end_t >= 1, "Rocker cap too thin, increase rk_cap_t or rk_cap_v");
+assert(rk_cap_x0 + rk_lug_over <= rk_cap_x1 - 1, "Interlock pad reaches past the right cap");
+assert(rk_lug_len + 2 * rk_rib_land <= rk_paddle.y / 2, "Interlock pad too long");
+assert([for (u = rocker_units) if (u[6] && is_on(u[4]) && !is_on(u[4] + 1)) u] == [],
+       "view_on has an interlocked left rocker (ALT) ON with the right one (BAT) OFF");
 assert(tg_pitch >= 2 * cb_r + 1.5 && tg_pitch >= max([for (i = [0 : len(breakers) - 1]) cb_label_w(i)]) + 1, "Breakers too close to each other, increase tg_pitch");
 assert(cb_pocket_depth < cb_nut_t, "Breaker nut sunk completely into the panel");
 assert(min_cb_mount_dist >= 0.5, "A mount screw runs into a breaker or its label");
@@ -574,6 +637,81 @@ module breakers_plate() {
          breaker(breakers[i][1]);
 }
 
+// --- Rocker caps ---
+
+// A 2D profile in [y, z] extruded along x from x0 to x1
+module rk_x_extrude(x0, x1) {
+   translate([x0, 0, 0])
+      rotate([90, 0, 90])
+         linear_extrude(x1 - x0)
+            children();
+}
+
+// Paddle and cap turned by a about the pivot (ON is -rk_rocker_tilt)
+module rk_turned(a) {
+   translate([0, 0, rk_pivot_z])
+      rotate([a, 0, 0])
+         translate([0, 0, -rk_pivot_z])
+            children();
+}
+
+// The bought paddle, half way, from behind the lip to its concave top
+module rk_paddle_part(n = 24) {
+   l = rk_paddle.y / 2;
+   rk_x_extrude(-rk_paddle.x / 2, rk_paddle.x / 2)
+      polygon(concat([[-l, -1], [l, -1]], [for (i = [0 : n]) let(y = l - 2 * l * i / n) [y, rk_paddle_top(y)]]));
+}
+
+// Cap profile: the paddle's top underneath, the V on top, ribs on the
+// faces up to ribs_to from the crease
+module rk_cap_2d(ribs_to, n = 24) {
+   l = rk_paddle.y / 2;
+   difference() {
+      polygon(concat([for (i = [0 : n]) let(y = -l + 2 * l * i / n) [y, rk_paddle_top(y)]],
+                     [[l, rk_cap_top(l)], [0, rk_cap_top(0)], [-l, rk_cap_top(-l)]]));
+      for (s = [-1, 1], y = [rk_rib_land + rk_rib_w / 2 : rk_rib_pitch : (s > 0 ? ribs_to : l - rk_rib_land) - rk_rib_w / 2])
+         translate([s * y, rk_cap_top(y)])
+            rotate(s * rk_cap_v)
+               square([rk_rib_w, 2 * rk_rib_depth], center = true);
+   }
+}
+
+// Interlock pad on the top end, lift above the cap's top
+module rk_lug_2d(lift) {
+   l = rk_paddle.y / 2;
+   y0 = l - rk_lug_len;
+   polygon([[y0, rk_cap_top(y0) + lift], [l, rk_cap_top(l) + lift],
+            [l, rk_cap_top(l) + lift + rk_lug_t], [y0, rk_cap_top(y0) + lift + rk_lug_t]]);
+}
+
+// A cap in the unit's coordinates, the paddle half way: side -1 left,
+// 1 right; the left one with the interlock pad reaching over the right
+// one if lug
+module rk_cap(side, lug = false) {
+   x0 = side < 0 ? -rk_cap_x1 : rk_cap_x0;
+   x1 = side < 0 ? -rk_cap_x0 : rk_cap_x1;
+   rk_x_extrude(x0, x1)
+      rk_cap_2d(lug ? rk_paddle.y / 2 - rk_lug_len - rk_rib_land : rk_paddle.y / 2 - rk_rib_land);
+   if (lug) {
+      rk_x_extrude(x0, x1)
+         rk_lug_2d(-0.01);
+      rk_x_extrude(x1 - 0.01, rk_cap_x0 + rk_lug_over)
+         rk_lug_2d(rk_lug_clear);
+   }
+}
+
+// The caps of rocker r (rocker_units) as printed: each on its outer side,
+// the left one's pad up
+module rocker_caps_plate(r) {
+   u = rocker_units[r];
+   translate([0, 0, rk_cap_x1])
+      rotate([0, -90, 0])
+         rk_cap(-1, u[6]);
+   translate([rk_cap_print_space, 0, rk_cap_x1])
+      rotate([0, 90, 0])
+         rk_cap(1);
+}
+
 // --- Views (rendered to PNG by "make views") ---
 
 c_cut = "#3d7bd9";           // panel in the section views
@@ -623,8 +761,10 @@ module tabs(points, size, z) {
 
 function rocker_tab_points() = [for (x = [-rk_dx, rk_dx], y = [-1, 0, 1]) [x, y * rk_pin_pitch]];
 
-// Double rocker, front of the panel at z=0. on = [left, right]
-module rocker2_part(c, on, cut = false) {
+// Double rocker, front of the panel at z=0. on = [left, right]; its caps
+// in cap_c ("" none), the left one with the interlock pad if lug, cap_lift
+// in front of the paddles (exploded)
+module rocker2_part(c, on, cap_c = "", lug = false, cut = false, cap_lift = 0) {
    color(c_bezel)
       cut_if(cut)
          difference() {
@@ -636,19 +776,20 @@ module rocker2_part(c, on, cut = false) {
                      square(rk_window, center = true);
          }
    // Up is ON: the top half pressed in, the bottom half sticks out
-   color(rocker_color(c))
-      cut_if(cut)
-         for (i = [0, 1])
-            translate([i == 0 ? -rk_dx : rk_dx, 0, 0])
-               intersection() {
-                  translate([0, 0, -1])
-                     linear_extrude(rk_bezel_t + rk_rocker_h + 4)
-                        rrect(rk_window - [0.6, 0.6], 0.8);
-                  translate([0, 0, rk_bezel_t + rk_rocker_h])
-                     rotate([on[i] ? -rk_rocker_tilt : rk_rocker_tilt, 0, 0])
-                        translate([-20, -20, -40])
-                           cube([40, 40, 40]);
-               }
+   for (i = [0, 1]) {
+      a = on[i] ? -rk_rocker_tilt : rk_rocker_tilt;
+      color(rocker_color(c))
+         cut_if(cut)
+            rk_turned(a)
+               translate([i == 0 ? -rk_dx : rk_dx, 0, 0])
+                  rk_paddle_part();
+      if (cap_c != "")
+         color(rocker_color(cap_c))
+            cut_if(cut)
+               translate([0, 0, cap_lift])
+                  rk_turned(a)
+                     rk_cap(i == 0 ? -1 : 1, lug && i == 0);
+   }
    color(c_body)
       cut_if(cut) {
          translate([0, 0, -rk_body_depth])
@@ -798,7 +939,7 @@ module carrier_part() {
 module unit_part(u, cut = false, nuts = true) {
    translate([u[0], unit_y(u), 0])
       if (is_rocker(u))
-         rocker2_part(u[3], [is_on(u[4]), is_on(u[4] + 1)], cut);
+         rocker2_part(u[3], [is_on(u[4]), is_on(u[4] + 1)], u[5], u[6], cut);
       else {
          toggle_part(is_on(u[4]), cut);
          if (nuts)
@@ -970,7 +1111,7 @@ module exploded_view(e = 30) {
          if (is_rocker(u)) {
             dashed_line(0, e - rk_body_depth);
             translate([0, 0, e])
-               rocker2_part(u[3], [is_on(u[4]), is_on(u[4] + 1)]);
+               rocker2_part(u[3], [is_on(u[4]), is_on(u[4] + 1)], u[5], u[6], cap_lift = 0.5 * e);
          } else {
             dashed_line(-e + tg_thread_len, e);
             translate([0, 0, -e])
@@ -999,6 +1140,13 @@ module exploded_view(e = 30) {
       mount_screws();
 }
 
+// The two rockers with their caps, ALT off and BAT on to show the interlock pad
+module rockers_view() {
+   for (r = [0 : len(rocker_units) - 1]) let(u = rocker_units[r])
+      translate([r * (rk_bezel.x + 8), 0, 0])
+         rocker2_part(u[3], r == 0 ? [false, true] : [true, false], u[5], u[6]);
+}
+
 // The Nano carrier on its own, from the back: the Nano, the cable tied on
 module carrier_view() {
    carrier_part();
@@ -1025,6 +1173,8 @@ rotate([0, 180, 0]) panel(); // Make module panel
 translate([0, 0, -30]) face(); // Make module face
 breakers_plate(); // Make module breakers
 nano_carrier(); // Make module carrier
+rocker_caps_plate(0); // Make module caps_master
+rocker_caps_plate(1); // Make module caps_avionics
 
 //switches_part(); // Ignore module
 
@@ -1035,3 +1185,4 @@ nano_carrier(); // Make module carrier
 //section_view(units[0]); // Make view section_rocker 100,0,70
 //section_view(units[4], 1.5 * tg_pitch); // Make view section_toggle 100,0,70
 //carrier_view(); // Make view carrier 150,0,195
+//rockers_view(); // Make view rockers 55,0,25
