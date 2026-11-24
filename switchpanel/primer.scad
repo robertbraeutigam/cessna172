@@ -14,7 +14,8 @@
 //   up. At the back of the tube the keyway opens into a quarter turn
 //   pocket: fully in, the lug turns into it and the keyway's end holds it
 //   (locked). Pulled out, the lug stops on the back of the panel plate.
-// - A 6 mm rod is screwed into the knob (M3 set screw) and runs back
+// - A 6 mm rod is screwed into the knob (a short M3 screw from the side,
+//   its head sunk in a counterbore) and runs back
 //   through a bracket: its front wall (screwed onto the end of the tube) and
 //   rear wall are the other two bearings.
 // - In the bracket the 75 mm linear pot left over from the carb heat sits
@@ -37,7 +38,8 @@
 // Parts to buy:
 // - 75 mm linear pot (small_pot_*, the carb heat one), 6 mm rod (rod_len)
 // - M3 screws: 4x M3x12 bracket onto the tube, 4x M3x10 pot straps, 1x
-//   M3x6 knob set screw, 4x M3x10 + nuts to mount the panel
+//   M3x4 socket head knob screw (knob_screw), 4x M3x10 + nuts to mount
+//   the panel
 // - 2x throttle/clamp.scad "plain" (clamp_plain.stl) as rod collars
 // - compression spring over the 6 mm rod (pop_spring_*)
 //
@@ -46,7 +48,7 @@
 // tube (hex key through the holes in the rear wall), pot onto its stands
 // with the straps. Push the rod in from the back, through the rear
 // wall, the pop spring, a collar, the carrier (slot over the pot ear), a collar, the front
-// wall and into the knob; tighten the set screw. With the knob pulled
+// wall and into the knob; tighten the knob screw. With the knob pulled
 // out, set the carrier so the ear is stroke / 2 before the pot's middle and
 // tighten the collars against it.
 
@@ -97,7 +99,13 @@ stem_play = 0.2;             // radial, in the tube and the panel
 lug_w = 3;
 lug_h = 2;                   // beyond the stem
 lug_len = 5;
-set_screw_pilot = 2.8;       // M3 set screw into the knob
+knob_screw_pilot = 2.8;      // M3 self tapping, into the knob's head
+// Knob screw, MEASURE: [length under the head, head diameter, head height],
+// an M3x4 socket head. Its head is sunk in a counterbore, its tip presses on
+// the rod; screw length + head height at most knob_d / 2 - rod_d / 2 - 0.5
+// (an M3x5 needs a head under 2.5 mm, e.g. a pan or button head)
+knob_screw = [4, 5.5, 3];
+knob_screw_z = -8;           // from the knob's back (the collar), in the round part
 
 // --- Tube and bracket ---
 wall = 4;                    // bracket walls
@@ -128,6 +136,7 @@ bore = stem_d + 2 * stem_play;
 key_r = stem_r + lug_h + 0.3;
 function arc_deg(len, r) = len / r * 180 / PI;
 lug_arc = arc_deg(lug_w + 0.4, key_r);
+knob_screw_floor = rod_d / 2 + knob_screw[0] - 0.5;   // counterbore floor, from the axis
 tube_len = stroke + lug_len + 0.5;
 stem_len = panel_t + stroke + lug_len;
 
@@ -178,6 +187,11 @@ assert(norm([tube_screw, tube_screw]) - pilot_d / 2 >= key_r + 1.2,
        "Bracket screws run into the lock pocket");
 assert(tube_half - tube_screw - pilot_d / 2 >= 1.5, "Bracket screws too close to the tube edge");
 assert(knob_collar_d / 2 >= bore / 2 + 1.5, "Knob does not stop on the face");
+assert(knob_screw_floor + 0.5 + knob_screw[2] <= knob_d / 2 - 0.5, "Knob screw head sticks out of the knob");
+assert(knob_screw_floor - rod_hole / 2 >= 2.5, "Knob screw holds in too little plastic");
+assert(knob_screw_z + (knob_screw[1] + 0.6) / 2 <= -(knob_d - knob_collar_d) / 2 - 0.5
+       && knob_screw_z - (knob_screw[1] + 0.6) / 2 >= -knob_len + 2.5, "Knob screw counterbore off the round part of the head");
+assert(knob_screw_z - knob_screw_pilot / 2 >= -knob_len + 2 + 0.5, "Knob screw misses the rod end");
 assert(ear_top + 0.5 <= -rod_loose / 2 - 1.5, "Carrier too thin over the pot ear");
 assert(collar_sweep + 0.5 <= br_h / 2 - rib_t, "Rod collars hit the bracket ribs");
 assert(carrier_x[0] >= strap_top + 1, "Carrier runs into the pot straps");
@@ -293,10 +307,15 @@ module knob() {
       // Rod, up to 2 mm before the front
       translate([0, 0, -knob_len + 2])
          cylinder(d = rod_hole, h = knob_len + stem_len);
-      // Set screw, from the side of the head
-      translate([0, 0, -knob_len / 2])
-         rotate([0, 90, 0])
-            cylinder(d = set_screw_pilot, h = knob_d);
+      // Knob screw, from the side of the head: pilot to the rod, the
+      // counterbore for its head from the floor out (the tip reaches the
+      // rod 0.5 before the head would sit on the floor)
+      translate([0, 0, knob_screw_z])
+         rotate([0, 90, 0]) {
+            cylinder(d = knob_screw_pilot, h = knob_d);
+            translate([0, 0, knob_screw_floor])
+               cylinder(d = knob_screw[1] + 0.6, h = knob_d);
+         }
    }
 }
 

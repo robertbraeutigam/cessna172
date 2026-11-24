@@ -54,7 +54,8 @@ over the pot's slider ear. The pot is the 75 mm one used for the carb heat.
   into a quarter turn pocket: fully in, the lug turns into it and the end of
   the keyway holds it (locked). Pulled out, the lug stops on the back of
   the panel plate.
-- **Rod:** an M3 set screw in the knob's head holds the rod. The rod runs
+- **Rod:** a short M3 screw from the side of the knob's head, its head
+  sunk in a counterbore, holds the rod. The rod runs
   back through the bracket, whose front wall (screwed onto the end of the
   tube) and rear wall are two more bearings.
 - **Pot:** in the bracket the pot sits on two stands, held down by two
@@ -83,7 +84,7 @@ bracket is wider than the cut-out, so it goes on from behind the sheet.
 | 2 | `throttle/clamp.scad` plain clamp (`clamp_plain.stl`), with an M3 screw + nut | rod collars on both sides of the carrier |
 | 4 | M3 x 12 socket head screw | bracket onto the tube |
 | 4 | M3 x 10 screw | pot straps onto the stands |
-| 1 | M3 x 6 set screw | knob onto the rod |
+| 1 | M3 x 4 socket head screw (`knob_screw`; an M3 x 5 needs a head under 2.5 mm) | knob onto the rod |
 | 4 | M3 x 10 pan head screw + nut | face flange onto the sheet |
 | - | 3 wires | pot to the switch panel's Nano |
 
@@ -110,7 +111,7 @@ stiffer spring pops harder, the pot slider's friction works against it.
    straps on.
 5. Push the rod in from the back: through the rear wall, the spring, a collar, the
    carrier (its slot over the pot's ear), the other collar, the front wall
-   and into the knob, and tighten the set screw.
+   and into the knob, and tighten the knob screw.
 6. With the knob out, slide the carrier to where the ear is 22.5 mm
    (`stroke / 2`) in front of the pot's middle, and tighten the collars
    against it so the rod still turns.
