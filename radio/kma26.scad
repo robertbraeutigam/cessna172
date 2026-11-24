@@ -34,7 +34,7 @@
 //   floor (like the KX155's driver boards) with a CD74HC4067 mux for the
 //   inputs and two 74HC595 shift registers for the 13 lamps. Its USB
 //   cable runs out of the open back to the powered USB hub, tied onto
-//   tie_block.
+//   tie post.
 //
 // Coordinates: radio.inc.scad (installed: x right, y backwards, z up).
 // Printed: the body front side down, the face front side up, the button
@@ -61,7 +61,7 @@
 // switches, LEDs and resistors onto the front boards (the LEDs standing
 // on the board), screw them onto their bosses. Toggles, pot and rotary
 // switch through plate and face from the back, nuts on the front. Logic
-// board into its rails, wiring, USB cable tied onto the tie block. Knobs
+// board into its rails, wiring, USB cable tied onto the tie post. Knobs
 // on last, the mic knob pointing at EMG with the switch turned fully left.
 // Into the sheet over the KX155s, the 4 screws through the end flanges.
 
@@ -327,7 +327,7 @@ assert(len(mics) * rot_step <= 360 && len(mics) <= 12, "Too many mic positions f
 assert(lg_x >= x_in0 + 0.5 && lg_x + lg_pitch + rail.x <= x_in1 - 0.5, "Logic board does not fit");
 assert(lg_board_z + board_t + max(lg_high, nano_high) <= ap_h - wall - 0.5, "Parts on the logic board hit the top");
 assert(nano_board.x + mux_board.x + 6 <= lg_board.x && nano_board.y + 4 <= lg_board.y, "Nano and mux do not fit the logic board");
-assert(tie_x + tie_block.x <= x_in1 - 0.5 && (tie_x >= lg_x + lg_pitch + rail.x + 1 || tie_x + tie_block.x <= lg_x - 1), "Tie block does not fit beside the rails");
+assert(tie_x + tie_post.x <= x_in1 - 0.5 && (tie_x >= lg_x + lg_pitch + rail.x + 1 || tie_x + tie_post.x <= lg_x - 1), "Tie post does not fit beside the rails");
 // Inputs: 10 buttons, MUTE, 2 per toggle on the mux
 assert(len(buttons) + 1 + 4 <= 16, "More inputs than the mux has");
 assert(len(buttons) + len(lamps) <= 16, "More lamps than the two shift registers have");
@@ -398,9 +398,9 @@ module unit_body() {
                cube([rail.x, unit_d - lg_y0 + 2, rail.y + 0.01]);
          translate([lg_x, lg_y0 - 2, wall - 0.01])
             cube([lg_pitch + rail.x, 2, rail.y + 0.01]);
-         // Cable tie block, at the back
-         translate([tie_x, unit_d - tie_block.y, wall - 0.01])
-            cube(tie_block + [0, 0, 0.01]);
+         // Cable tie post, at the back
+         translate([tie_x + tie_post.x / 2, unit_d - tie_post.y / 2, wall])
+            tie_post();
       }
       // Lamp windows and the pockets for the lens ears
       ext_y(-1, plate_t + 2)
@@ -419,9 +419,6 @@ module unit_body() {
       for (i = [0, 1])
          translate([lg_x + i * lg_pitch - drv_over - fit, lg_y0, wall + rail.y - 1.6 - board_t - fit])
             cube([rail.x + 2 * (drv_over + fit), unit_d, board_t + 2 * fit]);
-      // Tunnel for the cable tie
-      translate([tie_x - 1, unit_d - tie_block.y / 2 - 2, wall + 1.5])
-         cube([tie_block.x + 2, 4, 2]);
       gitrev_cut(unit_w - flange_w / 2, ap_h / 2);
    }
 }

@@ -21,6 +21,7 @@
 $fn = 30;
 
 include <nano.inc.scad>
+include <usb.inc.scad>   // usb_plug: the plug through the back wall
 
 // Box dimensions
 height = 50;
@@ -71,7 +72,6 @@ big_pot_module_height = 6;
 big_pot_full_length = 130;
 
 // Arduino Nano (lib/nano.inc.scad: the board, its pinout and its rails)
-usb_plug = [12, 9];          // MEASURE: the USB cable's plug body (width, height), through the back wall
 nano_x = 46;                 // its middle, between the carb heat pot's legs and the throttle pot's
 
 // Small linear pot dimensions

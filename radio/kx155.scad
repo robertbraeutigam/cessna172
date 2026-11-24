@@ -27,7 +27,7 @@
 // Everything goes to an Arduino Nano of its own running MobiFlight, in
 // rails on the floor right of the driver boards (under the NAV encoder),
 // its USB jack at the open back; the USB cable to the powered USB hub is
-// tied onto tie_block beside it. Each pin is a line of its own
+// tied onto `tie_post` beside it. Each pin is a line of its own
 // (nano_pins; the README has the table), so each unit is tested alone.
 //
 // Coordinates: radio.inc.scad (installed: x right, y backwards, z up).
@@ -232,7 +232,7 @@ assert(drv_span <= x_in1 - x_in0 - 1, "Driver boards do not fit side by side");
 assert(drv_y0 >= plate_t + max(pot_body[1], enc_body.y + enc_pins, flip_board_y + board_t) + 3, "Driver boards too close to the parts on the face");
 assert(wall + rail.y + drv_high <= board_z0 || drv_y0 >= board_y + board_t + 3, "Driver boards hit the digit boards");
 assert(dig_mods * dig_n >= groups[0][1] && dig_mods * dig_n >= groups[2][1], "Not enough digits for a frequency");
-assert(tie_x + tie_block.x <= x_in1 - 0.5, "Nano and tie block do not fit right of the driver boards");
+assert(tie_x + tie_post.x <= x_in1 - 0.5, "Nano and tie post do not fit right of the driver boards");
 assert(nano_y1 - nano_board.y / 2 - nano_rail_end >= flip_board_y + board_t + 0.5, "Nano runs into the NAV flip switch board");
 assert(wall + nano_under + nano_t + 1.5 <= row_z - enc_body.z / 2 - 0.5
        || nano_y1 - nano_board.y / 2 - nano_rail_end >= plate_t + enc_body.y + enc_pins + 0.5, "Nano runs into the NAV encoder");
@@ -275,7 +275,7 @@ module labels_2d() {
 
 // --- Printed parts ---
 
-// The body: face plate, walls, filter frames, bosses, driver rails, tie block
+// The body: face plate, walls, filter frames, bosses, driver rails, tie post
 module unit_body() {
    difference() {
       union() {
@@ -309,9 +309,9 @@ module unit_body() {
             cube([drv_span, 2, rail.y + 0.01]);
          // The Nano's rails
          unit_nano_rails(nano_x, nano_y1);
-         // Cable tie block, at the back right of the Nano
-         translate([tie_x, unit_d - tie_block.y, wall - 0.01])
-            cube(tie_block + [0, 0, 0.01]);
+         // Cable tie post, at the back right of the Nano
+         translate([tie_x + tie_post.x / 2, unit_d - tie_post.y / 2, wall])
+            tie_post();
       }
       // Windows, a bit bigger than the face's
       ext_y(-1, plate_t + 1.01)
@@ -326,9 +326,6 @@ module unit_body() {
       for (i = [0 : drv_n])
          translate([drv_x0 + i * drv_pitch - drv_over - fit, drv_y0, wall + rail.y - 1.6 - board_t - fit])
             cube([rail.x + 2 * (drv_over + fit), unit_d, board_t + 2 * fit]);
-      // Tunnel for the cable tie
-      translate([tie_x - 1, unit_d - tie_block.y / 2 - 2, wall + 1.5])
-         cube([tie_block.x + 2, 4, 2]);
       // Version on the back of the right flange
       gitrev_cut(unit_w - flange_w / 2, unit_h / 2);
    }

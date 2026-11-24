@@ -54,6 +54,7 @@
 $fn = 60;
 
 include <nano.inc.scad>
+include <usb.inc.scad>   // usb_plug: the plug through the back wall
 
 // Preview: card at this heading, parts apart by explode
 view_heading = 30;
@@ -66,7 +67,6 @@ include <stepper.inc.scad>
 motor_screw_head = 2.5;      // pan head over the ears
 
 // --- The Nano (lib/nano.inc.scad), along y, its USB jack at the back end ---
-usb_plug = [12, 9];          // MEASURE: the cable's plug body, through the back wall
 
 // --- Housing (the C2300's front, 2.57") ---
 body_w = 65;

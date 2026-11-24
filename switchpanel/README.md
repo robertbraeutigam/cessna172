@@ -317,7 +317,8 @@ switches, fits inside the rim and holds the cable at the jack's height.
 
 **MEASURE**: the USB plug (`usb_plug`: width, height and length with its
 strain relief, the tie block sits behind it) and the cable (`cable_d`,
-4 mm); the tie (`tie`, 3.6 x 1.3 mm). The Nano's values, pinout and rails
+4 mm); the tie (`tie`, 3.6 x 1.3 mm). They and the tie block are the
+shared ones of [`lib/usb.inc.scad`](../lib/usb.inc.scad). The Nano's values, pinout and rails
 are in [`lib/nano.inc.scad`](../lib/nano.inc.scad) (`nano_*`), shared by
 every component; its mounting holes (`nano_holes`, `nano_hole_d`)
 are the official Nano's (1.8 mm, 40.64 x 15.24 mm, in line with the pin

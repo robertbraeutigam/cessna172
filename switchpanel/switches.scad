@@ -85,6 +85,7 @@ $fn = 48;
 
 include <panel.inc.scad>
 include <nano.inc.scad>
+include <usb.inc.scad>
 
 // Preview: which switches are shown ON, in label order (missing ones are OFF)
 view_on = [1, 1, 0, 1, 0, 0, 1, 1, 1, 1];
@@ -162,17 +163,10 @@ switch_pins = ["D2", "D3", "D4", "D5", "D6", "D7", "D8", "D9", "D10", "D11", "D1
 ignition_inputs = 5;         // OFF, R, L, BOTH, START
 ignition_pins = ["A0", "A1", "A2", "A3", "A4"];
 primer_pin = "A7";           // analog only
-usb_plug = [12, 9, 28];      // MEASURE: the USB cable's plug: width, height, length with its strain relief
 nano_x = 45;                 // board center; left half, the ignition is left of the panel
 nano_clear = 0.3;
 
-// --- USB cable: tied down next to the plug ---
-cable_d = 4;                 // MEASURE: the USB cable
-tie = [3.6, 1.3];            // cable tie, width x thickness
-tie_clear = 0.6;             // added to the tie's width and thickness in the slot
-tie_block = [10, 13, 6];     // along the cable (x) x across x height off the carrier plate
-tie_groove = 1.5;            // cable groove in the block top
-tie_gap = 2;                 // the plug's end to the block
+// --- USB cable (lib/usb.inc.scad): tied onto a tie block next to the plug ---
 
 // --- Nano carrier: a plate with the Nano's rails and the tie block,
 // screwed onto two bosses on the panel back ---
@@ -365,7 +359,6 @@ module on_nano() {
 tie_x = nano_x + tie_lx;
 tie_y = nano_y;
 tie_z = carrier_z - carrier_t;   // foot of the block
-tie_slot = tie + [tie_clear, tie_clear];
 
 // Distance from a point to a centered box
 function box_dist(p, c, size) = norm([max(0, abs(p.x - c.x) - size.x / 2), max(0, abs(p.y - c.y) - size.y / 2)]);
@@ -413,7 +406,7 @@ assert(switch_count <= len(switch_pins), "More switches than Nano pins for them"
 assert(nano_y - carrier_size.y / 2 >= nano_switch_y + nano_clear, "Nano carrier runs into the switches, increase margin_top");
 assert(nano_x + carrier_x0 >= panel_x0 + rim_w + nano_clear && nano_x + carrier_x0 + carrier_size.x <= panel_x1 - rim_w - nano_clear,
        "Nano carrier does not fit inside the rim, move nano_x");
-assert(abs(carrier_t + tie_block.z - tie_groove + cable_d / 2 - usb_lz) <= 1.5, "The tie block holds the cable off the jack's height");
+assert(abs(carrier_t + tie_cable_h - usb_lz) <= 1.5, "The tie block holds the cable off the jack's height");
 assert(usb_lz - usb_plug.y / 2 >= carrier_t, "USB plug runs into the carrier plate");
 assert(carrier_end >= carrier_boss_d && carrier_end / 2 - carrier_screw_hole / 2 >= 2, "Carrier too short at the ends for its screws");
 assert(carrier_size.y >= carrier_boss_d && carrier_size.y >= tie_block.y, "Carrier too narrow for its bosses or the tie block");
@@ -421,9 +414,6 @@ assert(carrier_boss_d >= carrier_pilot + 3, "Carrier boss wall too thin");
 assert(carrier_screw_len - carrier_t >= 4 && carrier_screw_len - carrier_t <= carrier_pilot_len - 0.5,
        "Carrier screws too short for the bosses or too long for the pilot holes");
 assert(tie_lx - tie_block.x / 2 >= nano_rail_end, "Tie block runs into the Nano's stops");
-assert(tie_block.y >= cable_d + 2 * tie_slot.y + 2, "Cable tie block too narrow for the cable");
-assert(tie_block.z - tie_groove - tie_slot.y >= 2, "Cable tie block too thin above the slot");
-assert(tie_block.x >= tie_slot.x + 4, "Cable tie block too short for the slot");
 assert(len(breakers) <= len(tg_xs), "More breakers than toggles below them");
 assert(min_on_dist >= 1 && min_on_cb_dist >= 1, "A rocker's ON label runs into a toggle or a breaker, increase group_space");
 assert(min_cb_rk_dist >= 1, "A breaker runs into a rocker, increase group_space or lower rk_raise");
@@ -786,18 +776,6 @@ module toggle_nut_part(cut = false) {
          }
 }
 
-// Block for the cable tie, foot at z=0: the tie goes through a slot along
-// y at its foot, around the cable lying in the groove on top
-module tie_block() {
-   difference() {
-      translate([-tie_block.x / 2, -tie_block.y / 2, -0.01])
-         cube(tie_block + [0, 0, 0.01]);
-      translate([-tie_slot.x / 2, -tie_block.y / 2 - 1, -1])
-         cube([tie_slot.x, tie_block.y + 2, tie_slot.y + 1]);
-      translate([-tie_block.x / 2 - 1, 0, tie_block.z + cable_d / 2 - tie_groove])
-         rotate([0, 90, 0]) cylinder(d = cable_d, h = tie_block.x + 2);
-   }
-}
 
 // Nano carrier in its own coordinates (see carrier_size), as printed:
 // plate on the bed, the Nano's rails (a wall along each long edge, a
@@ -952,7 +930,7 @@ module wires_part() {
 // top rim
 module cable_part() {
    zj = carrier_z - usb_lz;                                   // the jack's middle
-   zt = tie_z - tie_block.z + tie_groove - cable_d / 2;       // cable axis on the block
+   zt = tie_z - tie_cable_h;                                  // cable axis on the block
    x_plug = nano_x + nano_board.y / 2 + nano_usb_out;
    color(c_cable) {
       translate([x_plug, nano_y - usb_plug.x / 2, zj - usb_plug.y / 2])
@@ -969,21 +947,9 @@ module cable_part() {
             translate(path[i]) sphere(d = cable_d, $fn = 16);
          }
    // The tie around the cable and through the block
-   color(c_gnd)
-      translate([tie_x, tie_y, zt])
-         rotate([0, 90, 0])
-            difference() {
-               hull() {
-                  cylinder(d = cable_d + 2 * tie.y, h = tie.x, center = true);
-                  translate([zt - tie_z + tie_slot.y / 2, 0, 0])
-                     cube([tie.y, tie_block.y - 2, tie.x], center = true);
-               }
-               hull() {
-                  cylinder(d = cable_d, h = tie.x + 1, center = true);
-                  translate([zt - tie_z + tie_slot.y / 2, 0, 0])
-                     cube([0.01, tie_block.y - 2 - 2 * tie.y, tie.x + 1], center = true);
-               }
-            }
+   translate([tie_x, tie_y, tie_z])
+      mirror([0, 0, 1])
+         tie_part(c_gnd);
 }
 
 module dashed_line(from_z, to_z, d = 0.5) {

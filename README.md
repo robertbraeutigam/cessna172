@@ -84,6 +84,11 @@ width (`nano_board`) before printing, clones differ.
 the compass and the instruments: the 28BYJ-48, the ULN2003 board (with
 the places of its standoffs), the A3144 hall sensor and the homing
 magnet, their sizes and view models.
+[`lib/usb.inc.scad`](lib/usb.inc.scad) has the USB cable (plug, cable and
+tie sizes) and what it is tied onto, so that pulling it does not lever
+the Nano's jack: the tie block in line behind the plug (the cable in a
+groove on its top, the tie through a slot at its foot) and, where there
+is no room behind the plug, the tie post beside it (the radio units).
 
 The printer is an Anycubic Kobra 3 V2 (255 x 255 mm bed). Large parts must
 fit on it, and the files check it. Values that depend on bought parts
