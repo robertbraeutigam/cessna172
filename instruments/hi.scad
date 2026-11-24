@@ -142,6 +142,7 @@ uln_r = [uln_board.y, uln_board.x];   // the ULN2003 boards turned upright
 hi_nano_x = 0;               // the Nano's middle, along z, the USB jack up
 hi_car_z = [-24, 24];        // the carrier plate's bottom and top
 usb_plug = 20;               // the plug over the Nano's end (a straight mini USB plug, then the cable bends back)
+tc_car_x1 = 42.6;            // the turn coordinator's carrier's right edge from its axis (tc.scad's tc_car_x[1], keep in sync)
 
 // --- Calculated ---
 function g_ra(z, m) = m * z / 2 + m;
@@ -306,9 +307,9 @@ for (b = uln_xz) assert(b.y >= hi_car_z[0] + 0.5 && b.y + uln_r.y <= hi_car_z[1]
 assert(nano_z0 + nano_board.y <= hi_car_z[1] + 1, "Nano off the carrier");
 assert(uln_xz[0].x >= hi_nano_x + nano_board.x / 2 + rail_w + 1 && uln_xz[1].x + uln_r.x <= hi_nano_x - nano_board.x / 2 - rail_w - 1,
        "A ULN2003 board over the Nano's rails");
-// the neighbours are standard instruments (TC, VSI): their carriers are as deep as this one's front
+// the VSI right of it is a standard instrument (its carrier as deep as this one's front), the turn coordinator's is like this one
 assert(hi_car_x[1] <= inst_pitch.x + car_x0 - 1, "Carrier runs into the right neighbour's carrier");
-assert(hi_car_x[0] >= -inst_pitch.x + max(car_x1, post_x + car_post_d / 2) + 1, "Carrier runs into the left neighbour's carrier");
+assert(hi_car_x[0] >= -inst_pitch.x + tc_car_x1 + 1, "Carrier runs into the turn coordinator's carrier");
 // the attitude indicator is above: the USB plug stays under its case
 assert(nano_z0 + nano_board.y + usb_plug <= inst_pitch.y - case_r - 1, "The USB plug runs into the attitude indicator");
 

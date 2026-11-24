@@ -255,6 +255,20 @@ its own top-level directory; new components should follow the same layout.
     Nano, USB up) behind them, facing back. 62 mm deep (`hi_depth`) only
     above `hi_deep_z`, 19 mm under it (`hi_low_depth`): the frame checks
     both against the housing. Print `face` (card, bug ring, fixed ring).
+  - `tc.scad` — the turn coordinator (the six-pack's bottom left): the
+    standard's case front with four screws, no knob, and the heading
+    indicator's two motor drive. The white airplane on the 3 mm axle in
+    front of the face (1:1 to motor A, the standard's), the face plate
+    (a cup holding the glass, the face glued on) with the inclinometer's
+    tube as a slot round the axis under it (`ball_r`, ±`slot_a`) and two
+    bridges for the wires; behind it the ball disc (the black ball on a
+    paper ring) on the dial's hub, an internal ring gear turned by motor
+    B's pinion (5:1), its magnet in the disc, the sensor in the dial's
+    front. The carrier behind the motors, shifted left of the HI's (each
+    file has a copy of the other's carrier edge: `hi_car_x0`,
+    `tc_car_x1`). 65 mm deep (`tc_depth`) only above `tc_deep_z`,
+    22 mm under it (`tc_low_depth`), checked by the frame. Print `face`
+    (face and ball ring).
 
 - `frame/` — the aluminium extrusion frame on the desk and the ACM panel
   sheets over it, all 2020 profile. `frame.inc.scad` holds the

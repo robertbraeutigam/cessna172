@@ -14,15 +14,18 @@
 
 [![Heading indicator](https://robertbraeutigam.github.io/cessna172/instruments/hi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/hi_montage.png)
 
+[![Turn coordinator](https://robertbraeutigam.github.io/cessna172/instruments/tc_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/tc_montage.png)
+
 The analogue ("steam") instruments. They all follow one standard
 (`instrument.inc.scad`): a 3 1/8" case behind a round hole in the panel,
 a colour printed face, and a needle turned by a 28BYJ-48 geared stepper.
 So far: the RPM indicator (tachometer), the airspeed indicator (ASI),
-the vertical speed indicator (VSI), the attitude indicator (AI), the altimeter (ALT) and the
-heading indicator (HI); the last three have
+the vertical speed indicator (VSI), the attitude indicator (AI), the altimeter (ALT), the
+heading indicator (HI) and the turn coordinator (TC); the last four have
 the standard's case front but mechanisms of their own (see
-[Attitude indicator](#attitude-indicator), [Altimeter](#altimeter) and
-[Heading indicator](#heading-indicator)). The instruments go into
+[Attitude indicator](#attitude-indicator), [Altimeter](#altimeter),
+[Heading indicator](#heading-indicator) and
+[Turn coordinator](#turn-coordinator)). The instruments go into
 the holes of the stage 2 left sheet (see
 [Cockpit frame](../frame/README.md)): the stage 1 sheet is lower and its
 top bar is in the way.
@@ -36,6 +39,7 @@ top bar is in the way.
 | `ai.scad` | the attitude indicator: the standard's case front, a roll frame with the horizon bowl and the pitch motor on it, a slip ring, the roll motor; the roll dial's print |
 | `alt.scad` | the altimeter: the standard's case front, three needles on concentric shafts with a motor each, the Kollsman window's disc, knob and pot; the face and Kollsman ring print |
 | `hi.scad` | the heading indicator: the standard's case front, a card on the axle and a bug disc behind it with a motor each, two knobs on rotary encoders; the card, bug ring and fixed ring print |
+| `tc.scad` | the turn coordinator: the standard's case front, the airplane on the axle, a face plate with the inclinometer's tube, the ball on a disc behind it, a motor each; the face and ball ring print |
 
 ## How it works
 
@@ -823,3 +827,166 @@ turn the short way round):
   `sim/autopilot/heading_down` / `sim/autopilot/heading_up`, its *Button*
   `sim/autopilot/heading_sync`. Check the command names in X-Plane's
   keyboard settings, they change between versions.
+
+## Turn coordinator
+
+The six-pack's bottom left instrument, the 172N's turn coordinator: a
+white airplane (seen from behind) that banks with the turn rate, wings
+level at the marks at 9 and 3 o'clock and a standard rate turn
+(2 minutes) at the L and R marks under them, and the inclinometer's
+black ball in a curved tube under the axis, between two black wires.
+TURN COORDINATOR, D.C. ELEC., 2 MIN. and NO PITCH INFORMATION are
+printed on the face. Its case front is the standard's, with the four
+screws on the diagonals; there is no knob. Behind it are two 28BYJ-48
+steppers side by side, the heading indicator's drive.
+
+It is under the airspeed indicator, left of the heading indicator, in
+the bottom row: like the heading indicator, only its upper part is over
+the force feedback yoke's housing. Its board carrier is 65 mm deep
+behind the sheet (`tc_depth`), but nothing deeper than the back plate
+reaches below 24 mm under its axis (`tc_deep_z`); below that it is
+22 mm deep (`tc_low_depth`: the case and the back plate). The frame
+checks both against the housing.
+
+### How it works
+
+- **Front to back**: the glass, the airplane (on the axle), the face
+  plate (a cup: its rim presses the glass against the lip, the face's
+  paper on its front), the ball disc behind it, the dial (a plate with a
+  rim forward to the face plate, a lug on the rim keying the face
+  plate), the airplane's gears, the back plate.
+- **Airplane**: printed white, pressed onto the front end of a 3 mm
+  steel axle, which turns in the dial's hub and in the back plate. The
+  axle's gear is turned 1:1 by motor A's (26 teeth, module 1), like the
+  standard's needle; the magnet in motor A's gear homes it on a sensor
+  in the back plate.
+- **Ball**: the tube is a curved slot through the face plate, an arc
+  round the axis (21 mm from it, ±32 degrees from 6 o'clock), with two
+  thin bridges across its middle: the wires. Behind it the ball disc
+  turns on the dial's hub; a white paper ring on its front carries the
+  black ball (with a highlight), so the ball runs along the tube's curve
+  as the disc turns, and the rest of the ring fills the tube white. Its
+  drive is the heading indicator's bug's: an internal ring gear on its
+  back (80 teeth, module 0.8) turned by motor B's pinion (16 teeth),
+  5 motor turns a disc turn; the magnet in a boss on the disc's back,
+  the sensor in a pocket in the dial's front (its legs along a groove,
+  its wires back through the gear layer and the back plate). To home,
+  the disc turns until the magnet passes the sensor, the ball out of
+  sight behind the face meanwhile.
+- **Back**: the two motors lie on the back plate's back, their bodies
+  slanted (A to the upper left, B to the lower right) so that their wire
+  covers pass each other. Four posts carry the board carrier behind them:
+  the two ULN2003 boards upright either side, the Nano between them, all
+  facing back, the Nano's USB jack up. The carrier is shifted 2.5 mm left
+  of the axis, clear of the heading indicator's carrier (as deep, 89 mm
+  to the right; each file checks it against a copy of the other's edge).
+  A straight mini USB plug fits under the airspeed indicator's case.
+- **Print orientation**: the case, the face plate and the dial back side
+  down, the ball disc, back plate and carrier front down, the gears
+  flat, the pinion on its teeth, the airplane front down (white).
+  Everything else black.
+
+The `assert`s check the face (the airplane's wings inside the marks, L,
+R and the words in the window and clear of the tube, the ball in the
+tube and the ball ring filling it), the front stack (the axle ending in
+the back plate, the ball disc inside the dial's rim), the gears, the
+ball sensor's wires, the motors, their ears and covers, the screws,
+posts and sensors (as in the heading indicator), and the carrier clear
+of the heading indicator's and under the airspeed indicator.
+
+### The print
+
+`make` writes `target/tc_face.pdf` (on the project page as
+[face](https://robertbraeutigam.github.io/cessna172/instruments/tc_face.pdf)):
+two faces, the glass's template and two ball rings, black and white.
+Print at 100 % on matte photo paper. Cut the face out on its edge and
+the tube's slot on the black line inside its white rim (a sharp craft
+knife), punch the axle's hole; cut the ball ring on its edges. Glue the
+face onto the face plate's front (the slot over the plate's slot), the
+ball ring onto the ball disc, its mark at the top on the notch in the
+disc's edge (over the magnet), the ball at the bottom.
+
+### Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 2 | 28BYJ-48 stepper, 5 V, with its ULN2003 driver board | airplane and ball |
+| 1 | Arduino Nano (ATmega328P, 5 V), mini USB cable (straight plug) | MobiFlight board of the instrument |
+| 2 | A3144 hall sensor | homes |
+| 2 | disc magnet 6 x 3 mm | homes |
+| 1 | 3 mm steel dowel pin, 20 mm | the airplane's axle |
+| 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
+| 1 | the face and the ball ring, printed on photo paper | |
+| 4 | M3 x 8 button head, black | case through the sheet |
+| 3 | M3 x 8 countersunk self tapping screw | back plate into the case |
+| 4 | M3 x 8 countersunk self tapping screw | carrier onto the back plate's posts |
+| 4 | M3 x 8 countersunk screw + nut | motor ears |
+| 8 | M3 x 6 self tapping screw | ULN2003 boards |
+
+The axle's length is a MEASURE value: check it before printing.
+
+### Assembly
+
+1. Magnets into motor gear A (back face) and into the ball disc's boss
+   (back face); check which face pulls each sensor low.
+2. Back plate: motors A and B (ears countersunk from the front, nuts
+   behind), sensor A into its pocket (flat face forward, legs bent back
+   through the slot). Motor gear A onto A's shaft, the pinion onto B's.
+3. Dial: the ball sensor into its pocket in the front (flat face
+   forward), its legs out along the groove, bent back through the hole;
+   wires through the back plate's hole. Face onto the face plate, the
+   ball ring onto the ball disc.
+4. The airplane onto the axle's front end (pressed, glue, about wings
+   level), the axle from the front through the face plate.
+5. Glass into the case from behind, the face plate with the axle (its
+   notch at the top), the ball disc over the axle, the dial (its lug
+   into the face plate's notch, its hub into the ball disc's sleeve).
+   The airplane's gear onto the axle's back end, its back face 3.2 mm
+   from the end (`gear_from_end` in the build's echo). Then the back
+   plate's stack, the axle into its bearing and the gears meshing, the
+   posts into the dial's holes: screwed into the case (three screws).
+6. The carrier onto the back plate's posts (from its back; before the
+   boards: the screws are under them), the boards onto it, wire it
+   (below). Flash and set up MobiFlight, let it home, and set the
+   steppers' offsets (the airplane wings level, the ball between the
+   wires): the homes are one a turn, so neither the airplane's angle on
+   the axle nor the ring's on the disc has to be exact.
+7. Into the panel: drill the four screw holes using the case as the
+   template, the case into the hole from behind, the four screws.
+
+### Wiring
+
+| Signal | Nano pin | MobiFlight device |
+|--------|----------|-------------------|
+| motor A (airplane) ULN2003 IN1..IN4 | D2, D3, D4, D5 | *Stepper* airplane |
+| sensor A OUT | D6 | its home input |
+| motor B (ball) ULN2003 IN1..IN4 | D7, D8, D9, D10 | *Stepper* ball |
+| ball sensor OUT | D11 | its home input |
+| ULN2003 boards' -, sensors' GND | GND | |
+| ULN2003 boards' +, sensors' VCC | 5 V | |
+
+**USB**: one port on the powered USB hub, about 0.55 A while both motors
+move (two steppers, see [USB](#wiring) above).
+
+### MobiFlight
+
+Two *Steppers* (pins above, coils off at rest):
+
+- **Airplane**: 2038 steps a turn, following
+  `sim/cockpit2/gauges/indicators/turn_rate_roll_deg_pilot` (the
+  airplane symbol's bank in degrees, right turn positive), steps
+  `$*2038/360`. The airplane turns the other way from the motor; if it
+  banks the wrong way, give the motor its pins the other way round. The
+  L and R marks are 20 degrees under wings level (`rate_a`): check in a
+  2 minute turn that the dataref's value lands on them, and move
+  `rate_a` (or scale the steps) if it does not.
+- **Ball**: 10190 steps a turn (5 motor turns), following
+  `sim/cockpit2/gauges/indicators/slip_deg` (the ball's deflection in
+  degrees), steps `Max(-32, Min(32, $))*10190/360` (limited to the tube's ends,
+  ±32 degrees: `slot_a`). The ball to the right
+  turns the disc counter clockwise; the pinion and the ring turn the same
+  way. One degree of slip moves the ball one degree along the tube; if
+  it looks too lively or too dull next to X-Plane's own panel, scale the
+  steps.
+- **Offsets**: after homing, set each stepper's offset so the airplane
+  is wings level and the ball sits between the wires.
