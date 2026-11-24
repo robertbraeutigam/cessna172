@@ -32,7 +32,8 @@ top bar is in the way.
 
 | File | Parts |
 |------|-------|
-| `instrument.inc.scad` | the standard: case, dial, needle, gears, back plate, board carrier; the face's colour layers and print page |
+| `instrument.inc.scad` | the standard: case, dial, needle, gears, back plate, board carrier; the face's colour layers and print page; the helpers the instruments with their own mechanisms share (motor placement and clearances, ring gear, sensor pocket); every carrier's place between its neighbours (`carrier_slots`) |
+| `twin_drive.inc.scad` | the two motor drive of the heading indicator and the turn coordinator: the axle's gears, a disc turned through an internal ring gear by a second motor, the dial with the disc's sensor, the back plate with both motors, the board carrier |
 | `rpm.scad` | the RPM indicator: its face and the parts above; the face print |
 | `asi.scad` | the airspeed indicator: its face and the parts above; the face print |
 | `vsi.scad` | the vertical speed indicator: its face and the parts above; the face print |
@@ -101,7 +102,10 @@ and the back do not meet in the columns, that the magnet fits the gear,
 and that the motor, the carrier's
 posts, its screws and the boards clear each other, the gears and the
 dial's posts, and that the carrier stays between the neighbours and off
-the case screws.
+the case screws. Behind the cases, neighbours' carriers share the width
+between their axes: `carrier_slots` in `instrument.inc.scad` gives each
+instrument's carrier its place, each instrument checks that its carrier
+stays in it, and the include checks the places against each other.
 
 ## The faces
 
@@ -723,9 +727,10 @@ their gears, the magnet boss and the hubs clear of each other), the bug
 sensor's wires clear of the gears and motors, the two motors, their ears
 and covers clear of each other and of the screws, posts and sensors, the
 encoders outside the case's wall and clear of the neighbours, the knobs
-on their shafts, and the carrier between the neighbours' carriers (the
-TC and the VSI are standard instruments) and under the attitude
-indicator.
+on their shafts, and the carrier in its place between the neighbours'
+(`carrier_slots`) and under the attitude indicator. The drive, its parts
+and its checks are `twin_drive.inc.scad`, shared with the turn
+coordinator.
 
 ### The print
 
@@ -880,7 +885,8 @@ checks both against the housing.
   the two ULN2003 boards upright either side, the Nano between them, all
   facing back, the Nano's USB jack up. The carrier is shifted 2.5 mm left
   of the axis, clear of the heading indicator's carrier (as deep, 89 mm
-  to the right; each file checks it against a copy of the other's edge).
+  to the right; their places are in `carrier_slots`). The drive is the
+  heading indicator's (`twin_drive.inc.scad`).
   A straight mini USB plug fits under the airspeed indicator's case.
 - **Print orientation**: the case, the face plate and the dial back side
   down, the ball disc, back plate and carrier front down, the gears

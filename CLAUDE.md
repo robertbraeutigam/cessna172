@@ -185,7 +185,26 @@ its own top-level directory; new components should follow the same layout.
     Small gears, the motor behind the case over the axis, the carrier
     on posts behind it, all within the case's outline, 47 mm deep
     (`inst_depth` in the frame, which sets the force feedback yoke back
-    for it).
+    for it). It also holds what the instruments with their own
+    mechanisms share (gear radii, motor placement and clearance
+    functions `m_body`, `m_ears`, `clear_cover`, `cover_pts`,
+    `motor_at`, `along_xz`, `ring_gear_2d`, `sensor_pocket`; do not copy
+    them into a file), and the carriers' places side by side
+    (`carrier_slots`, x from each axis, by `inst_rows` and
+    `inst_col_x`, the frame's layout): neighbours' places are checked
+    against each other, each instrument checks its carrier is in its
+    place (`carrier_in_slot`); a new instrument (the NAV indicators) gets
+    a place there.
+  - `twin_drive.inc.scad` — the two motor drive of `hi.scad` and
+    `tc.scad`, included after the instrument defines `y_bd` (the disc's
+    paper), `y_ax` (the axle), `twin_nano_x` and `twin_posts`: motor A to
+    the axle 1:1 (the standard's gears), a disc on the dial's hub turned
+    by motor B's pinion in its internal ring gear (5:1), homed by a magnet
+    in the disc over a sensor in the dial's front; the dial
+    (`twin_dial`), the back plate with both motors slanted side by side,
+    the carrier (two ULN2003s, the Nano, USB up), their checks and view
+    parts (`twin_drive_parts`). The instrument draws its case, the axle's
+    part and the papers.
   - `rpm.scad` — the RPM indicator (tachometer): 0-35 hundred RPM over
     240 degrees, the 172N's stepped green arc and red line at 2700, a
     dummy hour meter.
@@ -252,7 +271,8 @@ its own top-level directory; new components should follow the same layout.
     back turned by motor B's pinion (5:1), its magnet in the disc and the
     sensor in the dial's front. The motors side by side on the back
     plate, slanted so their covers pass; the carrier (two ULN2003s, the
-    Nano, USB up) behind them, facing back. 62 mm deep (`hi_depth`) only
+    Nano, USB up) behind them, facing back (the drive is
+    `twin_drive.inc.scad`). 62 mm deep (`hi_depth`) only
     above `hi_deep_z`, 19 mm under it (`hi_low_depth`): the frame checks
     both against the housing. Print `face` (card, bug ring, fixed ring).
   - `tc.scad` — the turn coordinator (the six-pack's bottom left): the
@@ -264,9 +284,8 @@ its own top-level directory; new components should follow the same layout.
     bridges for the wires; behind it the ball disc (the black ball on a
     paper ring) on the dial's hub, an internal ring gear turned by motor
     B's pinion (5:1), its magnet in the disc, the sensor in the dial's
-    front. The carrier behind the motors, shifted left of the HI's (each
-    file has a copy of the other's carrier edge: `hi_car_x0`,
-    `tc_car_x1`). 65 mm deep (`tc_depth`) only above `tc_deep_z`,
+    front. The carrier behind the motors, shifted left of the HI's
+    (`carrier_slots`). 65 mm deep (`tc_depth`) only above `tc_deep_z`,
     22 mm under it (`tc_low_depth`), checked by the frame. Print `face`
     (face and ball ring).
 

@@ -65,6 +65,7 @@
 sheet_t = 3;
 cut_d = 81;                  // the instrument's hole (inst_cut_d)
 inst_pitch = [89, 88];       // check only: the six-pack's centres across and down (frame/)
+nav_dx = 100;                // check only: the NAV indicators' column right of the six-pack's right one (frame's n172_nav_dx)
 
 // --- The stepper drive (lib/stepper.inc.scad: the 28BYJ-48, the ULN2003
 // board, the A3144 sensor, the magnet) and the Nano (lib/nano.inc.scad) ---
@@ -255,6 +256,32 @@ assert(max(abs(car_x0), post_x + car_post_d / 2, car_x1) <= inst_pitch.x / 2 - 1
 for (i = [0 : 3]) let(c = cols[i], q = [min(max(c.x, car_x0), car_x1), min(max(c.y, -car_h / 2), car_h / 2)])
    assert(norm(c - q) >= csk_d / 2 + 2, "Board carrier over a case screw");
 
+// --- The carriers side by side (frame/): behind the cases, neighbours' board carriers share the width between their
+// axes. Each carrier's place, x from its own axis, is here; each instrument checks that its carrier is in it
+// (carrier_in_slot()), and here the neighbours are checked against each other (as if all were as deep). A new
+// instrument in a row gets its place here. ---
+inst_rows = [["TC", "HI", "VSI", "NAV 1"], ["ASI", "AI", "ALT", "NAV 2"]];   // the frame's inst_names, the lower row first
+inst_col_x = [-inst_pitch.x, 0, inst_pitch.x, inst_pitch.x + nav_dx];
+car_slot_gap = 1;            // between two neighbours' places
+std_car_x = [car_x0, max(car_x1, post_x + car_post_d / 2)];   // the standard's carrier
+carrier_slots = [["ASI", std_car_x], ["VSI", std_car_x],      // the standard
+                 ["TC", [-48, 42.7]],                         // tc.scad (tc_car_x), shifted left
+                 ["HI", [-45.2, 45.2]],                       // hi.scad (twin_car_x)
+                 ["AI", [-39, 39]],                           // ai.scad (car_box)
+                 ["ALT", [-39, 39]]];                         // alt.scad (car_box)
+function carrier_slot(name) = [for (s = carrier_slots) if (s[0] == name) s[1]][0];
+
+for (row = inst_rows, i = [0 : len(row) - 2]) let(a = carrier_slot(row[i]), b = carrier_slot(row[i + 1]))
+   if (a != undef && b != undef)
+      assert(a[1] + car_slot_gap <= inst_col_x[i + 1] - inst_col_x[i] + b[0], str(row[i], "'s carrier runs into ", row[i + 1], "'s"));
+
+// the instrument's carrier, from x[0] to x[1] (from its axis), in its place
+module carrier_in_slot(name, x) {
+   s = carrier_slot(name);
+   assert(s != undef, str("No carrier place for ", name));
+   assert(x[0] >= s[0] && x[1] <= s[1], str(name, "'s carrier off its place (carrier_slots)"));
+}
+
 // --- Helpers ---
 function pol(r, a) = [r * sin(a), r * cos(a)];        // a: clockwise from 12 o'clock, as on the face
 
@@ -291,6 +318,46 @@ module gear_2d(z, m = gear_m, play = gear_play) {
       polygon(concat([[0, 0]],
                      [for (p = flank) p[0] * [cos(-p[1]), sin(-p[1])]],
                      [for (i = [len(flank) - 1 : -1 : 0]) flank[i][0] * [cos(flank[i][1]), sin(flank[i][1])]]));
+}
+
+// The instruments with mechanisms of their own (ai, alt, hi, tc) share these
+
+// a gear's tip and root radius
+function g_ra(z, m) = m * z / 2 + m;
+function g_rf(z, m) = m * z / 2 - 1.25 * m;
+// a motor m = [its shaft [x, z], the direction of its body from it]: the body's middle, a unit vector across, its ears
+function m_body(m) = m[0] + motor_shaft_dy * m[1];
+function m_perp(m) = [m[1].y, -m[1].x];
+function m_ears(m) = [for (s = [-1, 1]) m_body(m) + s * motor_ear_dx * m_perp(m)];
+// clear of a motor's wire cover: a circle of radius r at p
+function clear_cover(m, p, r) = let(d = p - m_body(m), t = d * m[1], s = d * m_perp(m))
+   t >= motor_cover[1] + r || t <= -r || abs(s) >= motor_cover[0] / 2 + r;
+// the cover's four corners
+function cover_pts(m) = [for (t = [0, motor_cover[1]], s = [-1, 1]) m_body(m) + t * m[1] + s * motor_cover[0] / 2 * m_perp(m)];
+
+// along y from y0 to y1, a 2D shape at p ([x, z])
+module along_xz(p, y0, y1) {
+   along_y(y0, y1) translate(p) children();
+}
+
+// motor m's flange on y = yf, its body behind it
+module motor_at(m, yf) {
+   translate([m[0].x, yf, m[0].y]) rotate([0, atan2(m[1].x, m[1].y), 0]) rotate([90, 0, 0]) motor_local();
+}
+
+// internal ring gear, teeth inward, out to radius ro
+module ring_gear_2d(z, m, ro) {
+   difference() {
+      circle(r = ro, $fn = 4 * z);
+      gear_2d(z, m, -gear_play);
+      circle(r = m * z / 2 - m, $fn = 4 * z);
+   }
+}
+
+// sensor: flat face towards -y at y, legs out along z (s: up or down) to the back
+module sensor_pocket(p, y, s, depth = back_t) {
+   translate([p.x - sensor.x / 2 - 0.15, y - 0.01, p.y - sensor.z / 2 - 0.15]) cube([sensor.x + 0.3, sensor.y + 0.11, sensor.z + 0.3]);
+   translate([p.x - sensor.x / 2 - 0.15, y - 1, s > 0 ? p.y + sensor.z / 2 - 1 : p.y - sensor.z / 2 - 1.5]) cube([sensor.x + 0.3, depth + 2, 2.5]);
 }
 
 // --- Outlines, x right, z up ---

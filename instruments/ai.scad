@@ -338,8 +338,8 @@ assert(uln_xz[0].x >= 1 && uln_xz[1].x + uln_board.x <= -1, "ULN2003 boards over
 assert(nano_xz.y + nano_board.x + 2 <= min([for (b = uln_xz) b.y]) && nano_xz.y - 2 >= car_box[1] && nano_xz.x - 1 >= car_box[0]
        && nano_xz.x + nano_board.y + 2 <= car_box[2], "Nano off the carrier or under a ULN2003 board");
 assert(y_cr0 >= y_sr1 + 1, "Slip ring runs into the carrier");
-assert(max(abs(car_box[0]), car_box[2]) <= inst_pitch.x / 2 - 1 && max(abs(car_box[1]), car_box[3]) <= inst_pitch.y / 2 - 1,
-       "Board carrier runs into the next instrument");
+assert(max(abs(car_box[1]), car_box[3]) <= inst_pitch.y / 2 - 1, "Board carrier runs into the instrument under it");
+carrier_in_slot("AI", [car_box[0], car_box[2]]);   // between the neighbours' (instrument.inc.scad)
 
 // --- Helpers ---
 // along x, from x0 to x1, a 2D shape in [y, z]
