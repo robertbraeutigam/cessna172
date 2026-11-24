@@ -281,9 +281,9 @@ inst_depth = 46.6;
 // feedback yoke's housing
 ai_depth = 115.5;
 ai_bezel = 86;               // its square front bezel, in front of the sheet (bezel[0])
-// The altimeter (instruments/alt.scad) is deeper too (three motors, alt_depth
-// echo): it must be in the top row as well
-alt_depth = 100.3;
+// The altimeter (instruments/alt.scad) is deeper too (two motors behind
+// each other, alt_depth echo): it must be in the top row as well
+alt_depth = 98.2;
 
 // --- Layout, x ---
 x_sw0 = sheet_edge;                          // switch panel, left face edge
