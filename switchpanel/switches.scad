@@ -26,7 +26,7 @@
 //   push-to-reset buttons (hex nut, button with the rating on it), glued
 //   into hex holes in the face.
 // - The front is a separate thin face (face_t, panel.inc.scad) with the
-//   labels standing out of it, to be painted with a white paint pen. It is
+//   labels standing out of it, a white part of its own (face_white). It is
 //   printed front side up, the panel behind it front side down, so neither
 //   needs supports. The toggle nuts, the rocker lips and the mount screws
 //   clamp it on.

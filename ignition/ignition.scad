@@ -64,7 +64,7 @@
 // switchpanel/) and mounts to its left, a bit higher, with a flange all
 // round (it is a panel of its own, the primer is under it).
 // Its front is a separate thin face (face_t) with the position labels
-// standing out of it (label_raise), to be painted with a white paint pen.
+// standing out of it (label_raise), a white part of its own (face_white).
 // The face is printed front side up and the panel front side down, so
 // neither needs supports. Together they are panel_t thick, like the switch
 // panel. The face is clamped by the mount screws and the lock flange (glue
