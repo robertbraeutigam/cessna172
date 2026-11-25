@@ -49,7 +49,7 @@
 //   board), 4x 10 mm countersunk (bezel), 2x 10 mm countersunk (base into
 //   the shell), 4x 10 mm countersunk (base onto the stand)
 // - 2x M5 x 10 button head + T-nut (stand onto the top bar)
-// - clear sheet 1 mm (glass_*), white acrylic paint for the card's marks
+// - clear sheet 1 mm (glass_*), white filament (one colour: white acrylic paint)
 //
 // Assembly (one colour: paint the white parts first): stand onto the base (screws
 // from inside), magnet into the drum's pad (check which face triggers the
