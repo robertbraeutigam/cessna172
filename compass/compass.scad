@@ -35,7 +35,7 @@
 // Parts to buy:
 // - 28BYJ-48 stepper (5 V) with its ULN2003 driver board (motor_*, uln_*)
 // - Arduino Nano (ATmega328P, 5 V) and a USB cable (nano_*)
-// - A3144 hall sensor (sensor), disc magnet 6 x 3 mm (magnet)
+// - A3144 hall sensor (sensor), 2 x disc magnet 5 x 1 mm, stacked (magnet)
 // - M3 self tapping screws: 2x 6 mm (motor ears), 4x 8 mm (ULN2003
 //   board), 4x 10 mm countersunk (bezel), 2x 10 mm countersunk (base into
 //   the shell), 4x 10 mm countersunk (base onto the stand)
@@ -201,6 +201,7 @@ assert(mag_r + pad_d / 2 <= band_ri - 0.5 && mag_r - pad_d / 2 >= hub_d / 2 + 0.
 assert(norm([spost / 2, mag_r + spost / 2]) <= band_ri - 0.5, "Sensor post runs into the band");
 assert(mag_r - spost / 2 >= motor_d / 2 - motor_y + 0.5, "Sensor post runs into the motor");
 assert(sensor.z + 0.3 <= spost && sensor.x + 0.3 <= spost - 1, "Sensor does not fit its post");
+assert(sensor_gap + 0.1 <= magnet_gap_max, "Magnet too far from the sensor");
 assert(z_motor0 >= z_floor + 0.5, "Motor stands on the floor");
 assert(nano_rail_hw + 0.2 <= motor_ear_dx - post_d / 2 || nano_rail_y0 >= motor_y + post_d / 2,
        "Nano rails run into the motor posts");
@@ -359,7 +360,9 @@ module base() {
          cylinder(d = pilot_d, h = screw_depth + 1);
       // sensor pocket (flat face up, legs towards the axis) and the legs' groove down the post
       translate([spost_c.x - sensor.x / 2 - 0.15, spost_c.y - sensor.z / 2 - 0.15, z_spost - sensor_pocket])
-         cube([sensor.x + 0.3, spost, sensor_pocket + 1]);
+         cube([sensor.x + 0.3, sensor.z + 0.3, sensor_pocket + 1]);
+      translate([spost_c.x - sensor_legs_w / 2, spost_c.y, z_spost - sensor_pocket])
+         cube([sensor_legs_w, spost / 2 + 0.01, sensor_pocket + 1]);
       translate([spost_c.x - sensor.x / 2 - 0.15, spost_c.y + spost / 2 - 1.2, z_floor])
          cube([sensor.x + 0.3, 2, z_spost - z_floor + 1]);
       // ULN2003 board screws through the standoffs and the plate

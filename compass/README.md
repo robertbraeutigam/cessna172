@@ -26,8 +26,9 @@ frame's right top bar, about where the windshield's middle is (see
   is left of N): the real card stays put while the aircraft turns around
   it, so the stepper turns it counterclockwise (seen from above) as the
   heading grows.
-- **Home**: a 6 x 3 mm disc magnet in a pad under the drum's top disc
-  passes 1.5 mm over an A3144 hall sensor lying on a post. At start
+- **Home**: a 5 x 2 mm magnet (two 5 x 1 mm discs stacked) in a pad under the drum's top disc
+  passes 1.5 mm over an A3144 hall sensor lying on a post, centred in
+  its pocket (the legs' channel is narrower than its body). At start
   MobiFlight turns the card until the sensor pulls low and calls that
   position 0. The strip is glued with N in front there, so it does not
   matter where the magnet sits on the drum or which way the D bore goes on.
@@ -89,7 +90,7 @@ thicker paper or vinyl, set `paper_t` and print again.
 | 1 | 28BYJ-48 stepper, 5 V, with its ULN2003 driver board | card |
 | 1 | Arduino Nano (ATmega328P, 5 V), USB cable | MobiFlight board of the compass |
 | 1 | A3144 hall sensor (unipolar, not latching) | home |
-| 1 | disc magnet 6 x 3 mm | home |
+| 2 | disc magnet 5 x 1 mm | home (two stacked) |
 | 1 | clear sheet 1 mm (PET or acrylic), 52 x 30 mm | window |
 | 1 | the card, printed on paper | card |
 | 2 | M3 x 6 self tapping screw | motor ears onto the posts |

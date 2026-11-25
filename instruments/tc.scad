@@ -47,7 +47,7 @@
 //
 // Parts to buy:
 // - 2 x 28BYJ-48 stepper (5 V) with its ULN2003 board, an Arduino Nano and
-//   a mini USB cable, 2 x A3144 hall sensor, 2 x disc magnet 6 x 3 mm
+//   a mini USB cable, 2 x A3144 hall sensor, 4 x disc magnet 5 x 1 mm (stacked in pairs)
 // - 3 mm steel dowel pin, 20 mm (tc_axle_len)
 // - clear sheet 1 mm (glass), the face and the ball ring printed on
 //   photo paper

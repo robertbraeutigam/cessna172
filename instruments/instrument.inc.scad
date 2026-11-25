@@ -41,7 +41,7 @@
 // Parts to buy (per instrument):
 // - 28BYJ-48 stepper (5 V) with its ULN2003 driver board (motor_*, uln_*)
 // - Arduino Nano (ATmega328P, 5 V) and a USB cable (nano_*)
-// - A3144 hall sensor (sensor), disc magnet 6 x 3 mm (magnet)
+// - A3144 hall sensor (sensor), 2 x disc magnet 5 x 1 mm, stacked (magnet)
 // - 3 mm steel dowel pin, 12 mm (axle)
 // - clear sheet 1 mm, PET or acrylic (glass_t), the face printed on paper
 //   (paper_t)
@@ -223,6 +223,7 @@ for (c = cols) {
 assert(front_screw - sheet_t + back_screw - back_t + 1 <= y_back0 - y_sheet1, "Front and back screws meet in the columns");
 assert(mag_r + magnet[0] / 2 + 0.5 <= gear_rf && mag_r - magnet[0] / 2 >= shaft_d / 2 + 2, "Magnet does not fit the motor gear");
 assert(gear_t - magnet[1] - 0.1 >= 1, "Magnet pocket too deep for the gear");
+assert(gear_gap + 0.1 <= magnet_gap_max, "Magnet too far from the sensor");
 assert(norm(sensor_c - motor_c) >= motor_d / 2 + 2 && min([for (e = ears) norm(sensor_c - e)]) >= nut[0] / 2 + sensor.x / 2 + 2,
        "Sensor's legs run into the motor or its ear screws");
 assert(norm(sensor_c - [drive_a, 0]) + sensor.z / 2 + 3 <= arm_r + 1, "Sensor off the back plate");
@@ -354,10 +355,11 @@ module ring_gear_2d(z, m, ro) {
    }
 }
 
-// sensor: flat face towards -y at y, legs out along z (s: up or down) to the back
+// sensor: flat face towards -y at y, legs out along z (s: up or down) to the back,
+// their slot narrower than the body, so it stays centred at p
 module sensor_pocket(p, y, s, depth = back_t) {
    translate([p.x - sensor.x / 2 - 0.15, y - 0.01, p.y - sensor.z / 2 - 0.15]) cube([sensor.x + 0.3, sensor.y + 0.11, sensor.z + 0.3]);
-   translate([p.x - sensor.x / 2 - 0.15, y - 1, s > 0 ? p.y + sensor.z / 2 - 1 : p.y - sensor.z / 2 - 1.5]) cube([sensor.x + 0.3, depth + 2, 2.5]);
+   translate([p.x - sensor_legs_w / 2, y - 1, s > 0 ? p.y + sensor.z / 2 - 1 : p.y - sensor.z / 2 - 1.5]) cube([sensor_legs_w, depth + 2, 2.5]);
 }
 
 // --- Outlines, x right, z up ---
@@ -470,10 +472,7 @@ module back_plate() {
       translate([drive_a, y_back0 - 1, 0]) rotate([-90, 0, 0]) cylinder(d = motor_boss[0] + 0.6, h = back_t + 2);
       for (e = ears) translate([e.x, y_back0, e.y]) rotate([90, 0, 0]) csk_hole();
       // sensor: flat face forward in a pocket, its legs through a slot to the back
-      translate([sensor_c.x - sensor.x / 2 - 0.15, y_back0 - 0.01, sensor_c.y - sensor.z / 2 - 0.15])
-         cube([sensor.x + 0.3, sensor.y + 0.01, sensor.z + 0.3]);
-      translate([sensor_c.x - sensor.x / 2 - 0.15, y_back0 - 1, sensor_c.y + sensor.z / 2 - 1])
-         cube([sensor.x + 0.3, back_t + 2, 2.5]);
+      sensor_pocket(sensor_c, y_back0, 1);
       // the board carrier's screws, from the front into its posts
       for (s = car_screws) translate([s.x, y_back0, s.y]) rotate([90, 0, 0]) csk_hole();
    }

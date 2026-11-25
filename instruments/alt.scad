@@ -48,7 +48,7 @@
 //
 // Parts to buy:
 // - 2 x 28BYJ-48 stepper (5 V) with its ULN2003 board, an Arduino Nano and
-//   a mini USB cable, 2 x A3144 hall sensor, 2 x disc magnet 6 x 3 mm
+//   a mini USB cable, 2 x A3144 hall sensor, 4 x disc magnet 5 x 1 mm (stacked in pairs)
 // - 3 mm silver steel rod (the axle, axle_len, and the idler's pin,
 //   pin_len), brass tube 4 x 0.45 mm (tube, tube_len)
 // - a 10 turn pot 10k with a 6.35 mm shaft (3590S type, pot_*)
@@ -290,6 +290,7 @@ for (m = [mB]) {
 assert(norm(snsB - m_body(mB)) + sensor.z / 2 >= motor_d / 2 + 1.5, "Sensor B's legs (out of the far end) run into B");
 assert(norm(snsC - m_body(mC)) + sensor.z / 2 >= motor_d / 2 + 1.5, "Sensor C's legs (out of the far end) run into C");
 assert(cp[0] - mag_rm - magnet[0] / 2 >= 0.8 && cp[1] - magnet[1] - 0.1 >= 1.2, "Coupler too small for its magnet");
+assert(y_bp[0] - y_l2[1] + 0.1 <= magnet_gap_max && y_rp[0] - y_cp[1] + 0.1 <= magnet_gap_max, "A magnet too far from its sensor");
 assert(y_csh >= y_cp[0] - cp[3] + 3.5 && y_cp[1] - y_csh >= flat_len - 0.5, "C's shaft (its flats) does not reach through the coupler, or leaves the axle no room");
 assert(norm(m_body(mB)) - motor_d / 2 >= cp[2] / 2 + 1, "Coupler's hub runs into B");
 assert(norm(knob_c - m_body(mB)) >= pot_body[0] / 2 + motor_d / 2 + 1, "Pot runs into B");

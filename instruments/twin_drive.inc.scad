@@ -107,6 +107,7 @@ assert(norm(mB[0]) - pin_hub >= gear_ra + 1.5, "Pinion's hub runs into the axle'
 assert(norm(mB[0] - mA[0]) >= gear_ra + pin_hub + 2, "Pinion's hub runs into A's gear");
 assert(bmag[0] - magnet[0] / 2 - 1.5 <= dhub_d / 2 + 0.15 + sleeve_w, "The disc's magnet boss off the sleeve");
 assert(ring_t - magnet[1] - 0.1 + bd_t >= 1, "The disc's magnet pocket too deep");
+assert(y_d[0] - y_b[2] + 0.1 <= magnet_gap_max && y_p[0] - y_g[1] + 0.1 <= magnet_gap_max, "A magnet too far from its sensor");
 assert(dhub_d / 2 - (axle[0] + 0.3) / 2 >= 3, "Dial's hub too thin");
 // the disc's sensor in the dial, its legs in a groove to the hole, through the gear layer and the back plate
 assert(dp_t - sensor.y - 0.1 >= 0.5, "The disc's sensor pocket too deep for the dial");
@@ -222,7 +223,7 @@ module twin_dial(y_rim, y_hub) {
       // the disc's sensor: flat face forward, its legs out in a groove, then back through the hole
       rotate([0, bmag[1], 0]) {
          translate([-sensor.x / 2 - 0.15, y_d[0] - 0.01, bmag[0] - sensor.z / 2 - 0.15]) cube([sensor.x + 0.3, sensor.y + 0.11, sensor.z + 0.3]);
-         translate([-sensor.x / 2 - 0.15, y_d[0] - 0.01, bmag[0]]) cube([sensor.x + 0.3, 1, bsens_out - bmag[0] + 1]);
+         translate([-sensor_legs_w / 2, y_d[0] - 0.01, bmag[0]]) cube([sensor_legs_w, 1, bsens_out - bmag[0] + 1]);
          translate([0, y_d[0] - 1, bsens_out]) rotate([-90, 0, 0]) cylinder(d = 3, h = dp_t + 2);
       }
       // the back plate's posts' ends, keying it

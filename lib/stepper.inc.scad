@@ -35,7 +35,11 @@ uln_hole_xy = [for (x = [-1, 1], y = [-1, 1]) [x * (uln_board.x / 2 - uln_hole_i
 
 // --- A3144 hall sensor and the disc magnet, MEASURE ---
 sensor = [4.1, 1.6, 3.1];    // A3144 (TO-92S): width, thickness (flat face), height
-magnet = [6, 3];             // disc magnet: diameter, height
+sensor_legs_w = 3.6;         // the legs' slot: wider than the legs (2.54 + a leg), narrower than the body,
+                             // so the body stays centred in its pocket over the magnet
+magnet = [5, 2];             // disc magnet: diameter, height (two 5 x 1 stacked)
+magnet_gap_max = 2.5;        // magnet to the sensor's flat face: two 5 x 1 switch it reliably up to about 3,
+                             // centred over its middle
 
 // The stepper for the views: the flange's top at z = 0, the shaft at the
 // origin pointing up (+z), the body towards +y

@@ -72,8 +72,10 @@ top bar is in the way.
   behind the sheet (`inst_depth` in the frame, which checks it against
   the force feedback yoke's housing, set back for it: `ffb_back`). The
   motor's shaft end sits in a pocket in the dial's back.
-- **Home**: a 6 x 3 mm disc magnet in the motor gear's back face passes
-  0.5 mm over an A3144 hall sensor in a pocket in the back plate. The
+- **Home**: a 5 x 2 mm magnet (two 5 x 1 mm discs stacked) in the motor gear's back face passes
+  0.5 mm over an A3144 hall sensor in a pocket in the back plate (its
+  legs' slot is narrower than its body, so it stays centred under the
+  magnet; it switches reliably up to about a 3 mm gap). The
   gears are 1:1, so there is one home per needle turn. At start
   MobiFlight turns the needle until the sensor pulls low and calls that
   0. The needle is pressed on pointing at 0 after it has homed, so the
@@ -171,7 +173,7 @@ Per instrument:
 | 1 | 28BYJ-48 stepper, 5 V, with its ULN2003 driver board | needle |
 | 1 | Arduino Nano (ATmega328P, 5 V), USB cable | MobiFlight board of the instrument |
 | 1 | A3144 hall sensor (unipolar, not latching) | home |
-| 1 | disc magnet 6 x 3 mm | home |
+| 2 | disc magnet 5 x 1 mm | home (two stacked) |
 | 1 | steel dowel pin 3 x 12 mm | needle axle |
 | 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
 | 1 | the face, printed on photo paper | face |
@@ -406,7 +408,7 @@ arms).
 | 1 | Arduino Nano (ATmega328P, 5 V), mini USB cable with an angled plug | MobiFlight board of the instrument |
 | 1 | capsule slip ring, 8 wires (MSM-12-08A: 12 mm, 24 mm flange with 3 holes) | the pitch motor's and sensor's wires across the roll axis |
 | 2 | A3144 hall sensor | homes |
-| 2 | disc magnet 6 x 3 mm | homes |
+| 4 | disc magnet 5 x 1 mm | homes (two stacked each) |
 | 2 | steel dowel pin 3 x 10 mm | the bowl's pivots |
 | 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
 | 1 | the dial's face, printed on photo paper | roll dial |
@@ -577,7 +579,7 @@ ring on its edges and glue it onto the disc's front.
 | 2 | 28BYJ-48 stepper, 5 V, with its ULN2003 driver board | the two needles |
 | 1 | Arduino Nano (ATmega328P, 5 V), mini USB cable | MobiFlight board of the instrument |
 | 2 | A3144 hall sensor | homes |
-| 2 | disc magnet 6 x 3 mm | homes |
+| 4 | disc magnet 5 x 1 mm | homes (two stacked each) |
 | 1 | 10 turn pot 10k, 6.35 mm shaft, 3590S type (e.g. Bourns 3590S-2-103L or a clone) | the Kollsman knob |
 | 1 | 3 mm silver steel rod, 44 + 16 mm | the axle, the idler's pin |
 | 1 | brass tube 4 x 0.45 mm, 21 mm | the 1000 ft needle's shaft |
@@ -749,7 +751,7 @@ front. The airplane is a printed part, not on the paper.
 | 2 | 28BYJ-48 stepper, 5 V, with its ULN2003 driver board | card and bug |
 | 1 | Arduino Nano (ATmega328P, 5 V), mini USB cable (straight plug) | MobiFlight board of the instrument |
 | 2 | A3144 hall sensor | homes |
-| 2 | disc magnet 6 x 3 mm | homes |
+| 4 | disc magnet 5 x 1 mm | homes (two stacked each) |
 | 2 | EC11 rotary encoder with push switch, 20 mm D shaft, M7 bushing, with its nut | the knobs |
 | 1 | 3 mm steel dowel pin, 16 mm | the card's axle |
 | 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
@@ -920,7 +922,7 @@ disc's edge (over the magnet), the ball at the bottom.
 | 2 | 28BYJ-48 stepper, 5 V, with its ULN2003 driver board | airplane and ball |
 | 1 | Arduino Nano (ATmega328P, 5 V), mini USB cable (straight plug) | MobiFlight board of the instrument |
 | 2 | A3144 hall sensor | homes |
-| 2 | disc magnet 6 x 3 mm | homes |
+| 4 | disc magnet 5 x 1 mm | homes (two stacked each) |
 | 1 | 3 mm steel dowel pin, 20 mm | the airplane's axle |
 | 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
 | 1 | the face and the ball ring, printed on photo paper | |

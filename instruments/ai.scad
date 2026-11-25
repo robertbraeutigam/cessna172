@@ -59,8 +59,8 @@
 //
 // Parts to buy:
 // - 2 x 28BYJ-48 stepper (5 V) with its ULN2003 board, an Arduino Nano and
-//   a mini USB cable (angled plug), 2 x A3144 hall sensor, 2 x disc magnet
-//   6 x 3 mm, a capsule slip ring with 8 wires (MSM-12-08A: 12 mm, a 24 mm
+//   a mini USB cable (angled plug), 2 x A3144 hall sensor, 4 x disc magnet
+//   5 x 1 mm (stacked in pairs), a capsule slip ring with 8 wires (MSM-12-08A: 12 mm, a 24 mm
 //   flange with 3 holes)
 // - 2 x steel dowel pin 3 x 10 mm (the bowl's pivots)
 // - clear sheet 1 mm (glass), the dial's face printed on photo paper
@@ -285,6 +285,7 @@ assert(mag_rb + magnet[0] / 2 + 0.5 <= sqrt(bowl_r * bowl_r - bowl_x * bowl_x) &
        "Pitch magnet off the bowl's side");
 assert(abs(home_pitch) + asin(magnet[0] / 2 / mag_rb) + 2 <= bowl_a, "Pitch magnet off the side plate's sector");
 assert(mag_rb - sensor.z / 2 >= run_d / 2 + 2, "Pitch sensor runs into the pivot");
+assert(x_arm - bowl_x + 0.1 <= magnet_gap_max && gear_gap + 0.1 <= magnet_gap_max, "A magnet too far from its sensor");
 // pitch drive: the sector and the pinion inside the bowl, the motor clear of the shell
 assert(-x_g[0] <= x_side - 0.5 && x_g[1] >= -x_side + hub_l - 0.01, "Sector off the left hub");
 assert(a_pitch - ra_pinion >= hex_af / cos(30) / 2 + 0.5, "Pinion runs into the left hub");
@@ -714,8 +715,7 @@ module ai_back_plate() {
       translate([drive_a, y_bk0 - 1, 0]) rotate([-90, 0, 0]) cylinder(d = motor_boss[0] + 0.6, h = back_t + 2);
       for (e = rm_ears) translate([e.x, y_bk0, e.y]) rotate([90, 0, 0]) csk_hole();
       // roll sensor: flat face forward in a pocket, the legs through a slot to the back
-      translate([rsensor.x - sensor.x / 2 - 0.15, y_bk0 - 0.01, rsensor.y - sensor.z / 2 - 0.15]) cube([sensor.x + 0.3, sensor.y + 0.01, sensor.z + 0.3]);
-      translate([rsensor.x - sensor.x / 2 - 0.15, y_bk0 - 1, rsensor.y + sensor.z / 2 - 1]) cube([sensor.x + 0.3, back_t + 2, 2.5]);
+      sensor_pocket(rsensor, y_bk0, 1);
       for (p = posts) translate([p.x, y_cr0 + 0.01, p.y]) rotate([90, 0, 0]) cylinder(d = pilot_d, h = back_screw - car_t + 1);
    }
 }
