@@ -78,8 +78,12 @@ The panel is 97 x 100 mm (the back 77 x 80 mm), with the flange all
 round; it used to have none on its right end, where it met the switch
 row, so print the panel and its face again. Its front is a separate
 1 mm face with the position labels, tick marks and MAGNETOS standing 0.8 mm
-out of it around the key, to be painted with a white acrylic paint pen.
-The face is printed front side up (the STL is already flipped), the panel
+out of it around the key (and 0.4 mm into it, `label_in`). They are a
+white part of their own, `ignition_face_white.stl`, in the same place as
+the black `ignition_face.stl`: load both as one object and give each its
+filament (see [Two colours](../compass/README.md#two-colours)); in one
+colour print both black and paint the labels with a white acrylic paint
+pen. The face is printed front side up (the STL is already flipped), the panel
 front side down, so neither needs supports; together they are 3 mm thick,
 like the switch panel. The mount screws clamp the face onto the panel,
 and so does the lock flange (glue or double sided tape it on

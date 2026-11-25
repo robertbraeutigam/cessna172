@@ -93,7 +93,10 @@ bracket is wider than the cut-out, so it goes on from behind the sheet.
 | - | 3 wires | pot to the switch panel's Nano |
 
 Printed: `primer_panel.stl` (front side down), `primer_face.stl` (front
-side up), `primer_knob.stl` (the head, front down), `primer_stem.stl`
+side up) with its white label `primer_face_white.stl` (two colours, as
+the compass's: load both as one object and give each its filament, see
+[Two colours](../compass/README.md#two-colours); in one colour print both black and paint the
+label), `primer_knob.stl` (the head, front down), `primer_stem.stl`
 (on its lug end), `primer_bracket.stl`
 (on its spine), `primer_strap.stl` (2x), `primer_carrier.stl`.
 
@@ -107,7 +110,7 @@ stiffer spring pops harder, the pot slider's friction works against it.
 
 ### Assembly
 
-1. Paint the label, put the face on the panel, push the panel through its
+1. In one colour, paint the label. Put the face on the panel, push the panel through its
    cut-out and screw the flange onto the sheet.
 2. From behind: put the knob's stem into the tube, the lug in the keyway,
    and push it in until its front end comes out of the face. Push the
@@ -154,9 +157,13 @@ only.
 
 The switch list (`groups` in the source) drives the layout. The
 panel is 216.6 x 100 mm (the back 196.6 x 80 mm). Like the ignition, its
-front is a separate 1 mm face with the labels standing 0.8 mm out of it,
-for a white paint pen; the face is printed front side up
-(`switches_face.stl`), the panel front side down, so neither needs
+front is a separate 1 mm face with the labels standing 0.8 mm out of it
+and 0.4 mm into it (`label_in`). They are a white part of their own,
+`switches_face_white.stl`, in the same place as the black
+`switches_face.stl`: load both as one object and give each its filament
+(see [Two colours](../compass/README.md#two-colours)); in one colour print both black and paint
+the labels with a white paint pen. The face is printed front side up,
+the panel front side down, so neither needs
 supports, and together they are 3 mm thick. The toggle nuts, the rocker
 lips and the mount screws clamp the face on. The switches and labels need about 61 mm of the back's height, the
 rest is split between above and below them. The rim on the back stiffens
@@ -173,7 +180,7 @@ it.
 | 1 | Arduino Nano (ATmega328P, 5 V, mini USB) | all inputs, see [Nano](#nano) |
 | 2 | M3 x 8 self tapping screw | carrier (`switches_carrier.stl`) onto the panel |
 | 4 | printed rocker cap (`switches_cap.stl`, 2 in red, 2 in white) + CA glue or epoxy | the Cessna look, see [Rocker caps](#rocker-caps) |
-| 6 | printed dummy breaker (`switches_breakers.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
+| 6 | printed dummy breaker (`switches_breakers.stl` and `switches_breakers_white.stl`) + glue | circuit breakers, see [Circuit breakers](#circuit-breakers) |
 | 1 | mini USB cable, long enough to the powered USB hub | the Nano to the PC |
 | 1 | cable tie, up to 3.6 mm wide | the USB cable onto its block (`tie`) |
 | 1 | 7 pin Dupont or JST connector (optional) | ignition cable, so the panels can be separated, see [Wiring](#wiring) |
@@ -263,9 +270,11 @@ the button. Here they are non-functional dummies: a hex nut with a button
 on top and the rating engraved into the button, all printed as one part
 (`switches_breakers.stl`, nut side down). They are glued into hex holes in
 the 1 mm face, onto the panel behind it, which locate them and keep them
-straight; nothing goes through the panel. Print them in black and paint the
-nut silver and the rating white, or print the nut and the button in
-different colors.
+straight; nothing goes through the panel. The rating is engraved 0.8 mm
+deep and filled by a white part of its own, `switches_breakers_white.stl`
+(two colours, see [Two colours](../compass/README.md#two-colours)). Print the rest black (or
+paint the nut silver); in one colour, print both black and paint the
+rating white.
 
 They are the ones of the X-Plane 172N's row over the toggles: FLAP 10,
 INST 5, AVN BUS 1 15, AVN BUS 2 15, TURN COORD 5, INST LTS 5 (its ALT

@@ -32,11 +32,15 @@ sheet_cut_clear = 1;         // sheet hole beyond the back, all round (frame/)
 
 // --- Front face and lettering ---
 // The front of both panels is a separate thin face, printed front side up,
-// with the lettering standing out of it, to be painted with a white paint
-// pen. The printed panel behind it is panel_t - face_t thick at the front
-// and printed front side down, so neither needs supports.
+// with the lettering standing out of it. Two colours: the lettering is a
+// white part of its own (face_white), also inlaid into the face (label_in)
+// so it is thick enough to look white; in one colour print both in black
+// and paint the lettering with a white paint pen. The printed panel
+// behind it is panel_t - face_t thick at the front and printed front side
+// down, so neither needs supports.
 face_t = 1;
 label_raise = 0.8;           // lettering in front of the face
+label_in = 0.4;              // and into it
 font = "Liberation Sans:style=Bold";
 label_size = 3;
 group_label_size = 3.2;
@@ -49,6 +53,7 @@ c_label = "#f4f4f4";
 assert(mount_inset + mount_nut_r + 0.3 <= flange_w - sheet_cut_clear,
        "Mount nuts do not sit on the sheet, make flange_w wider");
 assert(face_t >= 0.8 && panel_t - face_t >= 1.6, "Face or panel plate too thin");
+assert(face_t - label_in >= 0.6, "Face too thin behind the lettering");
 assert(mount_d / 2 + 1.2 <= mount_inset, "Mount holes too close to the face edge");
 
 // Mount holes in the flange: top and bottom row. h is the back's height,

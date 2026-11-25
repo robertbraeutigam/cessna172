@@ -659,12 +659,22 @@ module panel() {
    }
 }
 
-// Front face from z=-panel_t to the panel, with the labels standing out in
-// front of it
-module face() {
+// The labels, white: standing out of the face and inlaid into it
+module face_labels() {
    translate([0, 0, -panel_t - label_raise])
-      linear_extrude(label_raise + 0.01)
+      linear_extrude(label_raise + label_in)
          labels_2d();
+}
+
+// Front face from z=-panel_t to the panel, the labels' pockets in it
+module face() {
+   difference() {
+      face_plate();
+      face_labels();
+   }
+}
+
+module face_plate() {
    translate([0, 0, -panel_t])
       linear_extrude(face_t)
          difference() {
@@ -814,14 +824,12 @@ module panel_part() {
    face_part();
 }
 
-// Face with the raised labels painted
+// Face with its white labels
 module face_part() {
    color(c_panel)
       face();
    color(c_label)
-      translate([0, 0, -panel_t - label_raise - 0.01])
-         linear_extrude(0.02)
-            labels_2d();
+      face_labels();
 }
 
 module mount_screws() {
@@ -1111,6 +1119,7 @@ module front_view(pos = 0) {
 housing(); // Make module housing
 translate([0, 0, -explode]) panel(); // Make module panel
 translate([0, 0, -2 * explode]) rotate([0, 180, 0]) face(); // Make module face
+translate([0, 0, -2 * explode]) rotate([0, 180, 0]) face_labels(); // Make module face_white
 translate([0, 0, z_cam]) rotate([0, 0, pos_angle(view_pos)]) rotor(); // Make module rotor
 translate([half + 10, 0, 0]) shoe_print(); // Make module shoe
 translate([0, 0, explode]) cover(); // Make module cover

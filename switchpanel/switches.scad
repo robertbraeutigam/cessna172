@@ -210,7 +210,7 @@ cb_button_d = 6.5;
 cb_button_h = 4;             // above the nut
 cb_button_chamfer = 0.5;
 cb_rating_size = 2.6;        // number engraved into the button
-cb_rating_depth = 0.4;
+cb_rating_depth = 0.8;       // white part of its own (breakers_white), deep enough to look white
 cb_label_size = 2.2;
 cb_label_line = 3.1;         // line pitch of two-line breaker labels
 cb_label_gap = 1.5;          // nut to its label
@@ -533,11 +533,22 @@ module panel() {
    }
 }
 
-// Front face from z=-face_t to 0, the labels stand out in front of it
-module face() {
-   translate([0, 0, -0.01])
-      linear_extrude(label_raise + 0.01)
+// The labels, white: standing out of the face and inlaid into it
+module face_labels() {
+   translate([0, 0, -label_in])
+      linear_extrude(label_in + label_raise)
          labels_2d();
+}
+
+// Front face from z=-face_t to 0, the labels' pockets in it
+module face() {
+   difference() {
+      face_plate();
+      face_labels();
+   }
+}
+
+module face_plate() {
    translate([0, 0, -face_t])
       linear_extrude(face_t)
          difference() {
@@ -580,11 +591,24 @@ module breaker(amps) {
       cb_button(amps);
 }
 
+// Its rating, white: filling the engraving
+module breaker_rating(amps) {
+   translate([0, 0, cb_nut_t - 0.01 + cb_button_h - cb_rating_depth])
+      linear_extrude(cb_rating_depth)
+         cb_rating_2d(amps);
+}
+
 // All breakers in a row, as they are printed: nut down
 module breakers_plate() {
    for (i = [0 : len(breakers) - 1])
       translate([i * (2 * cb_r + cb_print_space), 0, 0])
          breaker(breakers[i][1]);
+}
+
+module breakers_white() {
+   for (i = [0 : len(breakers) - 1])
+      translate([i * (2 * cb_r + cb_print_space), 0, 0])
+         breaker_rating(breakers[i][1]);
 }
 
 // --- Rocker caps ---
@@ -852,9 +876,7 @@ module breakers_part() {
             translate([0, 0, cb_nut_t - 0.01])
                cb_button(breakers[i][1]);
          color(c_label)
-            translate([0, 0, cb_nut_t + cb_button_h - cb_rating_depth])
-               linear_extrude(cb_rating_depth - 0.02)
-                  cb_rating_2d(breakers[i][1]);
+            breaker_rating(breakers[i][1]);
       }
 }
 
@@ -865,14 +887,12 @@ module panel_part() {
    face_part();
 }
 
-// Face with the raised labels painted
+// Face with its white labels
 module face_part() {
    color(c_panel)
       face();
    color(c_label)
-      translate([0, 0, label_raise - 0.01])
-         linear_extrude(0.02)
-            labels_2d();
+      face_labels();
 }
 
 module mount_screws() {
@@ -1040,6 +1060,7 @@ module section_view(u, w = 40) {
             union() {
                panel();
                face();
+               face_labels();
             }
             translate([u[0] - w, panel_y0 - 1, -50])
                cube([w, panel_size.y + 2, 100]);
@@ -1049,7 +1070,9 @@ module section_view(u, w = 40) {
 
 rotate([0, 180, 0]) panel(); // Make module panel
 translate([0, 0, -30]) face(); // Make module face
+translate([0, 0, -30]) face_labels(); // Make module face_white
 breakers_plate(); // Make module breakers
+breakers_white(); // Make module breakers_white
 nano_carrier(); // Make module carrier
 rocker_cap(); // Make module cap
 

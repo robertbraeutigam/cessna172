@@ -482,6 +482,13 @@ box_lid(); // Make module lid
   earlier; white covers, it is the paper). The PDF export centers every
   layer on its own outline, so the file must draw the same registration
   marks in every layer.
+- Two colours (the printer prints multi-colour): a part with white
+  lettering or marks is two modules in the same print place, `<name>`
+  (black, with pockets) and `<name>_white` (the white part, standing out
+  and inlaid, so it is thick enough to look white), loaded together in the
+  slicer as one object (compass, ignition and switch panel faces, the
+  breakers; `compass/README.md#two-colours`). In one colour both are
+  printed black and the white painted.
 - Files without any `Make module` marker are rendered whole to
   `target/<file>.stl`, unless they have `Make view` markers: then they
   only make views (their asserts are still checked), like `frame.scad`.

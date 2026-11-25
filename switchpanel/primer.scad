@@ -278,11 +278,22 @@ module labels_2d() {
          text(title, size = label_size, font = font, halign = "center");
 }
 
-// Front face from z=-panel_t to the panel, the label standing out of it
-module face() {
+// The label, white: standing out of the face and inlaid into it
+module face_labels() {
    translate([0, 0, -panel_t - label_raise])
-      linear_extrude(label_raise + 0.01)
+      linear_extrude(label_raise + label_in)
          labels_2d();
+}
+
+// Front face from z=-panel_t to the panel, the label's pocket in it
+module face() {
+   difference() {
+      face_plate();
+      face_labels();
+   }
+}
+
+module face_plate() {
    translate([0, 0, -panel_t])
       linear_extrude(face_t)
          difference() {
@@ -531,10 +542,7 @@ module pop_spring_part(u) {
 module panel_part() {
    color(c_tube) panel();
    color(c_panel) face();
-   color(c_label)
-      translate([0, 0, -panel_t - label_raise - 0.01])
-         linear_extrude(0.02)
-            labels_2d();
+   color(c_label) face_labels();
 }
 
 module bracket_parts() {
@@ -565,6 +573,7 @@ module section_view(u = stroke, locked = true) {
    t = locked ? lock_turn : 0;
    color(c_tube) cut() panel();
    color(c_panel) cut() face();
+   color(c_label) cut() face_labels();
    color(c_knob) cut() knob_in_place(u, t);
    color(c_bracket) cut() bracket();
    color(c_carrier) cut() for (i = [0, 1]) strap_in_place(i);
@@ -577,6 +586,7 @@ module section_view(u = stroke, locked = true) {
 
 module exploded_view(e = explode) {
    color(c_panel) translate([0, 0, -2 * e]) face();
+   color(c_label) translate([0, 0, -2 * e]) face_labels();
    color(c_tube) panel();
    color(c_knob) translate([0, 0, -3 * e]) knob_in_place(stroke, 0) knob_head();
    color(c_knob) translate([0, 0, e]) knob_in_place(stroke, 0) knob_stem();
@@ -596,6 +606,7 @@ module installed() {
 
 translate([0, 0, -explode]) panel(); // Make module panel
 translate([0, 0, -2 * explode]) rotate([0, 180, 0]) face(); // Make module face
+translate([0, 0, -2 * explode]) rotate([0, 180, 0]) face_labels(); // Make module face_white
 translate([0, 0, knob_len]) knob_head(); // Make module knob
 translate([knob_d, 0, stem_len]) rotate([180, 0, 0]) knob_stem(); // Make module stem
 translate([0, 0, -spine_x + spine_t]) rotate([0, -90, 0]) bracket(); // Make module bracket
