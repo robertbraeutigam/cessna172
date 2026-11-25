@@ -123,7 +123,7 @@ project page: [RPM](https://robertbraeutigam.github.io/cessna172/instruments/rpm
 [VSI](https://robertbraeutigam.github.io/cessna172/instruments/vsi_face.pdf)),
 each two faces and a cut template for the glass on an A4 page (landscape), in
 colour, 1:1, with OpenSCAD's scale bar along the edges. It is made the
-same way as the [compass card](../compass/README.md#the-card), but in
+same way as any print (see [Building](../README.md#building)), but in
 colour: every shape of the face is drawn with `ink(colour)`, and the
 `Make print face black,#1f9e3a,white,#e02020` marker tells the Makefile to
 render it once per colour and lay the layers over each other in that

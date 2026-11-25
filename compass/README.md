@@ -13,24 +13,25 @@ frame's right top bar, about where the windshield's middle is (see
 
 | File | Parts |
 |------|-------|
-| `compass.scad` | base (floor with the motor posts, sensor post, Nano rails and the ULN2003 plate), shell, bezel, bezel back, drum, stand; the card print |
+| `compass.scad` | base (floor with the motor posts, sensor post, Nano rails and the ULN2003 plate), shell, bezel, bezel back, drum (the card), stand |
 
 ## How it works
 
-- **Card**: the drum is an inverted cup, a top disc with a 58 mm band
+- **Card**: the drum is an inverted cup, a top disc with a 57.5 mm band
   hanging from it. It sits over the motor and is pressed onto the shaft
   (double D bore, blind, so the shaft end sets its height). The motor
-  stands on two posts under its ears. The card is a paper strip glued
-  around the band: white 5° and 10° ticks and N 3 6 E 12 15 S 21 24 W 30
-  33 on black. Like on the real compass, the numbers fall to the right (E
-  is left of N): the real card stays put while the aircraft turns around
-  it, so the stepper turns it counterclockwise (seen from above) as the
-  heading grows.
+  stands on two posts under its ears. The band is the card: printed in
+  black, its 5° and 10° ticks (1 mm wide) and N 3 6 E 12 15 S 21 24 W 30
+  33 stand 0.6 mm out of it (`mark_h`), painted white. Like on the real
+  compass, the numbers fall to the right (E is left of N): the real card
+  stays put while the aircraft turns around it, so the stepper turns it
+  counterclockwise (seen from above) as the heading grows.
 - **Home**: a 5 x 2 mm magnet (two 5 x 1 mm discs stacked) in a pad under the drum's top disc
   passes 1.5 mm over an A3144 hall sensor lying on a post, centred in
   its pocket (the legs' channel is narrower than its body). At start
   MobiFlight turns the card until the sensor pulls low and calls that
-  position 0. The strip is glued with N in front there, so it does not
+  its zero. Wherever N is then, an offset in the output's transform puts
+  it under the lubber line (see [MobiFlight](#mobiflight)), so it does not
   matter where the magnet sits on the drum or which way the D bore goes on.
 - **Window**: round with a flat top and bottom, so only the card shows. A
   1 mm clear sheet lies in a pocket in the bezel back's front (a 2 mm
@@ -67,26 +68,28 @@ The motor, board, sensor and magnet sizes (`motor_*`, `uln_*`, `sensor`,
 `magnet`: the shared ones of [`lib/stepper.inc.scad`](../lib/stepper.inc.scad),
 the instruments' too; the Nano's `nano_*` and its rails are the shared
 ones of [`lib/nano.inc.scad`](../lib/nano.inc.scad), here without their
-lips: it drops in from above) and the paper and window sheet thicknesses
-(`paper_t`, `glass_t`) are MEASURE values. The `assert`s check that the
-band clears the motor, its ears, wires and posts, the sensor post and the
-side walls; that the pad clears the hub, the band and the ear screws; that
-the boards clear each other, the card and the screw columns; that the
-stand's screws clear the posts and the Nano; and that the card strip fits
-an A4 page.
+lips: it drops in from above) and the window sheet's thickness
+(`glass_t`) are MEASURE values. The `assert`s check that the
+band clears the motor, its ears, wires and posts, the sensor post, and
+with its marks the side walls and the lubber line; that the pad clears
+the hub, the band and the ear screws; that the boards clear each other,
+the card and the screw columns; and that the stand's screws clear the
+posts and the Nano.
+
+The case was first printed around a paper card glued onto a 58 mm band.
+Its sizes stay as they were (`bz_back`, the axis to the bezel back), and
+the band is 0.5 mm smaller so the marks clear the side walls by 0.65 mm;
+only the drum is new. The notch in the base's front edge was the paper
+card's front mark and has no use now.
 
 ## The card
 
-`make` writes `target/compass_card.pdf` (also on the
-[project page](https://robertbraeutigam.github.io/cessna172/compass/compass_card.pdf)):
-three strips on an A4 page, drawn 1:1 in black with the markings as white
-paper, and OpenSCAD's scale bar along the edges. Print it at 100 % (no "fit
-to page"), check the scale bar with a ruler, and cut out one strip along
-its black edges. It is black and white, like the real card, so any printer
-will do: matte photo paper or a print shop's sticker vinyl looks best. The
-strip is 182.5 mm (the band's circumference at the paper's middle,
-`paper_t`) plus a 6 mm plain black end that goes under the other end. With
-thicker paper or vinyl, set `paper_t` and print again.
+Print the drum in black (top down, as the STL lies). The marks stand
+0.6 mm out of the band, so they are easy to paint: wipe a nearly dry flat
+brush with white acrylic across them, or go over them with a white paint
+pen, and touch up the edges with a fine brush. Paint before the drum goes
+on, and keep the paint off the band between the marks (wipe it off with a
+damp cloth while it is wet).
 
 ## Hardware
 
@@ -97,7 +100,7 @@ thicker paper or vinyl, set `paper_t` and print again.
 | 1 | A3144 hall sensor (unipolar, not latching) | home |
 | 2 | disc magnet 5 x 1 mm | home (two stacked) |
 | 1 | clear sheet 1 mm (PET or acrylic), 52 x 30 mm, no glue | window |
-| 1 | the card, printed on paper | card |
+| 1 | white acrylic paint (or a white paint pen) | the card's marks, lubber line, lettering |
 | 2 | M3 x 6 self tapping screw | motor ears onto the posts |
 | 4 | M3 x 8 self tapping screw | ULN2003 board |
 | 10 | M3 x 10 countersunk self tapping screw | bezel (4), base into the shell (2), base onto the stand (4) |
@@ -114,11 +117,9 @@ thicker paper or vinyl, set `paper_t` and print again.
    the back), ULN2003 board behind its plate (parts towards the back
    wall). Wire them (see [Wiring](#wiring)), coil the motor's cable behind
    the plate and plug it in.
-4. Flash and set up MobiFlight (see [MobiFlight](#mobiflight)), and let
-   the stepper home with the drum pushed on. Mark the drum's front at the
-   notch in the base's front edge, pull the drum off, and glue the card on
-   with N on the mark and the plain end under, its top edge flush with the
-   drum's top. Press the drum back on.
+4. Paint the drum's marks (see [The card](#the-card)) and press it onto
+   the shaft, any way round. Flash and set up MobiFlight (see
+   [MobiFlight](#mobiflight)), let it home and set the N offset.
 5. Shell down over it from above, the USB cable through the notch in the
    back wall, two screws from below into the back columns.
 6. Paint the lubber line and the lettering. Lay the bezel back on its
@@ -175,6 +176,13 @@ as they change between versions.
   in flight still takes only some 10-20 mA on average, and the motor and
   the ULN2003 board stay cool (see
   [USB](#wiring)).
-- **Fine tuning**: if N is a little off the lubber line after homing,
-  add an offset in the transform (e.g. `$+2`) rather than gluing the card
-  again.
+- **N offset**: after homing the card is wherever the magnet put it, so
+  set its direction first, then the offset. With the output's value at 0
+  (the Connector's test value, or the airplane heading north), read the
+  card under the lubber line, say `r` degrees (N = 0, 3 = 30, ... 33 =
+  330; between ticks as well as you can). Then make the transform
+  `($+360-r)%360` (for `r` = 40: `($+320)%360`; with the direction
+  reversed, `(720-$-r)%360`) and check N again. The `%360` keeps the value
+  in 0..359 for the compass mode. The sensor trips at the same place at
+  every start, so the offset holds; it changes only if the drum is pulled
+  off and pressed on again, or the magnet moves.

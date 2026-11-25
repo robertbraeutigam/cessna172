@@ -16,7 +16,7 @@ wiring and the assembly:
 | [`ignition/`](ignition/README.md) | the ignition key switch, the left end of the switch panel |
 | [`frame/`](frame/README.md) | the aluminium frame and panel sheet that everything mounts on |
 | [`yoke/`](yoke/README.md) | the hollow control wheel: PTT, trim rocker, a Nano inside |
-| [`compass/`](compass/README.md) | the magnetic compass over the panel: a printed card on a 28BYJ-48 stepper, on its own Nano |
+| [`compass/`](compass/README.md) | the magnetic compass over the panel: a printed drum card on a 28BYJ-48 stepper, on its own Nano |
 | [`instruments/`](instruments/README.md) | the analogue instruments: the RPM, airspeed, vertical speed, attitude and heading indicators, the altimeter, the turn coordinator and the NAV indicators (CDI), 28BYJ-48 steppers behind colour printed faces |
 | [`radio/`](radio/README.md) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, each on its own Nano |
 
@@ -62,7 +62,7 @@ face_print(); // Make print face black,#1f9e3a,white -> target/<file>_face.pdf, 
 ```
 
 A leading `//` only hides a line from the OpenSCAD preview; the build still
-renders it. A print is a 2D drawing for paper (the compass card): exported
+renders it. A print is a 2D drawing for paper: exported
 1:1 to an A4 PDF, filled black, with OpenSCAD's scale bar to check it. With
 a list of colours it is a colour print (an instrument's face): rendered
 once per colour, the file drawing only that colour's shapes
@@ -229,9 +229,9 @@ and a Nano inside.
 
 ### [Compass](compass/README.md)
 
-The magnetic compass over the panel: a drum card with a printed paper
-strip, turned by a 28BYJ-48 stepper and homed on a hall sensor, on an
-Arduino Nano of its own.
+The magnetic compass over the panel: a printed drum card, its marks
+standing out of it and painted white, turned by a 28BYJ-48 stepper and
+homed on a hall sensor, on an Arduino Nano of its own.
 
 [![Compass](https://robertbraeutigam.github.io/cessna172/compass/compass_montage.png)](https://robertbraeutigam.github.io/cessna172/compass/compass_montage.png)
 

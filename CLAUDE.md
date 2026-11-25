@@ -161,9 +161,12 @@ its own top-level directory; new components should follow the same layout.
   size), standing over the panel on a printed stand bolted into the frame's
   right top bar (`frame/frame.inc.scad` repeats its sizes). The card is a
   drum (inverted cup) pressed onto a 28BYJ-48 stepper's shaft, over the
-  motor; a printed paper strip (`card_print`, a `Make print`) is glued
-  around it, numbers falling to the right like the real card. A magnet in
-  the drum and an A3144 hall sensor on a post home it. MobiFlight on an
+  motor, printed in black, its ticks and numbers standing out of the band
+  (`mark_h`, painted white), numbers falling to the right like the real
+  card. A magnet in the drum and an A3144 hall sensor on a post home it;
+  an offset in MobiFlight's transform puts N under the lubber line. The
+  case is printed (it was made for a paper card): its sizes stay
+  (`bz_back`), the band fits inside them. MobiFlight on an
   Arduino Nano of its own (USB to the powered USB hub) drives the ULN2003 board. Parts: base (everything is
   mounted on it), shell, bezel (window, dummy compensator screws, the
   glass in a pocket in its back), bezel back (holds the glass, lubber
@@ -466,8 +469,8 @@ box_lid(); // Make module lid
 - `// Ignore module` — never rendered. Used for reference geometry (pots, rods)
   that is shown with `#` in the preview while designing.
 - `// Make print <name>` — a 2D statement exported to
-  `target/<file>_<name>.pdf`, 1:1 on an A4 page, filled black (paper parts
-  like the compass card; the PDFs are deployed with the STLs). Prints are
+  `target/<file>_<name>.pdf`, 1:1 on an A4 page, filled black (paper
+  parts; the PDFs are deployed with the STLs). Prints are
   made with the models, also from files with modules.
   `// Make print <name> <colour>,<colour>,...` (no spaces in the list) is
   a colour print: the statement is rendered once per colour with

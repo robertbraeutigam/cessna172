@@ -10,14 +10,18 @@
 // - The drum is an inverted cup (top disc and band) pressed onto the
 //   motor's shaft (double D bore, blind: the shaft end sets its height). It
 //   hangs over the motor, which stands on two posts under its ears.
-// - The card itself is a paper strip (compass_card.pdf, printed 1:1)
-//   glued around the band: white ticks and N 3 6 E 12 ... on black. Seen
-//   from the front the numbers fall to the right (E is left of N), like on
-//   the real card, which stays put while the aircraft turns around it.
+// - The card is the band itself, printed in black: its ticks and
+//   N 3 6 E 12 ... stand out of it (mark_h), painted white. Seen from the
+//   front the numbers fall to the right (E is left of N), like on the real
+//   card, which stays put while the aircraft turns around it.
 // - Home: a disc magnet in a pad under the drum's top disc passes over a
 //   digital hall sensor (A3144) lying on a post. MobiFlight turns the card
-//   until the sensor pulls low and calls that 0; the strip is glued with
-//   N in front there, so the magnet's place on the drum does not matter.
+//   until the sensor pulls low and calls that its zero; wherever N is
+//   then, an offset in MobiFlight's transform puts it under the lubber
+//   line (see the README), so the magnet's place does not matter.
+// - The case was printed around the earlier paper card, so the case's
+//   sizes stay (y_bz) and the band is a little smaller (card_r) so the
+//   marks clear the side walls.
 // - The Nano lies in rails on the floor behind the motor, its USB jack in
 //   a notch in the back wall. The ULN2003 driver board stands behind a
 //   plate at the back, which hides it (and its LEDs) from the window.
@@ -43,17 +47,16 @@
 //   board), 4x 10 mm countersunk (bezel), 2x 10 mm countersunk (base into
 //   the shell), 4x 10 mm countersunk (base onto the stand)
 // - 2x M5 x 10 button head + T-nut (stand onto the top bar)
-// - clear sheet 1 mm (glass_*), card printed on paper (paper_t)
+// - clear sheet 1 mm (glass_*), white acrylic paint for the card's marks
 //
-// Assembly: stand onto the base (screws from inside), magnet into the
-// drum's pad (check which face triggers the sensor), sensor onto its post,
-// motor onto its posts, Nano into its rails, ULN2003 board behind its
-// plate; wire it (see the README). Flash and set up MobiFlight, let it
-// home, mark the drum's front (the notch in the base's front edge), pull
-// it off and glue the card on with N at the mark, plain black end under;
-// press it back on. Shell over it (the USB cable through the notch),
-// two screws from below, the glass into the bezel back, the bezel over
-// it, both screwed on.
+// Assembly: paint the drum's marks white, stand onto the base (screws
+// from inside), magnet into the drum's pad (check which face triggers the
+// sensor), sensor onto its post, motor onto its posts, Nano into its
+// rails, ULN2003 board behind its plate; wire it (see the README). Press
+// the drum on. Shell over it (the USB cable through the notch), two
+// screws from below, the glass into the bezel back, the bezel over it,
+// both screwed on. Flash and set up MobiFlight and set the offset that
+// puts N under the lubber line after homing.
 
 $fn = 60;
 
@@ -86,26 +89,24 @@ csk_d = 6.2;                 // M3 countersunk head
 screw_depth = 9;
 
 // --- Card ---
-card_d = 58;                 // the band, under the paper
+card_d = 57.5;               // the band, under the marks
+mark_h = 0.6;                // the marks stand out of the band
 band_t = 1.2;
 band_h = 22;
 disc_t = 2;
 hub_d = 10;
 bore_play = 0.1;             // the double D bore over the shaft (press fit)
 shaft_skin = 0.5;            // drum top over the shaft end
-paper_t = 0.1;               // MEASURE: the card's paper
-card_overlap = 6;            // plain black end, glued under the other end
 side_gap_min = 0.6;          // card to the side walls
-card_gap = 2;                // card to the bezel's back (the lubber line)
-tick_w = 0.5;
+card_gap = 1;                // card to the bezel's back (the lubber line), at least
+bz_back = 31.1;              // axis to the bezel back (the shell's front edge): the case is printed, keep it
+tick_w = 1;                  // two lines of a 0.4 mm nozzle
 tick_10 = 5;                 // every 10 degrees
 tick_5 = 3;
 tick_top = 1.5;              // band top to the ticks
 label_size = 6.5;
 label_y = 7;                 // label middle over the band bottom
 card_font = "Liberation Sans:style=Bold";
-seam = 102.5;                // the strip's ends (card angle), between two ticks and two labels
-card_copies = 3;             // on the print
 
 // --- Window and bezel ---
 window_d = 48;
@@ -145,9 +146,8 @@ bed = [255, 255];
 
 // --- Calculated ---
 card_r = card_d / 2;
-card_ro = card_r + paper_t;
+card_ro = card_r + mark_h;                   // the marks' tops
 band_ri = card_r - band_t;
-card_len = PI * (card_d + paper_t);          // the strip, at the paper's middle
 z_top = band_h / 2;                          // drum top
 z_band0 = -band_h / 2;
 z_shaft_end = z_top - shaft_skin;
@@ -159,7 +159,7 @@ z_bot = -body_h / 2;
 z_floor = z_bot + floor_t;
 z_ceil = body_h / 2 - wall;
 xi = body_w / 2 - wall;                      // inside, half width
-y_bz = -(card_ro + card_gap);                // bezel back, the shell's front edge
+y_bz = -bz_back;                             // bezel back, the shell's front edge
 y_face = y_bz - bezel_t;
 motor_y = motor_shaft_dy;                    // the motor body's middle
 nano_y0 = motor_y + motor_cover[1] + 1;      // behind the wire cover
@@ -194,11 +194,12 @@ y_stop = y_bzb + glass_t;                    // the pocket's floor: the glass's 
 comp_hole = bz_front_t - 0.6;                // the dummy compensator screws' holes, deep
 comp_z = -(window_h / 2 + (body_h / 2 - window_h / 2) * 0.35);
 
-echo(compass_depth = depth, axis_to_face = y_face, card_strip = [card_len + card_overlap, band_h],
+echo(compass_depth = depth, axis_to_face = y_face,
      compass_bottom = z_bot, stand = [stand_dy, rise]);
 
 // --- Checks ---
 assert(card_ro + side_gap_min <= xi, "Card rubs on the side walls");
+assert(card_ro + card_gap <= bz_back, "Card rubs on the lubber line");
 assert(norm([motor_cover[0] / 2, motor_y + motor_cover[1]]) <= band_ri - 0.5, "Wire cover runs into the band");
 assert(z_band0 >= z_motor0 + motor_wire_h + 0.5, "Band hangs over the motor's wires");
 assert(norm([motor_ear_dx + post_d / 2, motor_y]) <= band_ri - 0.5
@@ -234,8 +235,7 @@ assert(stand_dy + stand_screw.y + csk_d / 2 <= nano_rail_y0, "Stand screws under
 assert(foot.y <= 20 && foot_bolt_dx - m5_head_d / 2 >= neck.x / 2 + 1, "M5 heads run into the neck");
 assert(abs(stand_screw.x) + 3 <= neck.x / 2 && abs(stand_screw.y) + 3 <= neck.y / 2, "Stand screws off the neck");
 assert(rise - foot.z >= screw_depth + 2, "Stand neck too short for the screws");
-assert(card_len + card_overlap <= 200, "Card strip does not fit an A4 page");
-assert(seam % 5 == 2.5 && abs(seam % 30 - 15) <= 5, "Card seam on a tick or a label");
+assert(2 * PI * card_ro / 72 >= tick_w + 1, "Ticks too close");
 assert(depth <= bed.x && body_w <= bed.y, "Shell does not fit the bed");
 
 // --- Card geometry ---
@@ -243,36 +243,15 @@ assert(depth <= bed.x && body_w <= bed.y, "Shell does not fit the bed");
 // card at heading H: h faces the pilot (-y) at H = h; the card turns
 // counterclockwise (seen from above) as the heading grows
 function card_angle(h, H = 0) = -90 - h + H;
-function card_x(h) = ((card_angle(h) - seam) % 360 + 720) % 360 / 360 * card_len;
 function card_label(h) = h == 0 ? "N" : h == 90 ? "E" : h == 180 ? "S" : h == 270 ? "W" : str(h / 10);
 
-// The strip, flat: x along it (x = 0 at the seam, the plain end left of
-// it), y up; black is the fill, the markings are holes (the paper)
-module card_marks_2d() {
-   for (h = [0 : 5 : 355]) {
-      len = h % 10 == 0 ? tick_10 : tick_5;
-      translate([card_x(h) - tick_w / 2, band_h - tick_top - len]) square([tick_w, len]);
-      if (h % 30 == 0)
-         translate([card_x(h), label_y])
-            text(card_label(h), size = label_size, font = card_font, halign = "center", valign = "center");
-   }
-}
-
-module card_strip() {
-   difference() {
-      translate([-card_overlap, 0]) square([card_len + card_overlap, band_h]);
-      card_marks_2d();
-   }
-}
-
-// The print: card_copies strips, a caption over them
-module card_print() {
-   for (i = [0 : card_copies - 1])
-      translate([0, i * (band_h + 6)]) card_strip();
-   translate([-card_overlap, card_copies * (band_h + 6) - 2])
-      text(str("COMPASS CARD ", round(card_len * 10) / 10, " + ", card_overlap,
-               " x ", band_h, " mm, print at 100 %, plain end under"),
-           size = 3, font = font);
+// A mark (tick, label) flat: x along the band, y = z
+module card_mark_2d(h) {
+   len = h % 10 == 0 ? tick_10 : tick_5;
+   translate([-tick_w / 2, z_top - tick_top - len]) square([tick_w, len]);
+   if (h % 30 == 0)
+      translate([0, z_band0 + label_y])
+         text(card_label(h), size = label_size, font = card_font, halign = "center", valign = "center");
 }
 
 // --- Helpers ---
@@ -308,7 +287,24 @@ module double_d(d, flat, h) {
 }
 
 // --- Drum ---
+// the marks standing out of the band, their tops on its cylinder
+module drum_marks() {
+   intersection() {
+      for (h = [0 : 5 : 355]) rotate([0, 0, card_angle(h)])
+         translate([band_ri + 0.2, 0, 0]) rotate([90, 0, 90]) linear_extrude(card_ro + 1 - band_ri) card_mark_2d(h);
+      translate([0, 0, z_band0]) difference() {
+         cylinder(r = card_ro, h = band_h, $fn = 360);
+         translate([0, 0, -1]) cylinder(r = band_ri + 0.1, h = band_h + 2, $fn = 180);
+      }
+   }
+}
+
 module drum() {
+   drum_body();
+   drum_marks();
+}
+
+module drum_body() {
    difference() {
       union() {
          // top disc and band
@@ -386,7 +382,7 @@ module base() {
       // into the shell's back columns (from below) and onto the stand (from inside)
       for (b = back_screws) translate([b.x, b.y, z_bot]) rotate([180, 0, 0]) csk_hole();
       for (s = stand_screws) translate([s.x, s.y, z_floor]) csk_hole();
-      // the drum's front mark: a notch in the front edge
+      // a notch in the front edge (the front mark for the paper card, no longer needed: the base is printed)
       translate([0, y_bz - 0.01, z_bot - 1]) linear_extrude(floor_t + 2)
          polygon([[-1.5, 0], [1.5, 0], [0, 2]]);
    }
@@ -480,7 +476,6 @@ module stand() {
 
 // --- View only: bought parts ---
 c_body = "#1d1f22";
-c_card = "#111214";
 c_label = "#f4f4f4";
 c_lubber = "#f4f4f4";
 c_steel = "#b9c0c8";
@@ -521,26 +516,9 @@ module glass_part() {
    color(c_glass) translate([-glass.x / 2, y_glass, -glass.y / 2]) cube([glass.x, glass_t, glass.y]);
 }
 
-// the card on the drum: black paper, white markings
+// the drum's marks, painted white
 module card_part(H) {
-   rotate([0, 0, H]) {
-      color(c_card) translate([0, 0, z_band0]) render() difference() {
-         cylinder(r = card_ro, h = band_h, $fn = 180);
-         translate([0, 0, -1]) cylinder(r = card_r - 0.01, h = band_h + 2, $fn = 180);
-      }
-      color(c_label) for (h = [0 : 5 : 355]) rotate([0, 0, card_angle(h)]) {
-         len = h % 10 == 0 ? tick_10 : tick_5;
-         translate([card_ro - 0.05, -tick_w / 2, z_top - tick_top - len]) cube([0.15, tick_w, len]);
-         if (h % 30 == 0)
-            translate([card_ro - 0.05, 0, z_band0 + label_y]) rotate([90, 0, 90]) linear_extrude(0.15)
-               text(card_label(h), size = label_size, font = card_font, halign = "center", valign = "center");
-      }
-   }
-}
-
-module card_flat_view() {
-   color(c_card) linear_extrude(0.5) card_strip();
-   color(c_label) translate([0, 0, -0.1]) linear_extrude(0.1) translate([-card_overlap, 0]) square([card_len + card_overlap, band_h]);
+   rotate([0, 0, H]) color(c_label) render() drum_marks();
 }
 
 module top_bar_part() {
@@ -561,7 +539,7 @@ module compass_parts(H, e = 0, with_shell = true) {
       sensor_part();
    }
    translate([0, 0, e]) {
-      rotate([0, 0, H]) color(c_body) render() drum();
+      rotate([0, 0, H]) color(c_body) render() drum_body();
       magnet_part(H);
       card_part(H);
    }
@@ -606,11 +584,8 @@ translate([0, 0, y_bz]) rotate([-90, 0, 0]) bezel_back(); // Make module bezel_b
 translate([0, 0, z_top]) rotate([180, 0, 0]) drum(); // Make module drum
 stand(); // Make module stand
 
-card_print(); // Make print card
-
 //assembled_view(); // Make view main 70,0,-35
 //assembled_view(); // Make view front 90,0,0
 //exploded_view(); // Make view exploded 65,0,-40
 //inside_view(); // Make view inside 55,0,-140
 //assembled_view(); // Make view back 60,0,150
-//card_flat_view(); // Make view card 0,0,0
