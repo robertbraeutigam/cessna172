@@ -93,6 +93,7 @@ label_r = 20;                // position labels around the key
 tick_r = 12;                 // tick marks, from here outwards
 tick_len = 3;
 tick_w = 0.6;
+label_rot = [0, 0, 0, 0, -90]; // per position, seen from the front; START reads downwards like the real panel
 title = "MAGNETOS";          // above the position labels, "" for none
 title_gap = 2;
 panel_screw_head_d = 5.5;    // M3 socket head, the face has holes around them
@@ -120,7 +121,7 @@ rotor_clamp_t = 2.5;         // rotor between spindle end and screw head, the re
 
 // --- Positions (VERIFY against the real switch) ---
 pitch = 30;                  // OFF->R, R->L, L->BOTH
-start_pitch = 30;            // BOTH->START
+start_pitch = 60;            // BOTH->START: START points straight right (3 o'clock)
 position_names = ["OFF", "R", "L", "BOTH", "START"];
 function pos_angle(i) = i < 4 ? i * pitch : 3 * pitch + start_pitch;
 sweep = pos_angle(4);
@@ -155,8 +156,8 @@ start_pin_d = 3;             // M3 screw
 start_pin_len = 8;           // screw length
 start_spring_od = 5;
 start_spring_id = 3.8;       // MEASURE inner diameter (OD - 2x wire)
-start_spring_len = 15;       // free length
-start_spring_solid = 5.5;    // fully compressed length
+start_spring_len = 30;       // free length
+start_spring_solid = 11;     // fully compressed length
 start_spring_preload = 1.5;
 // The shoe is a block that fills the slot's cross section with a spigot
 // that goes into the spring, so the spring's end is held centred and cannot
@@ -614,7 +615,7 @@ module cable_clamp(side = cable_side) {
 module labels_2d() {
    for (i = [0 : 4]) {
       translate(label_pos(i))
-         mirror([1, 0])
+         mirror([1, 0]) rotate(label_rot[i])
             text(position_names[i], size = label_size, font = font, halign = "center", valign = "center");
       rotate(key_off_angle + pos_angle(i))
          translate([tick_r, -tick_w / 2])

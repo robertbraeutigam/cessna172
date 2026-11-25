@@ -95,7 +95,7 @@ between the rims. The cutout is turned so the key points at OFF
 |-----|------|-----|
 | 1 | mailbox / cabinet cam lock | key and spindle (`lock_*`: 18 mm thread, 17 mm body, 25 x 4 mm nut, 8 mm square spindle, its M4 x 5 cam screw with a 12 mm head holds the rotor) |
 | 1 | 6 mm steel ball + spring | detent (`detent_spring_*`, spring OD below 6 mm) |
-| 1 | spring, 5 mm OD, about 3.8 mm ID, 15 mm | START return (`start_spring_*`, measure the ID: the shoe spigot goes inside) |
+| 1 | spring, 5 mm OD, about 3.8 mm ID, 30 mm (it must not go solid above 11 mm) | START return (`start_spring_*`, measure the ID: the shoe spigot goes inside) |
 | 1 | cube magnet, 5 x 5 x 5 mm | position sensing (`magnet_*`) |
 | 5 | A3144 hall sensor | one per position (OFF included: it is needed, see [In X-Plane](#in-x-plane)) |
 | 1 | prototype board, 2.54 mm pitch | 5 pieces of 3 x 4 holes, one on each sensor's legs |
@@ -129,7 +129,9 @@ between the rims. The cutout is turned so the key points at OFF
    groove under the clamp block and screw the clamp bar up against it with
    the M3 x 10 screws.
 
-The positions (30° apart) should be verified against the real switch.
+OFF, R, L and BOTH are 30° apart, OFF at 10 o'clock and L straight up;
+START is 60° past BOTH, straight to the right (3 o'clock), as on the real
+switch, its label written downwards beside it.
 
 ## In X-Plane
 
