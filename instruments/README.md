@@ -130,7 +130,15 @@ ASI has a yellow arc too).
   (3.2 mm) for the axle. Glue it into the dial (spray adhesive or a glue
   stick, so it stays flat).
 - Lay the clear sheet over the glass template and cut it on the line's
-  inside.
+  inside. Keep the protective film on (trace the line onto it) until
+  assembly. Sharp scissors are enough: the lip covers 2.7 mm of the glass
+  all round (77.4 mm glass, 72 mm window), so the edge may be rough or a
+  little wavy, but it must be under 77.4 mm everywhere (the bore is
+  77.7 mm, never press it in) and over about 74 mm, so the dial's rim
+  still holds it. Cut a square first (score it with a knife on a steel
+  ruler and snap it), then the circle in short cuts, turning the sheet,
+  and take the burr off with fine sandpaper. Acrylic cracks under
+  scissors: use a circle cutter on it.
 
 The RPM face: 0 to 35 hundred RPM over 240 degrees (0 at 8 o'clock, 35 at
 4 o'clock), a tick every 100 RPM and a number every 500. The 172N's green
