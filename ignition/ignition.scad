@@ -93,7 +93,8 @@ label_r = 20;                // position labels around the key
 tick_r = 12;                 // tick marks, from here outwards
 tick_len = 3;
 tick_w = 0.6;
-label_rot = [0, 0, 0, 0, -90]; // per position, seen from the front; START reads downwards like the real panel
+label_stack = [false, false, false, false, true]; // letters stacked top to bottom (START, like the real panel)
+label_stack_pitch = 1.3;     // stacked letter spacing, x label_size
 title = "MAGNETOS";          // above the position labels, "" for none
 title_gap = 2;
 panel_screw_head_d = 5.5;    // M3 socket head, the face has holes around them
@@ -615,8 +616,14 @@ module cable_clamp(side = cable_side) {
 module labels_2d() {
    for (i = [0 : 4]) {
       translate(label_pos(i))
-         mirror([1, 0]) rotate(label_rot[i])
-            text(position_names[i], size = label_size, font = font, halign = "center", valign = "center");
+         mirror([1, 0])
+            if (label_stack[i])
+               let(name = position_names[i], n = len(name), step = label_stack_pitch * label_size)
+                  for (j = [0 : n - 1])
+                     translate([0, ((n - 1) / 2 - j) * step])
+                        text(name[j], size = label_size, font = font, halign = "center", valign = "center");
+            else
+               text(position_names[i], size = label_size, font = font, halign = "center", valign = "center");
       rotate(key_off_angle + pos_angle(i))
          translate([tick_r, -tick_w / 2])
             square([tick_len, tick_w]);

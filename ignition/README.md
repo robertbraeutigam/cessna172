@@ -131,7 +131,8 @@ between the rims. The cutout is turned so the key points at OFF
 
 OFF, R, L and BOTH are 30° apart, OFF at 10 o'clock and L straight up;
 START is 60° past BOTH, straight to the right (3 o'clock), as on the real
-switch, its label written downwards beside it.
+switch, its label's letters stacked
+downwards beside it.
 
 ## In X-Plane
 
