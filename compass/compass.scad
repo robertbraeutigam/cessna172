@@ -11,7 +11,7 @@
 //   motor's shaft (double D bore, blind: the shaft end sets its height). It
 //   hangs over the motor, which stands on two posts under its ears.
 // - The card is the band itself, printed in black: its ticks and
-//   N 3 6 E 12 ... stand out of it (mark_h), painted white. Seen from the
+//   N 3 6 E 12 ... stand out of it (mark_h), white. Seen from the
 //   front the numbers fall to the right (E is left of N), like on the real
 //   card, which stays put while the aircraft turns around it.
 // - Home: a disc magnet in a pad under the drum's top disc passes over a
@@ -25,6 +25,8 @@
 // - The Nano lies in rails on the floor behind the motor, its USB jack in
 //   a notch in the back wall. The ULN2003 driver board stands behind a
 //   plate at the back, which hides it (and its LEDs) from the window.
+// - Two colours: the marks, the bezel's lettering and the lubber line are
+//   separate white parts (*_white STLs) in pockets of the black ones.
 // - Parts: the base (floor with all of the above on it, printed flat),
 //   the shell (sides, top and back, printed top down), the bezel (the
 //   front with the window, printed back side down, the N-S and E-W
@@ -49,7 +51,7 @@
 // - 2x M5 x 10 button head + T-nut (stand onto the top bar)
 // - clear sheet 1 mm (glass_*), white acrylic paint for the card's marks
 //
-// Assembly: paint the drum's marks white, stand onto the base (screws
+// Assembly (one colour: paint the white parts first): stand onto the base (screws
 // from inside), magnet into the drum's pad (check which face triggers the
 // sensor), sensor onto its post, motor onto its posts, Nano into its
 // rails, ULN2003 board behind its plate; wire it (see the README). Press
@@ -91,6 +93,7 @@ screw_depth = 9;
 // --- Card ---
 card_d = 57.5;               // the band, under the marks
 mark_h = 0.6;                // the marks stand out of the band
+mark_in = 0.6;               // and go this deep into it (white filament: thick enough not to look grey)
 band_t = 1.2;
 band_h = 22;
 disc_t = 2;
@@ -120,6 +123,8 @@ comp_screw_dx = 10;
 font = "Liberation Sans:style=Bold";
 text_size = 3;
 label_raise = 0.6;
+label_in = 0.6;              // the lettering, into the bezel's front
+lubber_in = 1.5;             // the lubber bar's ends, into the ledge above and under the window
 
 // --- Home sensor ---
 mag_r = 20;                  // magnet and sensor from the axis
@@ -200,6 +205,10 @@ echo(compass_depth = depth, axis_to_face = y_face,
 // --- Checks ---
 assert(card_ro + side_gap_min <= xi, "Card rubs on the side walls");
 assert(card_ro + card_gap <= bz_back, "Card rubs on the lubber line");
+assert(band_t - mark_in >= 0.6, "Band too thin behind the marks");
+assert(bz_front_t - label_in >= 1, "Bezel too thin behind the lettering");
+assert(abs(comp_z) + comp_screw_d / 2 + 1.5 + text_size + 1 <= body_h / 2 - 1, "Lettering runs off the bezel");
+assert(window_h / 2 + lubber_in <= body_h / 2 - wall, "Lubber bar's ends run out of the bezel back");
 assert(norm([motor_cover[0] / 2, motor_y + motor_cover[1]]) <= band_ri - 0.5, "Wire cover runs into the band");
 assert(z_band0 >= z_motor0 + motor_wire_h + 0.5, "Band hangs over the motor's wires");
 assert(norm([motor_ear_dx + post_d / 2, motor_y]) <= band_ri - 0.5
@@ -287,21 +296,26 @@ module double_d(d, flat, h) {
 }
 
 // --- Drum ---
-// the marks standing out of the band, their tops on its cylinder
+// Two colours: drum() is the black part, drum_marks() the white one (the
+// marks, standing out of the band and inlaid into it, their tops on its
+// cylinder), the same place in the print; drum_body() is the drum without
+// the marks' pockets.
 module drum_marks() {
    intersection() {
       for (h = [0 : 5 : 355]) rotate([0, 0, card_angle(h)])
-         translate([band_ri + 0.2, 0, 0]) rotate([90, 0, 90]) linear_extrude(card_ro + 1 - band_ri) card_mark_2d(h);
+         translate([band_ri, 0, 0]) rotate([90, 0, 90]) linear_extrude(card_ro + 1 - band_ri) card_mark_2d(h);
       translate([0, 0, z_band0]) difference() {
          cylinder(r = card_ro, h = band_h, $fn = 360);
-         translate([0, 0, -1]) cylinder(r = band_ri + 0.1, h = band_h + 2, $fn = 180);
+         translate([0, 0, -1]) cylinder(r = card_r - mark_in, h = band_h + 2, $fn = 360);
       }
    }
 }
 
 module drum() {
-   drum_body();
-   drum_marks();
+   difference() {
+      drum_body();
+      drum_marks();
+   }
 }
 
 module drum_body() {
@@ -426,9 +440,9 @@ module bezel() {
             along_y(y_face, y_face + 0.01) section(1);
             along_y(y_face + 1, y_face + 1.01) section();
          }
-         // lettering and the compensator screw slots, standing out of the front
-         translate([0, y_face, 0]) rotate([90, 0, 0]) linear_extrude(label_raise) bezel_labels_2d();
       }
+      // the lettering's pockets (bezel_labels)
+      bezel_labels();
       // window
       along_y(y_face - 1, y_bzb + 1) window_2d();
       // corner screws, countersunk from the front
@@ -442,7 +456,17 @@ module bezel() {
       translate([-comp_screw_d / 2 + 0.2, 0, -0.4]) cube([comp_screw_d - 0.4, comp_hole, 0.8]);
 }
 
+// the lettering, white: standing out of the front and inlaid into it
+module bezel_labels() {
+   translate([0, y_face + label_in, 0]) rotate([90, 0, 0]) linear_extrude(label_in + label_raise) bezel_labels_2d();
+}
+
 // --- Bezel back: the glass in a pocket in its front, on a ledge round the window, and the lubber line ---
+// the lubber line, white: a bar across the window behind the glass, its ends in the ledge
+module lubber() {
+   translate([-lubber_w / 2, y_stop, -window_h / 2 - lubber_in]) cube([lubber_w, y_bz - y_stop, window_h + 2 * lubber_in]);
+}
+
 module bezel_back() {
    difference() {
       along_y(y_bzb, y_bz) section();
@@ -450,9 +474,8 @@ module bezel_back() {
       translate([-glass.x / 2 - 0.15, y_bzb - 1, -glass.y / 2 - 0.15]) cube([glass.x + 0.3, y_stop - y_bzb + 1, glass.y + 0.3]);
       for (x = [-1, 1], z = [-1, 1]) translate([x * sx, y_bzb - 1, z * sx]) rotate([-90, 0, 0])
          cylinder(d = clear_d, h = bezel_t + 2);
+      lubber();
    }
-   // lubber line, behind the glass
-   translate([-lubber_w / 2, y_stop, -window_h / 2 - 0.5]) cube([lubber_w, y_bz - y_stop, window_h + 1]);
 }
 
 module bezel_labels_2d() {
@@ -526,8 +549,11 @@ module top_bar_part() {
 }
 
 module labels_part() {
-   color(c_label) translate([0, y_face - 0.01, 0]) rotate([90, 0, 0]) linear_extrude(label_raise) bezel_labels_2d();
-   color(c_lubber) translate([-lubber_w / 2, y_stop - 0.05, -window_h / 2]) cube([lubber_w, 0.1, window_h]);
+   color(c_label) bezel_labels();
+}
+
+module lubber_part() {
+   color(c_lubber) lubber();
 }
 
 module compass_parts(H, e = 0, with_shell = true) {
@@ -539,7 +565,7 @@ module compass_parts(H, e = 0, with_shell = true) {
       sensor_part();
    }
    translate([0, 0, e]) {
-      rotate([0, 0, H]) color(c_body) render() drum_body();
+      rotate([0, 0, H]) color(c_body) render() drum();
       magnet_part(H);
       card_part(H);
    }
@@ -549,6 +575,7 @@ module compass_parts(H, e = 0, with_shell = true) {
          color(c_body) bezel();
          translate([0, e / 2, 0]) {
             color(c_body) bezel_back();
+            lubber_part();
             glass_part();
          }
          labels_part();
@@ -579,9 +606,15 @@ module inside_view(H = view_heading) {
 // --- Printable parts, in print orientation ---
 translate([0, 0, -z_bot]) base(); // Make module base
 translate([0, 0, body_h / 2]) rotate([180, 0, 0]) shell(); // Make module shell
+// Two colours: each part with white on it is two STLs in the same place,
+// <part> (black) and <part>_white; load both into the slicer at once as one
+// object with two parts and give each its filament
 translate([0, 0, y_bzb]) rotate([-90, 0, 0]) bezel(); // Make module bezel
+translate([0, 0, y_bzb]) rotate([-90, 0, 0]) bezel_labels(); // Make module bezel_white
 translate([0, 0, y_bz]) rotate([-90, 0, 0]) bezel_back(); // Make module bezel_back
+translate([0, 0, y_bz]) rotate([-90, 0, 0]) lubber(); // Make module bezel_back_white
 translate([0, 0, z_top]) rotate([180, 0, 0]) drum(); // Make module drum
+translate([0, 0, z_top]) rotate([180, 0, 0]) drum_marks(); // Make module drum_white
 stand(); // Make module stand
 
 //assembled_view(); // Make view main 70,0,-35

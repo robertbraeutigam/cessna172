@@ -166,7 +166,9 @@ its own top-level directory; new components should follow the same layout.
   card. A magnet in the drum and an A3144 hall sensor on a post home it;
   an offset in MobiFlight's transform puts N under the lubber line. The
   case is printed (it was made for a paper card): its sizes stay
-  (`bz_back`), the band fits inside them. MobiFlight on an
+  (`bz_back`), the band fits inside them. Two colours: the white parts
+  (drum marks, bezel lettering, lubber line) are `*_white` modules in the
+  same print place, filling pockets in the black parts. MobiFlight on an
   Arduino Nano of its own (USB to the powered USB hub) drives the ULN2003 board. Parts: base (everything is
   mounted on it), shell, bezel (window, dummy compensator screws, the
   glass in a pocket in its back), bezel back (holds the glass, lubber

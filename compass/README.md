@@ -13,7 +13,7 @@ frame's right top bar, about where the windshield's middle is (see
 
 | File | Parts |
 |------|-------|
-| `compass.scad` | base (floor with the motor posts, sensor post, Nano rails and the ULN2003 plate), shell, bezel, bezel back, drum (the card), stand |
+| `compass.scad` | base (floor with the motor posts, sensor post, Nano rails and the ULN2003 plate), shell, bezel, bezel back, drum (the card), stand; the white parts of the bezel (lettering), the bezel back (lubber line) and the drum (marks) as `*_white` STLs |
 
 ## How it works
 
@@ -58,7 +58,7 @@ frame's right top bar, about where the windshield's middle is (see
   down (open front and bottom), the bezel and the bezel back back side down
   (the bezel's lettering on top, its back flat on the bed; the bezel
   back's pocket open on top, the lubber bar on the bed), the drum top down, and the stand on its foot. All black except
-  the stand. The bezel's lower screws go into posts on the base, its upper
+  the stand and the white parts (see [Two colours](#two-colours)). The bezel's lower screws go into posts on the base, its upper
   ones into blocks in the shell. Two screws from below hold the shell's back
   columns. The stand is screwed onto the base from inside.
 - **Size**: 65 x 65 mm front, 109 mm deep (5 mm more than the C2300, for
@@ -82,14 +82,35 @@ the band is 0.5 mm smaller so the marks clear the side walls by 0.65 mm;
 only the drum is new. The notch in the base's front edge was the paper
 card's front mark and has no use now.
 
-## The card
+## Two colours
 
-Print the drum in black (top down, as the STL lies). The marks stand
-0.6 mm out of the band, so they are easy to paint: wipe a nearly dry flat
-brush with white acrylic across them, or go over them with a white paint
-pen, and touch up the edges with a fine brush. Paint before the drum goes
-on, and keep the paint off the band between the marks (wipe it off with a
-damp cloth while it is wet).
+The drum's marks, the bezel's lettering and the lubber line are white,
+the rest black. An STL has no colour (a slicer shows it in its first
+filament's colour), so each of these parts is two STLs in the same place
+on the bed: the black part (`compass_drum.stl`, `compass_bezel.stl`,
+`compass_bezel_back.stl`) and its white part (`compass_drum_white.stl`,
+`compass_bezel_white.stl`, `compass_bezel_back_white.stl`). The white part
+fills pockets in the black one, so they do not overlap.
+
+In the slicer (Anycubic Slicer Next, like Orca and Bambu Studio), select
+both files of a part and open them together. When it asks whether to load
+them as a single object with multiple parts, say yes; otherwise select
+both objects and *Assemble* them. Then give the white part the white
+filament in the object list (the part's filament column), and the black
+part the black one. Do not move or scale the parts against each other.
+
+- **Drum**: the marks stand 0.6 mm out of the band and go 0.6 mm into it,
+  so they are 1.2 mm of white seen from the front (thinner white looks
+  grey over black). Printed top down, every layer of the band has both
+  colours.
+- **Bezel**: the lettering stands 0.6 mm out of the front and goes 0.6 mm
+  in; printed back side down it is only the top layers.
+- **Bezel back**: the lubber bar, its ends 1.5 mm into the ledge above and
+  under the window, through the ledge's whole thickness.
+
+With one colour, print both files of a part in black and paint the marks,
+the lettering and the lubber line white: wipe a nearly dry flat brush with
+white acrylic across the raised marks, or use a white paint pen.
 
 ## Hardware
 
@@ -100,7 +121,7 @@ damp cloth while it is wet).
 | 1 | A3144 hall sensor (unipolar, not latching) | home |
 | 2 | disc magnet 5 x 1 mm | home (two stacked) |
 | 1 | clear sheet 1 mm (PET or acrylic), 52 x 30 mm, no glue | window |
-| 1 | white acrylic paint (or a white paint pen) | the card's marks, lubber line, lettering |
+| 1 | white filament, or white acrylic paint / a white paint pen with one colour | the card's marks, lubber line, lettering |
 | 2 | M3 x 6 self tapping screw | motor ears onto the posts |
 | 4 | M3 x 8 self tapping screw | ULN2003 board |
 | 10 | M3 x 10 countersunk self tapping screw | bezel (4), base into the shell (2), base onto the stand (4) |
@@ -117,12 +138,12 @@ damp cloth while it is wet).
    the back), ULN2003 board behind its plate (parts towards the back
    wall). Wire them (see [Wiring](#wiring)), coil the motor's cable behind
    the plate and plug it in.
-4. Paint the drum's marks (see [The card](#the-card)) and press it onto
-   the shaft, any way round. Flash and set up MobiFlight (see
+4. Press the drum onto the shaft, any way round (one colour: paint its
+   marks first, see [Two colours](#two-colours)). Flash and set up MobiFlight (see
    [MobiFlight](#mobiflight)), let it home and set the N offset.
 5. Shell down over it from above, the USB cable through the notch in the
    back wall, two screws from below into the back columns.
-6. Paint the lubber line and the lettering. Lay the bezel back on its
+6. With one colour, paint the lubber line and the lettering. Lay the bezel back on its
    back, the clear sheet into its pocket (film off, no fingerprints), the
    bezel on it, and screw both on together.
 7. Bolt the stand onto the right top bar (T-nuts in the top slot).
