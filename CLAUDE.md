@@ -194,8 +194,7 @@ its own top-level directory; new components should follow the same layout.
     (`carrier_slots`, x from each axis, by `inst_rows` and
     `inst_col_x`, the frame's layout): neighbours' places are checked
     against each other, each instrument checks its carrier is in its
-    place (`carrier_in_slot`); a new instrument (the NAV indicators) gets
-    a place there.
+    place (`carrier_in_slot`); a new instrument gets a place there.
   - `twin_drive.inc.scad` — the two motor drive of `hi.scad` and
     `tc.scad`, included after the instrument defines `y_bd` (the disc's
     paper), `y_ax` (the axle), `twin_nano_x` and `twin_posts`: motor A to
@@ -289,6 +288,27 @@ its own top-level directory; new components should follow the same layout.
     (`carrier_slots`). 65 mm deep (`tc_depth`) only above `tc_deep_z`,
     22 mm under it (`tc_low_depth`), checked by the frame. Print `face`
     (face and ball ring).
+  - `cdi.scad` — the NAV indicators (NAV 1 and NAV 2 are the same print,
+    a Nano each): a VOR course deviation indicator, no glideslope. The
+    standard's case front with three screws, the OBS knob at the lower
+    left. The azimuth card is a ring in front of the needle (toothed
+    band behind it, riding on a guide ring glued on the dial), turned
+    mechanically by the knob's pinion (`z_card` / `z_kp`, 3.33 knob
+    turns a card turn); a gear pair on the knob's shaft behind the dial
+    turns a sensor gear 1:1 with the card (`z_sg` / `z_kg` must equal
+    it), its diametric magnet over an AS5600 board (`as_*`, MEASURE)
+    whose analog output (A7) gives X-Plane the OBS absolutely, endless.
+    The needle hangs from a pivot at the top (`pivot`, behind the card),
+    5 dots each side; a gear sector on its axle is turned 4:1 by a
+    28BYJ-48's pinion, homed by a magnet in the sector. The TO/OFF/FROM
+    flag is a printed sector on an SG90 servo (`sv_*`, MEASURE) behind a
+    window in the face, OFF in the middle. Layers: card, needle, dial,
+    layer 1 (flag, knob gear, sensor gear), layer 2 (sector, pinion,
+    AS5600), back plate (motor, servo), carrier (ULN2003, Nano). 66 mm
+    deep (`nav_depth`) only right of `nav_deep_x` (the force feedback
+    housing ends just right of NAV 1's left edge), 20 mm left of it
+    (`nav_low_depth`), checked by the frame. Print `face` (card, face,
+    flag fields; black, red, white).
 
 - `lib/` — not a component (no Makefile, no README): bought parts that
   every component uses, as `*.inc.scad` files the Makefiles copy into each

@@ -17,7 +17,7 @@ wiring and the assembly:
 | [`frame/`](frame/README.md) | the aluminium frame and panel sheet that everything mounts on |
 | [`yoke/`](yoke/README.md) | the hollow control wheel: PTT, trim rocker, a Nano inside |
 | [`compass/`](compass/README.md) | the magnetic compass over the panel: a printed card on a 28BYJ-48 stepper, on its own Nano |
-| [`instruments/`](instruments/README.md) | the analogue instruments: the RPM, airspeed, vertical speed, attitude and heading indicators, the altimeter and the turn coordinator, 28BYJ-48 steppers behind colour printed faces |
+| [`instruments/`](instruments/README.md) | the analogue instruments: the RPM, airspeed, vertical speed, attitude and heading indicators, the altimeter, the turn coordinator and the NAV indicators (CDI), 28BYJ-48 steppers behind colour printed faces |
 | [`radio/`](radio/README.md) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, each on its own Nano |
 
 Every component has its own Arduino Nano running
@@ -171,8 +171,9 @@ resetting and needles losing their home). So the hub:
 - has every board's cable short and of a decent gauge (the cheap thin ones
   drop voltage).
 
-The pedestal (trim indicator) and the flaps (indicator) are planned with
-a 9 g servo each, on a Nano of its own: about 0.15-0.3 A when it moves,
+The NAV indicators' flags have a 9 g servo each, and the pedestal (trim
+indicator) and the flaps (indicator) are planned with one, each on the
+component's Nano: about 0.15-0.3 A when it moves,
 up to 0.7 A stalled. Put a 470 uF capacitor across its supply at the
 servo; if its Nano resets when it moves, feed it from the USB 5 V before
 the Nano's diode (the 5V pin is behind it).
@@ -247,7 +248,9 @@ inHg and hPa set by its knob through a 10 turn pot; deeper too) and the
 heading indicator (the card and an orange bug disc behind it, a motor
 each, two knobs on rotary encoders) and the turn coordinator (the
 airplane on the axle, the ball on a disc behind the face's tube, a motor
-each).
+each) and the NAV indicators (VOR course deviation indicators: the
+needle on a motor, the TO/FROM flag on a servo, the azimuth card turned
+by the OBS knob and read by a magnetic angle sensor).
 
 [![RPM indicator](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/rpm_montage.png)
 
@@ -262,6 +265,8 @@ each).
 [![Heading indicator](https://robertbraeutigam.github.io/cessna172/instruments/hi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/hi_montage.png)
 
 [![Turn coordinator](https://robertbraeutigam.github.io/cessna172/instruments/tc_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/tc_montage.png)
+
+[![NAV indicator](https://robertbraeutigam.github.io/cessna172/instruments/cdi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/cdi_montage.png)
 
 ### [Radio stack](radio/README.md)
 

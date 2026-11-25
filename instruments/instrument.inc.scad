@@ -269,7 +269,8 @@ carrier_slots = [["ASI", std_car_x], ["VSI", std_car_x],      // the standard
                  ["TC", [-48, 42.7]],                         // tc.scad (tc_car_x), shifted left
                  ["HI", [-45.2, 45.2]],                       // hi.scad (twin_car_x)
                  ["AI", [-39, 39]],                           // ai.scad (car_box)
-                 ["ALT", [-39, 39]]];                         // alt.scad (car_box)
+                 ["ALT", [-39, 39]],                          // alt.scad (car_box)
+                 ["NAV 1", [-37, 41]], ["NAV 2", [-37, 41]]]; // cdi.scad (car_box)
 function carrier_slot(name) = [for (s = carrier_slots) if (s[0] == name) s[1]][0];
 
 for (row = inst_rows, i = [0 : len(row) - 2]) let(a = carrier_slot(row[i]), b = carrier_slot(row[i + 1]))

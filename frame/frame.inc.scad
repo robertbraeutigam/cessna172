@@ -297,6 +297,14 @@ hi_low_depth = 18.5;
 tc_depth = 64.8;
 tc_deep_z = -24;
 tc_low_depth = 21.7;
+// The NAV indicators (instruments/cdi.scad): a motor, a servo and the
+// boards behind the back plate (nav_depth echo), but only right of
+// nav_deep_x from the axis; left of it they are as shallow as
+// nav_low_depth (the case and the back plate): the force feedback yoke's
+// housing ends just right of their left edge
+nav_depth = 65.7;
+nav_deep_x = -37;
+nav_low_depth = 19.9;
 
 // --- Layout, x ---
 x_sw0 = sheet_edge;                          // switch panel, left face edge
@@ -559,6 +567,10 @@ let(i = search(["TC"], inst_names)[0], b = circ(inst_c[i], inst_body_d))
    assert(!overlaps([b[0], b[2]], yoke_x) || (inst_c[i].y + tc_deep_z >= ffb_h || tc_depth <= ffb_front_y - 3)
                                            && (b[1] >= ffb_h || tc_low_depth <= ffb_front_y - 3),
           "TC (stage 2) runs into the force feedback yoke's housing");
+for (n = ["NAV 1", "NAV 2"]) let(i = search([n], inst_names)[0], b = circ(inst_c[i], inst_body_d))
+   assert(!overlaps([b[0], b[2]], yoke_x) || b[1] >= ffb_h
+          || (!overlaps([inst_c[i].x + nav_deep_x, b[2]], yoke_x) || nav_depth <= ffb_front_y - 3) && nav_low_depth <= ffb_front_y - 3,
+          str(n, " (stage 2) runs into the force feedback yoke's housing"));
 for (i = [0 : 7])
    assert(inst_c[i].y - inst_cut_d / 2 >= sheet_h, str(inst_names[i], " hidden behind the stage 1 left sheet (the monitor shows it)"));
 assert(sheet_h <= sheet_h_max, "Left panel too high for the monitor");

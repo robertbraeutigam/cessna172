@@ -16,16 +16,20 @@
 
 [![Turn coordinator](https://robertbraeutigam.github.io/cessna172/instruments/tc_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/tc_montage.png)
 
+[![NAV indicator](https://robertbraeutigam.github.io/cessna172/instruments/cdi_montage.png)](https://robertbraeutigam.github.io/cessna172/instruments/cdi_montage.png)
+
 The analogue ("steam") instruments. They all follow one standard
 (`instrument.inc.scad`): a 3 1/8" case behind a round hole in the panel,
 a colour printed face, and a needle turned by a 28BYJ-48 geared stepper.
 So far: the RPM indicator (tachometer), the airspeed indicator (ASI),
 the vertical speed indicator (VSI), the attitude indicator (AI), the altimeter (ALT), the
-heading indicator (HI) and the turn coordinator (TC); the last four have
-the standard's case front but mechanisms of their own (see
+heading indicator (HI), the turn coordinator (TC) and the NAV
+indicators (CDI); the last five have the standard's case front but
+mechanisms of their own (see
 [Attitude indicator](#attitude-indicator), [Altimeter](#altimeter),
-[Heading indicator](#heading-indicator) and
-[Turn coordinator](#turn-coordinator)). The instruments go into
+[Heading indicator](#heading-indicator),
+[Turn coordinator](#turn-coordinator) and
+[NAV indicators](#nav-indicators)). The instruments go into
 the holes of the stage 2 left sheet (see
 [Cockpit frame](../frame/README.md)): the stage 1 sheet is lower and its
 top bar is in the way.
@@ -40,6 +44,7 @@ top bar is in the way.
 | `ai.scad` | the attitude indicator: the standard's case front, a roll frame with the horizon bowl and the pitch motor on it, a slip ring, the roll motor; the roll dial's print |
 | `alt.scad` | the altimeter: the standard's case front, three needles on concentric shafts with a motor each, the Kollsman window's disc, knob and pot; the face and Kollsman ring print |
 | `hi.scad` | the heading indicator: the standard's case front, a card on the axle and a bug disc behind it with a motor each, two knobs on rotary encoders; the card, bug ring and fixed ring print |
+| `cdi.scad` | the NAV indicators (VOR course deviation indicator): the standard's case front, the azimuth card turned by the OBS knob through gears and read by an AS5600 magnetic angle sensor, the needle on a gear sector and a motor, the TO/FROM flag on a servo; the card, face and flag print |
 | `tc.scad` | the turn coordinator: the standard's case front, the airplane on the axle, a face plate with the inclinometer's tube, the ball on a disc behind it, a motor each; the face and ball ring print |
 
 ## How it works
@@ -1007,3 +1012,215 @@ Two *Steppers* (pins above, coils off at rest):
   steps.
 - **Offsets**: after homing, set each stepper's offset so the airplane
   is wings level and the ball sits between the wires.
+
+## NAV indicators
+
+NAV 1 and NAV 2, right of the six-pack, are one print (`cdi.scad`): VOR
+course deviation indicators like the 172N's, but VOR only, without the
+glideslope (VFR). Each has its own Nano; their MobiFlight setups differ
+only in the datarefs. The case front is the standard's (the 81 mm hole,
+the lip, the glass), but the lower left screw's place is the OBS knob's,
+so it has three screws. Behind it: one 28BYJ-48 stepper (the needle),
+a 9 g servo (the TO/FROM flag) and an AS5600 magnetic angle sensor (the
+course).
+
+NAV 1 is in the bottom row, and the force feedback yoke's housing ends
+just right of its left edge: it is 66 mm deep behind the sheet
+(`nav_depth`), but only right of 37 mm left of its axis (`nav_deep_x`);
+left of that only the case and the back plate are there, 20 mm deep
+(`nav_low_depth`). The frame checks both.
+
+### How it works
+
+- **Front to back**: the glass, the azimuth card (a ring round the
+  window), the needle, the dial with the face, layer 1 (the flag, the
+  knob's gear and the sensor gear), layer 2 (the needle's sector and the
+  motor's pinion, the AS5600 board), the back plate (the motor, the
+  servo), the board carrier.
+- **Card and OBS knob**: the card is a printed ring (paper on its front:
+  N 3 6 E ... 33, a tick every 5 degrees) with a toothed band behind it
+  (120 teeth, module 0.6). It rides on a guide ring glued onto the dial
+  and turns between the glass and the dial. The knob's pinion (36 teeth)
+  meshes with the band directly: 3.33 knob turns a card turn, clockwise
+  raises the course, which shows under the index at the top (the
+  reciprocal under the bottom one; both indexes are on the lip, painted
+  white). There is nothing between the knob and the card but gears, like
+  in the real one.
+- **The course to X-Plane**: behind the dial, a 15 tooth gear on the
+  knob's shaft turns a 50 tooth gear on a peg of the dial: 50 / 15 is
+  120 / 36, so it turns exactly with the card. A diametric magnet in its
+  hub turns over an AS5600 magnetic angle sensor: its analog output
+  (0 to 5 V over a turn, no end stops) gives MobiFlight the course
+  absolutely, all the way round, like the altimeter's pot gives the
+  Kollsman setting (that one has end stops, which suit a scale with
+  ends; the card turns endlessly). X-Plane's OBS is set from it: nothing
+  to keep in step, nothing to home.
+- **Needle**: it hangs from a pivot at the top (behind the card) and
+  swings over the face, 5 dots each side (2 degrees a dot, 10 degrees of
+  course full scale). It is pressed onto a 3 mm steel axle at the pivot,
+  which turns in the dial and in the back plate; on the axle behind the
+  dial a gear sector (60 teeth on the full circle, module 0.8) is turned
+  by the motor's pinion (15 teeth): the motor turns 4 times the needle's
+  angle (137 degrees at full scale), so the gearbox's play shows only a
+  quarter as much. A magnet pair in the sector passes a hall sensor in
+  the back plate when the needle is in the middle: its home.
+- **Flag**: the TO / OFF / FROM window right of the middle shows one of
+  three paper fields on a printed sector on the servo's spline: a white
+  triangle up (TO), red and white stripes (OFF: no signal) and a white
+  triangle down (FROM), 40 servo degrees apart, OFF in the middle.
+- **Back**: the motor (its body to the left) and the servo (standing
+  behind the back plate, its boss through it) on the back plate's back.
+  Four posts carry the board carrier behind them: the ULN2003 board and
+  the Nano facing back, the Nano's USB jack down. Nothing deeper than the
+  back plate is left of 37 mm from the axis (the housing).
+- **Print orientation**: the case back side down (the pinion's pocket
+  open to the sheet, the gears' pocket open to the back), the card, dial,
+  needle (white), sector, sensor gear, flag, back plate, carrier and knob
+  front down, the knob's shaft on its pinion's front, the gears, the
+  spacer and the guide ring flat. Everything else black.
+
+The `assert`s check the face (dots, window, middle clear of each other
+and of the card), the card's train (teeth, band, guide ring, the knob's
+shaft clear of the hole and the bore), the sensor's train (1:1 with the
+card), the needle's sweep (tip and hub inside the guide ring), the
+sector's and the flag's sweeps against everything in their layers, the
+AS5600 board, the motor, the servo, the sensors and the posts clear of
+each other, the carrier in its place (`carrier_slots`), nothing deep
+left of `nav_deep_x`, and the knob against the neighbours.
+
+### The print
+
+`make` writes `target/cdi_face.pdf` (on the project page as
+[face](https://robertbraeutigam.github.io/cessna172/instruments/cdi_face.pdf)):
+two cards, two faces, two flags and the glass's template, in black, red
+and white. Print at 100 % on matte photo paper. Cut the card and the
+face on their edges, the face's window on the white line's inside, punch
+the face's axle hole; cut the flags on their edges. Glue the card onto
+the card's plate, the face onto the dial (window over window, inside the
+guide ring), the flag onto the flag's front (OFF on its middle).
+
+### Hardware
+
+| Qty | Part | Use |
+|-----|------|-----|
+| 1 | 28BYJ-48 stepper, 5 V, with its ULN2003 driver board | needle |
+| 1 | SG90 9 g servo, with its screws | TO/FROM flag |
+| 1 | AS5600 magnetic angle sensor board (analog output) with its diametric magnet 6 x 2.5 mm | the course |
+| 1 | Arduino Nano (ATmega328P, 5 V), mini USB cable | MobiFlight board of the instrument |
+| 1 | A3144 hall sensor | the needle's home |
+| 2 | disc magnet 5 x 1 mm | the needle's home (stacked) |
+| 1 | 3 mm steel dowel pin, 18 mm | the needle's axle |
+| 1 | 470 uF capacitor, 10 V | across the servo's supply |
+| 1 | clear sheet 1 mm (PET or acrylic), 78 x 78 mm | glass |
+| 1 | the card, the face and the flag, printed on photo paper | |
+| 3 | M3 x 8 button head, black | case through the sheet |
+| 3 | M3 x 8 countersunk self tapping screw | back plate into the case |
+| 4 | M3 x 8 countersunk self tapping screw | carrier onto the back plate's posts |
+| 2 | M3 x 8 countersunk screw + nut | motor ears |
+| 4 | M3 x 6 self tapping screw | ULN2003 board |
+| 2 | M3 x 6 self tapping screw | AS5600 board |
+
+For two indicators, twice. The axle's length comes from the build's echo
+(`axle_len`). The servo's sizes (`sv_*`) and the AS5600 board's (`as_*`:
+the boards differ between sellers, and so do their holes) are MEASURE
+values: check them before printing. The knob turns 3.33 times a card
+turn: the real ones are said to be 3 to 5 (no maker's figure found);
+`z_kp` sets it (with `z_kg` and `z_sg`, which must keep the sensor gear
+1:1 with the card).
+
+### Assembly
+
+1. Magnets: the 5 x 1 pair into the sector's back face (check which face
+   pulls the sensor low), the diametric magnet into the sensor gear's
+   hub (glue).
+2. Back plate: the motor (ears countersunk from the front, nuts behind),
+   the hall sensor into its pocket (flat face forward, legs bent back
+   through the slot), the AS5600 board onto its standoffs, chip forward,
+   its wires through the slot first; the servo from behind, its boss
+   through the plate, its tabs onto the posts (its own screws). The
+   pinion onto the motor's shaft.
+3. Set the servo to its middle (90 degrees, e.g. from the Connector) and
+   put the flag onto its spline, OFF towards the window's place, with the
+   servo horn's screw through the flag's middle.
+4. Dial: glue the guide ring into its groove and the spacer ring onto the
+   dial's front edge, its gap at the lower left (the knob's place: with
+   the window at the upper right, 45 degrees under 9 o'clock). Face onto
+   the dial, card paper onto the card. The sensor gear onto the dial's
+   peg.
+5. The needle onto the axle's front end (pressed), the axle from the
+   front through the dial, the sector pressed onto its back end, its
+   teeth pointing straight down along the needle.
+6. The knob's shaft into the case from the front (its pinion in the
+   front pocket, its shaft through the bearing), the knob's gear onto its
+   back end in the back pocket (glue).
+7. Glass into the case from behind, the card (its teeth meshing the
+   knob's pinion), the dial stack (the guide ring into the card's band).
+   Then the back plate's stack: the sector onto the pinion with the
+   needle in the middle and the motor at its home, the sensor gear onto
+   the knob's gear, the posts' pins into the dial. Screwed into the case
+   (three screws).
+8. The carrier onto the back plate's posts (from its back), the boards
+   onto it, wire it (below). Flash and set up MobiFlight, let it home.
+9. Into the panel: drill the three screw holes and the knob's 7 mm hole
+   using the case as the template, the case into the hole from behind,
+   the knob's shaft at the hole, the three screws, the knob onto the
+   shaft (its flat; glue it if it is loose).
+
+### Wiring
+
+| Signal | Nano pin | MobiFlight device |
+|--------|----------|-------------------|
+| ULN2003 IN1, IN2, IN3, IN4 | D2, D3, D4, D5 | *Stepper* needle |
+| hall sensor OUT | D6 | its home input |
+| servo signal (orange) | D9 | *Servo* flag |
+| AS5600 OUT | A7 | *Analog input* course |
+| AS5600 DIR | GND (or 5 V: the direction) | |
+| ULN2003 -, sensor GND, servo - (brown), AS5600 GND | GND | |
+| ULN2003 +, sensor VCC, servo + (red), AS5600 VCC | 5 V | |
+
+Put the 470 uF capacitor across the servo's + and - at the Nano. The
+AS5600 needs no programming: its output is analog, 0 to VCC over one
+turn, by default. Tie its DIR pin, do not leave it open.
+
+**USB**: one port on the powered USB hub: about 0.3 A while the needle
+moves (one stepper with the Nano), up to 0.3 A more while the flag
+moves (the servo).
+
+### MobiFlight
+
+For NAV 2 the same with `nav2` in the datarefs.
+
+- **Needle**: a *Stepper* (pins above, 2038 steps a turn, its home
+  input, coils off at rest) following
+  `sim/cockpit2/radios/indicators/nav1_hdef_dots_pilot`. X-Plane gives
+  the deflection in its dots, 2.5 at full scale, so one of them is two of
+  the face's. The needle's angle is not linear in the dots (the dots are
+  on a straight row under a pivot), so use the *Interpolation* with these
+  points, both ways (negative to the left; from `steps_at_xplane_dots`
+  in the build's echo):
+
+  | X-Plane dots | 0 | 0.5 | 1 | 1.5 | 2 | 2.5 |
+  |---|---|---|---|---|---|---|
+  | steps | 0 | 175 | 344 | 501 | 645 | 773 |
+
+  Beyond 2.5 it stays there. The motor turns the other way from the
+  needle (through the sector); if the needle goes the wrong way, give
+  the motor its pins the other way round. Check on a radial: 2 degrees
+  off course should put the needle on the first dot; if X-Plane's full
+  scale differs, scale the dots. Fine tune the middle with an offset. If
+  the Connector does not move the stepper to negative positions, add 773
+  to every step value and let it home with the needle at the left end
+  instead (the sector's magnet then has to be there).
+- **Flag**: a *Servo* on D9 following
+  `sim/cockpit2/radios/indicators/nav1_flag_from_to_pilot` (0 no signal,
+  1 TO, 2 FROM), its angle `if($=1,50,if($=2,130,90))`: OFF in the middle,
+  TO and FROM 40 degrees either side (`fl_step`). If TO and FROM are
+  swapped, swap 50 and 130; if a field sits off the window, move the
+  angles a little.
+- **Course**: an *Analog input* on A7 that sets
+  `sim/cockpit2/radios/actuators/nav1_obs_deg_mag_pilot` to
+  `Round(((($-Z)+1024)%1024)*360/1024,0)%360`, where Z is the input's
+  value with N under the index (the Connector shows it). About 2.8
+  counts a degree; raise the input's sensitivity if the course flickers.
+  If the course goes down as the knob turns clockwise, tie the AS5600's
+  DIR pin the other way.

@@ -126,8 +126,8 @@ build checks that the instruments stay on the left sheet, clear of each
 other, the yoke column hole and the split upright, and that their cases
 fit in front of the force feedback yoke's housing (`inst_body_d`,
 `inst_depth`: the [standard instrument](../instruments/README.md)'s case
-with the motor and boards behind it, 84 mm round and 47 mm deep behind the sheet; the VSI, NAV 1
-and the RPM are in front of the housing). The
+with the motor and boards behind it, 84 mm round and 47 mm deep behind the sheet; the VSI and the RPM are in
+front of the housing). The
 [attitude indicator](../instruments/README.md#attitude-indicator) is
 deeper, 116 mm (`ai_depth`), and has a square 86 mm front bezel
 (`ai_bezel`, checked against its neighbours' holes), so it must stay in the top row, over the
@@ -139,7 +139,11 @@ the bottom row over the housing's top: its boards make it 62 mm deep
 is over the housing; under that it is 19 mm deep (`hi_low_depth`). The
 [turn coordinator](../instruments/README.md#turn-coordinator) left of it
 is built the same way: 65 mm deep (`tc_depth`) above 24 mm under its
-axis (`tc_deep_z`), 22 mm under that (`tc_low_depth`). The ADF's place in the 172N, under NAV 2 at the column's height,
+axis (`tc_deep_z`), 22 mm under that (`tc_low_depth`). The
+[NAV indicators](../instruments/README.md#nav-indicators) are 66 mm deep
+(`nav_depth`), but only right of 37 mm left of their axis
+(`nav_deep_x`): the housing ends 38.5 mm left of NAV 1's axis, and left
+of that it is 20 mm deep (`nav_low_depth`, the case and the back plate). The ADF's place in the 172N, under NAV 2 at the column's height,
 is free as well.
 
 The frame overhangs the desk edge by 22 mm (`frame_overhang`: a 2020 and
