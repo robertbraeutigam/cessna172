@@ -32,10 +32,10 @@ frame's right top bar, about where the windshield's middle is (see
   position 0. The strip is glued with N in front there, so it does not
   matter where the magnet sits on the drum or which way the D bore goes on.
 - **Window**: round with a flat top and bottom, so only the card shows. A
-  1 mm clear sheet lies in a pocket in the bezel's back (2 mm thick), and
-  the bezel back (a 1 mm plate with the same window) holds it there, so
-  it needs no glue and its edges are hidden 2 mm behind the bezel's
-  front all round: cut it with scissors or a knife and a ruler, only not
+  1 mm clear sheet lies in a pocket in the bezel back's front (a 2 mm
+  plate with the same window, a 1 mm ledge round it behind the glass),
+  and the bezel (2 mm, flat behind) holds it there, so it needs no glue
+  and its edges are hidden 2 mm behind the bezel's front all round: cut it with scissors or a knife and a ruler, only not
   bigger than 52 x 30 mm. The lubber line is a printed bar across the
   bezel back's window, just in front of the card; paint its front white.
   The N-S and E-W compensator screws under the window are dummies.
@@ -54,11 +54,12 @@ frame's right top bar, about where the windshield's middle is (see
   then print the base in PETG if PLA softens near the posts.
 - **Parts**: the base is printed flat with everything on it, the shell top
   down (open front and bottom), the bezel and the bezel back back side down
-  (the lubber bar on the bed; the glass pocket is bridged), the drum top down, and the stand on its foot. All black except
+  (the bezel's lettering on top, its back flat on the bed; the bezel
+  back's pocket open on top, the lubber bar on the bed), the drum top down, and the stand on its foot. All black except
   the stand. The bezel's lower screws go into posts on the base, its upper
   ones into blocks in the shell. Two screws from below hold the shell's back
   columns. The stand is screwed onto the base from inside.
-- **Size**: 65 x 65 mm front, 108 mm deep (4 mm more than the C2300, for
+- **Size**: 65 x 65 mm front, 109 mm deep (5 mm more than the C2300, for
   the Nano behind the motor), its bottom 25 mm over the top bar (`rise`).
 
 The motor, board, sensor and magnet sizes (`motor_*`, `uln_*`, `sensor`,
@@ -119,9 +120,9 @@ thicker paper or vinyl, set `paper_t` and print again.
    drum's top. Press the drum back on.
 5. Shell down over it from above, the USB cable through the notch in the
    back wall, two screws from below into the back columns.
-6. Paint the lubber line and the lettering. Lay the bezel face down, the
-   clear sheet into its pocket (film off, no fingerprints), the bezel
-   back on it, and screw both on together.
+6. Paint the lubber line and the lettering. Lay the bezel back on its
+   back, the clear sheet into its pocket (film off, no fingerprints), the
+   bezel on it, and screw both on together.
 7. Bolt the stand onto the right top bar (T-nuts in the top slot).
 
 ## Wiring
