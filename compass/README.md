@@ -13,7 +13,7 @@ frame's right top bar, about where the windshield's middle is (see
 
 | File | Parts |
 |------|-------|
-| `compass.scad` | base (floor with the motor posts, sensor post, Nano rails and the ULN2003 plate), shell, bezel, drum, stand; the card print |
+| `compass.scad` | base (floor with the motor posts, sensor post, Nano rails and the ULN2003 plate), shell, bezel, bezel back, drum, stand; the card print |
 
 ## How it works
 
@@ -32,8 +32,12 @@ frame's right top bar, about where the windshield's middle is (see
   position 0. The strip is glued with N in front there, so it does not
   matter where the magnet sits on the drum or which way the D bore goes on.
 - **Window**: round with a flat top and bottom, so only the card shows. A
-  1 mm clear sheet is glued into the bezel's front. The lubber line is a
-  printed bar behind it, just in front of the card; paint its front white.
+  1 mm clear sheet lies in a pocket in the bezel's back (2 mm thick), and
+  the bezel back (a 1 mm plate with the same window) holds it there, so
+  it needs no glue and its edges are hidden 2 mm behind the bezel's
+  front all round: cut it with scissors or a knife and a ruler, only not
+  bigger than 52 x 30 mm. The lubber line is a printed bar across the
+  bezel back's window, just in front of the card; paint its front white.
   The N-S and E-W compensator screws under the window are dummies.
 - **Electronics**: the Nano lies in rails on the floor behind the motor,
   its USB jack in a notch in the back wall. The ULN2003 driver board is
@@ -49,8 +53,8 @@ frame's right top bar, about where the windshield's middle is (see
   stays cool; if it is left on, it gets warm while it holds the card:
   then print the base in PETG if PLA softens near the posts.
 - **Parts**: the base is printed flat with everything on it, the shell top
-  down (open front and bottom), the bezel back side down (the lubber bar on
-  the bed), the drum top down, and the stand on its foot. All black except
+  down (open front and bottom), the bezel and the bezel back back side down
+  (the lubber bar on the bed; the glass pocket is bridged), the drum top down, and the stand on its foot. All black except
   the stand. The bezel's lower screws go into posts on the base, its upper
   ones into blocks in the shell. Two screws from below hold the shell's back
   columns. The stand is screwed onto the base from inside.
@@ -90,7 +94,7 @@ thicker paper or vinyl, set `paper_t` and print again.
 | 1 | Arduino Nano (ATmega328P, 5 V), USB cable | MobiFlight board of the compass |
 | 1 | A3144 hall sensor (unipolar, not latching) | home |
 | 1 | disc magnet 6 x 3 mm | home |
-| 1 | clear sheet 1 mm (PET or acrylic), 52 x 30 mm | window |
+| 1 | clear sheet 1 mm (PET or acrylic), 52 x 30 mm, no glue | window |
 | 1 | the card, printed on paper | card |
 | 2 | M3 x 6 self tapping screw | motor ears onto the posts |
 | 4 | M3 x 8 self tapping screw | ULN2003 board |
@@ -115,8 +119,9 @@ thicker paper or vinyl, set `paper_t` and print again.
    drum's top. Press the drum back on.
 5. Shell down over it from above, the USB cable through the notch in the
    back wall, two screws from below into the back columns.
-6. Glue the clear sheet into the bezel's front, paint the lubber line and
-   the lettering, and screw the bezel on.
+6. Paint the lubber line and the lettering. Lay the bezel face down, the
+   clear sheet into its pocket (film off, no fingerprints), the bezel
+   back on it, and screw both on together.
 7. Bolt the stand onto the right top bar (T-nuts in the top slot).
 
 ## Wiring

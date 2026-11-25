@@ -22,12 +22,14 @@
 //   a notch in the back wall. The ULN2003 driver board stands behind a
 //   plate at the back, which hides it (and its LEDs) from the window.
 // - Parts: the base (floor with all of the above on it, printed flat),
-//   the shell (sides, top and back, printed top down), the bezel (window
-//   with the lubber line, printed back side down, the N-S and E-W
-//   compensator screws as dummies, lettering for a paint pen), the drum
-//   (printed top down) and the stand (bolted onto the top bar's slot).
-//   A clear sheet (cut from 1 mm PET or acrylic) is glued into the bezel
-//   front in front of the lubber line.
+//   the shell (sides, top and back, printed top down), the bezel (the
+//   front with the window, printed back side down, the N-S and E-W
+//   compensator screws as dummies, lettering for a paint pen), the bezel
+//   back (a plate behind it with the window and the lubber line, printed
+//   back side down), the drum (printed top down) and the stand (bolted
+//   onto the top bar's slot). A clear sheet (cut from 1 mm PET or
+//   acrylic) lies in a pocket in the bezel's back, held by the bezel back
+//   (no glue), its edges behind the bezel's front.
 //
 // Coordinates: x to the right, y away from the pilot, z up. The origin is
 // the card's axis at the band's middle (the window's middle).
@@ -49,7 +51,8 @@
 // home, mark the drum's front (the notch in the base's front edge), pull
 // it off and glue the card on with N at the mark, plain black end under;
 // press it back on. Shell over it (the USB cable through the notch),
-// two screws from below, bezel with the glass on.
+// two screws from below, the glass into the bezel, the bezel back behind
+// it, both screwed on.
 
 $fn = 60;
 
@@ -108,6 +111,7 @@ window_d = 48;
 window_h = band_h + 4;       // flat top and bottom: only the card shows
 glass_t = 1;                 // MEASURE: clear sheet
 glass_edge = 2;              // glass past the window, all round
+bz_front_t = 2;              // the bezel's front part, the glass in a pocket in its back; the bezel back is the rest of bezel_t
 lubber_w = 1.2;
 comp_screw_d = 4;            // the dummy compensator screws
 comp_screw_dx = 10;
@@ -183,6 +187,9 @@ z_spost = z_sensor1 - sensor.y + sensor_pocket;
 spost_c = [0, -mag_r];
 // window: round, flat top and bottom
 glass = [window_d + 2 * glass_edge, window_h + 2 * glass_edge];
+y_glass = y_face + bz_front_t - glass_t;     // the glass's front
+y_bzb = y_face + bz_front_t;                 // the bezel back's front, the glass's back
+comp_hole = bz_front_t - 0.6;                // the dummy compensator screws' holes, deep
 comp_z = -(window_h / 2 + (body_h / 2 - window_h / 2) * 0.35);
 
 echo(compass_depth = depth, axis_to_face = y_face, card_strip = [card_len + card_overlap, band_h],
@@ -211,6 +218,9 @@ assert(window_h <= window_d - 6, "Window as high as round");
 assert(window_h / 2 >= band_h / 2, "Window smaller than the card");
 assert(norm([glass.x / 2, glass.y / 2]) + 0.2 <= norm([sx, sx]) - csk_d / 2 - 1, "Bezel screws run into the glass");
 assert(sx - block / 2 >= z_top + 0.5, "Bezel screw blocks run into the card");
+assert(bz_front_t - glass_t >= 0.8 && bz_front_t >= (csk_d - clear_d) / 2 + 0.3, "Bezel front too thin for the glass pocket or the screw heads");
+assert(bezel_t - bz_front_t >= 0.8, "Bezel back too thin");
+assert(abs(comp_z) - comp_screw_d / 2 >= glass.y / 2 + 0.15 + 1, "Compensator screws run into the glass pocket");
 for (s = stand_screws)
    assert(abs(s.x) + csk_d / 2 <= motor_ear_dx - post_d / 2 || abs(s.y - motor_y) >= post_d / 2 + csk_d / 2,
           "Stand screws under the motor posts")
@@ -405,12 +415,12 @@ module shell() {
    }
 }
 
-// --- Bezel: the front, with the window and the lubber line ---
+// --- Bezel: the front, with the window, the glass in a pocket in its back ---
 module bezel() {
    difference() {
       union() {
          // plate, its front edge chamfered
-         along_y(y_face + 1, y_bz) section();
+         along_y(y_face + 1, y_bzb) section();
          hull() {
             along_y(y_face, y_face + 0.01) section(1);
             along_y(y_face + 1, y_face + 1.01) section();
@@ -420,19 +430,29 @@ module bezel() {
       }
       // window
       along_y(y_face - 1, y_bz + 1) window_2d();
-      // the glass, in the front
-      translate([-glass.x / 2 - 0.15, y_face - 1, -glass.y / 2 - 0.15]) cube([glass.x + 0.3, glass_t + 1, glass.y + 0.3]);
+      // the glass, in a pocket in the back
+      translate([-glass.x / 2 - 0.15, y_glass, -glass.y / 2 - 0.15]) cube([glass.x + 0.3, glass_t + 1, glass.y + 0.3]);
       // corner screws, countersunk from the front
       for (x = [-1, 1], z = [-1, 1]) translate([x * sx, y_face, z * sx]) rotate([90, 0, 0]) csk_hole();
       // compensator screws (dummies): a hole each, the slot stands in it
       for (s = [-1, 1]) translate([s * comp_screw_dx, y_face - 1, comp_z]) rotate([-90, 0, 0])
-         cylinder(d = comp_screw_d, h = 1 + bezel_t - 1);
+         cylinder(d = comp_screw_d, h = 1 + comp_hole);
    }
-   // lubber line, behind the glass
-   translate([-lubber_w / 2, y_face + glass_t, -window_h / 2 - 0.5]) cube([lubber_w, y_bz - y_face - glass_t, window_h + 1]);
    // the screw slots in their holes
    for (s = [-1, 1]) translate([s * comp_screw_dx, y_face, comp_z]) rotate([0, 45 * s, 0])
-      translate([-comp_screw_d / 2 + 0.2, 0, -0.4]) cube([comp_screw_d - 0.4, bezel_t - 1, 0.8]);
+      translate([-comp_screw_d / 2 + 0.2, 0, -0.4]) cube([comp_screw_d - 0.4, comp_hole, 0.8]);
+}
+
+// --- Bezel back: the plate behind the glass, holding it, with the lubber line ---
+module bezel_back() {
+   difference() {
+      along_y(y_bzb, y_bz) section();
+      along_y(y_bzb - 1, y_bz + 1) window_2d();
+      for (x = [-1, 1], z = [-1, 1]) translate([x * sx, y_bzb - 1, z * sx]) rotate([-90, 0, 0])
+         cylinder(d = clear_d, h = bezel_t + 2);
+   }
+   // lubber line, behind the glass
+   translate([-lubber_w / 2, y_bzb, -window_h / 2 - 0.5]) cube([lubber_w, y_bz - y_bzb, window_h + 1]);
 }
 
 module bezel_labels_2d() {
@@ -494,7 +514,7 @@ module magnet_part(H) {
 }
 
 module glass_part() {
-   color(c_glass) translate([-glass.x / 2, y_face, -glass.y / 2]) cube([glass.x, glass_t, glass.y]);
+   color(c_glass) translate([-glass.x / 2, y_glass, -glass.y / 2]) cube([glass.x, glass_t, glass.y]);
 }
 
 // the card on the drum: black paper, white markings
@@ -525,7 +545,7 @@ module top_bar_part() {
 
 module labels_part() {
    color(c_label) translate([0, y_face - 0.01, 0]) rotate([90, 0, 0]) linear_extrude(label_raise) bezel_labels_2d();
-   color(c_lubber) translate([-lubber_w / 2, y_face + glass_t - 0.05, -window_h / 2]) cube([lubber_w, 0.1, window_h]);
+   color(c_lubber) translate([-lubber_w / 2, y_bzb - 0.05, -window_h / 2]) cube([lubber_w, 0.1, window_h]);
 }
 
 module compass_parts(H, e = 0, with_shell = true) {
@@ -545,7 +565,10 @@ module compass_parts(H, e = 0, with_shell = true) {
       translate([0, 0, 3.5 * e]) color(c_body) shell();
       translate([0, -2 * e, 0]) {
          color(c_body) bezel();
-         glass_part();
+         translate([0, e / 2, 0]) {
+            color(c_body) bezel_back();
+            glass_part();
+         }
          labels_part();
       }
    }
@@ -574,7 +597,8 @@ module inside_view(H = view_heading) {
 // --- Printable parts, in print orientation ---
 translate([0, 0, -z_bot]) base(); // Make module base
 translate([0, 0, body_h / 2]) rotate([180, 0, 0]) shell(); // Make module shell
-translate([0, 0, y_bz]) rotate([-90, 0, 0]) bezel(); // Make module bezel
+translate([0, 0, y_bzb]) rotate([-90, 0, 0]) bezel(); // Make module bezel
+translate([0, 0, y_bz]) rotate([-90, 0, 0]) bezel_back(); // Make module bezel_back
 translate([0, 0, z_top]) rotate([180, 0, 0]) drum(); // Make module drum
 stand(); // Make module stand
 

@@ -165,8 +165,9 @@ its own top-level directory; new components should follow the same layout.
   around it, numbers falling to the right like the real card. A magnet in
   the drum and an A3144 hall sensor on a post home it. MobiFlight on an
   Arduino Nano of its own (USB to the powered USB hub) drives the ULN2003 board. Parts: base (everything is
-  mounted on it), shell, bezel (window, lubber line, dummy compensator
-  screws), drum, stand. The motor, ULN2003, sensor and magnet values are
+  mounted on it), shell, bezel (window, dummy compensator screws, the
+  glass in a pocket in its back), bezel back (holds the glass, lubber
+  line), drum, stand. The motor, ULN2003, sensor and magnet values are
   `lib/stepper.inc.scad`'s (MEASURE).
 
 - `instruments/` — the analogue instruments (stage 2 holes in the frame's
