@@ -19,6 +19,7 @@ wiring and the assembly:
 | [`compass/`](compass/README.md) | the magnetic compass over the panel: a printed drum card on a 28BYJ-48 stepper, on its own Nano |
 | [`instruments/`](instruments/README.md) | the analogue instruments: the RPM, airspeed, vertical speed, attitude and heading indicators, the altimeter, the turn coordinator and the NAV indicators (CDI), 28BYJ-48 steppers behind colour printed faces |
 | [`radio/`](radio/README.md) | the radio stack: the KMA 26 audio panel, two KX155 NAV/COMs and the KT 76C transponder, each on its own Nano |
+| [`trim/`](trim/README.md) | the elevator trim wheel on a rotary encoder, with a servo driven position indicator (a remake of FlightSimMaker's Thingiverse design) |
 
 Every component has its own Arduino Nano running
 MobiFlight and one USB cable to a powered USB hub; see
@@ -278,3 +279,11 @@ on an Arduino Nano of its own.
 [![KX155](https://robertbraeutigam.github.io/cessna172/radio/kx155_montage.png)](https://robertbraeutigam.github.io/cessna172/radio/kx155_montage.png)
 
 [![KT 76C](https://robertbraeutigam.github.io/cessna172/radio/kt76c_montage.png)](https://robertbraeutigam.github.io/cessna172/radio/kt76c_montage.png)
+
+### [Trim wheel](trim/README.md)
+
+The elevator trim wheel on a rotary encoder, and a 9 g servo swinging the
+position indicator beside it; an OpenSCAD remake of FlightSimMaker's
+Thingiverse design.
+
+[![Trim wheel](https://robertbraeutigam.github.io/cessna172/trim/trim_montage.png)](https://robertbraeutigam.github.io/cessna172/trim/trim_montage.png)

@@ -319,6 +319,18 @@ its own top-level directory; new components should follow the same layout.
     (`nav_low_depth`), checked by the frame. Print `face` (card, face,
     flag fields; black, red, white).
 
+- `trim/` — `trim.scad`: the elevator trim wheel for the pedestal under
+  the throttle, an OpenSCAD remake of FlightSimMaker's "Trim Wheel"
+  (Thingiverse 4290141, CC BY-NC-SA, credited in its README), its sizes
+  measured off the original STLs, every part in the original's print
+  orientation. Face plate (wheel slot, hood, indicator window with curved
+  rims, NOSE DOWN/UP), case (open front, insert bosses, cable hole in the
+  top), wheel (24 balls) on a spacer turning in a bushing in the encoder
+  bracket (`bracket`, `bracket_large`), the encoder's shaft in the
+  spacer; the smoother rubs on the wheel (its place inferred); a 60 mm
+  arm on an SG90 in the servo bracket is the indicator. No board in it
+  yet, and not yet fitted to the frame's pedestal rule (`pedestal_size`).
+
 - `lib/` — not a component (no Makefile, no README): bought parts that
   every component uses, as `*.inc.scad` files the Makefiles copy into each
   component's `target/` (a component's own include must not take one of
