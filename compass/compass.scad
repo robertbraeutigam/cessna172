@@ -26,8 +26,8 @@
 // - The Nano lies in rails on the floor behind the motor, its USB jack at
 //   the back wall. The ULN2003 driver board stands behind a plate at the
 //   back, which hides it (and its LEDs) from the window. The Dupont plugs
-//   on its pins go into a bulge on the shell's back, open at the bottom
-//   (the shell goes down past them), the USB cable out there too.
+//   on its pins stand out into a box on the shell's back, over the USB
+//   notch; the shell slides on from behind.
 // - Two colours: the marks, the bezel's lettering and the lubber line are
 //   separate white parts (*_white STLs) in pockets of the black ones.
 // - Parts: the base (floor with all of the above on it, printed flat),
@@ -58,7 +58,7 @@
 // from inside), magnet into the drum's pad (check which face triggers the
 // sensor), sensor onto its post, motor onto its posts, Nano into its
 // rails, ULN2003 board behind its plate; wire it (see the README). Press
-// the drum on. Shell over it (the USB cable through the notch), two
+// the drum on. Shell on from behind (the USB cable in the notch), two
 // screws from below, the glass into the bezel back, the bezel over it,
 // both screwed on. Flash and set up MobiFlight and set the offset that
 // puts N under the lubber line after homing.
@@ -140,11 +140,12 @@ spost = 7;                   // sensor post, square
 
 // --- Boards ---
 br_t = 3;                    // ULN2003 plate
-// the bulge on the shell's back: room for the Dupont plugs on the ULN2003
-// board's pins, open at the bottom so the shell goes down past them
+// the box on the shell's back: room for the Dupont plugs on the ULN2003
+// board's pins (the shell slides on from behind)
 bulge_w = 35;                // inside, centred
-bulge_top = 2;               // inside, over the board's top edge (at the shell's outside)
-plug_reach = 25;             // MEASURE: the plugs and their wires' bend, from the board's parts side
+bulge_d = 15;                // behind the back wall, outside
+bulge_top = 2;               // inside, over the board's top edge
+bulge_skip = 0.5;            // its underside over the USB plug
 
 // --- Stand, on the frame's 2020 top bar ---
 rise = 25;                   // the compass's bottom over the bar
@@ -191,9 +192,8 @@ uln_c = [0, z_uln0 + uln_board.y / 2];     // the ULN2003 board's middle, [x, z]
 uln_holes = [for (h = uln_hole_xy) uln_c + h];
 plate_w = uln_board.x + 2;
 z_plate1 = z_uln0 + uln_board.y + 1;
-y_bulge = y_plate1 + uln_standoff + uln_t + plug_reach;   // the bulge's back, inside
-z_bulge = z_uln0 + uln_board.y + bulge_top;  // its roof, inside, at its back (45 degrees up towards the wall)
-z_bulge_wall = z_bulge + y_bulge - y_bi;     // the roof at the back wall's inside: the wall's opening's top
+z_bulge0 = usb_z + usb_plug.y / 2 + bulge_skip;   // the box's underside
+z_bulge1 = z_uln0 + uln_board.y + bulge_top; // its roof, inside
 sx = xi - block / 2;                         // bezel screws, x and z
 back_screws = [for (s = [-1, 1]) [s * sx, y_bi - block / 2]];
 stand_screws = [for (x = [-1, 1], y = [-1, 1]) [x * stand_screw.x, stand_dy + y * stand_screw.y]];
@@ -237,8 +237,8 @@ assert(nano_rail_hw + 0.2 <= motor_ear_dx - post_d / 2 || nano_rail_y0 >= motor_
        "Nano rails run into the motor posts");
 assert(z_plate1 <= z_ceil - 1, "ULN2003 board too high");
 assert(bulge_w >= uln_board.x && bulge_w / 2 <= sx - block / 2 - 1, "Back bulge narrower than the ULN2003 board or into the back columns");
-assert(z_bulge_wall + 1 <= z_ceil - 1, "Back bulge's opening runs into the shell's top");
-assert(y_bulge >= y_back, "Back bulge inside the back wall");
+assert(z_bulge1 + wall <= z_ceil, "Back box runs over the shell's top");
+assert(bulge_d >= 2 * wall, "Back box too shallow");
 assert(y_plate0 - 8 >= card_ro + 1, "ULN2003 plate's gussets run into the card");
 assert(plate_w / 2 + 2 <= sx - block / 2, "ULN2003 plate runs into the back columns");
 assert(window_h <= window_d - 6, "Window as high as round");
@@ -435,26 +435,18 @@ module shell() {
             translate([b.x - block / 2, b.y - block / 2, z_floor]) cube([block, block + 0.01, z_ceil - z_floor + 0.01]);
             along_y(y_bz, y_back) section(wall - 0.01);
          }
-         // back bulge, down to the base's bottom behind it
-         intersection() {
-            bulge_yz(bulge_w / 2 + wall, wall);
-            translate([-body_w, y_back - 0.01, z_bot]) cube([2 * body_w, y_bulge + wall - y_back + 1, body_h]);
-         }
+         // the box on the back, over the USB plug
+         translate([-bulge_w / 2 - wall, y_back - 0.01, z_bulge0])
+            cube([bulge_w + 2 * wall, bulge_d + 0.01, z_bulge1 + wall - z_bulge0]);
       }
-      bulge_yz(bulge_w / 2, 0);
+      translate([-bulge_w / 2, y_bi - 1, z_bulge0 + wall])
+         cube([bulge_w, y_back + bulge_d - wall - y_bi + 1, z_bulge1 - z_bulge0 - wall]);
       for (s = [-1, 1]) translate([s * sx, y_bz - 1, sx]) rotate([-90, 0, 0])
          cylinder(d = pilot_d, h = screw_depth + 1);
       for (b = back_screws) translate([b.x, b.y, z_floor - 0.01]) cylinder(d = pilot_d, h = screw_depth);
       // USB plug notch
       translate([-usb_plug.x / 2, y_bi - 1, z_floor - 1]) cube([usb_plug.x, wall + 2, usb_z + usb_plug.y / 2 - z_floor + 1]);
    }
-}
-
-// the back bulge's room (grow = 0, open at the bottom and into the shell)
-// or its outside (grow = wall), hw wide each side of the middle
-module bulge_yz(hw, grow) {
-   rotate([90, 0, 90]) translate([0, 0, -hw]) linear_extrude(2 * hw) offset(delta = grow)
-      polygon([[y_bi - 1, z_bot - 1], [y_bulge, z_bot - 1], [y_bulge, z_bulge], [y_bi - 1, z_bulge_wall + 1]]);
 }
 
 // --- Bezel: the front, with the window, flat behind ---

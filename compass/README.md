@@ -43,14 +43,13 @@ frame's right top bar, about where the windshield's middle is (see
   bezel back's window, just in front of the card; paint its front white.
   The N-S and E-W compensator screws under the window are dummies.
 - **Electronics**: the Nano lies in rails on the floor behind the motor,
-  its USB jack at the back wall. The ULN2003 driver board is
+  its USB jack in a notch in the back wall. The ULN2003 driver board is
   screwed behind a plate at the back, which hides the board and its LEDs
   from the window. The wires are soldered onto the Nano and end in
   female Dupont plugs on the ULN2003 board's pins and the sensor's legs,
   so it all comes apart. The plugs stand out behind the back wall, into
-  a bulge on the shell's back (`bulge_w` wide, `plug_reach` from the
-  board, MEASURE), open at the bottom so the shell goes down past them;
-  the USB cable comes out there too.
+  a box on the shell's back over the USB notch (`bulge_w` wide,
+  `bulge_d` deep), so the shell slides on from behind.
 - **Own board**: the stepper needs four outputs and a home input, on a
   Nano running MobiFlight, like every component (see
   [Connections](../README.md#connections)). The stepper takes about
@@ -60,14 +59,14 @@ frame's right top bar, about where the windshield's middle is (see
   stays cool; if it is left on, it gets warm while it holds the card:
   then print the base in PETG if PLA softens near the posts.
 - **Parts**: the base is printed flat with everything on it, the shell top
-  down (open front and bottom), the bezel and the bezel back back side down
+  down (open front and bottom; supports under the box on its back), the bezel and the bezel back back side down
   (the bezel's lettering on top, its back flat on the bed; the bezel
   back's pocket open on top, the lubber bar on the bed), the drum top down, and the stand on its foot. All black except
   the stand and the white parts (see [Two colours](#two-colours)). The bezel's lower screws go into posts on the base, its upper
   ones into blocks in the shell. Two screws from below hold the shell's back
   columns. The stand is screwed onto the base from inside.
 - **Size**: 65 x 65 mm front, 109 mm deep (5 mm more than the C2300, for
-  the Nano behind the motor) and the bulge 10.5 mm behind that, its bottom 25 mm over the top bar (`rise`).
+  the Nano behind the motor) and the box 15 mm behind that, its bottom 25 mm over the top bar (`rise`).
 
 The motor, board, sensor and magnet sizes (`motor_*`, `uln_*`, `sensor`,
 `magnet`: the shared ones of [`lib/stepper.inc.scad`](../lib/stepper.inc.scad),
@@ -149,8 +148,8 @@ white acrylic across the raised marks, or use a white paint pen.
    5 mm drill bit by hand in the bore; if it turns on the shaft, a drop
    of thin CA glue on the shaft. Flash and set up MobiFlight (see
    [MobiFlight](#mobiflight)), let it home and set the N offset.
-5. Shell down over it from above, the plugs and the USB cable into the
-   bulge on its back, two screws from below into the back columns.
+5. Slide the shell on from behind, its open front first, the USB cable
+   in the notch in its back wall and the plugs in the box over it, two screws from below into the back columns.
 6. With one colour, paint the lubber line and the lettering. Lay the bezel back on its
    back, the clear sheet into its pocket (film off, no fingerprints), the
    bezel on it, and screw both on together.
