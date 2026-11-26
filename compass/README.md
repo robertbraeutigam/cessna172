@@ -19,8 +19,12 @@ frame's right top bar, about where the windshield's middle is (see
 
 - **Card**: the drum is an inverted cup, a top disc with a 57.5 mm band
   hanging from it. It sits over the motor and is pushed onto the shaft
-  (double D bore, blind, so the shaft end sets its height; 0.25 mm play,
-  `bore_play`, so it slides on by hand). The motor
+  (double D bore, 0.25 mm play, `bore_play`, so it slides on by hand). The
+  bore goes through the hub: the drum stops where the shaft's flats end,
+  and to take it off, a pin pushed in from the top onto the shaft's end
+  pushes it off without pulling on the motor. Four windows in the top
+  disc, between spokes, show the motor and the sensor beside the magnet
+  pad, so the gap can be checked. The motor
   stands on two posts under its ears. The band is the card: printed in
   black, its 5° and 10° ticks (1 mm wide) and N 3 6 E 12 15 S 21 24 W 30
   33 stand 0.6 mm out of it (`mark_h`), painted white. Like on the real

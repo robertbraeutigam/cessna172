@@ -8,9 +8,12 @@
 // homes the card on a hall sensor at start.
 //
 // - The drum is an inverted cup (top disc and band) pushed onto the
-//   motor's shaft (double D bore, blind: the shaft end sets its height;
+//   motor's shaft (double D bore, through: it stops where the flats end,
+//   and a pin pushed in from the top on the shaft's end takes it off;
 //   a sliding fit, a drop of CA glue if it turns on the shaft). It
 //   hangs over the motor, which stands on two posts under its ears.
+//   Windows in the top disc, between spokes, show the motor and the
+//   sensor under the magnet pad.
 // - The card is the band itself, printed in black: its ticks and
 //   N 3 6 E 12 ... stand out of it (mark_h), white. Seen from the
 //   front the numbers fall to the right (E is left of N), like on the real
@@ -102,6 +105,8 @@ disc_t = 2;
 hub_d = 10;
 bore_play = 0.25;            // the double D bore over the shaft (sliding fit; a drop of CA if loose)
 shaft_skin = 0.5;            // drum top over the shaft end
+win_rim = 1.5;               // the top disc's windows from the hub, the band and the magnet pad
+spoke_w = 4;                 // between the windows
 side_gap_min = 0.6;          // card to the side walls
 card_gap = 1;                // card to the bezel's back (the lubber line), at least
 bz_back = 31.1;              // axis to the bezel back (the shell's front edge): the case is printed, keep it
@@ -223,6 +228,7 @@ assert(motor_ear_dx - post_d / 2 >= motor_d / 2 + 0.2, "Motor posts touch the mo
 assert(z_hub0 >= z_flange + motor_boss[1] + 1, "Drum hub runs onto the motor's boss");
 assert(z_pad0 >= z_flange + motor_screw_head + 1, "Magnet pad hits the ear screws");
 assert(mag_r + pad_d / 2 <= band_ri - 0.5 && mag_r - pad_d / 2 >= hub_d / 2 + 0.5, "Magnet pad runs into the band or the hub");
+assert(band_ri - win_rim - (hub_d / 2 + win_rim) >= 8, "No room for the drum's windows");
 assert(norm([spost / 2, mag_r + spost / 2]) <= band_ri - 0.5, "Sensor post runs into the band");
 assert(mag_r - spost / 2 >= motor_d / 2 - motor_y + 0.5, "Sensor post runs into the motor");
 assert(sensor.z + 0.3 <= spost && sensor.x + 0.3 <= spost - 1, "Sensor does not fit its post");
@@ -344,8 +350,22 @@ module drum_body() {
          // magnet pad, in front at home
          translate([spost_c.x, spost_c.y, z_pad0]) cylinder(d = pad_d, h = z_top - z_pad0);
       }
-      translate([0, 0, z_hub0 - 0.01]) double_d(shaft_d + bore_play, shaft_flat + bore_play, flat_len + 0.01);
+      translate([0, 0, z_hub0 - 0.01]) double_d(shaft_d + bore_play, shaft_flat + bore_play, z_top - z_hub0 + 1);
       translate([spost_c.x, spost_c.y, z_pad0 - 0.01]) cylinder(d = magnet[0] + 0.2, h = magnet[1] + 0.1 + 0.01);
+      // windows: four between spokes, the one to the pad as wide as the pad
+      translate([0, 0, z_top - disc_t - 1]) linear_extrude(disc_t + 2) drum_windows_2d();
+   }
+}
+
+module drum_windows_2d() {
+   difference() {
+      circle(r = band_ri - win_rim, $fn = 180);
+      circle(d = hub_d + 2 * win_rim);
+      for (a = [0 : 90 : 270]) rotate(a) translate([0, -spoke_w / 2]) square([card_r, spoke_w]);
+      hull() {
+         translate(spost_c) circle(d = pad_d + 2 * win_rim);
+         translate([-spoke_w / 2, 0]) square([spoke_w, 0.01]);
+      }
    }
 }
 
