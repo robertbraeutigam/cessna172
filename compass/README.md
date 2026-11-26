@@ -47,7 +47,11 @@ frame's right top bar, about where the windshield's middle is (see
   bezel back's window, just in front of the card; paint its front white.
   The N-S and E-W compensator screws under the window are dummies.
 - **Electronics**: the Nano lies in rails on the floor behind the motor,
-  its USB jack in a notch in the back wall. The ULN2003 driver board is
+  its USB jack in a notch in the back wall. The rails have lips over the
+  board's edges and a stop in front of it; the base is open at the back,
+  so it slides in from there, and the shell's back wall closes the rails
+  behind it. With the shell on, the Nano cannot lift, nor move when the
+  USB plug is pushed in or pulled out. The ULN2003 driver board is
   screwed behind a plate at the back, which hides the board and its LEDs
   from the window. The wires are soldered onto the Nano and end in
   female Dupont plugs on the ULN2003 board's pins and the sensor's legs,
@@ -58,10 +62,16 @@ frame's right top bar, about where the windshield's middle is (see
   Nano running MobiFlight, like every component (see
   [Connections](../README.md#connections)). The stepper takes about
   0.2 A at 5 V with its coils on, which USB supplies (the Nano's 5 V pin is
-  behind a 0.5 A diode). With the coils switched off at rest (see
-  [MobiFlight](#mobiflight)) it only draws that while the card turns and
-  stays cool; if it is left on, it gets warm while it holds the card:
-  then print the base in PETG if PLA softens near the posts.
+  behind a 0.5 A diode). The coils stay on, also at rest, so the motor
+  and the ULN2003 board get warm.
+- **Vents**: slots in the floor under the drum (inside the wire shield,
+  in front of the stand) let air in; it rises past the motor, out
+  through the drum's windows, and leaves through 8 slots across the
+  shell's top, behind the axis (not seen from the seat).
+- **Wire shield**: a wall under the drum, round its front half, reaches
+  6 mm up inside the band (`shield_over`), the sensor post in it. Through
+  the window, under the card, only that black wall shows, not the
+  sensor, the motor or the wires.
 - **Parts**: the base is printed flat with everything on it, the shell top
   down (open front and bottom), the bezel and the bezel back back side down
   (the bezel's lettering on top, its back flat on the bed; the bezel
@@ -75,14 +85,15 @@ frame's right top bar, about where the windshield's middle is (see
 The motor, board, sensor and magnet sizes (`motor_*`, `uln_*`, `sensor`,
 `magnet`: the shared ones of [`lib/stepper.inc.scad`](../lib/stepper.inc.scad),
 the instruments' too; the Nano's `nano_*` and its rails are the shared
-ones of [`lib/nano.inc.scad`](../lib/nano.inc.scad), here without their
-lips: it drops in from above) and the window sheet's thickness
+ones of [`lib/nano.inc.scad`](../lib/nano.inc.scad)) and the window sheet's thickness
 (`glass_t`) are MEASURE values. The `assert`s check that the
 band clears the motor, its ears, wires and posts, the sensor post, and
 with its marks the side walls and the lubber line; that the pad clears
 the hub, the band and the ear screws; that the boards clear each other,
-the card and the screw columns; and that the stand's screws clear the
-posts and the Nano.
+the card and the screw columns; that the stand's screws clear the
+posts and the Nano; that the wire shield clears the band, the magnet
+pad, the motor, its posts and the bezel's posts; and that the top slots
+clear the shell's corners and screw blocks.
 
 The case was first printed around a paper card glued onto a 58 mm band.
 Its sizes stay as they were (`bz_back`, the axis to the bezel back), and
@@ -142,8 +153,8 @@ white acrylic across the raised marks, or use a white paint pen.
    face pulls the output low (the sensor's flat, printed face towards the
    magnet). Sensor flat face up into the pocket on its post, legs bent down
    the groove.
-3. Motor onto its posts (wires to the back), Nano into its rails (USB to
-   the back), ULN2003 board behind its plate (parts towards the back
+3. Motor onto its posts (wires to the back), Nano slid into its rails
+   from the back, far end first, until it stops (USB to the back), ULN2003 board behind its plate (parts towards the back
    wall). Wire them (see [Wiring](#wiring)), coil the motor's cable behind
    the plate and plug it in.
 4. Push the drum onto the shaft until it stops, any way round, the flats
@@ -172,10 +183,9 @@ collector and pulls low over the magnet; the Nano's internal pull-up is
 enough on its short wire. The USB cable goes to the powered USB hub on
 the desk.
 
-**USB**: one port on the powered USB hub. With the Nano about 0.25 A
-while the card turns (and for a few seconds at start, while it homes),
-some 10-20 mA on average in flight with the coils off at rest (see
-[MobiFlight](#mobiflight)): the port must give 500 mA, as every port of
+**USB**: one port on the powered USB hub. With the Nano about 0.25 A,
+all the time: the coils stay on, also at rest (see
+[MobiFlight](#mobiflight)). The port must give 500 mA, as every port of
 the [powered USB hub](../README.md#powered-usb-hub) does.
 
 ## MobiFlight
@@ -199,15 +209,9 @@ as they change between versions.
   (`360-$`) or give it the pins the other way round (D5..D2).
 - **Pin order**: if the motor only hums or shakes, swap the middle pins
   (IN2 and IN3) in the stepper's settings.
-- **Coils off at rest**: tick *Disable stepper when at target position*
-  in the stepper's settings. The firmware then switches the coils off as
-  soon as the card is where it should be, and on again for the next
-  move; the 28BYJ-48's gearbox holds the card without power. The motor
-  draws current only while it steps (about 2.5 ms a step at the
-  firmware's 400 steps a second), so a card that swings all the time
-  in flight still takes only some 10-20 mA on average, and the motor and
-  the ULN2003 board stay cool (see
-  [USB](#wiring)).
+- **Coils on**: the stepper's coils cannot be switched off at rest, so
+  they stay on and hold the card: about 0.25 A all the time, and the
+  motor and the ULN2003 board get warm (hence the vents).
 - **N offset**: after homing the card is wherever the magnet put it, so
   set its direction first, then the offset. With the output's value at 0
   (the Connector's test value, or the airplane heading north), read the

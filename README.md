@@ -157,8 +157,8 @@ port hub, or two hubs, one into the other (USB takes up to 127 devices),
 and one cable from the first to the PC.
 
 The current is the limit. At rest it is small: every stepper has its
-coils off when it is at its target, so the whole panel takes a few
-hundred mA. The peak is at start, when every needle homes at once for a
+coils off when it is at its target, except the compass's (about 0.25 A
+all the time), so the whole panel takes a few hundred mA. The peak is at start, when every needle homes at once for a
 few seconds: with the compass and about 13 steppers in the instruments
 3.5-4 A. That is more than many cheap "powered" hubs give (their supply
 often has 2-3 A, shared by all ports; too little shows as boards

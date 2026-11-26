@@ -27,9 +27,18 @@
 //   sizes stay (y_bz) and the band is a little smaller (card_r) so the
 //   marks clear the side walls.
 // - The Nano lies in rails on the floor behind the motor, its USB jack at
-//   the back wall. The ULN2003 driver board stands behind a plate at the
+//   the back wall. The rails have lips; it slides in from the back (the
+//   base has no back wall) and the shell's back wall closes them, so a
+//   plug pushed in or pulled out cannot move it. The ULN2003 driver board stands behind a plate at the
 //   back, which hides it (and its LEDs) from the window, far enough in
 //   front of the back wall for the Dupont plugs on its pins (uln_plug_room).
+// - The coils stay on (MobiFlight holds the card), so the motor and the
+//   ULN2003 get warm: slots in the floor under the drum let air in, it
+//   rises past the motor, out through the drum's windows and through slots
+//   across the shell's top.
+// - A wall under the drum (the wire shield), round its front half and up
+//   into the band, the sensor post in it, hides the wires from the window
+//   under the card.
 // - Two colours: the marks, the bezel's lettering and the lubber line are
 //   separate white parts (*_white STLs) in pockets of the black ones.
 // - Parts: the base (floor with all of the above on it, printed flat),
@@ -58,8 +67,8 @@
 //
 // Assembly (one colour: paint the white parts first): stand onto the base (screws
 // from inside), magnet into the drum's pad (check which face triggers the
-// sensor), sensor onto its post, motor onto its posts, Nano into its
-// rails, ULN2003 board behind its plate; wire it (see the README). Press
+// sensor), sensor onto its post, motor onto its posts, Nano slid into
+// its rails from the back, ULN2003 board behind its plate; wire it (see the README). Press
 // the drum on. Shell over it (the USB cable through the notch), two
 // screws from below, the glass into the bezel back, the bezel over it,
 // both screwed on. Flash and set up MobiFlight and set the offset that
@@ -146,6 +155,16 @@ spost = 7;                   // sensor post, square
 br_t = 3;                    // ULN2003 plate
 gusset = [8, 16];            // the plate's gussets: reach in front of it, height
 plate_gap = 2;               // the plate to the card, at least
+// --- Wire shield and vents (the coils stay on: the motor and the ULN2003 get warm) ---
+shield_t = 1.6;              // a wall under the drum, round its front half, the sensor post in it
+shield_over = 6;             // its top over the band's bottom edge, inside the drum
+shield_gap = 1;              // to the band's inside and under the magnet pad
+vent_w = 2;                  // slots: in the floor under the drum, across the shell's top
+vent_pitch = 4;
+vent_rim = 1.5;              // floor slots to what stands on the floor
+top_vent_n = 8;
+top_vent_len = 40;
+top_vent_y0 = 4;             // the first top slot's middle, behind the axis
 
 // --- Stand, on the frame's 2020 top bar ---
 rise = 25;                   // the compass's bottom over the bar
@@ -206,6 +225,13 @@ y_bzb = y_face + bz_front_t;                 // the bezel back's front, the glas
 y_glass = y_bzb;
 y_stop = y_bzb + glass_t;                    // the pocket's floor: the glass's back, on the bezel back's ledge
 comp_hole = bz_front_t - 0.6;                // the dummy compensator screws' holes, deep
+// wire shield: from the sensor post's front face out, under the band
+shield_r0 = mag_r + spost / 2;
+shield_r1 = shield_r0 + shield_t;
+z_shield1 = z_band0 + shield_over;
+// floor slots: inside the shield, in front of the stand's neck
+vent_y1 = stand_dy - neck.y / 2 - vent_rim;
+top_vent_y1 = y_bi - block - 1;              // the last top slot's middle, in front of the back columns
 comp_z = -(window_h / 2 + (body_h / 2 - window_h / 2) * 0.35);
 
 echo(compass_depth = depth, axis_to_face = y_face,
@@ -259,6 +285,17 @@ assert(foot.y <= 20 && foot_bolt_dx - m5_head_d / 2 >= neck.x / 2 + 1, "M5 heads
 assert(abs(stand_screw.x) + 3 <= neck.x / 2 && abs(stand_screw.y) + 3 <= neck.y / 2, "Stand screws off the neck");
 assert(rise - foot.z >= screw_depth + 2, "Stand neck too short for the screws");
 assert(2 * PI * card_ro / 72 >= tick_w + 1, "Ticks too close");
+assert(shield_r1 <= band_ri - shield_gap, "Wire shield rubs on the band");
+assert(norm([spost / 2, shield_r0]) <= shield_r1, "Sensor post sticks out of the wire shield");
+assert(mag_r + pad_d / 2 <= shield_r0 || z_shield1 <= z_pad0 - shield_gap, "Wire shield hits the magnet pad");
+assert(z_shield1 > z_band0 + 2, "Wire shield does not reach up into the drum");
+assert(sqrt(pow(motor_d / 2, 2) - pow(motor_y, 2)) <= shield_r0 - shield_gap, "Motor runs into the wire shield");
+assert(motor_y - post_d / 2 >= shield_gap, "Motor posts run into the wire shield's ends");
+assert(norm([sx - block / 2, y_bz + block + 1]) >= shield_r1 + shield_gap, "Wire shield runs into the bezel's posts");
+assert(vent_y1 > 0, "No room for the floor slots in front of the stand");
+assert(top_vent_len / 2 <= body_w / 2 - corner_r - 1 && top_vent_len / 2 <= sx - block / 2 - 1, "Top slots run into the shell's corners or the back columns");
+assert(top_vent_y0 - vent_w / 2 >= y_bz + block + 2, "Top slots run into the bezel's screw blocks");
+assert((top_vent_y1 - top_vent_y0) / (top_vent_n - 1) >= vent_w + 2, "Top slots too close");
 assert(depth <= bed.x && body_w <= bed.y, "Shell does not fit the bed");
 
 // --- Card geometry ---
@@ -381,11 +418,14 @@ module base() {
          // sensor post
          translate([spost_c.x - spost / 2, spost_c.y - spost / 2, z_floor - 0.01])
             cube([spost, spost, z_spost - z_floor + 0.01]);
-         // Nano rails (no lips, it drops in from above as before; the plug
-         // through the back wall holds it), through the ULN2003 plate, and the
-         // stop in front of it
+         // Nano rails with lips, through the ULN2003 plate, and the stop in
+         // front of it: it slides in from the back (the base is open there),
+         // the shell's back wall closes them
          translate([nano_c.x, nano_c.y, z_floor])
-            nano_rails(far_stop = true, lips = false);
+            nano_rails(far_stop = true);
+         // wire shield round the drum's front half, under the band
+         translate([0, 0, z_floor - 0.01]) linear_extrude(z_shield1 - z_floor + 0.01)
+            shield_2d();
          // ULN2003 plate: the Nano through a notch under it, gussets in front
          difference() {
             translate([-plate_w / 2, y_plate0, z_floor - 0.01]) cube([plate_w, br_t, z_plate1 - z_floor + 0.01]);
@@ -405,6 +445,8 @@ module base() {
             along_y(y_bz, y_back) section(wall - 0.01);
          }
       }
+      // vent slots under the drum
+      translate([0, 0, z_bot - 1]) linear_extrude(floor_t + 2) floor_vents_2d();
       // motor ear screws
       for (s = [-1, 1]) translate([s * motor_ear_dx, motor_y, z_ear0 - screw_depth])
          cylinder(d = pilot_d, h = screw_depth + 1);
@@ -427,6 +469,34 @@ module base() {
       // a notch in the front edge (the front mark for the paper card, no longer needed: the base is printed)
       translate([0, y_bz - 0.01, z_bot - 1]) linear_extrude(floor_t + 2)
          polygon([[-1.5, 0], [1.5, 0], [0, 2]]);
+   }
+}
+
+// the wire shield: half a ring in front (y <= 0), the sensor post in it
+module shield_2d() {
+   intersection() {
+      difference() {
+         circle(r = shield_r1, $fn = 180);
+         circle(r = shield_r0, $fn = 180);
+      }
+      translate([-shield_r1 - 1, -shield_r1 - 1]) square([2 * shield_r1 + 2, shield_r1 + 1]);
+   }
+}
+
+// slots in the floor: inside the shield, in front of the stand's neck, clear
+// of the sensor post; under the motor, so the air rises past it and out
+// through the drum's windows
+module floor_vents_2d() {
+   intersection() {
+      for (y = [vent_y1 - vent_w / 2 : -vent_pitch : -shield_r0])
+         translate([-shield_r0, y - vent_w / 2]) square([2 * shield_r0, vent_w]);
+      difference() {
+         intersection() {
+            circle(r = shield_r0 - vent_rim, $fn = 180);
+            translate([-shield_r0, -shield_r0]) square([2 * shield_r0, shield_r0 + vent_y1]);
+         }
+         translate(spost_c) square(spost + 2 * vent_rim, center = true);
+      }
    }
 }
 
@@ -453,6 +523,10 @@ module shell() {
       for (s = [-1, 1]) translate([s * sx, y_bz - 1, sx]) rotate([-90, 0, 0])
          cylinder(d = pilot_d, h = screw_depth + 1);
       for (b = back_screws) translate([b.x, b.y, z_floor - 0.01]) cylinder(d = pilot_d, h = screw_depth);
+      // vent slots across the top, behind the axis
+      for (i = [0 : top_vent_n - 1])
+         translate([-top_vent_len / 2, top_vent_y0 + i * (top_vent_y1 - top_vent_y0) / (top_vent_n - 1) - vent_w / 2, z_ceil - 1])
+            cube([top_vent_len, vent_w, wall + 2]);
       // USB plug notch
       translate([-usb_plug.x / 2, y_bi - 1, z_floor - 1]) cube([usb_plug.x, wall + 2, usb_z + usb_plug.y / 2 - z_floor + 1]);
    }
