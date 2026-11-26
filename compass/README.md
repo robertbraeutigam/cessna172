@@ -51,9 +51,16 @@ frame's right top bar, about where the windshield's middle is (see
   board's edges and a stop in front of it; the base is open at the back,
   so it slides in from there, and the shell's back wall closes the rails
   behind it. With the shell on, the Nano cannot lift, nor move when the
-  USB plug is pushed in or pulled out. The ULN2003 driver board is
-  screwed behind a plate at the back, which hides the board and its LEDs
-  from the window. The wires are soldered onto the Nano and end in
+  USB plug is pushed in or pulled out. A shelf on the shell's back wall
+  lies over the jack, in the top of the plug's notch: it holds the jack
+  end down too, and keeps the wires away from the notch, so they are not
+  seen through it. The ULN2003 driver board is screwed behind a plate at
+  the back. The plate fills the case's whole section (0.5 mm from the
+  shell, `plate_clear`), so no light of the board's LEDs or the Nano's
+  gets past it to the window. The Nano goes through a notch under it,
+  the motor's cable and plug through a slot right of the board
+  (`cable_slot`); both are low, under the drum, where the wire shield
+  stops what light gets through. The wires are soldered onto the Nano and end in
   female Dupont plugs on the ULN2003 board's pins and the sensor's legs,
   so it all comes apart. The plate stands far enough in front of the
   back wall for the plugs and their wires' bend (`uln_plug_room`, MEASURE),
@@ -155,8 +162,9 @@ white acrylic across the raised marks, or use a white paint pen.
    the groove.
 3. Motor onto its posts (wires to the back), Nano slid into its rails
    from the back, far end first, until it stops (USB to the back), ULN2003 board behind its plate (parts towards the back
-   wall). Wire them (see [Wiring](#wiring)), coil the motor's cable behind
-   the plate and plug it in.
+   wall). Wire them (see [Wiring](#wiring)), the motor's cable through the
+   slot right of the plate, coiled behind it and plugged in. Keep the
+   wires off the USB jack: the shell's shelf comes down over it.
 4. Push the drum onto the shaft until it stops, any way round, the flats
    lined up (one colour: paint its marks first, see
    [Two colours](#two-colours)). Do not force it: if it is tight, turn a

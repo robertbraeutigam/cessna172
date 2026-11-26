@@ -29,9 +29,16 @@
 // - The Nano lies in rails on the floor behind the motor, its USB jack at
 //   the back wall. The rails have lips; it slides in from the back (the
 //   base has no back wall) and the shell's back wall closes them, so a
-//   plug pushed in or pulled out cannot move it. The ULN2003 driver board stands behind a plate at the
-//   back, which hides it (and its LEDs) from the window, far enough in
-//   front of the back wall for the Dupont plugs on its pins (uln_plug_room).
+//   plug pushed in or pulled out cannot move it. A shelf on the back wall
+//   over the jack (in the notch's top) holds the jack end down too and
+//   keeps the wires away from the notch and out of sight through it.
+// - The ULN2003 driver board stands behind a plate at the back, far enough
+//   in front of the back wall for the Dupont plugs on its pins
+//   (uln_plug_room). The plate fills the case's section (the shell
+//   round it), so no light of the board's LEDs or the Nano's gets to the
+//   window; the Nano passes through a notch under it and the motor's
+//   cable through a slot right of the board, both low, under the drum.
+//   Light from these goes only under the drum, against the wire shield.
 // - The coils stay on (MobiFlight holds the card), so the motor and the
 //   ULN2003 get warm: slots in the floor under the drum let air in, it
 //   rises past the motor, out through the drum's windows and through slots
@@ -68,7 +75,8 @@
 // Assembly (one colour: paint the white parts first): stand onto the base (screws
 // from inside), magnet into the drum's pad (check which face triggers the
 // sensor), sensor onto its post, motor onto its posts, Nano slid into
-// its rails from the back, ULN2003 board behind its plate; wire it (see the README). Press
+// its rails from the back, ULN2003 board behind its plate, the motor's cable through the slot
+// beside it; wire it (see the README), no wires over the USB jack. Press
 // the drum on. Shell over it (the USB cable through the notch), two
 // screws from below, the glass into the bezel back, the bezel over it,
 // both screwed on. Flash and set up MobiFlight and set the offset that
@@ -155,6 +163,13 @@ spost = 7;                   // sensor post, square
 br_t = 3;                    // ULN2003 plate
 gusset = [8, 16];            // the plate's gussets: reach in front of it, height
 plate_gap = 2;               // the plate to the card, at least
+plate_clear = 0.5;           // the plate to the shell's inside: it fills the section, so no LED light gets past it
+cable_slot = [8, 16];        // through the plate, right of the ULN2003 board: the motor's cable and plug
+// --- Shelf over the USB jack, on the shell's back wall: holds the jack down, keeps the wires off the notch ---
+shelf_hw = 6.2;              // half width: over the jack, between the pin rows
+shelf_len = 8;               // into the case from the back wall
+shelf_t = 1.5;               // at its front edge; its top rises 45 degrees to the wall (printed top down)
+shelf_gap = 0.3;             // over the jack
 // --- Wire shield and vents (the coils stay on: the motor and the ULN2003 get warm) ---
 shield_t = 1.6;              // a wall under the drum, round its front half, the sensor post in it
 shield_over = 6;             // its top over the band's bottom edge, inside the drum
@@ -210,7 +225,10 @@ y_plate0 = y_plate1 - br_t;
 uln_c = [0, z_uln0 + uln_board.y / 2];     // the ULN2003 board's middle, [x, z]
 uln_holes = [for (h = uln_hole_xy) uln_c + h];
 plate_w = uln_board.x + 2;
-z_plate1 = z_uln0 + uln_board.y + 1;
+z_plate1 = z_uln0 + uln_board.y + 1;      // the ULN2003 board's top, and a little
+cable_x0 = uln_board.x / 2 + 2;            // the cable slot, from the gusset out
+z_shelf0 = nano_top + shelf_gap;
+notch_top = usb_z + usb_plug.y / 2;
 sx = xi - block / 2;                         // bezel screws, x and z
 back_screws = [for (s = [-1, 1]) [s * sx, y_bi - block / 2]];
 stand_screws = [for (x = [-1, 1], y = [-1, 1]) [x * stand_screw.x, stand_dy + y * stand_screw.y]];
@@ -266,7 +284,13 @@ assert(y_plate0 >= card_ro + plate_gap, "ULN2003 plate runs into the card");
 assert(y_plate0 >= motor_y + motor_cover[1] + 5, "No room for the motor's cable in front of the ULN2003 plate");
 assert(z_floor + gusset[1] <= z_band0 - 1 || y_plate0 - gusset[0] >= card_ro + 1, "ULN2003 plate's gussets run into the card");
 assert(norm([plate_w / 2 - 1, y_plate0 - gusset[0] - motor_y]) >= motor_d / 2 + 1, "ULN2003 plate's gussets run into the motor");
-assert(plate_w / 2 + 2 <= sx - block / 2, "ULN2003 plate runs into the back columns");
+assert(y_plate1 <= y_bi - block - 0.5, "ULN2003 plate runs into the back columns");
+assert(cable_x0 + cable_slot.x <= xi - plate_clear - 1, "Cable slot runs out of the plate");
+assert(z_floor + cable_slot.y <= z_band0 - 1, "Cable slot not hidden under the drum");
+assert(cable_x0 - 1 >= plate_w / 2, "Cable slot runs into the gusset");
+assert(shelf_hw >= usb_plug.x / 2 && shelf_hw <= nano_row / 2 - nano_pad_d / 2 - 0.3, "USB shelf: not over the notch, or over the pin rows");
+assert(shelf_len <= nano_usb_len - nano_usb_out, "USB shelf longer than the jack");
+assert(z_shelf0 + shelf_t <= notch_top, "USB shelf too thick under the notch's top");
 assert(window_h <= window_d - 6, "Window as high as round");
 assert(window_h / 2 >= band_h / 2, "Window smaller than the card");
 assert(norm([glass.x / 2, glass.y / 2]) + 0.2 <= norm([sx, sx]) - csk_d / 2 - 1, "Bezel screws run into the glass");
@@ -426,11 +450,18 @@ module base() {
          // wire shield round the drum's front half, under the band
          translate([0, 0, z_floor - 0.01]) linear_extrude(z_shield1 - z_floor + 0.01)
             shield_2d();
-         // ULN2003 plate: the Nano through a notch under it, gussets in front
+         // ULN2003 plate, wall to wall and up to the top (only the floor and
+         // the shell round it): the Nano through a notch under it, the motor's
+         // cable through a slot right of the board, gussets in front
          difference() {
-            translate([-plate_w / 2, y_plate0, z_floor - 0.01]) cube([plate_w, br_t, z_plate1 - z_floor + 0.01]);
+            intersection() {
+               along_y(y_plate0, y_plate1) section(wall + plate_clear);
+               translate([-body_w, y_plate0 - 1, z_floor - 0.01]) cube([2 * body_w, br_t + 2, body_h]);
+            }
             translate([-nano_rail_hw - 0.5, y_plate0 - 1, z_floor - 1])
                cube([2 * nano_rail_hw + 1, br_t + 2, z_uln0 - 1 - z_floor + 1]);
+            translate([cable_x0, y_plate0 - 1, z_floor - 1])
+               cube([cable_slot.x, br_t + 2, cable_slot.y + 1]);
          }
          for (s = [-1, 1])
             translate([s * (plate_w / 2 - 1), y_plate0 + 0.01, z_floor - 0.01])
@@ -514,6 +545,10 @@ module shell() {
             translate([s * sx - block / 2, y_bz, sx - block / 2]) cube([block, block + 1, z_ceil - sx + block / 2 + 0.01]);
             along_y(y_bz, y_back) section(wall - 0.01);
          }
+         // shelf over the USB jack, its top sloping up to the back wall
+         translate([-shelf_hw, 0, 0]) rotate([90, 0, 90]) linear_extrude(2 * shelf_hw)
+            polygon([[y_bi - shelf_len, z_shelf0], [y_bi + 0.01, z_shelf0],
+                     [y_bi + 0.01, z_shelf0 + shelf_t + shelf_len], [y_bi - shelf_len, z_shelf0 + shelf_t]]);
          // back columns: the base's screws
          for (b = back_screws) intersection() {
             translate([b.x - block / 2, b.y - block / 2, z_floor]) cube([block, block + 0.01, z_ceil - z_floor + 0.01]);
@@ -528,7 +563,7 @@ module shell() {
          translate([-top_vent_len / 2, top_vent_y0 + i * (top_vent_y1 - top_vent_y0) / (top_vent_n - 1) - vent_w / 2, z_ceil - 1])
             cube([top_vent_len, vent_w, wall + 2]);
       // USB plug notch
-      translate([-usb_plug.x / 2, y_bi - 1, z_floor - 1]) cube([usb_plug.x, wall + 2, usb_z + usb_plug.y / 2 - z_floor + 1]);
+      translate([-usb_plug.x / 2, y_bi - 0.01, z_floor - 1]) cube([usb_plug.x, wall + 1, notch_top - z_floor + 1]);
    }
 }
 
