@@ -47,14 +47,14 @@ frame's right top bar, about where the windshield's middle is (see
   bezel back's window, just in front of the card; paint its front white.
   The N-S and E-W compensator screws under the window are dummies.
 - **Electronics**: the Nano lies in rails on the floor behind the motor,
-  its USB jack in a notch in the back wall. The rails have lips over the
-  board's edges and a stop in front of it; the base is open at the back,
-  so it slides in from there, and the shell's back wall closes the rails
-  behind it. With the shell on, the Nano cannot lift, nor move when the
-  USB plug is pushed in or pulled out. A shelf on the shell's back wall
-  lies over the jack, in the top of the plug's notch: it holds the jack
-  end down too, and keeps the wires away from the notch, so they are not
-  seen through it. The ULN2003 driver board is screwed behind a plate at
+  its USB jack in a notch in the back wall. In front of it is a stop with
+  hoods over the far end's corners (3 mm over the board, `hood_reach`; the
+  middle is left free for an ICSP header), beside the jack two stops on
+  the base that take the pull of a plug pulled out. A shelf on the shell's
+  back wall lies over the jack, in the top of the plug's notch: it holds
+  the jack end down, and keeps the wires away from the notch, so they are
+  not seen through it. With the shell on, the Nano cannot move when the
+  USB plug is pushed in or pulled out. The ULN2003 driver board is screwed behind a plate at
   the back. The plate fills the case's whole section (0.5 mm from the
   shell, `plate_clear`), so no light of the board's LEDs or the Nano's
   gets past it to the window. The Nano goes through a notch under it,
@@ -86,7 +86,7 @@ frame's right top bar, about where the windshield's middle is (see
   the stand and the white parts (see [Two colours](#two-colours)). The bezel's lower screws go into posts on the base, its upper
   ones into blocks in the shell. Two screws from below hold the shell's back
   columns. The stand is screwed onto the base from inside.
-- **Size**: 65 x 65 mm front, 109 mm deep (5 mm more than the C2300, for
+- **Size**: 65 x 65 mm front, 110 mm deep (6 mm more than the C2300, for
   the Nano behind the motor), its bottom 25 mm over the top bar (`rise`).
 
 The motor, board, sensor and magnet sizes (`motor_*`, `uln_*`, `sensor`,
@@ -160,8 +160,9 @@ white acrylic across the raised marks, or use a white paint pen.
    face pulls the output low (the sensor's flat, printed face towards the
    magnet). Sensor flat face up into the pocket on its post, legs bent down
    the groove.
-3. Motor onto its posts (wires to the back), Nano slid into its rails
-   from the back, far end first, until it stops (USB to the back), ULN2003 board behind its plate (parts towards the back
+3. Motor onto its posts (wires to the back), Nano into its rails (USB to
+   the back): its far end in under the hoods, then the jack end down
+   between the two stops, ULN2003 board behind its plate (parts towards the back
    wall). Wire them (see [Wiring](#wiring)), the motor's cable through the
    slot right of the plate, coiled behind it and plugged in. Keep the
    wires off the USB jack: the shell's shelf comes down over it.

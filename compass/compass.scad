@@ -27,11 +27,12 @@
 //   sizes stay (y_bz) and the band is a little smaller (card_r) so the
 //   marks clear the side walls.
 // - The Nano lies in rails on the floor behind the motor, its USB jack at
-//   the back wall. The rails have lips; it slides in from the back (the
-//   base has no back wall) and the shell's back wall closes them, so a
-//   plug pushed in or pulled out cannot move it. A shelf on the back wall
-//   over the jack (in the notch's top) holds the jack end down too and
-//   keeps the wires away from the notch and out of sight through it.
+//   the back wall. A stop in front of it with hoods over the far end's
+//   corners, stops on the base beside the jack (a plug pulled out pulls
+//   the board against them), and a shelf on the shell's back wall over
+//   the jack (in the notch's top) that holds the jack end down and keeps
+//   the wires away from the notch and out of sight through it. With the
+//   shell on, the Nano cannot move.
 // - The ULN2003 driver board stands behind a plate at the back, far enough
 //   in front of the back wall for the Dupont plugs on its pins
 //   (uln_plug_room). The plate fills the case's section (the shell
@@ -74,8 +75,8 @@
 //
 // Assembly (one colour: paint the white parts first): stand onto the base (screws
 // from inside), magnet into the drum's pad (check which face triggers the
-// sensor), sensor onto its post, motor onto its posts, Nano slid into
-// its rails from the back, ULN2003 board behind its plate, the motor's cable through the slot
+// sensor), sensor onto its post, motor onto its posts, Nano into its
+// rails (far end under the hoods, jack end down between the stops), ULN2003 board behind its plate, the motor's cable through the slot
 // beside it; wire it (see the README), no wires over the USB jack. Press
 // the drum on. Shell over it (the USB cable through the notch), two
 // screws from below, the glass into the bezel back, the bezel over it,
@@ -166,6 +167,10 @@ plate_gap = 2;               // the plate to the card, at least
 plate_clear = 0.5;           // the plate to the shell's inside: it fills the section, so no LED light gets past it
 cable_slot = [8, 16];        // through the plate, right of the ULN2003 board: the motor's cable and plug
 // --- Shelf over the USB jack, on the shell's back wall: holds the jack down, keeps the wires off the notch ---
+// --- Hoods over the Nano's far end (its corners, the middle left free for an ICSP header) ---
+hood_reach = 3;              // over the board, from its end
+hood_x0 = 4.5;               // from the middle
+hood_t = 1.2;
 shelf_hw = 6.2;              // half width: over the jack, between the pin rows
 shelf_len = 8;               // into the case from the back wall
 shelf_t = 1.5;               // at its front edge; its top rises 45 degrees to the wall (printed top down)
@@ -211,7 +216,7 @@ y_bz = -bz_back;                             // bezel back, the shell's front ed
 y_face = y_bz - bezel_t;
 motor_y = motor_shaft_dy;                    // the motor body's middle
 nano_y0 = motor_y + motor_cover[1] + 1;      // behind the wire cover
-y_bi = nano_y0 + nano_board.y;               // back wall, inside
+y_bi = nano_y0 + nano_board.y / 2 + nano_rail_end;   // back wall, inside: behind the jack stops
 nano_c = [0, nano_y0 + nano_board.y / 2];    // the Nano's middle
 nano_rail_y0 = nano_c.y - nano_rail_end;     // the front of the stop in front of it
 y_back = y_bi + wall;
@@ -228,6 +233,7 @@ plate_w = uln_board.x + 2;
 z_plate1 = z_uln0 + uln_board.y + 1;      // the ULN2003 board's top, and a little
 cable_x0 = uln_board.x / 2 + 2;            // the cable slot, from the gusset out
 z_shelf0 = nano_top + shelf_gap;
+z_hood0 = z_floor + nano_top_h + nano_rail_gap;
 notch_top = usb_z + usb_plug.y / 2;
 sx = xi - block / 2;                         // bezel screws, x and z
 back_screws = [for (s = [-1, 1]) [s * sx, y_bi - block / 2]];
@@ -289,7 +295,10 @@ assert(cable_x0 + cable_slot.x <= xi - plate_clear - 1, "Cable slot runs out of 
 assert(z_floor + cable_slot.y <= z_band0 - 1, "Cable slot not hidden under the drum");
 assert(cable_x0 - 1 >= plate_w / 2, "Cable slot runs into the gusset");
 assert(shelf_hw >= usb_plug.x / 2 && shelf_hw <= nano_row / 2 - nano_pad_d / 2 - 0.3, "USB shelf: not over the notch, or over the pin rows");
-assert(shelf_len <= nano_usb_len - nano_usb_out, "USB shelf longer than the jack");
+assert(shelf_len <= nano_usb_len - nano_usb_out + nano_rail_end - nano_board.y / 2, "USB shelf longer than the jack");
+assert(nano_board.y / 2 - (nano_row_pins - 1) / 2 * nano_pin_pitch - nano_pad_d / 2 >= hood_reach + 0.3, "Nano hoods reach onto the pin rows");
+assert(z_hood0 + hood_t <= z_motor0 - 1, "Nano hoods run into the motor");
+assert(hood_x0 <= nano_rail_in - 2, "Nano hoods too narrow");
 assert(z_shelf0 + shelf_t <= notch_top, "USB shelf too thick under the notch's top");
 assert(window_h <= window_d - 6, "Window as high as round");
 assert(window_h / 2 >= band_h / 2, "Window smaller than the card");
@@ -442,11 +451,16 @@ module base() {
          // sensor post
          translate([spost_c.x - spost / 2, spost_c.y - spost / 2, z_floor - 0.01])
             cube([spost, spost, z_spost - z_floor + 0.01]);
-         // Nano rails with lips, through the ULN2003 plate, and the stop in
-         // front of it: it slides in from the back (the base is open there),
-         // the shell's back wall closes them
-         translate([nano_c.x, nano_c.y, z_floor])
-            nano_rails(far_stop = true);
+         // Nano rails (no lips), through the ULN2003 plate: the stop in front
+         // of it with hoods over its far end's corners, the stops beside the
+         // jack. The far end goes in under the hoods, the jack end drops in
+         // between the jack stops, the shell's shelf comes down over the jack.
+         translate([nano_c.x, nano_c.y, z_floor]) {
+            nano_rails(far_stop = true, jack_stop = true, plug_w = usb_plug.x, lips = false);
+            for (s = [-1, 1]) mirror([s > 0 ? 0 : 1, 0, 0])
+               translate([hood_x0, -nano_rail_end, nano_top_h - 0.01])
+                  cube([nano_rail_hw - hood_x0, nano_rail_stop + nano_rail_end_clear + hood_reach, nano_rail_gap + hood_t + 0.01]);
+         }
          // wire shield round the drum's front half, under the band
          translate([0, 0, z_floor - 0.01]) linear_extrude(z_shield1 - z_floor + 0.01)
             shield_2d();
