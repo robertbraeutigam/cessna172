@@ -108,7 +108,7 @@ ffb_h = 130;                 // the future force feedback yoke's height
 // its housing as wide and deep as the Saitek's (a guess), set back this
 // far behind the Saitek's front (the desk edge), so the instruments' cases
 // fit in front of it; its shaft is made as long as that needs.
-ffb_back = 30;
+ffb_back = 36;
 yoke_shaft_z = 65;           // shaft center above the desk (the yoke column)
 yoke_shaft_d = 22;           // the shaft through the sheet
 yoke_hole_d = 28;            // its round hole in the sheet
@@ -275,26 +275,26 @@ inst_body_d = 84;            // the case behind the sheet (case_d), its screw ea
 inst_ear = [46, 9];          // the screw ears: from the axis, diameter (ear_r, ear_d)
 // The standard instrument (instruments/instrument.inc.scad): the motor and the boards behind the case, within its
 // outline, this deep behind the sheet's back (instrument_depth echo)
-inst_depth = 46.6;
+inst_depth = 53.6;
 // The attitude indicator (instruments/ai.scad) is deeper (its bowl and two
 // motors, ai_depth echo): it must be in the top row, over the force
 // feedback yoke's housing
-ai_depth = 115.5;
+ai_depth = 131;
 ai_bezel = 86;               // its square front bezel, in front of the sheet (bezel[0])
 // The altimeter (instruments/alt.scad) is deeper too (two motors behind
 // each other, alt_depth echo): it must be in the top row as well
-alt_depth = 98.2;
+alt_depth = 113.7;
 // The heading indicator (instruments/hi.scad) has two motors side by side
 // and its boards behind them (hi_depth echo), but only above hi_deep_z from
 // its axis; under that it is hi_low_depth deep (the case, the back plate,
 // the knobs' encoders): its lower edge may be in front of the housing
-hi_depth = 61.6;
+hi_depth = 77.1;
 hi_deep_z = -24;
 hi_low_depth = 18.5;
 // The turn coordinator (instruments/tc.scad) is built like it: two motors
 // side by side and its boards behind them (tc_depth echo) above tc_deep_z,
 // tc_low_depth deep under it (the case and the back plate)
-tc_depth = 64.8;
+tc_depth = 80.3;
 tc_deep_z = -24;
 tc_low_depth = 21.7;
 // The NAV indicators (instruments/cdi.scad): a motor, a servo and the
@@ -302,7 +302,7 @@ tc_low_depth = 21.7;
 // nav_deep_x from the axis; left of it they are as shallow as
 // nav_low_depth (the case and the back plate): the force feedback yoke's
 // housing ends just right of their left edge
-nav_depth = 65.7;
+nav_depth = 81.2;
 nav_deep_x = -37;
 nav_low_depth = 19.9;
 

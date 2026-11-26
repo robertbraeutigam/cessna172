@@ -86,7 +86,7 @@ y_sh = y_p[1] - shaft_len;                          // the motors' shafts' ends
 y_mb = y_p[1] + motor_flange_t + motor_h;           // their bodies' backs
 y_k = [y_mb + 1, y_mb + 1 + car_t];                 // the carrier
 // behind the sheet's back: all of it, the case and the back plate; the motors and the carrier are above twin_deep_z (from the axis)
-twin_depth = y_k[1] + max(uln_standoff + uln_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
+twin_depth = y_k[1] + max(uln_standoff + uln_t + uln_plug_room, nano_under + nano_t + nano_usb[1]) - y_sheet1;
 twin_case_depth = y_p[1] - y_sheet1;
 twin_deep_z = min(concat([twin_car_z[0]], [for (m = [mA, mB]) m_body(m).y - motor_d / 2],
                          [for (m = [mA, mB], e = m_ears(m)) e.y - motor_ear_w / 2],

@@ -230,7 +230,7 @@ ai_arm = [-inst_pitch.x + drive_a, 0];               // the attitude indicator's
 vsi_c = [0, -inst_pitch.y];                           // the VSI under it
 uln_holes_a = [for (b = uln_xz, i = [0, 1], j = [0, 1])
    [b.x + uln_hole_in + i * (uln_board.x - 2 * uln_hole_in), b.y + uln_hole_in + j * (uln_board.y - 2 * uln_hole_in)]];
-alt_depth = y_kr[1] + max(uln_standoff + uln_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
+alt_depth = y_kr[1] + max(uln_standoff + uln_t + uln_plug_room, nano_under + nano_t + nano_usb[1]) - y_sheet1;
 baro_span = k_baro * (baro_range[1] - baro_range[0]);
 pot_span = pot_turns * 360 / k_ratio;                 // the disc's turn over the pot's 10 turns
 

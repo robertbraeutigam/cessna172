@@ -252,7 +252,7 @@ leg_r = sleeve_id / 2 + 0.2;                  // legs: their inside (the outside
 sr_hole_xz = [for (a = sr_holes[2]) sr_holes[0] / 2 * [cos(a), sin(a)]];
 arm_screw = [x_arm + arm.x / 2, 0];           // the back disc's screws into the arms (both sides)
 pad_screws = [for (z = pad_z) [x_f + pad.x / 2, z]];
-ai_depth = y_cr1 + max(uln_standoff + uln_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
+ai_depth = y_cr1 + max(uln_standoff + uln_t + uln_plug_room, nano_under + nano_t + nano_usb[1]) - y_sheet1;
 
 echo(ai_depth = ai_depth, case_depth = y_bk1 - y_sheet1, pivot = y_p, back_disc = y_b0, window = 2 * vis_r,
      pitch_mm_per_10 = bowl_r * sin(10), pitch_steps_per_degree = 2038 * z_sector / z_pinion / 360);

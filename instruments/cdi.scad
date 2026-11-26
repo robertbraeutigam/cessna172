@@ -254,7 +254,7 @@ y_kr = [y_kr0, y_kr0 + car_t];                        // carrier
 y_axle = [y_nd[0] + needle_skin, y_bp[1] - 0.8];
 axle_len = y_axle[1] - y_axle[0];
 y_ks = [y_sheet1 + 0.2, y_bp[0] + 2.5];               // the knob's shaft: its pinion's hub's front, its end in the back plate
-nav_depth = y_kr[1] + max(uln_standoff + uln_t + uln_parts, nano_under + nano_t + nano_usb[1]) - y_sheet1;
+nav_depth = y_kr[1] + max(uln_standoff + uln_t + uln_plug_room, nano_under + nano_t + nano_usb[1]) - y_sheet1;
 // MobiFlight: the needle's steps at X-Plane's dots (+-2.5 full scale: one of them is two of the face's)
 function nav_steps(xd) = round(dev_a(2 * xd) * sec_ratio * 2038 / 360);
 

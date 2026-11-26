@@ -52,7 +52,7 @@ frame's right top bar, about where the windshield's middle is (see
   from the window. The wires are soldered onto the Nano and end in
   female Dupont plugs on the ULN2003 board's pins and the sensor's legs,
   so it all comes apart. The plate stands far enough in front of the
-  back wall for the plugs and their wires' bend (`plug_room`, MEASURE),
+  back wall for the plugs and their wires' bend (`uln_plug_room`, MEASURE),
   2 mm or more behind the card.
 - **Own board**: the stepper needs four outputs and a home input, on a
   Nano running MobiFlight, like every component (see

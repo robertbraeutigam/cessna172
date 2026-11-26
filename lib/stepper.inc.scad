@@ -27,6 +27,7 @@ uln_board = [35, 32];        // width (x) x height (y)
 uln_t = 1.6;
 uln_hole_in = 2.7;           // its 4 holes from the edges
 uln_parts = 14;              // the parts on its front (socket, chip, header pins)
+uln_plug_room = 29.5;        // in front of it with female Dupont plugs on its pins (and the motor's plug), their wires bent
 uln_pins = 3;                // solder stubs behind it
 uln_standoff = 4;            // on printed standoffs this high
 uln_standoff_d = 6;

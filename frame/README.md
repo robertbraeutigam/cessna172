@@ -63,7 +63,7 @@ from the left edge; the left top bar is just over it, so the left sheet
 ends 100 mm above the desk. With the shaft in, the wheel is about 30 mm in
 front of the sheet (`yoke_reach`, checked). The stand-in for a future
 force feedback yoke (DIY, comes with the stage 2 instruments: `ffb_h`,
-130 mm high) stands 30 mm over the left sheet, its housing 30 mm further
+130 mm high) stands 30 mm over the left sheet, its housing 36 mm further
 back than the Saitek's (`ffb_back`, its shaft made as long as that needs),
 so the instruments' cases fit in front of it. The Saitek could not go
 back: its clamps need the desk edge, and its wheel would come within
@@ -126,21 +126,21 @@ build checks that the instruments stay on the left sheet, clear of each
 other, the yoke column hole and the split upright, and that their cases
 fit in front of the force feedback yoke's housing (`inst_body_d`,
 `inst_depth`: the [standard instrument](../instruments/README.md)'s case
-with the motor and boards behind it, 84 mm round and 47 mm deep behind the sheet; the VSI and the RPM are in
+with the motor and boards behind it, 84 mm round and 54 mm deep behind the sheet; the VSI and the RPM are in
 front of the housing). The
 [attitude indicator](../instruments/README.md#attitude-indicator) is
-deeper, 116 mm (`ai_depth`), and has a square 86 mm front bezel
+deeper, 131 mm (`ai_depth`), and has a square 86 mm front bezel
 (`ai_bezel`, checked against its neighbours' holes), so it must stay in the top row, over the
 housing; so must the [altimeter](../instruments/README.md#altimeter),
-98 mm deep (`alt_depth`: two motors behind each other). The
+114 mm deep (`alt_depth`: two motors behind each other). The
 [heading indicator](../instruments/README.md#heading-indicator) is in
-the bottom row over the housing's top: its boards make it 62 mm deep
+the bottom row over the housing's top: its boards make it 77 mm deep
 (`hi_depth`), but only above 24 mm under its axis (`hi_deep_z`), which
 is over the housing; under that it is 19 mm deep (`hi_low_depth`). The
 [turn coordinator](../instruments/README.md#turn-coordinator) left of it
-is built the same way: 65 mm deep (`tc_depth`) above 24 mm under its
+is built the same way: 80 mm deep (`tc_depth`) above 24 mm under its
 axis (`tc_deep_z`), 22 mm under that (`tc_low_depth`). The
-[NAV indicators](../instruments/README.md#nav-indicators) are 66 mm deep
+[NAV indicators](../instruments/README.md#nav-indicators) are 81 mm deep
 (`nav_depth`), but only right of 37 mm left of their axis
 (`nav_deep_x`): the housing ends 38.5 mm left of NAV 1's axis, and left
 of that it is 20 mm deep (`nav_low_depth`, the case and the back plate). The ADF's place in the 172N, under NAV 2 at the column's height,

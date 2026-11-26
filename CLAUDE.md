@@ -189,7 +189,7 @@ its own top-level directory; new components should follow the same layout.
     The motor, board, sensor and magnet values are `lib/stepper.inc.scad`'s
     (MEASURE), the compass's too; `frame/frame.inc.scad` repeats the case's sizes and depth.
     Small gears, the motor behind the case over the axis, the carrier
-    on posts behind it, all within the case's outline, 47 mm deep
+    on posts behind it, all within the case's outline, 54 mm deep
     (`inst_depth` in the frame, which sets the force feedback yoke back
     for it). It also holds what the instruments with their own
     mechanisms share (gear radii, motor placement and clearance
@@ -221,7 +221,7 @@ its own top-level directory; new components should follow the same layout.
     right, under the altimeter): 0 at 9 o'clock, UP over the top and DOWN
     under it to 2000 ft/min, the 20s either side of 3 o'clock, on a
     non-linear scale (`vsi_cal`, also the MobiFlight interpolation table
-    in the README); white on black. The standard, 47 mm deep.
+    in the README); white on black. The standard, 54 mm deep.
   - `ai.scad` — the attitude indicator (the six-pack's top middle,
     modelled on the RC Allen 172 instrument: its dial and bowl markings,
     the yellow airplane on a pedestal, the index): the standard's case front, then its
@@ -243,7 +243,7 @@ its own top-level directory; new components should follow the same layout.
     hole circle MEASURE) screwed onto the back plate. The roll motor is
     alone on the back plate, its body beside its shaft, 1:1 to the roll
     gear; two ULN2003s and a Nano on a carrier behind it. Print `face`
-    (roll dial). 116 mm deep (`ai_depth` in the frame: it stays over the
+    (roll dial). 131 mm deep (`ai_depth` in the frame: it stays over the
     force feedback yoke's housing).
   - `alt.scad` — the altimeter (the six-pack's top right): the standard's
     case front with three screws (the lower left place is the knob's),
@@ -262,7 +262,7 @@ its own top-level directory; new components should follow the same layout.
     pot on the knob's shaft (`pot_*`, MEASURE) gives MobiFlight the
     setting absolutely (A7). The keeper holds the disc on the dial's hub
     and its legs press and key the dial. Boards on a carrier behind
-    motor C. Print `face` (face and Kollsman ring). 98 mm deep
+    motor C. Print `face` (face and Kollsman ring). 114 mm deep
     (`alt_depth` in the frame: top row, over the housing).
   - `hi.scad` — the heading indicator (the six-pack's bottom middle):
     the standard's case front with two screws (top diagonals), the lower
@@ -277,7 +277,7 @@ its own top-level directory; new components should follow the same layout.
     sensor in the dial's front. The motors side by side on the back
     plate, slanted so their covers pass; the carrier (two ULN2003s, the
     Nano, USB up) behind them, facing back (the drive is
-    `twin_drive.inc.scad`). 62 mm deep (`hi_depth`) only
+    `twin_drive.inc.scad`). 77 mm deep (`hi_depth`) only
     above `hi_deep_z`, 19 mm under it (`hi_low_depth`): the frame checks
     both against the housing. Print `face` (card, bug ring, fixed ring).
   - `tc.scad` — the turn coordinator (the six-pack's bottom left): the
@@ -290,7 +290,7 @@ its own top-level directory; new components should follow the same layout.
     paper ring) on the dial's hub, an internal ring gear turned by motor
     B's pinion (5:1), its magnet in the disc, the sensor in the dial's
     front. The carrier behind the motors, shifted left of the HI's
-    (`carrier_slots`). 65 mm deep (`tc_depth`) only above `tc_deep_z`,
+    (`carrier_slots`). 80 mm deep (`tc_depth`) only above `tc_deep_z`,
     22 mm under it (`tc_low_depth`), checked by the frame. Print `face`
     (face and ball ring).
   - `cdi.scad` — the NAV indicators (NAV 1 and NAV 2 are the same print,
@@ -309,7 +309,7 @@ its own top-level directory; new components should follow the same layout.
     flag is a printed sector on an SG90 servo (`sv_*`, MEASURE) behind a
     window in the face, OFF in the middle. Layers: card, needle, dial,
     layer 1 (flag, knob gear, sensor gear), layer 2 (sector, pinion,
-    AS5600), back plate (motor, servo), carrier (ULN2003, Nano). 66 mm
+    AS5600), back plate (motor, servo), carrier (ULN2003, Nano). 81 mm
     deep (`nav_depth`) only right of `nav_deep_x` (the force feedback
     housing ends just right of NAV 1's left edge), 20 mm left of it
     (`nav_low_depth`), checked by the frame. Print `face` (card, face,
@@ -335,7 +335,9 @@ its own top-level directory; new components should follow the same layout.
     instruments: the 28BYJ-48 (`motor_*`, `shaft_*`, view model
     `motor_local`: flange top at z=0, shaft up, body towards +y), the
     ULN2003 board (`uln_*`, its standoffs `uln_standoff`,
-    `uln_standoff_d`, its holes `uln_hole_xy` from its middle, view model
+    `uln_standoff_d`, its holes `uln_hole_xy` from its middle, the room in
+    front of it for the female Dupont plugs on its pins `uln_plug_room`,
+    which every board's clearance and depth counts, view model
     `uln_part` on a plate at z=0), the A3144 (`sensor`) and the magnet
     (`magnet`), all MEASURE. The holders (motor posts and plates,
     carriers, sensor pockets) stay in the components.

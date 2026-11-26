@@ -29,7 +29,7 @@
 // - The Nano lies in rails on the floor behind the motor, its USB jack at
 //   the back wall. The ULN2003 driver board stands behind a plate at the
 //   back, which hides it (and its LEDs) from the window, far enough in
-//   front of the back wall for the Dupont plugs on its pins (plug_room).
+//   front of the back wall for the Dupont plugs on its pins (uln_plug_room).
 // - Two colours: the marks, the bezel's lettering and the lubber line are
 //   separate white parts (*_white STLs) in pockets of the black ones.
 // - Parts: the base (floor with all of the above on it, printed flat),
@@ -144,8 +144,6 @@ spost = 7;                   // sensor post, square
 
 // --- Boards ---
 br_t = 3;                    // ULN2003 plate
-plug_room = 29.5;            // MEASURE: the board's parts side to the back wall: its parts and the Dupont
-                             // plugs on its pins, with their wires' bend
 gusset = [8, 16];            // the plate's gussets: reach in front of it, height
 plate_gap = 2;               // the plate to the card, at least
 
@@ -188,7 +186,7 @@ z_nano = z_floor + nano_under;               // Nano underside
 nano_top = z_nano + nano_t + nano_usb[1];
 usb_z = z_nano + nano_t + nano_usb[1] / 2;
 z_uln0 = nano_top + 1.5;                     // ULN2003 board bottom
-y_plate1 = y_bi - plug_room - uln_t - uln_standoff;   // plate back
+y_plate1 = y_bi - uln_plug_room - uln_t - uln_standoff;   // plate back
 y_plate0 = y_plate1 - br_t;
 uln_c = [0, z_uln0 + uln_board.y / 2];     // the ULN2003 board's middle, [x, z]
 uln_holes = [for (h = uln_hole_xy) uln_c + h];
@@ -238,7 +236,6 @@ assert(nano_rail_hw + 0.2 <= motor_ear_dx - post_d / 2 || nano_rail_y0 >= motor_
        "Nano rails run into the motor posts");
 assert(z_plate1 <= z_ceil - 1, "ULN2003 board too high");
 
-assert(plug_room >= uln_parts + 0.5, "No room for the ULN2003 board's parts");
 assert(y_plate0 >= card_ro + plate_gap, "ULN2003 plate runs into the card");
 assert(y_plate0 >= motor_y + motor_cover[1] + 5, "No room for the motor's cable in front of the ULN2003 plate");
 assert(z_floor + gusset[1] <= z_band0 - 1 || y_plate0 - gusset[0] >= card_ro + 1, "ULN2003 plate's gussets run into the card");

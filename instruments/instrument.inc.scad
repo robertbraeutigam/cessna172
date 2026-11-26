@@ -188,7 +188,8 @@ car_x0 = uln_x0 - 1;
 nano_x = cover_x1 + nano_rail_hw;   // its middle; along z, USB down
 car_x1 = nano_x + nano_rail_hw + 1;
 car_h = max(uln_board.y, nano_board.y + 3) + 4;
-y_car0 = y_back1 + motor_flange_t + motor_h + 1 + nano_under + nano_t + nano_usb[1];   // the carrier plate
+y_car0 = y_back1 + max(motor_flange_t + motor_h + 1 + nano_under + nano_t + nano_usb[1],   // the carrier plate: the Nano over the motor,
+                       1 + uln_plug_room + uln_t + uln_standoff);   // the Dupont plugs on the ULN2003 board before the back plate
 y_car1 = y_car0 + car_t;
 uln_holes = [for (x = [0, 1], z = [-1, 1])
    [uln_x0 + uln_hole_in + x * (uln_board.x - 2 * uln_hole_in), z * (uln_board.y / 2 - uln_hole_in)]];
@@ -249,7 +250,7 @@ for (s = car_screws) {
           || abs(s.y) - car_post_d / 2 >= uln_board.y / 2 + 0.5, "A carrier post runs into the ULN2003 board");
 }
 assert(y_car0 - y_back1 - motor_flange_t - motor_h >= nano_under + nano_t + nano_usb[1] + 0.9, "Nano runs into the motor");
-assert(y_car0 - uln_standoff - uln_t - uln_parts >= y_back1 + 1, "ULN2003 board's parts run into the back plate");
+assert(y_car0 - uln_standoff - uln_t - uln_plug_room >= y_back1 + 1, "ULN2003 board's plugs run into the back plate");
 assert(uln_x0 + uln_board.x + 1 <= cover_x1, "ULN2003 board runs into the motor's cover");
 // between the six-pack's neighbours (they are as big), clear of the case screws' heads
 assert(max(abs(car_x0), post_x + car_post_d / 2, car_x1) <= inst_pitch.x / 2 - 1 && car_h / 2 <= inst_pitch.y / 2 - 1,

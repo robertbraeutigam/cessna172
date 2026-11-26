@@ -73,7 +73,7 @@ top bar is in the way.
   the board carrier stands on four posts behind the motor, its boards
   facing forward: the ULN2003 board beside the motor's wire cover, the
   Nano behind the motor. Nothing is outside the case's outline, so the
-  instruments can sit on the 89 / 88 mm centres, but it is 47 mm deep
+  instruments can sit on the 89 / 88 mm centres, but it is 54 mm deep
   behind the sheet (`inst_depth` in the frame, which checks it against
   the force feedback yoke's housing, set back for it: `ffb_back`). The
   motor's shaft end sits in a pocket in the dial's back.
@@ -175,7 +175,7 @@ gives the needle's angle from 0 (500 at 50 degrees, 1000 at 96, 1500 at
 the left, VERTICAL SPEED and 100 FEET PER MINUTE right of the hub. It is
 white on black only (`Make print face black,white`). It sits in the
 six-pack's bottom right hole, under the altimeter, in front of the force
-feedback yoke's housing: it is the standard, 47 mm deep.
+feedback yoke's housing: it is the standard, 54 mm deep.
 
 ## Hardware
 
@@ -229,7 +229,10 @@ Per instrument:
 | hall sensor OUT (VCC to 5 V, GND to GND) | D6 | the stepper's home (zero) input |
 | ULN2003 + and - | 5 V, GND | |
 
-The same as the compass. The motor plugs into the ULN2003 board. The
+The same as the compass. The motor plugs into the ULN2003 board, the
+wires from the Nano onto its pins with female Dupont plugs (the depths
+leave room for them and their wires' bend: `uln_plug_room` in
+[`lib/stepper.inc.scad`](../lib/stepper.inc.scad)). The
 sensor's output is open collector and pulls low over the magnet; the
 Nano's internal pull-up is enough on its short wire. The USB cable goes
 down to the powered USB hub on the desk.
@@ -326,7 +329,7 @@ attitude indicator (and X-Plane's 172N). Its
 case front is the standard's (the 81 mm hole, the lip, the glass), with
 a square front bezel (86 mm, 4 mm thick) in front of the sheet: the
 case's four screws go through its corners and the sheet. Behind it is a mechanism of its own with
-two 28BYJ-48 steppers and a slip ring, and it is 116 mm deep behind the
+two 28BYJ-48 steppers and a slip ring, and it is 131 mm deep behind the
 sheet (`ai_depth`). It is in the top row, over the force feedback yoke's
 housing, so the depth does not matter there (the frame checks it).
 
@@ -515,7 +518,7 @@ Kollsman windows, inHg at 3 o'clock and hPa at 9 o'clock (for QNH in
 Europe), set by one knob at the lower left. Its case front is the
 standard's (the 81 mm hole, the lip, the glass), but the lower left
 screw's place is the knob's, so it has three screws. Behind it are two
-28BYJ-48 steppers, one behind the other, and it is 98 mm deep behind the
+28BYJ-48 steppers, one behind the other, and it is 114 mm deep behind the
 sheet (`alt_depth`): like the AI it is in the top row, over the force
 feedback yoke's housing (the frame checks it).
 
@@ -560,7 +563,7 @@ feedback yoke's housing (the frame checks it).
   down left. Four posts carry the rear plate with motor C; four more
   carry the board carrier with the two ULN2003 boards and the Nano facing
   back, its USB jack down. The carrier reaches below the case: the VSI
-  under it is only 47 mm deep.
+  under it is only 54 mm deep.
 - **Print orientation**: every part has its features on one side: the
   dial, the disc, the keeper, the back and rear plates and the carrier
   are printed front down, the case back side down (the knob's train's
@@ -686,7 +689,7 @@ steppers side by side.
 
 It is under the attitude indicator, in the bottom row, over the force
 feedback yoke's housing only with its upper part: its board carrier is
-62 mm deep behind the sheet (`hi_depth`), but nothing deeper than the
+77 mm deep behind the sheet (`hi_depth`), but nothing deeper than the
 back plate reaches below 24 mm under its axis (`hi_deep_z`); below that
 it is 19 mm deep (`hi_low_depth`: the case, the back plate, the knobs'
 encoders). The frame checks both against the housing.
@@ -863,7 +866,7 @@ steppers side by side, the heading indicator's drive.
 
 It is under the airspeed indicator, left of the heading indicator, in
 the bottom row: like the heading indicator, only its upper part is over
-the force feedback yoke's housing. Its board carrier is 65 mm deep
+the force feedback yoke's housing. Its board carrier is 80 mm deep
 behind the sheet (`tc_depth`), but nothing deeper than the back plate
 reaches below 24 mm under its axis (`tc_deep_z`); below that it is
 22 mm deep (`tc_low_depth`: the case and the back plate). The frame
@@ -1025,7 +1028,7 @@ a 9 g servo (the TO/FROM flag) and an AS5600 magnetic angle sensor (the
 course).
 
 NAV 1 is in the bottom row, and the force feedback yoke's housing ends
-just right of its left edge: it is 66 mm deep behind the sheet
+just right of its left edge: it is 81 mm deep behind the sheet
 (`nav_depth`), but only right of 37 mm left of its axis (`nav_deep_x`);
 left of that only the case and the back plate are there, 20 mm deep
 (`nav_low_depth`). The frame checks both.
