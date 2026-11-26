@@ -28,8 +28,9 @@
 //   marks clear the side walls.
 // - The Nano lies in rails on the floor behind the motor, its USB jack at
 //   the back wall. A stop in front of it with hoods over the far end's
-//   corners, stops on the base beside the jack (a plug pulled out pulls
-//   the board against them), and a shelf on the shell's back wall over
+//   corners, stops on the base beside the jack, in pockets in the back
+//   wall's foot (a plug pulled out pulls the board against them), and a
+//   shelf on the shell's back wall over
 //   the jack (in the notch's top) that holds the jack end down and keeps
 //   the wires away from the notch and out of sight through it. With the
 //   shell on, the Nano cannot move.
@@ -171,7 +172,8 @@ cable_slot = [8, 16];        // through the plate, right of the ULN2003 board: t
 hood_reach = 3;              // over the board, from its end
 hood_x0 = 4.5;               // from the middle
 hood_t = 1.2;
-shelf_hw = 6.2;              // half width: over the jack, between the pin rows
+usb_clear = 0.4;             // the plug's housing to the notch, sides and top
+shelf_hw = 6.4;              // half width: over the jack, between the pin rows, as wide as the notch
 shelf_len = 8;               // into the case from the back wall
 shelf_t = 1.5;               // at its front edge; its top rises 45 degrees to the wall (printed top down)
 shelf_gap = 0.3;             // over the jack
@@ -216,7 +218,9 @@ y_bz = -bz_back;                             // bezel back, the shell's front ed
 y_face = y_bz - bezel_t;
 motor_y = motor_shaft_dy;                    // the motor body's middle
 nano_y0 = motor_y + motor_cover[1] + 1;      // behind the wire cover
-y_bi = nano_y0 + nano_board.y / 2 + nano_rail_end;   // back wall, inside: behind the jack stops
+y_bi = nano_y0 + nano_board.y;               // back wall, inside: the board's end, the jack in the wall
+notch_hw = usb_plug.x / 2 + usb_clear;       // the plug's notch, half width
+stop_pocket = nano_rail_end - nano_board.y / 2 + 0.2;   // the jack stops, into the back wall
 nano_c = [0, nano_y0 + nano_board.y / 2];    // the Nano's middle
 nano_rail_y0 = nano_c.y - nano_rail_end;     // the front of the stop in front of it
 y_back = y_bi + wall;
@@ -234,7 +238,7 @@ z_plate1 = z_uln0 + uln_board.y + 1;      // the ULN2003 board's top, and a litt
 cable_x0 = uln_board.x / 2 + 2;            // the cable slot, from the gusset out
 z_shelf0 = nano_top + shelf_gap;
 z_hood0 = z_floor + nano_top_h + nano_rail_gap;
-notch_top = usb_z + usb_plug.y / 2;
+notch_top = usb_z + usb_plug.y / 2 + usb_clear;
 sx = xi - block / 2;                         // bezel screws, x and z
 back_screws = [for (s = [-1, 1]) [s * sx, y_bi - block / 2]];
 stand_screws = [for (x = [-1, 1], y = [-1, 1]) [x * stand_screw.x, stand_dy + y * stand_screw.y]];
@@ -294,8 +298,10 @@ assert(y_plate1 <= y_bi - block - 0.5, "ULN2003 plate runs into the back columns
 assert(cable_x0 + cable_slot.x <= xi - plate_clear - 1, "Cable slot runs out of the plate");
 assert(z_floor + cable_slot.y <= z_band0 - 1, "Cable slot not hidden under the drum");
 assert(cable_x0 - 1 >= plate_w / 2, "Cable slot runs into the gusset");
-assert(shelf_hw >= usb_plug.x / 2 && shelf_hw <= nano_row / 2 - nano_pad_d / 2 - 0.3, "USB shelf: not over the notch, or over the pin rows");
-assert(shelf_len <= nano_usb_len - nano_usb_out + nano_rail_end - nano_board.y / 2, "USB shelf longer than the jack");
+assert(shelf_hw >= notch_hw && shelf_hw <= nano_row / 2 - nano_pad_d / 2 - 0.3, "USB shelf: not over the notch, or over the pin rows");
+assert(shelf_len <= nano_usb_len - nano_usb_out, "USB shelf longer than the jack");
+assert(notch_hw <= usb_plug.x / 2 + 0.5 - 0.1, "The plug's housing runs into the jack stops");
+assert(wall - stop_pocket >= 0.5, "Back wall too thin over the jack stops");
 assert(nano_board.y / 2 - (nano_row_pins - 1) / 2 * nano_pin_pitch - nano_pad_d / 2 >= hood_reach + 0.3, "Nano hoods reach onto the pin rows");
 assert(z_hood0 + hood_t <= z_motor0 - 1, "Nano hoods run into the motor");
 assert(hood_x0 <= nano_rail_in - 2, "Nano hoods too narrow");
@@ -577,7 +583,9 @@ module shell() {
          translate([-top_vent_len / 2, top_vent_y0 + i * (top_vent_y1 - top_vent_y0) / (top_vent_n - 1) - vent_w / 2, z_ceil - 1])
             cube([top_vent_len, vent_w, wall + 2]);
       // USB plug notch
-      translate([-usb_plug.x / 2, y_bi - 0.01, z_floor - 1]) cube([usb_plug.x, wall + 1, notch_top - z_floor + 1]);
+      translate([-notch_hw, y_bi - 0.01, z_floor - 1]) cube([2 * notch_hw, wall + 1, notch_top - z_floor + 1]);
+      // pockets for the base's jack stops and the rails' ends, in the back wall's foot
+      translate([-nano_rail_hw - 0.2, y_bi - 0.01, z_floor - 1]) cube([2 * nano_rail_hw + 0.4, stop_pocket + 0.01, nano_top_h + 1.2]);
    }
 }
 

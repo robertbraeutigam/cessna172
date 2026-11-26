@@ -177,7 +177,7 @@ flaps_gap = 70;              // throttle box face to the flaps plate (172N)
 // stand, its foot bolted into the bar's top slot (two M5, T-nuts), the
 // compass on its neck. It has its own Nano on a USB cable, nothing on the
 // sheet.
-compass_body = [65, 110.3, 65];   // body_w, depth (bezel to back), body_h
+compass_body = [65, 108.6, 65];   // body_w, depth (bezel to back), body_h
 compass_face_dy = -35.1;     // the bezel's front from the card axis (axis_to_face)
 compass_stand_dy = 14;       // stand_dy: the stand's middle behind the card axis
 compass_rise = 25;           // rise: the compass's bottom over the bar
