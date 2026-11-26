@@ -25,9 +25,8 @@
 //   marks clear the side walls.
 // - The Nano lies in rails on the floor behind the motor, its USB jack at
 //   the back wall. The ULN2003 driver board stands behind a plate at the
-//   back, which hides it (and its LEDs) from the window. The Dupont plugs
-//   on its pins stand out into a box on the shell's back, over the USB
-//   notch; the shell slides on from behind.
+//   back, which hides it (and its LEDs) from the window, far enough in
+//   front of the back wall for the Dupont plugs on its pins (plug_room).
 // - Two colours: the marks, the bezel's lettering and the lubber line are
 //   separate white parts (*_white STLs) in pockets of the black ones.
 // - Parts: the base (floor with all of the above on it, printed flat),
@@ -58,7 +57,7 @@
 // from inside), magnet into the drum's pad (check which face triggers the
 // sensor), sensor onto its post, motor onto its posts, Nano into its
 // rails, ULN2003 board behind its plate; wire it (see the README). Press
-// the drum on. Shell on from behind (the USB cable in the notch), two
+// the drum on. Shell over it (the USB cable through the notch), two
 // screws from below, the glass into the bezel back, the bezel over it,
 // both screwed on. Flash and set up MobiFlight and set the offset that
 // puts N under the lubber line after homing.
@@ -140,12 +139,10 @@ spost = 7;                   // sensor post, square
 
 // --- Boards ---
 br_t = 3;                    // ULN2003 plate
-// the box on the shell's back: room for the Dupont plugs on the ULN2003
-// board's pins (the shell slides on from behind)
-bulge_w = 35;                // inside, centred
-bulge_d = 15;                // behind the back wall, outside
-bulge_top = 2;               // inside, over the board's top edge
-bulge_skip = 0.5;            // its underside over the USB plug
+plug_room = 29.5;            // MEASURE: the board's parts side to the back wall: its parts and the Dupont
+                             // plugs on its pins, with their wires' bend
+gusset = [8, 16];            // the plate's gussets: reach in front of it, height
+plate_gap = 2;               // the plate to the card, at least
 
 // --- Stand, on the frame's 2020 top bar ---
 rise = 25;                   // the compass's bottom over the bar
@@ -186,14 +183,12 @@ z_nano = z_floor + nano_under;               // Nano underside
 nano_top = z_nano + nano_t + nano_usb[1];
 usb_z = z_nano + nano_t + nano_usb[1] / 2;
 z_uln0 = nano_top + 1.5;                     // ULN2003 board bottom
-y_plate1 = y_bi - 0.5 - uln_parts - uln_t - uln_standoff;   // plate back
+y_plate1 = y_bi - plug_room - uln_t - uln_standoff;   // plate back
 y_plate0 = y_plate1 - br_t;
 uln_c = [0, z_uln0 + uln_board.y / 2];     // the ULN2003 board's middle, [x, z]
 uln_holes = [for (h = uln_hole_xy) uln_c + h];
 plate_w = uln_board.x + 2;
 z_plate1 = z_uln0 + uln_board.y + 1;
-z_bulge0 = usb_z + usb_plug.y / 2 + bulge_skip;   // the box's underside
-z_bulge1 = z_uln0 + uln_board.y + bulge_top; // its roof, inside
 sx = xi - block / 2;                         // bezel screws, x and z
 back_screws = [for (s = [-1, 1]) [s * sx, y_bi - block / 2]];
 stand_screws = [for (x = [-1, 1], y = [-1, 1]) [x * stand_screw.x, stand_dy + y * stand_screw.y]];
@@ -236,10 +231,12 @@ assert(z_motor0 >= z_floor + 0.5, "Motor stands on the floor");
 assert(nano_rail_hw + 0.2 <= motor_ear_dx - post_d / 2 || nano_rail_y0 >= motor_y + post_d / 2,
        "Nano rails run into the motor posts");
 assert(z_plate1 <= z_ceil - 1, "ULN2003 board too high");
-assert(bulge_w >= uln_board.x && bulge_w / 2 <= sx - block / 2 - 1, "Back bulge narrower than the ULN2003 board or into the back columns");
-assert(z_bulge1 + wall <= z_ceil, "Back box runs over the shell's top");
-assert(bulge_d >= 2 * wall, "Back box too shallow");
-assert(y_plate0 - 8 >= card_ro + 1, "ULN2003 plate's gussets run into the card");
+
+assert(plug_room >= uln_parts + 0.5, "No room for the ULN2003 board's parts");
+assert(y_plate0 >= card_ro + plate_gap, "ULN2003 plate runs into the card");
+assert(y_plate0 >= motor_y + motor_cover[1] + 5, "No room for the motor's cable in front of the ULN2003 plate");
+assert(z_floor + gusset[1] <= z_band0 - 1 || y_plate0 - gusset[0] >= card_ro + 1, "ULN2003 plate's gussets run into the card");
+assert(norm([plate_w / 2 - 1, y_plate0 - gusset[0] - motor_y]) >= motor_d / 2 + 1, "ULN2003 plate's gussets run into the motor");
 assert(plate_w / 2 + 2 <= sx - block / 2, "ULN2003 plate runs into the back columns");
 assert(window_h <= window_d - 6, "Window as high as round");
 assert(window_h / 2 >= band_h / 2, "Window smaller than the card");
@@ -368,10 +365,10 @@ module base() {
          translate([spost_c.x - spost / 2, spost_c.y - spost / 2, z_floor - 0.01])
             cube([spost, spost, z_spost - z_floor + 0.01]);
          // Nano rails (no lips, it drops in from above as before; the plug
-         // through the back wall holds it) up to the ULN2003 plate, and the
+         // through the back wall holds it), through the ULN2003 plate, and the
          // stop in front of it
          translate([nano_c.x, nano_c.y, z_floor])
-            nano_rails(y1 = y_plate0 - nano_c.y, far_stop = true, lips = false);
+            nano_rails(far_stop = true, lips = false);
          // ULN2003 plate: the Nano through a notch under it, gussets in front
          difference() {
             translate([-plate_w / 2, y_plate0, z_floor - 0.01]) cube([plate_w, br_t, z_plate1 - z_floor + 0.01]);
@@ -381,7 +378,7 @@ module base() {
          for (s = [-1, 1])
             translate([s * (plate_w / 2 - 1), y_plate0 + 0.01, z_floor - 0.01])
                rotate([90, 0, 90]) translate([0, 0, -1])
-                  linear_extrude(2) polygon([[0, 0], [-8, 0], [0, 16]]);
+                  linear_extrude(2) polygon([[0, 0], [-gusset[0], 0], [0, gusset[1]]]);
          // ULN2003 standoffs, behind the plate
          for (h = uln_holes) translate([h.x, y_plate1 - 0.01, h.y]) rotate([-90, 0, 0])
             cylinder(d = uln_standoff_d, h = uln_standoff + 0.01);
@@ -435,12 +432,7 @@ module shell() {
             translate([b.x - block / 2, b.y - block / 2, z_floor]) cube([block, block + 0.01, z_ceil - z_floor + 0.01]);
             along_y(y_bz, y_back) section(wall - 0.01);
          }
-         // the box on the back, over the USB plug
-         translate([-bulge_w / 2 - wall, y_back - 0.01, z_bulge0])
-            cube([bulge_w + 2 * wall, bulge_d + 0.01, z_bulge1 + wall - z_bulge0]);
       }
-      translate([-bulge_w / 2, y_bi - 1, z_bulge0 + wall])
-         cube([bulge_w, y_back + bulge_d - wall - y_bi + 1, z_bulge1 - z_bulge0 - wall]);
       for (s = [-1, 1]) translate([s * sx, y_bz - 1, sx]) rotate([-90, 0, 0])
          cylinder(d = pilot_d, h = screw_depth + 1);
       for (b = back_screws) translate([b.x, b.y, z_floor - 0.01]) cylinder(d = pilot_d, h = screw_depth);
