@@ -7,8 +7,9 @@
 // MobiFlight on an Arduino Nano of its own (like every component), which
 // homes the card on a hall sensor at start.
 //
-// - The drum is an inverted cup (top disc and band) pressed onto the
-//   motor's shaft (double D bore, blind: the shaft end sets its height). It
+// - The drum is an inverted cup (top disc and band) pushed onto the
+//   motor's shaft (double D bore, blind: the shaft end sets its height;
+//   a sliding fit, a drop of CA glue if it turns on the shaft). It
 //   hangs over the motor, which stands on two posts under its ears.
 // - The card is the band itself, printed in black: its ticks and
 //   N 3 6 E 12 ... stand out of it (mark_h), white. Seen from the
@@ -98,7 +99,7 @@ band_t = 1.2;
 band_h = 22;
 disc_t = 2;
 hub_d = 10;
-bore_play = 0.1;             // the double D bore over the shaft (press fit)
+bore_play = 0.25;            // the double D bore over the shaft (sliding fit; a drop of CA if loose)
 shaft_skin = 0.5;            // drum top over the shaft end
 side_gap_min = 0.6;          // card to the side walls
 card_gap = 1;                // card to the bezel's back (the lubber line), at least

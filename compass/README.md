@@ -18,8 +18,9 @@ frame's right top bar, about where the windshield's middle is (see
 ## How it works
 
 - **Card**: the drum is an inverted cup, a top disc with a 57.5 mm band
-  hanging from it. It sits over the motor and is pressed onto the shaft
-  (double D bore, blind, so the shaft end sets its height). The motor
+  hanging from it. It sits over the motor and is pushed onto the shaft
+  (double D bore, blind, so the shaft end sets its height; 0.25 mm play,
+  `bore_play`, so it slides on by hand). The motor
   stands on two posts under its ears. The band is the card: printed in
   black, its 5° and 10° ticks (1 mm wide) and N 3 6 E 12 15 S 21 24 W 30
   33 stand 0.6 mm out of it (`mark_h`), painted white. Like on the real
@@ -138,8 +139,11 @@ white acrylic across the raised marks, or use a white paint pen.
    the back), ULN2003 board behind its plate (parts towards the back
    wall). Wire them (see [Wiring](#wiring)), coil the motor's cable behind
    the plate and plug it in.
-4. Press the drum onto the shaft, any way round (one colour: paint its
-   marks first, see [Two colours](#two-colours)). Flash and set up MobiFlight (see
+4. Push the drum onto the shaft until it stops, any way round, the flats
+   lined up (one colour: paint its marks first, see
+   [Two colours](#two-colours)). Do not force it: if it is tight, turn a
+   5 mm drill bit by hand in the bore; if it turns on the shaft, a drop
+   of thin CA glue on the shaft. Flash and set up MobiFlight (see
    [MobiFlight](#mobiflight)), let it home and set the N offset.
 5. Shell down over it from above, the USB cable through the notch in the
    back wall, two screws from below into the back columns.
