@@ -21,6 +21,26 @@ its own top-level directory; new components should follow the same layout.
     the other files, keep them in sync.
   - `carb_heat_knob.scad`, `clamp.scad`, `pin.scad` — small parts (knob,
     rod clamps, pot hold-down pins).
+- `pedestal/` — `pedestal.scad`: the top of the pedestal under the
+  throttle, the elevator trim wheel and the trim indicator, mounted like
+  the throttle box (body through the apron sheet's cut-out onto the
+  apron's lower bar, two M5 through the floor; front plate flange
+  screwed onto the sheet, a separate face (`face_t`) with raised
+  lettering in front of it; `frame/frame.inc.scad` repeats its sizes:
+  `pedestal_size`, `under_face_t`, `pedestal_wheel`, `pedestal_ind`).
+  Open back, printed on its face. The wheel (rim out of the face's slot)
+  is glued on a 6 mm rod turning in two cheeks (bearing slots open to the
+  back, closed by screwed `keeper`s); a cap on the rod's right end holds
+  a diametric magnet over an AS5600 (analog, A0) on the right cheek's
+  block, no gears. MobiFlight writes the raw angle to a dataref and
+  `trim.lua` (FlyWithLua) adds its changes to the elevator trim (wraps
+  at a turn, so the wheel turns endlessly and the yoke's rocker still
+  trims). The indicator: a rack in a channel on the front plate's back,
+  its pointer through the slot, driven by an SG90 (D9) on a `bracket`
+  through a pinion (`sv_sweep` for the travel). The Nano in floor rails
+  under the servo, USB to the open back on a `tie_block`. The `as_*`
+  and `sv_*` values are MEASURE (the NAV indicator's); `gear_2d` is a
+  copy of `instruments/instrument.inc.scad`'s, keep them the same.
 - `switchpanel/` — the Cessna 172N lower-left switch panel (master, light
   switches, ...; the ignition key is its own component, `ignition/`).
   Similar in function to the Saitek Switch Panel, but it should look as close to the real 172N panel as possible, and every
@@ -334,7 +354,7 @@ its own top-level directory; new components should follow the same layout.
     coordinates (middle at the origin, on z=0, component side up, the
     jack at +y); each component places it with a proper rotation (a
     mirror swaps the pin rows). Every component with a Nano includes it:
-    throttle, yoke, switch panel, compass, radio, instruments. Its names
+    throttle, yoke, switch panel, compass, radio, instruments, pedestal. Its names
     are global: do not reuse them in a component.
   - `stepper.inc.scad` — the stepper drive of the compass and the
     instruments: the 28BYJ-48 (`motor_*`, `shaft_*`, view model
@@ -350,7 +370,7 @@ its own top-level directory; new components should follow the same layout.
     and tie (`tie`, `tie_slot`) sizes (MEASURE), and what it is tied onto:
     `tie_block` (in line behind the plug, the cable in a groove on its
     top at `tie_cable_h`, the tie through a slot at its foot; switch
-    panel, yoke), `tie_post` (beside the cable with a tunnel along it;
+    panel, yoke, pedestal), `tie_post` (beside the cable with a tunnel along it;
     the radio units), a view of the tie (`tie_part`). Both in their own
     coordinates (foot on z=0, middle over the origin, cable along x).
     The throttle and the compass take `usb_plug` for their back wall
@@ -384,7 +404,7 @@ its own top-level directory; new components should follow the same layout.
   desk edge (bottom bar, four uprights: left end, split, step, right end;
   two waist bars just under the desk top right of the yoke's clamps, a low
   left and a high right top bar, the throttle bar behind, the apron with
-  the trim wheel pedestal hanging under the throttle; bars cut to length;
+  the pedestal (`pedestal/`) hanging under the throttle; bars cut to length;
   three sheets: an L shaped left one, lower right and upper right), and the
   desk part (a ladder on the desk, stock lengths, its front rail cut at the
   yoke), with 45 degree braces between them (stock bars cut square,

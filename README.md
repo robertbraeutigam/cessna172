@@ -12,6 +12,7 @@ wiring and the assembly:
 | Directory | Component |
 |-----------|-----------|
 | [`throttle/`](throttle/README.md) | throttle quadrant: throttle, mixture and carb heat |
+| [`pedestal/`](pedestal/README.md) | the trim wheel and the trim indicator under the throttle |
 | [`switchpanel/`](switchpanel/README.md) | the 172N lower left switch panel: master, lights, avionics; the primer below it |
 | [`ignition/`](ignition/README.md) | the ignition key switch, the left end of the switch panel |
 | [`frame/`](frame/README.md) | the aluminium frame and panel sheet that everything mounts on |
@@ -151,8 +152,8 @@ FlyWithLua (NG) plugin script in X-Plane does it (see
 It stands on the desk right of the yoke (see
 [Cockpit frame](frame/README.md)). Every component's README says how many
 ports it takes and how much current (its *USB* paragraph). With the whole
-six-pack, the NAV indicators, the RPM, the four radio units, the planned
-pedestal and flaps and the Saitek devices that is about 22 ports: a 16
+six-pack, the NAV indicators, the RPM, the four radio units, the pedestal,
+the planned flaps and the Saitek devices that is about 22 ports: a 16
 port hub, or two hubs, one into the other (USB takes up to 127 devices),
 and one cable from the first to the PC.
 
@@ -171,8 +172,8 @@ resetting and needles losing their home). So the hub:
 - has every board's cable short and of a decent gauge (the cheap thin ones
   drop voltage).
 
-The NAV indicators' flags have a 9 g servo each, and the pedestal (trim
-indicator) and the flaps (indicator) are planned with one, each on the
+The NAV indicators' flags have a 9 g servo each, the pedestal's trim
+indicator has one, and the flaps (indicator) are planned with one, each on the
 component's Nano: about 0.15-0.3 A when it moves,
 up to 0.7 A stalled. Put a 470 uF capacitor across its supply at the
 servo; if its Nano resets when it moves, feed it from the USB 5 V before
@@ -203,6 +204,14 @@ Throttle, mixture and carb heat: 6 mm rods moving linear potentiometers in
 one box, read by a Nano on its floor.
 
 [![Throttle quadrant](https://robertbraeutigam.github.io/cessna172/throttle/throttle_box_montage.png)](https://robertbraeutigam.github.io/cessna172/throttle/throttle_box_montage.png)
+
+### [Pedestal](pedestal/README.md)
+
+The elevator trim wheel and the trim indicator under the throttle: the
+wheel read by a magnetic angle sensor (a FlyWithLua script turns its
+angle into trim), the pointer on a rack moved by a servo.
+
+[![Pedestal](https://robertbraeutigam.github.io/cessna172/pedestal/pedestal_montage.png)](https://robertbraeutigam.github.io/cessna172/pedestal/pedestal_montage.png)
 
 ### [Switch panel](switchpanel/README.md)
 

@@ -217,17 +217,19 @@ primer_tube = 50.5;          // tube_len (view only)
 primer_bracket = [38.1, 26, 95.2];   // beside the rod towards the pilot's right, height, length (view only)
 
 // --- Under the lower panel ---
-// Pedestal (trim wheel and trim indicator), a future component, same rule
-// as the throttle box: the
+// Pedestal (trim wheel and trim indicator, pedestal/pedestal.scad), same
+// rule as the throttle box: the
 // body (width x depth x height) goes through its cut-out in the apron sheet
 // and stands on the lower bar, the face flange (top and sides) is screwed
 // onto the sheet with M3, and two M5 bolts through the floor go into the
 // lower bar's top slot.
-under_face_t = 3;
+under_face_t = 5;            // the face (face_t) and the body's front plate (plate_t)
 under_flange = 10;
 under_play = 1;              // body to its cut-out
-under_bolt_y = 16;           // floor bolts from the face front, over the lower bar's slot
-pedestal_size = [75, 120, 150];   // 75 x 150 front (MEASURE), the depth a guess
+under_bolt_y = 18;           // floor bolts from the face front, over the lower bar's slot
+pedestal_size = [90, 120, 150];   // body
+pedestal_wheel = [8, 48, 85, 120, 12];   // the trim wheel: x from the middle, axle behind the face front and over the floor, diameter, width
+pedestal_ind = [-8.8, 62, 4, 38.5];      // the indicator slot: x from the middle, middle over the floor, width, length
 // Parking brake: a thin body (width x depth x height) on the bottom bar,
 // under the yoke column, two M5 into the bar's top slot; its T-handle
 // comes through a small hole in the sheet: released, it is almost flush

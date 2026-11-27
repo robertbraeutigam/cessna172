@@ -357,13 +357,14 @@ module under_box(x, size) {
 
 module pedestal_part() {
    under_box(pedestal_x, pedestal_size);
-   // trim wheel rim out of a slot in the face, trim indicator slot below it
-   z = apron_bar_z + pedestal_size.z;
+   // trim wheel rim out of a slot in the face, the trim indicator slot left of it
+   w = pedestal_wheel;
    color("#222")
-      translate([pedestal_x - 6, under_y0 + 40, z - 55])
-         rotate([0, 90, 0]) cylinder(d = 100, h = 12);
+      translate([pedestal_x + w[0] - w[4] / 2, under_y0 + w[1], apron_bar_z + w[2]])
+         rotate([0, 90, 0]) cylinder(d = w[3], h = w[4]);
+   i = pedestal_ind;
    color("#ddd")
-      translate([pedestal_x - 4, under_y0 - 0.5, apron_bar_z + 12]) cube([8, 1, 28]);
+      translate([pedestal_x + i[0] - i[2] / 2, under_y0 - 0.5, apron_bar_z + i[1] - i[3] / 2]) cube([i[2], 1, i[3]]);
 }
 
 // DIY flaps panel (placeholder): front plate on the sheet right of the
