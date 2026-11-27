@@ -338,25 +338,19 @@ module throttle_part() {
    }
 }
 
-// Under-desk component on its lower bar: box, face with flange, floor bolts
-module under_box(x, size) {
+// The pedestal on the lower bar: face with flange, the foot, its bolts (no box)
+module pedestal_part() {
+   size = pedestal_size;
    f = under_flange;
-   translate([x - size.x / 2, under_y0, apron_bar_z]) {
+   translate([pedestal_x - size.x / 2, under_y0, apron_bar_z]) {
       color(c_box) {
-         difference() {
-            cube(size);
-            translate([3, 3, 3]) cube(size - [6, 6, 0]);
-         }
          translate([-f, 0, 0]) cube([size.x + 2 * f, under_face_t, size.z + f]);
+         cube([size.x, pedestal_foot, 3]);
       }
       color("#b9c0c8")
          for (s = [-1, 1])
-            translate([size.x / 2 + s * size.x / 4, under_bolt_y, 3]) cylinder(d = m5_head_d, h = 3);
+            translate([size.x / 2 + s * pedestal_bolt_dx, under_bolt_y, 3]) cylinder(d = m5_head_d, h = 3);
    }
-}
-
-module pedestal_part() {
-   under_box(pedestal_x, pedestal_size);
    // trim wheel rim out of a slot in the face, the trim indicator slot left of it
    w = pedestal_wheel;
    color("#222")

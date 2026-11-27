@@ -23,12 +23,14 @@ its own top-level directory; new components should follow the same layout.
     rod clamps, pot hold-down pins).
 - `pedestal/` — `pedestal.scad`: the top of the pedestal under the
   throttle, the elevator trim wheel and the trim indicator, mounted like
-  the throttle box (body through the apron sheet's cut-out onto the
-  apron's lower bar, two M5 through the floor; front plate flange
-  screwed onto the sheet, a separate face (`face_t`) with raised
-  lettering in front of it; `frame/frame.inc.scad` repeats its sizes:
-  `pedestal_size`, `under_face_t`, `pedestal_wheel`, `pedestal_ind`).
-  Open back, printed on its face. The wheel (rim out of the face's slot)
+  the throttle box but with no housing (it is behind the sheet): a front
+  plate with a flange screwed onto the sheet, a separate face (`face_t`)
+  with raised lettering in front of it, a foot (`foot_d`) along its
+  bottom on the apron's lower bar with two M5 (`floor_bolt_dx`), and
+  everything else on the plate's back, through the apron sheet's
+  cut-out (within `body`); `frame/frame.inc.scad` repeats its sizes:
+  `pedestal_size`, `pedestal_foot`, `pedestal_bolt_dx`, `under_face_t`,
+  `pedestal_wheel`, `pedestal_ind`. Printed on its face. The wheel (rim out of the face's slot)
   is glued on a 6 mm rod turning in the left cheek; a printed `coupler`
   on its right end turns in the right cheek and takes the D shaft of an
   EC11 encoder with detents (D2, D3; MobiFlight sends the pitch trim
@@ -36,10 +38,12 @@ its own top-level directory; new components should follow the same layout.
   clamped in a plate right of the cheek. The bearings and the plate's
   slot are open to the back (wheel, rod, coupler and encoder go in as
   one), closed by screwed keepers (`keeper_left`, `keeper_right`) whose
-  tongues press a felt pad (`pad_*`) for resistance. The indicator: a rack in a channel on the front plate's back,
-  its pointer through the slot, driven by an SG90 (D9) on a `bracket`
-  through a pinion (`sv_sweep` for the travel). The Nano in floor rails
-  under the servo, USB to the open back on a `tie_block`. The `enc_*`
+  tongues press a felt pad (`pad_*`) for resistance. The indicator: a
+  rack in a channel on the front plate's back, its pointer through the
+  slot, driven by an SG90 (D9) on a `bracket` through a pinion
+  (`sv_sweep` for the travel). The Nano in rails on the plate's back
+  right of the encoder, its jack up, the cable tied onto a `tie_block`
+  above the plug. The `enc_*`
   (the heading indicator's) and `sv_*` (the NAV indicator's) values are
   MEASURE; `gear_2d` is a
   copy of `instruments/instrument.inc.scad`'s, keep them the same.

@@ -38,23 +38,26 @@ mark.
   elevator trim.
 
 The pedestal mounts in the [cockpit frame](../frame/README.md) like the
-throttle box: its body goes through a cut-out in the apron sheet under the
-throttle and stands on the apron's lower bar. The body's front plate has
-a 10 mm flange on the top and the sides, screwed onto the sheet with M3
-screws (nuts behind the sheet), and two M5 bolts through its floor go into
-T-nuts in the lower bar's top slot. The separate face, with the lettering
-standing out of it for a paint pen, goes in front of the flange on the
-same screws. The back of the body is open (it is under the desk), and
-everything goes in from there.
+throttle box, but it has no box: it is behind the sheet, so it needs no
+housing. The body is a front plate with a 10 mm flange on the top and
+the sides, screwed onto the sheet with M3 screws (nuts behind the sheet),
+and a 30 mm foot along its bottom that stands on the apron's lower bar,
+two M5 bolts through it into T-nuts in the bar's top slot. Everything
+else hangs on the plate's back (the cheeks are braced down to the foot)
+and goes through a cut-out in the apron sheet under the throttle; it all
+goes in from behind. The separate face, with the lettering standing out
+of it for a paint pen, goes in front of the flange on the same screws.
 
 | File | Parts |
 |------|-------|
-| `pedestal.scad` | body (front plate and flange, cheeks, the encoder's plate, the rack's channel, the Nano's rails), face, wheel, coupler, left and right keeper, rack, servo bracket, pinion |
+| `pedestal.scad` | body (front plate and flange, foot, cheeks, the encoder's plate, the rack's channel, the Nano's rails), face, wheel, coupler, left and right keeper, rack, servo bracket, pinion |
 
-The build checks that the wheel clears the floor, the top and the
-slot, the encoder's wires the right wall and its nut the coupler, the pinion and the servo the left
-wall, the bracket's posts the pinion, the rack and the servo, the Nano the
-floor bolts, the servo and the wheel, and that the face fits the printer.
+The build checks that the wheel clears the foot, the top and the
+slot, that everything behind the sheet stays within the cut-out (the
+encoder's wires, the pinion, the servo), the encoder's nut the coupler,
+the bracket's posts the pinion, the rack and the servo, the Nano, its
+plug and its tie block the encoder and its plate, the foot's bolt heads
+the cheeks, and that the face fits the printer.
 
 ## Hardware
 
@@ -72,7 +75,7 @@ floor bolts, the servo and the wheel, and that the face fits the printer.
 | 7 | M3 x 12 pan head screw + nut | face and flange onto the cockpit sheet |
 | 1 | cable tie | the USB cable onto its block |
 | - | hookup wire, stranded; CA glue | |
-| 2 | M5 x 10 button head screw + washer + T-nut | floor into the lower bar (counted in the frame) |
+| 2 | M5 x 10 button head screw + washer + T-nut | foot into the lower bar (counted in the frame) |
 
 The encoder's sizes (`enc_*`, the
 [heading indicator's](../instruments/README.md)) and the servo's
@@ -84,20 +87,22 @@ checks the bare body's pins (`enc_body`, `enc_wires`).
 
 ## Print
 
-Print the body on its face (the front plate on the bed: the walls, the
-cheeks, the channel and the posts all stand on it), the face front side
-up, the wheel on its web, the rack on its side, the bracket on its front,
-the pinion and the keepers flat, the coupler on its collar. The face is dark grey; paint the
-lettering and the pointer's front white.
+Print the body on its face (the front plate on the bed: the foot, the
+cheeks, the channel, the posts and the Nano's rails all stand on it),
+the face front side up, the wheel on its web, the rack on its side, the
+bracket on its front, the pinion and the keepers flat, the coupler on
+its collar. The face is dark grey; paint the lettering and the pointer's
+front white.
 
 ## Wiring
 
-The Nano lies in its rails (the shared ones of
-[`lib/nano.inc.scad`](../lib/nano.inc.scad)) on the floor under the servo,
-component side up, its USB jack towards the open back. It slides in from
-the back until it stops at the rails' front end; the cable is tied onto the block
-behind the plug (`tie_block` of [`lib/usb.inc.scad`](../lib/usb.inc.scad)),
-so pulling it does not lever the jack.
+The Nano stands in its rails (the shared ones of
+[`lib/nano.inc.scad`](../lib/nano.inc.scad)) on the front plate's back,
+right of the encoder, component side back, its USB jack up. It slides
+down into them from the top until it stops at their bottom end; the
+cable goes up behind the sheet and is tied onto the block above the
+plug (`tie_block` of [`lib/usb.inc.scad`](../lib/usb.inc.scad)), which
+also keeps the Nano in, and pulling it does not lever the jack.
 
 | Nano pin | To |
 |----------|----|
@@ -110,8 +115,8 @@ so pulling it does not lever the jack.
 The encoder's push switch pins (if it has them) stay free. Solder the
 470 uF capacitor across the servo's red and brown wires near the servo.
 
-**USB**: one port on the powered USB hub. The Nano takes about 20 mA; the servo 0.15-0.3 A while it moves, up to 0.7 A stalled
-(see [Connections](../README.md#connections) for servos on a Nano).
+**USB**: one port on the powered USB hub. The Nano takes about 20 mA;
+the servo 0.15-0.3 A while it moves, up to 0.7 A stalled (see [Connections](../README.md#connections) for servos on a Nano).
 
 ## Assembly
 
@@ -121,10 +126,10 @@ The encoder's push switch pins (if it has them) stay free. Solder the
    wires to the encoder, push its shaft into the coupler and put its nut
    on the bushing, loose. Put a pad into each keeper's pocket (a dab of
    glue).
-2. Screw the body into the frame first (the bracket covers the left floor
+2. Screw the body into the frame first (the bracket covers the left foot
    bolt): body through the apron sheet's cut-out, the face on the flange,
    the M3 screws through both and the sheet, then the M5 bolts through
-   the floor into the lower bar.
+   the foot into the lower bar.
 3. Wheel, rod, coupler and encoder in from the back as one: the rod into
    the left cheek's slot, the coupler into the right one's, the
    encoder's bushing into its plate's slot (the nut in front of the

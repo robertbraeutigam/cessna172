@@ -93,10 +93,11 @@ with the chair lowered, MEASURE).
 brackets; the left one right of the leg room, the right one under the
 end upright) and a lower bar between their ends, covered by a small ACM
 sheet. It carries the [**pedestal**](../pedestal/README.md) with the trim
-wheel and the trim indicator (its body 110 x 150 mm, `pedestal_size`), as
-far left under the throttle box as the leg room (`knee_w`, 460 mm around
-the yoke column) allows, which stands on the lower bar like the throttle
-box on its bar. The parking brake is a future component; its size
+wheel and the trim indicator (110 x 150 mm behind the sheet,
+`pedestal_size`), as far left under the throttle box as the leg room
+(`knee_w`, 460 mm around the yoke column) allows. It has no box, only a
+front plate and a foot that stands on the lower bar, bolted like the
+throttle box on its bar. The parking brake is a future component; its size
 (`park_size`) reserves the space (the depth is a guess), and its hole is
 cut when it exists.
 

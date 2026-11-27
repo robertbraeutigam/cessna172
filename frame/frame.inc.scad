@@ -217,17 +217,19 @@ primer_tube = 50.5;          // tube_len (view only)
 primer_bracket = [38.1, 26, 95.2];   // beside the rod towards the pilot's right, height, length (view only)
 
 // --- Under the lower panel ---
-// Pedestal (trim wheel and trim indicator, pedestal/pedestal.scad), same
-// rule as the throttle box: the
-// body (width x depth x height) goes through its cut-out in the apron sheet
-// and stands on the lower bar, the face flange (top and sides) is screwed
-// onto the sheet with M3, and two M5 bolts through the floor go into the
-// lower bar's top slot.
+// Pedestal (trim wheel and trim indicator, pedestal/pedestal.scad), like
+// the throttle box but with no box: what hangs on its front plate's back
+// (within width x depth x height) goes through its cut-out in the apron
+// sheet, a foot along the plate's bottom stands on the lower bar, the
+// face flange (top and sides) is screwed onto the sheet with M3, and two
+// M5 bolts through the foot go into the lower bar's top slot.
 under_face_t = 5;            // the face (face_t) and the body's front plate (plate_t)
 under_flange = 10;
 under_play = 1;              // body to its cut-out
 under_bolt_y = 18;           // floor bolts from the face front, over the lower bar's slot
-pedestal_size = [110, 120, 150];  // body
+pedestal_size = [110, 120, 150];  // what goes behind the sheet
+pedestal_foot = 30;          // the foot, from the face front
+pedestal_bolt_dx = 20;       // its bolts from the middle
 pedestal_wheel = [-2, 48, 85, 120, 12];   // the trim wheel: x from the middle, axle behind the face front and over the floor, diameter, width
 pedestal_ind = [-18.8, 62, 4, 38.5];      // the indicator slot: x from the middle, middle over the floor, width, length
 // Parking brake: a thin body (width x depth x height) on the bottom bar,
@@ -493,7 +495,7 @@ apron_screws = [for (p = concat(
 // M5 through the throttle box floor into T-nuts in the throttle bar's top slot, [x, y]
 throttle_bolts = [for (x = throttle_bolt_xs) [throttle_x0 + x, throttle_y0 + throttle_bolt_y]];
 // M5 through the pedestal floor into T-nuts in the lower bar's top slot, [x, y]
-pedestal_bolts = [for (s = [-1, 1]) [pedestal_x + s * pedestal_size.x / 4, under_y0 + under_bolt_y]];
+pedestal_bolts = [for (s = [-1, 1]) [pedestal_x + s * pedestal_bolt_dx, under_y0 + under_bolt_y]];
 
 // --- Checks ---
 function inside(r, b, m) = r[0] >= b[0] + m && r[1] >= b[1] + m && r[2] <= b[2] - m && r[3] <= b[3] - m;

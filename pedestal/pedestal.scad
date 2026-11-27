@@ -4,12 +4,13 @@
 // stands out of a tall slot in the face, NOSE DOWN at its top, NOSE UP at
 // its bottom, and left of it the trim indicator, a pointer moving up and
 // down in a narrow slot past the TAKE OFF mark. Mounted in the cockpit
-// frame (frame/) like the throttle box: the body goes through a cut-out in
-// the apron sheet and stands on the apron's lower bar, its front plate's
-// flange (top and sides) is screwed onto the sheet (M3, nuts behind the
-// sheet), and two M5 bolts through the floor go into T-nuts in the lower
-// bar's top slot. The back is open (it is under the desk); everything goes
-// in from there.
+// frame (frame/) like the throttle box, but with no box: it is behind
+// the sheet, so it needs no housing. Its front plate's flange (top and
+// sides) is screwed onto the sheet (M3, nuts behind the sheet), the
+// separate face in front of it, and everything else hangs on the plate's
+// back and goes through the cut-out in the apron sheet. A foot along the
+// plate's bottom stands on the apron's lower bar, two M5 bolts through it
+// into T-nuts in the bar's top slot; the cheeks are braced down to it.
 //
 // - The wheel is glued onto a 6 mm rod that turns in two cheeks on the
 //   front plate's back, one each side of the wheel, which frame the wheel
@@ -29,18 +30,19 @@
 //   plate's back, its pointer through the indicator slot. An SG90 servo
 //   on a bracket behind it turns the pinion (sv_sweep for the full
 //   travel); MobiFlight drives it from X-Plane's elevator trim.
-// - An Arduino Nano of its own (MobiFlight) in rails on the floor under
-//   the servo, its USB jack to the back, the cable tied onto a block
-//   behind the plug (README.md, Connections).
+// - An Arduino Nano of its own (MobiFlight) in rails on the front plate's
+//   back, right of the encoder, its USB jack up, the cable tied onto a
+//   block above the plug (README.md, Connections).
 //
 // Coordinates, installed: x to the right (seen from the pilot), y
-// backwards, z up; y = 0 is the face's front, z = 0 the floor's underside
+// backwards, z up; y = 0 is the face's front, z = 0 the foot's underside
 // (the lower bar's top), x = 0 the body's middle.
 //
-// Prints: the body on its face (front plate down, everything else stands
-// on it), the face front side up (lettering for a paint pen), the wheel
-// on its web, the rack on its side, the bracket on its front, the pinion,
-// the keepers flat, the coupler on its collar.
+// Prints: the body on its face (front plate down, the foot, the cheeks,
+// the channel, the posts and the rails stand on it), the face front side
+// up (lettering for a paint pen), the wheel on its web, the rack on its
+// side, the bracket on its front, the pinion and the keepers flat, the
+// coupler on its collar.
 //
 // Parts to buy (README.md): 6 mm rod (rod_len), EC11 rotary encoder,
 // SG90 servo, Arduino Nano, felt pad, M3 screws (face, bracket, keepers),
@@ -59,7 +61,7 @@ bed = [255, 255];
 
 // --- Body, the frame's pedestal_size and under_* (frame/frame.inc.scad) ---
 body = [110, 120, 150];      // width, depth from the face's front, height
-wall = 3;
+wall = 3;                    // the foot's thickness
 face_t = 2;                  // the separate face, in front of the front plate
 plate_t = 3;                 // the body's front plate with the flange
 flange_w = 10;               // top and sides (none at the bottom: the bar)
@@ -71,6 +73,8 @@ sheet_t = 3;
 sheet_cut_clear = 1;         // the frame's under_play
 bar_slot = 10;               // the lower bar's top slot behind the sheet (ext / 2)
 m5_d = 5.3;
+floor_bolt_dx = 20;          // the foot's bolts from the middle (the frame's pedestal_bolt_dx)
+foot_d = 30;                 // the foot on the lower bar, from the face's front (the frame's pedestal_foot)
 m5_head_d = 9.5;
 pilot_d = 2.8;               // M3 self tapping
 clear_d = 3.3;
@@ -133,7 +137,7 @@ gear_m = 1;
 gear_play = 0.15;
 pin_z = 24;                  // pinion teeth
 pin_w = 6;
-ind_z = 62;                  // the travel's middle over the floor
+ind_z = 62;                  // the travel's middle over the foot's underside
 rack_w = 5;                  // behind the teeth's root
 rack_play = 0.3;
 chan_wall = 1.5;
@@ -149,16 +153,16 @@ label_size = 3.2;
 // --- Calculated ---
 y_pl = face_t;                       // the front plate's front
 y_in = face_t + plate_t;             // its back, the inside
-wall_in = body.x / 2 - wall;         // the side walls' inside, |x|
-top_in = body.z - wall;
+side_in = body.x / 2 - 0.5;          // behind the sheet everything stays within the cut-out, |x|
+top_in = body.z - wall;              // and under this
 face_w = body.x + 2 * flange_w;
 face_h = body.z + flange_w;
 floor_bolt_y = y_in + sheet_t + bar_slot;
-floor_bolts = [for (s = [-1, 1]) [s * body.x / 4, floor_bolt_y]];
+floor_bolts = [for (s = [-1, 1]) [s * floor_bolt_dx, floor_bolt_y]];
 
 wheel_r = wheel_d / 2;
 y_ax = wheel_r - wheel_out;          // the axle behind the face's front
-z_ax = top_in - 2 - wheel_r;         // under the top wall
+z_ax = top_in - 2 - wheel_r;
 wx = [wheel_x - wheel_w / 2, wheel_x + wheel_w / 2];   // the rim, x
 slot_x = [wx[0] - wheel_gap, wx[1] + wheel_gap];
 slot_hl = sqrt(wheel_r * wheel_r - (y_ax - y_in) * (y_ax - y_in)) + slot_clear + (slot_x[1] - slot_x[0]) / 2;   // half its length, the round ends beyond the rim
@@ -194,14 +198,15 @@ y_br = [rack_y[1] + 0.3, sv_top + sv_tab[2]];          // the bracket: front, ba
 sv_dir = -1;                                           // the servo's body from its shaft, along z
 sv_bc = pin_c.y + sv_dir * (sv_body[0] / 2 - sv_shaft_dx);   // its body's middle, z
 sv_holes = [for (s = [-1, 1]) [pin_c.x, sv_bc + s * sv_tab_hole / 2]];
-br_x = [-wall_in + 0.5, ch_l[0] - 0.1];
+br_x = [-side_in + 0.5, ch_l[0] - 0.1];
 br_z = [chan_z[0], chan_z[1]];
-br_posts = [for (x = [-wall_in + 6, pin_c.x + 4], z = [br_z[0] + 6, br_z[1] - 6]) [x, z]];
+br_posts = [for (x = [-side_in + 6, pin_c.x + 4], z = [br_z[0] + 6, br_z[1] - 6]) [x, z]];
 
-nano_c = [-33, 52];                                    // its middle on the floor, the jack at +y
-usb_z = wall + nano_top_h + nano_usb.y / 2;            // the jack's middle
-nano_jack_y = nano_c.y + nano_board.y / 2 + nano_usb_out;
-tie_y = nano_jack_y + usb_plug.z + tie_gap + tie_block.x / 2;
+// the Nano on the front plate's back right of the encoder's plate, [x, z] of its middle, the jack up
+nano_c = [side_in - nano_rail_hw - 0.5, wall + nano_rail_end + 1];
+usb_y = y_in + nano_top_h + nano_usb.y / 2;            // the jack's axis
+nano_jack_z = nano_c.y + nano_board.y / 2 + nano_usb_out;
+tie_z = nano_jack_z + usb_plug.z + tie_gap + tie_block.x / 2;
 
 mount_holes = [for (z = [mount_inset + 4, body.z / 2], s = [-1, 1]) [s * (face_w / 2 - mount_inset), z],
                for (x = [-face_w / 2 + mount_inset, 0, face_w / 2 - mount_inset]) [x, face_h - mount_inset]];
@@ -212,18 +217,18 @@ echo(rod_len = rod_len, ind_travel = ind_travel, wheel_axle = [wheel_x, y_ax, z_
 // --- Checks ---
 assert(face_w <= bed.x && face_h <= bed.y && body.x <= bed.x && body.z <= bed.y, "Body or face does not fit the printer bed");
 assert(mount_inset + mount_nut_r + 0.3 <= flange_w - sheet_cut_clear, "Mount nuts do not sit on the sheet, make flange_w wider");
-assert(z_ax - wheel_r >= wall + 2, "The wheel runs into the floor");
-assert(z_ax + slot_hl <= top_in, "The wheel slot runs into the top wall");
+assert(z_ax - wheel_r >= wall + 2, "The wheel runs into the foot");
+assert(z_ax + slot_hl <= top_in, "The wheel slot runs into the face's top");
 assert(ch_l[0] - chan_wall - 0.1 > rack_xr, "Rack channel runs into the left cheek");
-assert(enc_mount + enc_body[1] + enc_body[2] + enc_wires <= wall_in, "The encoder's wires run into the right wall");
+assert(enc_mount + enc_body[1] + enc_body[2] + enc_wires <= side_in, "The encoder's wires run out of the cut-out");
 assert(cp_x[1] - collar_x0 >= 2, "The coupler's collar too short");
 assert(enc_pl[0] - enc_nut[1] >= cp_x[1] + 0.5, "The encoder's nut runs into the coupler");
 assert(enc_bush[1] >= enc_plate + enc_nut[1], "The encoder's bushing too short for its plate and nut");
 assert(keeper_screw - pilot_d / 2 >= coupler_hole / 2 + 1, "Keeper screws in the coupler's bearing");
-assert(pin_c.x - pin_ra >= -wall_in + 1, "The pinion runs into the left wall");
-assert(pin_c.x - sv_body[1] / 2 >= -wall_in + 0.5, "The servo runs into the left wall");
+assert(pin_c.x - pin_ra >= -side_in + 1, "The pinion runs out of the cut-out");
+assert(pin_c.x - sv_body[1] / 2 >= -side_in + 0.5, "The servo runs out of the cut-out");
 assert(sv_bc - sv_tab[0] / 2 >= br_z[0] && sv_bc + sv_tab[0] / 2 <= br_z[1], "The servo's tabs off the bracket");
-assert(chan_z[0] >= wall + 1 && chan_z[1] <= top_in - 1, "The rack channel runs into the floor or the top");
+assert(chan_z[0] >= wall + 1 && chan_z[1] <= top_in - 1, "The rack channel runs into the foot or out of the top");
 assert(ind_x - ind_slot_w / 2 >= -face_w / 2 + flange_w, "Indicator slot off the body");
 assert(ind_x + ind_slot_w / 2 + 3.5 <= slot_x[0] - 1, "No room for the TAKE OFF mark between the slots");
 for (p = br_posts) {
@@ -231,12 +236,15 @@ for (p = br_posts) {
    assert(p.x + 3.5 <= rack_tip - chan_wall - 0.5, "A bracket post runs into the rack's channel");
    assert(abs(p.y - sv_bc) >= sv_tab[0] / 2 + 3.5 || abs(p.x - pin_c.x) >= sv_body[1] / 2 + 3.5, "A bracket post runs into the servo");
 }
-assert(nano_c.x - nano_rail_hw >= -wall_in + 1 && nano_c.x + nano_rail_hw <= ch_l[0] - 1, "The Nano's rails run into a wall or a cheek");
-assert(nano_c.y - nano_rail_end >= floor_bolts[0].y + m5_head_d / 2 + 0.5, "The Nano runs into the left floor bolt");
-assert(wall + nano_top_h + nano_usb.y <= sv_bc - sv_body[0] / 2 - 2 || nano_c.y - nano_board.y / 2 >= y_br[1] + sv_body[2], "The Nano runs into the servo");
-assert(usb_z + usb_plug.y / 2 <= z_ax - wheel_r || nano_c.x + usb_plug.x / 2 <= wx[0] - 1, "The USB plug runs into the wheel");
-assert(tie_y + tie_block.x / 2 <= body.y, "The USB tie block off the floor");
-assert(abs(floor_bolts[0].x) + m5_head_d / 2 <= wall_in && floor_bolt_y - m5_head_d / 2 >= y_in, "Floor bolts off the floor");
+assert(nano_c.x - nano_rail_hw >= enc_pl[1] + 1, "The Nano's rails run into the encoder's plate");
+assert(usb_y + usb_plug.y / 2 + 1 <= y_ax - enc_body[0] / 2, "The USB plug and cable run into the encoder");
+assert(nano_c.x - tie_block.y / 2 >= enc_pl[1] + 0.5, "The USB tie block runs into the encoder's plate");
+assert(tie_z + tie_block.x / 2 <= top_in, "The USB tie block above the cut-out");
+for (b = floor_bolts, c = [ch_l, ch_r, enc_pl, [-side_in, -side_in]])
+   assert(b.x + m5_head_d / 2 + 0.5 <= c[0] || b.x - m5_head_d / 2 - 0.5 >= c[1], "A floor bolt's head runs into a cheek or the encoder's plate");
+assert(max([for (b = floor_bolts) abs(b.x)]) + m5_head_d / 2 <= side_in && floor_bolt_y + m5_head_d / 2 <= foot_d, "Floor bolts off the foot");
+assert(y_pl + 22 <= foot_d, "The cheeks' braces off the foot");
+assert(y_ax + wheel_r <= body.y, "The wheel deeper than the frame's pedestal_size");
 
 // --- Helpers ---
 // along y from y0 to y1, a 2D shape in x (right) and z (up)
@@ -294,7 +302,12 @@ module front_holes() {
 }
 
 // --- Body ---
-// cheek outline in [y, z]: a block round the axle, braced down to the floor at the front
+// the Nano's own coordinates (lib/nano.inc.scad) on the front plate's back, its jack up
+module on_nano() {
+   translate([nano_c.x, y_in, nano_c.y]) rotate([90, 0, 180]) children();
+}
+
+// cheek outline in [y, z]: a block round the axle, braced down to the foot
 module cheek_2d(h) {
    polygon([[y_pl, wall - 0.01], [y_pl + 22, wall - 0.01], [cheek_back, z_ax - h - 10],
             [cheek_back, z_ax + h], [y_pl, z_ax + h]]);
@@ -312,11 +325,8 @@ module body() {
       union() {
          // front plate with the flange
          along_y(y_pl, y_in) front_outline();
-         // walls: sides, top, floor; the back is open
-         difference() {
-            translate([-body.x / 2, y_pl, 0]) cube([body.x, body.y - y_pl, body.z]);
-            translate([-wall_in, y_in - 0.01, wall]) cube([2 * wall_in, body.y, top_in - wall]);
-         }
+         // the foot on the lower bar (no walls: it is behind the sheet)
+         translate([-body.x / 2, y_pl, 0]) cube([body.x, foot_d - y_pl, wall]);
          // cheeks: the left one (the rod), the right one (the coupler), the encoder's plate
          along_x(ch_l[0], ch_l[1]) cheek_2d(cheek_h);
          along_x(ch_r[0], ch_r[1]) cheek_2d(cheek_h);
@@ -328,15 +338,13 @@ module body() {
          // the bracket's posts
          for (p = br_posts) along_y(y_in - 0.01, y_br[0]) translate(p) circle(d = 7);
          // the Nano's rails and the USB cable's tie block
-         translate([nano_c.x, nano_c.y, wall]) nano_rails(far_stop = true);
-         translate([nano_c.x, tie_y, usb_z - tie_cable_h]) rotate(90) tie_block();
-         if (usb_z - tie_cable_h > wall)
-            translate([nano_c.x - tie_block.y / 2, tie_y - tie_block.x / 2, wall - 0.01]) cube([tie_block.y, tie_block.x, usb_z - tie_cable_h - wall + 0.02]);
+         on_nano() nano_rails(far_stop = true);
+         translate([nano_c.x, usb_y - tie_cable_h, tie_z]) rotate([0, -90, -90]) tie_block();
+         if (usb_y - tie_cable_h > y_in)
+            translate([nano_c.x - tie_block.y / 2, y_in - 0.01, tie_z - tie_block.x / 2]) cube([tie_block.y, usb_y - tie_cable_h - y_in + 0.02, tie_block.x]);
       }
       // through the front
       translate([0, y_pl - 1, 0]) along_y(0, y_in - y_pl + 2) front_holes();
-      // the wheel's room between the cheeks
-      translate([slot_x[0], y_in - 1, z_ax - wheel_r - 2]) cube([slot_x[1] - slot_x[0], body.y, wheel_d + 4]);
       // bearings: the rod in the left cheek, the coupler in the right one, the encoder's bushing in its plate
       along_x(ch_l[0] - 1, ch_l[1] + 0.01) back_slot_2d(rod_hole);
       along_x(ch_r[0] - 0.01, ch_r[1] + 1) back_slot_2d(coupler_hole);
@@ -346,7 +354,7 @@ module body() {
          translate([x, cheek_back + 1, z_ax + s * keeper_screw]) rotate([90, 0, 0]) cylinder(d = pilot_d, h = 9);
       // the bracket's screws
       for (p = br_posts) translate([p.x, y_in + 1, p.y]) rotate([-90, 0, 0]) cylinder(d = pilot_d, h = 20);
-      // floor bolts
+      // the foot's bolts
       for (b = floor_bolts) translate([b.x, b.y, -1]) cylinder(d = m5_d, h = wall + 2);
    }
 }
@@ -511,12 +519,12 @@ module rod_part() {
    color(c_steel) translate([rod_x[0], y_ax, z_ax]) rotate([0, 90, 0]) cylinder(d = rod_d, h = rod_len);
 }
 module nano_view() {
-   translate([nano_c.x, nano_c.y, wall]) nano_part();
+   on_nano() nano_part();
    color("#333") {
-      translate([nano_c.x - usb_plug.x / 2, nano_jack_y, usb_z - usb_plug.y / 2]) cube([usb_plug.x, usb_plug.z, usb_plug.y]);
-      translate([nano_c.x, nano_jack_y + usb_plug.z, usb_z]) rotate([-90, 0, 0]) cylinder(d = cable_d, h = body.y - nano_jack_y - usb_plug.z + 40);
+      translate([nano_c.x - usb_plug.x / 2, usb_y - usb_plug.y / 2, nano_jack_z]) cube([usb_plug.x, usb_plug.y, usb_plug.z]);
+      translate([nano_c.x, usb_y, nano_jack_z + usb_plug.z]) cylinder(d = cable_d, h = body.z - nano_jack_z - usb_plug.z + 40);
    }
-   translate([nano_c.x, tie_y, usb_z - tie_cable_h]) rotate(90) tie_part();
+   translate([nano_c.x, usb_y - tie_cable_h, tie_z]) rotate([0, -90, -90]) tie_part();
 }
 module bolts_part() {
    color(c_steel) for (b = floor_bolts) translate([b.x, b.y, wall]) cylinder(d = m5_head_d, h = 3);
@@ -575,19 +583,12 @@ module section_view(x = wheel_x) {
    }
 }
 
-// the top wall cut off, seen from behind
-module inside_view() {
-   intersection() {
-      assembled(sheet = false);
-      translate([-150, -50, -50]) cube([300, 300, top_in + 49.5]);
-   }
-}
 
 // the indicator seen from behind, cut in front of the bracket: rack, pinion, channel
 module indicator_view(t = view_trim) {
    intersection() {
       assembled(t, sheet = false);
-      translate([-wall_in - 0.5, -50, -50]) cube([wall_in + ch_r[0], 50 + y_br[0] - 0.05, 300]);
+      translate([-side_in - 0.5, -50, -50]) cube([side_in + ch_r[0], 50 + y_br[0] - 0.05, 300]);
    }
 }
 
@@ -605,6 +606,6 @@ pinion(); // Make module pinion
 //assembled(); // Make view main 70,0,-35
 //assembled(); // Make view front 90,0,0
 //exploded_view(); // Make view exploded 65,0,150
-//inside_view(); // Make view inside 35,0,200
+//assembled(sheet = false); // Make view back 35,0,200
 //indicator_view(); // Make view indicator 90,0,180
 //section_view(); // Make view section 90,0,90
