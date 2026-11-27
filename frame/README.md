@@ -78,10 +78,9 @@ the ignition 20 mm higher (as high as the desk allows, `switch_ign_rise`),
 the primer under its key 20 mm of sheet under the ignition's hole, the
 throttle box with its rods 56 mm over the switch row's bottom like in the
 172N (85 mm below the desk top), its body under the desk on the throttle
-bar, and the flaps panel (lever pot and indicator servo, on a Nano of its own; not
-designed yet, so its 50 x 63 mm front plate and 64 mm depth are
-placeholders) 70 mm (`flaps_gap`) right of the throttle box face, its
-body on the throttle bar too. The **parking brake** sits on the bottom bar
+bar, and the [flaps panel](../flaps/README.md) (78 x 88 mm face, no
+housing) 70 mm (`flaps_gap`) right of the throttle box face, its foot
+on the throttle bar too, two M5 into its top slot (`flaps_bolts`). The **parking brake** sits on the bottom bar
 under the yoke column, its T-handle through a small hole under the switch
 row: released, it is almost flush and lies sideways; set, it is pulled
 out 50 mm and turned to point down. The bottom bar is just under the

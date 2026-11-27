@@ -162,13 +162,16 @@ throttle_play = 1;           // box to its cut-out, sheet_cut_clear
 throttle_bolt_xs = [47.5, 102.5]; // floor_bolt_xs
 throttle_bolt_y = 36;        // floor_bolt_y, from the face front
 
-// --- Flaps panel, DIY (lever pot and indicator servo, not designed yet;
-// these sizes are placeholders until it is) ---
-// Right of the mixture, like in the 172N: its front plate is screwed onto
-// the sheet, its body goes through the cut-out and rests on the throttle bar.
-flaps_plate = [50, 63];      // front plate, width x height
-flaps_body = [44, 57, 64];   // through the sheet (a guess: 3 mm smaller than the plate all round), depth behind it
-flaps_play = 0.5;            // body to its cut-out
+// --- Flaps panel, from flaps/flaps.scad ---
+// Right of the mixture, like in the 172N: its front plate (flange left,
+// right and bottom, none at the top) is screwed onto the sheet, what
+// hangs on its back goes through the cut-out, and its foot stands on the
+// throttle bar, two M5 into the bar's top slot. No housing.
+flaps_plate = [78, 87.5];    // the face: width, height (from the flange's bottom to the cut-out's top)
+flaps_body = [60, 78, 112];  // behind the sheet: width, height (from the bar's top), depth from the face's front
+flaps_face_t = 5;            // face_t + plate_t
+flaps_bolt_xs = [-18, -4];   // foot_bolt_xs, from its middle
+flaps_play = 0.5;            // body to its cut-out, sheet_cut_clear
 flaps_gap = 70;              // throttle box face to the flaps plate (172N)
 
 // --- Compass, from compass/compass.scad ---
@@ -371,8 +374,10 @@ throttle_face = [throttle_x0 - throttle_flange, throttle_z,
 flaps_cut = [flaps_x - flaps_body.x / 2 - flaps_play, throttle_z,
              flaps_x + flaps_body.x / 2 + flaps_play, throttle_z + flaps_body.y + 2 * flaps_play];
 flaps_z = (flaps_cut[1] + flaps_cut[3]) / 2;           // center
-flaps_face = [flaps_x - flaps_plate.x / 2, flaps_z - flaps_plate.y / 2,
-              flaps_x + flaps_plate.x / 2, flaps_z + flaps_plate.y / 2];
+flaps_face = [flaps_x - flaps_plate.x / 2, flaps_cut[3] - flaps_plate.y,
+              flaps_x + flaps_plate.x / 2, flaps_cut[3]];
+// M5 through its foot into T-nuts in the throttle bar's top slot, [x, y]
+flaps_bolts = [for (x = flaps_bolt_xs) [flaps_x + x, ext / 2 + ext]];
 // bottom bar under the lowest cut-out, the sheet down to its bottom
 low_cuts = [ign_cut, switch_cut, primer_cut, throttle_cut, flaps_cut];
 z_bb = floor((min([for (c = low_cuts) c[1]]) - 3) / round_cut) * round_cut;   // bottom bar's top

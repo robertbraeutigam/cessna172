@@ -12,6 +12,7 @@ wiring and the assembly:
 | Directory | Component |
 |-----------|-----------|
 | [`throttle/`](throttle/README.md) | throttle quadrant: throttle, mixture and carb heat |
+| [`flaps/`](flaps/README.md) | the wing flap lever and the flap position indicator right of the throttle |
 | [`pedestal/`](pedestal/README.md) | the trim wheel and the trim indicator under the throttle |
 | [`switchpanel/`](switchpanel/README.md) | the 172N lower left switch panel: master, lights, avionics; the primer below it |
 | [`ignition/`](ignition/README.md) | the ignition key switch, the left end of the switch panel |
@@ -153,7 +154,7 @@ It stands on the desk right of the yoke (see
 [Cockpit frame](frame/README.md)). Every component's README says how many
 ports it takes and how much current (its *USB* paragraph). With the whole
 six-pack, the NAV indicators, the RPM, the four radio units, the pedestal,
-the planned flaps and the Saitek devices that is about 22 ports: a 16
+the flaps and the Saitek devices that is about 22 ports: a 16
 port hub, or two hubs, one into the other (USB takes up to 127 devices),
 and one cable from the first to the PC.
 
@@ -173,7 +174,7 @@ resetting and needles losing their home). So the hub:
   drop voltage).
 
 The NAV indicators' flags have a 9 g servo each, the pedestal's trim
-indicator has one, and the flaps (indicator) are planned with one, each on the
+indicator has one, and so has the flaps panel's indicator, each on the
 component's Nano: about 0.15-0.3 A when it moves,
 up to 0.7 A stalled. Put a 470 uF capacitor across its supply at the
 servo; if its Nano resets when it moves, feed it from the USB 5 V before
@@ -204,6 +205,14 @@ Throttle, mixture and carb heat: 6 mm rods moving linear potentiometers in
 one box, read by a Nano on its floor.
 
 [![Throttle quadrant](https://robertbraeutigam.github.io/cessna172/throttle/throttle_box_montage.png)](https://robertbraeutigam.github.io/cessna172/throttle/throttle_box_montage.png)
+
+### [Flaps panel](flaps/README.md)
+
+The wing flap lever with detents at UP, 10, 20 and 30, read by a hall
+sensor at each, and the flap position indicator, its pointer moved by a
+servo through a scotch yoke.
+
+[![Flaps panel](https://robertbraeutigam.github.io/cessna172/flaps/flaps_montage.png)](https://robertbraeutigam.github.io/cessna172/flaps/flaps_montage.png)
 
 ### [Pedestal](pedestal/README.md)
 

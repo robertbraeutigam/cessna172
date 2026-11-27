@@ -21,6 +21,24 @@ its own top-level directory; new components should follow the same layout.
     the other files, keep them in sync.
   - `carb_heat_knob.scad`, `clamp.scad`, `pin.scad` — small parts (knob,
     rod clamps, pot hold-down pins).
+- `flaps/` — `flaps.scad`: the flaps panel right of the throttle box,
+  like the X-Plane 172N's (WING FLAPS, scale UP/10/20/30 FULL, indicator
+  slot, lever slot). No housing, like the pedestal: front plate with a
+  flange left, right and bottom (none at the top: the waist bars), a
+  separate face with raised lettering, a foot on the throttle bar (two
+  M5, `foot_bolt_xs`), everything else on the plate's back within `body`;
+  `frame/frame.inc.scad` repeats `flaps_plate`, `flaps_body`,
+  `flaps_face_t`, `flaps_bolt_xs`. Lever: the handle's stem into a
+  block sliding in a channel, a ball detent (notches in the right wall)
+  at each of the `n_pos` positions, a magnet in the block over an A3144
+  per position on a screwed `strip` (also keeps the block and the
+  carrier in); D2..D5 set `flap_ratio`. Indicator: a carrier in its own
+  channel, its fin's slot driven by a pin on an SG90's arm (scotch yoke,
+  D9, `arm_r`), the servo on a rib (window, tabs screwed along x); the
+  servo's interpolation table is echoed (`indicator_table`) and in the
+  README. Nano in rails on the foot behind the lever, jack back,
+  `tie_block`. `sv_*` MEASURE (the NAV indicator's), `sensor`/`magnet`
+  from `lib/stepper.inc.scad`.
 - `pedestal/` — `pedestal.scad`: the top of the pedestal under the
   throttle, the elevator trim wheel and the trim indicator, mounted like
   the throttle box but with no housing (it is behind the sheet): a front
@@ -360,7 +378,7 @@ its own top-level directory; new components should follow the same layout.
     coordinates (middle at the origin, on z=0, component side up, the
     jack at +y); each component places it with a proper rotation (a
     mirror swaps the pin rows). Every component with a Nano includes it:
-    throttle, yoke, switch panel, compass, radio, instruments, pedestal. Its names
+    throttle, yoke, switch panel, compass, radio, instruments, pedestal, flaps. Its names
     are global: do not reuse them in a component.
   - `stepper.inc.scad` — the stepper drive of the compass and the
     instruments: the 28BYJ-48 (`motor_*`, `shaft_*`, view model
@@ -370,13 +388,13 @@ its own top-level directory; new components should follow the same layout.
     front of it for the female Dupont plugs on its pins `uln_plug_room`,
     which every board's clearance and depth counts, view model
     `uln_part` on a plate at z=0), the A3144 (`sensor`) and the magnet
-    (`magnet`), all MEASURE. The holders (motor posts and plates,
+    (`magnet`; the flaps panel's lever sensors use them too), all MEASURE. The holders (motor posts and plates,
     carriers, sensor pockets) stay in the components.
   - `usb.inc.scad` — the USB cable: plug (`usb_plug`), cable (`cable_d`)
     and tie (`tie`, `tie_slot`) sizes (MEASURE), and what it is tied onto:
     `tie_block` (in line behind the plug, the cable in a groove on its
     top at `tie_cable_h`, the tie through a slot at its foot; switch
-    panel, yoke, pedestal), `tie_post` (beside the cable with a tunnel along it;
+    panel, yoke, pedestal, flaps), `tie_post` (beside the cable with a tunnel along it;
     the radio units), a view of the tie (`tie_part`). Both in their own
     coordinates (foot on z=0, middle over the origin, cable along x).
     The throttle and the compass take `usb_plug` for their back wall
@@ -397,7 +415,7 @@ its own top-level directory; new components should follow the same layout.
   hole in the sheet; above it the reserved instruments (`inst_c`: six-pack,
   NAV 1 and 2 right of it, RPM beside the column), right of them the radio
   stack; below the desk top the lower panel (ignition with the primer,
-  switch row, throttle box and flaps on the throttle bar, parking brake),
+  switch row, throttle box and flaps (`flaps/`) on the throttle bar, parking brake),
   its backs under the desk's underside and the yoke's clamps, its bottom
   over the pilot's knees (`knee_z`, the chair lowered). Stage 2 also
   brings a DIY force feedback yoke, its housing set back (`ffb_back`) so

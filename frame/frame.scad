@@ -90,7 +90,7 @@ echo(ign_cut = ign_cut, switch_cut = switch_cut, primer_cut = primer_cut, park_c
      radio_cut = radio_cut, stack_cut_reserved = stack_cut);
 echo(stage2_instruments = [for (i = [0 : len(inst_c) - 1]) [inst_names[i], inst_c[i]]], inst_cut_d = inst_cut_d,
      stage2_left_sheet = [x_r, sheet_h_r - sheet_bottom]);
-echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts);
+echo(sheet_screws = sheet_screws, throttle_bolts = throttle_bolts, flaps_bolts = flaps_bolts);
 echo(apron_sheet = [apron[2] - apron[0], apron[3] - apron[1]], apron_screws = len(apron_screws));
 echo(pedestal_cut = pedestal_cut, pedestal_bolts = pedestal_bolts);
 echo(compass_bolts = compass_bolts);
@@ -361,18 +361,18 @@ module pedestal_part() {
       translate([pedestal_x + i[0] - i[2] / 2, under_y0 - 0.5, apron_bar_z + i[1] - i[3] / 2]) cube([i[2], 1, i[3]]);
 }
 
-// DIY flaps panel (placeholder): front plate on the sheet right of the
-// throttle box, body behind it on the front rail, lever and indicator on the plate
+// Flaps panel (flaps/): its face on the sheet right of the throttle box,
+// the foot on the throttle bar, the indicator's slot and the lever
 module flaps_part() {
-   y = -sheet_t;
+   y = -sheet_t - flaps_face_t;
    color(c_device) {
-      translate([flaps_face[0], y - 3, flaps_face[1]])
-         cube([flaps_plate.x, 3, flaps_plate.y]);
-      translate([flaps_x - flaps_body.x / 2, 0, flaps_z - flaps_body.y / 2])
-         cube([flaps_body.x, flaps_body.z - sheet_t, flaps_body.y]);
+      translate([flaps_face[0], y, flaps_face[1]])
+         cube([flaps_plate.x, flaps_face_t, flaps_plate.y]);
+      translate([flaps_x - flaps_body.x / 2, y, throttle_z])
+         cube([flaps_body.x, flaps_body.z, 3]);
    }
-   color("#ddd") translate([flaps_x - 18, y - 3.5, flaps_z - 20]) cube([2, 1, 40]);
-   color("#eee") translate([flaps_x + 4, y - 15, flaps_z + 8]) cube([16, 12, 6]);
+   color("#ddd") translate([flaps_x + 6.4, y - 0.5, throttle_z + 15]) cube([3, 1, 48]);
+   color("#eee") translate([flaps_x + 17.7, y - 7, throttle_z + 58]) cube([26, 5, 10]);
 }
 
 // Parking brake: body on the bottom bar behind the sheet, the T-handle
