@@ -4,52 +4,57 @@
 // side, the scale 0, 10, 20, 30, 40 degrees (0 to 10 twice as long as
 // the others, like the real placard), the indicator's pointer in a narrow
 // slot beside it showing where the flaps are, and the white lever in a
-// stepped slot right of it. The lever has no detents: it moves
-// continuously and stays where it is left (the flaps follow it, like the
-// 172N's preselect lever). The slot stops it: going down from 0 it rests
-// on a step at 10, moved to the right it goes on down to a step at 20,
-// moved to the right again it goes down to 40 (FULL). A spring holds it
-// to the left, against the steps; going up it springs back left past
-// them. Mounted in the cockpit frame (frame/) like the pedestal, with no
-// housing: it is behind the sheet. Its front plate has a flange on the
-// left, the right and the bottom (none at the top: the waist bars are
-// behind the sheet there), screwed onto the sheet (M3, nuts behind it),
-// the separate face in front of it; everything else hangs on the plate's
-// back and goes through the cut-out in the lower right sheet. A foot along
-// the plate's bottom stands on the frame's throttle bar, two M5 bolts
-// through it into T-nuts in the bar's top slot.
+// stepped slot right of it. The lever is an arm swinging on a rod behind
+// the plate, like the real one (its cam and switches turn on a pivot):
+// the paddle is level at 0 and leans down as the lever goes down. It has
+// no detents: it moves continuously and stays where it is left (the flaps
+// follow it, like the 172N's preselect lever). The slot stops it: going
+// down from 0 it rests on a step at 10, moved to the right it goes on down
+// to a step at 20, moved to the right again it goes down to 40 (FULL). A
+// spring holds it to the left, against the steps; going up it springs back
+// left past them. Mounted in the cockpit frame (frame/) like the pedestal,
+// with no housing: it is behind the sheet. Its front plate has a flange on
+// the left, the right and the bottom (none at the top: the waist bars are
+// behind the sheet there), screwed onto the sheet (M3, nuts behind it), the
+// separate face in front of it; everything else hangs on the plate's back
+// and goes through the cut-out in the lower right sheet. A foot along the
+// plate's bottom stands on the frame's throttle bar, two M5 bolts through
+// it into T-nuts in the bar's top slot.
 //
-// - Lever: the printed handle (a flat white paddle leaning down, the
-//   172's) has a square stem through the lever slot into a slider. The
-//   slider moves sideways in a pocket of a carriage, a spring in the
-//   carriage's right wall pushes it to the left; the carriage slides up and
-//   down in a channel on the plate's back. The stem rests against the
-//   slot's edges, so the slot's steps are the stops, and the spring pressing
-//   it on the edge gives the lever its friction.
-// - A slide pot (60 mm, 45 mm travel) stands right of the channel, its ear
-//   pointing at the plate through a slot in a tab on the carriage's right
-//   side; its wiper (A0) gives MobiFlight the lever's position, which it
-//   turns into the flap handle's ratio through a table (lever_table, echoed).
-// - Indicator: the pointer is on a carrier sliding in a channel of its own
-//   beside the lever's; a strip screwed over both channels' backs keeps the
-//   carriage and the carrier in. A fin on the carrier's back (through a
-//   slot in the strip) has a slot along y; a pin (an M3 screw) on the arm of
-//   an SG90 servo runs in it (a scotch yoke): the pointer moves
-//   r sin(angle) up and down, no gears. The servo is behind the strip, on a
-//   rib standing on the foot. MobiFlight drives it (D9) from the flaps'
-//   actual position through an interpolation table (indicator_table, echoed).
-// - An Arduino Nano of its own (MobiFlight) in rails on the foot behind
-//   the strip, at the left, its USB jack back, the cable tied onto a block
-//   behind the plug (README.md, Connections).
+// - Lever: one print, a hub turning and sliding on a fixed 6 mm steel rod
+//   (along x, between two walls on the foot), the arm forward from it, a
+//   square stem on its end through the lever slot, a gear sector under the
+//   hub. The paddle (the 172's flat white handle) is a print of its own,
+//   pushed onto the stem in front of the face and screwed across. A spring
+//   on the rod between the hub and the right wall pushes the lever to the
+//   left: the stem rests on the slot's edges (the steps are the stops), and
+//   the spring pressing it on the edge and on the hub gives the lever its
+//   friction.
+// - The sector turns a wide pinion (the lever slides along it) on a 16 mm
+//   rotary pot in the left wall, 5:1, so the lever's 26 degrees turn the pot
+//   131 degrees; its wiper (A0) gives MobiFlight the lever's position, which
+//   it turns into the flap handle's ratio through a table (lever_table,
+//   echoed).
+// - Indicator: the pointer is on a carrier sliding in a channel left of the
+//   lever's slot, a strip screwed over the channel keeps it in. Behind the
+//   strip a yoke plate is screwed onto the carrier's post: a pin (an M3
+//   screw) on the arm of an SG90 servo runs in its horizontal slot (a
+//   scotch yoke), so the pointer moves r sin(angle) up and down, no gears.
+//   The servo (its shaft along y) is on a rib off the left wall. MobiFlight
+//   drives it (D9) from the flaps' actual position through an interpolation
+//   table (indicator_table, echoed).
+// - An Arduino Nano of its own (MobiFlight) in rails on the foot at the
+//   left, its USB jack back, the cable tied onto a block behind the plug
+//   (README.md, Connections).
 //
 // Coordinates, installed: x to the right (seen from the pilot), y
 // backwards, z up; y = 0 is the face's front, z = 0 the foot's underside
 // (the throttle bar's top, the cut-out's bottom), x = 0 the middle.
 //
 // Prints: the body on its face (front plate down), the face front side
-// up (lettering for a paint pen), the handle on its paddle's end, the
-// carriage on its front, the carrier on its left side, the slider on its back, the
-// arm and the strip flat.
+// up (lettering for a paint pen), the lever on its left side, the paddle
+// on its underside, the pinion on its end, the carrier on its left side,
+// the yoke, the strip and the servo arm flat.
 
 $fn = 48;
 
@@ -63,7 +68,7 @@ explode = 30;
 bed = [255, 255];
 
 // --- Body, the frame's flaps_body, flaps_plate (frame/frame.inc.scad) ---
-body = [60, 112, 78];        // what goes through the cut-out and behind the sheet: width, depth from the face's front, height
+body = [68, 112, 78];        // what goes through the cut-out and behind the sheet: width, depth from the face's front, height
 face_t = 2;                  // the separate face
 plate_t = 3;                 // the front plate with the flange
 flange_w = 9;                // left, right and bottom
@@ -77,12 +82,12 @@ bar_slot = 30;               // the throttle bar's top slot behind the sheet
 m5_d = 5.3;
 m5_head_d = 9.5;
 foot_t = 3;
-foot_bolt_xs = [10, 23];      // the foot's bolts (the frame's flaps_bolt_xs)
+foot_bolt_xs = [5, 22];      // the foot's bolts (the frame's flaps_bolt_xs)
 pilot_d = 2.8;               // M3 self tapping
 clear_d = 3.3;
 
 // --- Scale ---
-travel = 42;                 // 0 to 40 degrees, lever and pointer
+travel = 42;                 // 0 to 40 degrees, where the lever's stem and the pointer cross the face's front
 degs = [0, 10, 20, 30, 40];
 z_mid = 39;                  // the travel's middle (and the servo's shaft)
 // the part of the travel from 0 to d degrees: 0 to 10 is 0.4 of it, each
@@ -91,39 +96,41 @@ function scale_at(d) = d <= 10 ? 0.04 * d : 0.2 + 0.02 * d;
 function lever_z(d) = z_mid + travel / 2 - scale_at(d) * travel;
 
 // --- Lever ---
-stem = 6;                    // the handle's square stem
+y_p = 85;                    // the pivot (the rod) behind the face's front
+stem = 6;                    // the square stem, and the arm's thickness
 stem_clear = 0.3;            // to the slot's edges
+x0 = 4;                      // the stem from 0 to 10 (then jog to the right)
 jog = [5, 3.5];              // the slot's steps to the right at 10 and 20
-handle_gap = 3;              // the paddle in front of the face
-paddle = [8, 24, 6];         // the paddle: width at the stem, at its end, thick
-paddle_out = 30;             // its end from the face's front
-paddle_tilt = 25;            // leaning down
-paddle_r = 1.5;              // its edges
-play = 0.3;
-sl = [stem + 3.2, 6, stem + 3.2];   // the slider: across, deep, high
-sl_sock = 4;                 // the stem's socket in the slider
-sl_gap = 1;                  // the slider at its right stop to the pocket's end
-blk_wall = 2;                // the carriage's walls round the pocket (left, top, bottom)
-blk_back = 3;                // its back wall (the slider screw's head in a slot in it)
-screw_head = [5.6, 2];       // the M3 pan head screw through the slider into the stem
-lev_spring = [4, 16, 4];     // the slider's spring: outer diameter, free length, solid length, MEASURE
-spring_bore = 4;             // its bore in the carriage's right wall
-lever_wall = 1.7;            // the channel's left wall
-right_wall = 2.5;            // the channel's right wall (the pot's inner wall)
-fork_t = 5;                  // the tab on the carriage's right side, over the pot's ear
-fork_wall = 1.5;             // round the ear in the tab
-strip_t = 3.5;               // the strip over the channels
-end_h = 6;                   // the channels' end blocks (the strip's screws)
+arm_h = 12;                  // the arm's height at the hub (the stem's at the plate)
+hub = [14, 10];              // the hub: diameter, long (from the arm's left face to the right)
+rod_d = 6;
+rod_hole = 6.2;              // in the walls
+hub_bore = 6.5;              // turns and slides on the rod
+wall_t = 3;                  // the rod's walls (the left one is the pot's plate)
+wall_y0 = 28.5;              // the walls' front end (behind the servo's arm)
+lev_spring = [9, 20, 6];     // on the rod: outer diameter, free length, solid length, MEASURE
+spring_min = 8;              // its length with the lever at its right stop
+paddle = [14, 24, 9];        // the paddle: width at the stem, at its end, thick (round the stem)
+paddle_l = 30;
+paddle_r = 2;
+paddle_sock = 8;             // the stem in the paddle
+paddle_clear = 1.5;          // the paddle to the face at 40 (it swings back towards it)
 
-// --- Slide pot, MEASURE (a 60 mm one, 45 mm travel, 10k linear) ---
-pot_l = 60;                  // long, without its solder tabs
-pot_w = 9;                   // wide
-pot_h = 7;                   // thick, its back to its top (the ear's face)
-pot_travel = 45;
-pot_ear = [1.2, 4, 15];      // the slider's ear: thick, long (along the pot), high over the pot's top
-pot_cap = 6;                 // its end caps (no ear over them)
-pot_tabs = 5;                // the solder tabs out of its bottom end
-pot_lip = 0.6;               // the snap lips over its back's edges
+// --- Gears: the lever's sector, the pot's pinion ---
+gear_m = 1;
+gear_play = 0.15;
+pin_z = 14;                  // pinion teeth
+ratio = 5;                   // sector : pinion
+pin_a = -130;                // the pinion's centre from the pivot, angle in the (y, z) plane (180 = forward, -90 = down)
+pin_w_extra = 0.5;           // the pinion wider than the sector's sweep along x
+
+// --- Rotary pot, MEASURE (16 mm, 10k linear, M7 bushing, 6 mm D shaft) ---
+pot_body = [17, 10];         // diameter, depth behind its mounting face (with the lugs bent back)
+pot_bush = [7, 7];           // threaded bushing: diameter, length
+pot_nut = [9.5, 2];          // its nut: across flats, thick
+pot_shaft = [6, 4.5, 20];    // D shaft: diameter, across the flat, length from the mounting face
+pot_tab = [7.8, 1.2, 3];     // its anti-rotation tab: from the axis, thick, wide
+pot_angle = 300;             // electrical angle
 
 // --- SG90 servo, MEASURE (the NAV indicator's, instruments/cdi.scad) ---
 sv_body = [22.8, 12.2, 22.7];   // length, width, height (its top to its bottom)
@@ -137,18 +144,23 @@ sv_pilot = 1.8;              // the servo's own 2 mm screws
 sv_screw = [2.2, 4.5, 1.6];  // its horn screw: clearance, head diameter, head height
 
 // --- Indicator ---
-car = [6, 12];               // the carrier: across, high (as deep as the carriage)
+ind_x = -9;                  // the pointer's slot
+car = [6, 12];               // the carrier: across, high
 car_wall = 1.5;
+car_d = 9.3;                 // deep
 tab = [3, 3];                // the pointer: across, high
 ind_slot_w = 4;
-arm_r = 23;                  // shaft to pin
+post_h = 8;                  // the carrier's post through the strip
+yoke_t = 3;
+arm_r = 23;                  // the servo's shaft to its pin
 arm_t = 3;                   // = the spline's length
 arm_w = 6;
 pin_d = 3;                   // M3 screw
 pin_head = [5.5, 2];
-fin_t = 3;
 rib_t = 3;                   // the servo's rib
-gusset = [3, 6, 20];         // the rib's gussets: thick, out, high
+strip_t = 3.5;
+end_h = 6;                   // the channel's end blocks (the strip's screws)
+play = 0.3;
 
 // --- Lettering ---
 label_raise = 0.8;
@@ -163,52 +175,53 @@ face_w = body.x + 2 * flange_w;
 face_z = [-flange_w, body.z + sheet_cut_clear];
 bolt_y = y_in + sheet_t + bar_slot;
 J = jog[0] + jog[1];
-blk_h = sl.z + 2 * play + 2 * blk_wall;
-// x, from the right: the pot, the channel's right wall, the carriage, its left wall
-px = [side - fork_wall - 0.3 - pot_w, side - fork_wall - 0.3];     // the pot (its outer wall is fork_wall thick)
-pot_x = (px[0] + px[1]) / 2;                                      // and its ear
-ow = [px[1] + 0.3, side];                                         // its outer wall
-lw_r = [px[0] - 0.3 - right_wall, px[0] - 0.3];
-bx = [lw_r[0] - play - (blk_wall + 0.5 + sl.x + J + sl_gap + spring_bore + 1.6), lw_r[0] - play];   // the carriage
-pocket_x = [bx[0] + blk_wall, bx[1] - spring_bore - 1.6];
-lever_xs = [pocket_x[0] + 0.5 + sl.x / 2, pocket_x[0] + 0.5 + sl.x / 2 + jog[0], pocket_x[0] + 0.5 + sl.x / 2 + J];   // the stem at 0..10, 10..20, 20..40
+// lever
+z_p = lever_z(0);                    // the pivot: the arm level at 0
+function theta(d) = atan((z_p - lever_z(d)) / y_p);   // the lever's angle down, the stem crossing the face's front at lever_z(d)
+t_max = theta(40);
+lever_xs = [x0, x0 + jog[0], x0 + J];   // the stem at 0..10, 10..20, 20..40
 function lever_x(d) = d < 10 ? lever_xs[0] : d < 20 ? lever_xs[1] : lever_xs[2];
-lw_l = [bx[0] - play - lever_wall, bx[0] - play];
-// y
-by = [y_in + play, y_in + play + sl.y + play + blk_back];
-strip_y = [by[1] + play, by[1] + play + strip_t];
-pot_y = [by[0] + 1 + pot_ear.z, by[0] + 1 + pot_ear.z + pot_h];  // its top (the ear's face), its back
-pot_z = [z_mid - pot_l / 2, z_mid + pot_l / 2];                   // the ear in the pot's middle at the travel's middle
-fork_x = [bx[1] - 0.01, pot_x + pot_ear.x / 2 + 0.3 + fork_wall];
-fork_h = pot_ear.y + 0.3 + 2 * fork_wall;
-wall_gap = [lever_z(40) - fork_h / 2 - 0.5, lever_z(0) + fork_h / 2 + 0.5];   // the right wall open in front of the tab, z
-notch = [z_mid - fork_h / 2 - 0.5, z_mid + fork_h / 2 + 0.5];  // and all through at the middle, to put the carriage in
-wall_back = pot_y[1] + 2.5;                           // the pot's walls, over its back for the lips
-chan_z = [lever_z(40) - blk_h / 2 - 1, lever_z(0) + blk_h / 2 + 1];
-end_z = [[foot_t, chan_z[0]], [chan_z[1], chan_z[1] + end_h]];
-// indicator, left of the lever
-cw_r = [lw_l[0] - car_wall, lw_l[0]];
-cx = [cw_r[0] - play - car.x, cw_r[0] - play];
-ind_x = (cx[0] + cx[1]) / 2;
+r_pb = (y_p + paddle_clear + paddle.z / 2 * sin(t_max)) / cos(t_max);
+y_pb = y_p - r_pb;                   // the paddle's back, at 0
+y_a0 = y_p - (y_p - y_in) + 3;       // the arm grows from the stem behind this (lever frame)
+hub_x = [-stem / 2, -stem / 2 + hub[1]];          // from the stem's middle
+sec_x = [-stem / 2, 0];                           // the sector, flush with the arm's left face
+r_sec = gear_m * pin_z * ratio / 2;
+r_pin = gear_m * pin_z / 2;
+cd = r_sec + r_pin;
+pin_c = [y_p + cd * cos(pin_a), z_p + cd * sin(pin_a)];   // the pinion's (and pot's) axis, (y, z)
+sec_a = [pin_a - t_max - 11, pin_a + 11];         // the sector's teeth, lever frame
+// walls, pinion, pot
+pin_x = [lever_xs[0] + sec_x[0] - pin_w_extra / 2, lever_xs[2] + sec_x[1] + pin_w_extra / 2];
+lw = [pin_x[0] - (pot_bush[1] - wall_t) - 0.5 - wall_t, pin_x[0] - (pot_bush[1] - wall_t) - 0.5];   // the left wall, the pot's plate
+pot_face = lw[0];                    // the pot's mounting face (x)
+rw = [lever_xs[2] + hub_x[1] + spring_min, lever_xs[2] + hub_x[1] + spring_min + wall_t];
+wall_z = [foot_t - 0.01, z_p + hub[0] / 2 + 2];
+wall_y = [wall_y0, y_p + hub[0] / 2 + 3];
+rod_x = [lw[0], rw[0] + wall_t - 1];
+// indicator: channel, strip, yoke, servo arm, servo
+cx = [ind_x - car.x / 2, ind_x + car.x / 2];
 cw_l = [cx[0] - play - car_wall, cx[0] - play];
-cy = by;
-fin_x = [cx[1] - 0.6 - fin_t, cx[1] - 0.6];
-// servo behind the strip: shaft along -x, its body to the right, long side along y, the arm pointing forward
-arm_x = [fin_x[1] + 0.5 + sv_screw[2] + 0.5, fin_x[1] + 0.5 + sv_screw[2] + 0.5 + arm_t];
-sv_top = arm_x[1] + sv_boss[1];                       // the servo's top (x)
+cw_r = [cx[1] + play, cx[1] + play + car_wall];
+cy = [y_in + play, y_in + play + car_d];
+strip_y = [cy[1] + play, cy[1] + play + strip_t];
+chan_z = [lever_z(40) - car.y / 2 - 1, lever_z(0) + car.y / 2 + 1];
+end_z = [[foot_t, chan_z[0]], [chan_z[1], chan_z[1] + end_h]];
+yk_y = [strip_y[1] + 0.5, strip_y[1] + 0.5 + yoke_t];
 a_max = asin(travel / 2 / arm_r);
-sv_ys = strip_y[1] + 0.5 + arm_w / 2 + arm_r;         // the shaft's y: the arm's end stays behind the strip
-sv_y = [sv_ys - sv_shaft_dx, sv_ys - sv_shaft_dx + sv_body[0]];   // its body
-sv_bc = (sv_y[0] + sv_y[1]) / 2;
-sv_holes = [for (s = [-1, 1]) sv_bc + s * sv_tab_hole / 2];      // y, at z_mid
-rib_x = [sv_top + sv_tab[2] - rib_t, sv_top + sv_tab[2] - 0.01];
-rib_y = [sv_bc - sv_tab[0] / 2 - gusset.x, sv_bc + sv_tab[0] / 2 + gusset.x];
-rib_z = [foot_t - 0.01, z_mid + sv_body[1] / 2 + 5];
-fin_slot = [sv_ys - arm_r - pin_d / 2 - 0.5, sv_ys - arm_r * cos(a_max) + pin_d / 2 + 0.5];
-fin_y = [cy[1] - 0.01, fin_slot[1] + 2];
-fin_h = pin_d + 0.3 + 5;
-function arm_a(d) = asin((lever_z(d) - z_mid) / arm_r);  // the arm's angle for the pointer at d, from -y, up positive
-// Nano on the foot behind the strip at the left, the jack back
+x_s = -side + 0.5 + sv_body[1] / 2;  // the servo's shaft, its arm pointing right
+yk_slot = [x_s + arm_r * cos(a_max) - pin_d / 2 - 0.5, x_s + arm_r + pin_d / 2 + 0.5];
+yk_x = [yk_slot[0] - 2, yk_slot[1] + 2];
+yk_h = pin_d + 0.3 + 5;
+arm_y = [yk_y[1] + 0.5, yk_y[1] + 0.5 + arm_t];
+sv_ty = arm_y[1] + sv_boss[1];       // the servo's top (y)
+sv_z = [z_mid - sv_shaft_dx, z_mid - sv_shaft_dx + sv_body[0]];   // its body, long side up
+sv_bc = (sv_z[0] + sv_z[1]) / 2;
+sv_holes = [for (s = [-1, 1]) sv_bc + s * sv_tab_hole / 2];      // z, at x_s
+rib_y = [sv_ty + sv_tab[2] - rib_t, sv_ty + sv_tab[2]];
+rib_z = [sv_bc - sv_tab[0] / 2 - 2, sv_bc + sv_tab[0] / 2 + 2];
+function arm_a(d) = asin((lever_z(d) - z_mid) / arm_r);  // the servo arm's angle for the pointer at d, from +x, up positive
+// Nano on the foot at the left, the jack back
 nano_c = [-side + nano_rail_hw + 0.5, strip_y[1] + 1 + nano_rail_end];
 usb_z = foot_t + nano_top_h + nano_usb.y / 2;
 nano_jack_y = nano_c.y + nano_board.y / 2 + nano_usb_out;
@@ -216,56 +229,86 @@ tie_y = nano_jack_y + usb_plug.z + tie_gap + tie_block.x / 2;
 
 mount_holes = [for (s = [-1, 1], z = [-flange_w / 2, body.z - 5]) [s * (face_w / 2 - mount_inset), z]];
 
-// the servo's angle (MobiFlight, 90 = arm straight forward) for the flaps'
+// the servo's angle (MobiFlight, 90 = arm pointing right) for the flaps'
 // ratio (0 .. 1 = 0 .. 40 degrees), the table for its interpolation
 indicator_table = [for (r = [0 : 0.125 : 1]) [r, round(10 * (90 + arm_a(40 * r))) / 10]];
-// the pot's reading (0 .. 1023, 0 at its bottom end) at each mark, to the flap handle's ratio
-function pot_raw(d) = round(1023 * (0.5 + (lever_z(d) - z_mid) / pot_travel));
+// the pot's reading at each mark (0 .. 1023, the lever's middle at the
+// pot's middle, rising as the lever goes down) to the flap handle's ratio
+function pot_raw(d) = round(1023 * (0.5 + ratio * (theta(d) - t_max / 2) / pot_angle));
 lever_table = [for (d = degs) [pot_raw(d), d / 40]];
-echo(indicator_table = indicator_table, lever_table = lever_table, marks_z = [for (d = degs) lever_z(d)],
-     lever_xs = lever_xs, ind_x = ind_x);
+echo(indicator_table = indicator_table, lever_table = lever_table, lever_deg = [for (d = degs) round(10 * theta(d)) / 10],
+     pot_turn = ratio * t_max, marks_z = [for (d = degs) lever_z(d)]);
 
 // --- Checks ---
 assert(face_w <= bed.x && face_z[1] - face_z[0] <= bed.y, "Face does not fit the printer bed");
 assert(mount_inset + mount_nut_r + 0.3 <= flange_w - sheet_cut_clear, "Mount nuts do not sit on the sheet, make flange_w wider");
-assert(chan_z[0] >= foot_t + 3 && end_z[1][1] <= body.z - 0.5, "The channels off the body's height");
-assert(travel <= pot_travel - 2, "The lever's travel longer than the pot's");
-assert(pot_z[0] - pot_tabs >= foot_t + 0.5 && pot_z[1] + 2.5 <= body.z - 0.5, "The pot off the body's height");
-assert(wall_gap[0] >= pot_z[0] + pot_cap / 2 + 1 && wall_gap[1] <= pot_z[1] - pot_cap / 2 - 1, "The carriage's tab runs into the pot's ledges");
-assert(z_mid - travel / 2 - pot_ear.y / 2 >= pot_z[0] + pot_cap && z_mid + travel / 2 + pot_ear.y / 2 <= pot_z[1] - pot_cap, "The pot's ear over its end caps");
-assert(pot_y[0] - pot_ear.z >= y_in + 0.5 && pot_y[0] - pot_ear.z <= by[0] + fork_t - 2.5, "The pot's ear not in the carriage's tab");
-assert(wall_back >= strip_y[1], "The channel's right wall shorter than the strip");
-assert(lev_spring[1] - 1 >= spring_bore + sl_gap + J, "The slider's spring too short (no preload at the left)");
-assert(spring_bore + sl_gap >= lev_spring[2] + 0.5, "The slider's spring solid before the slider's right stop");
-assert(lev_spring[0] + 0.4 <= sl.z, "The slider's spring wider than the slider");
-assert(blk_back >= screw_head[1] + play, "The slider screw's head deeper than the carriage's back");
-assert(cw_l[0] >= -side, "The carrier's channel out of the cut-out");
-assert(ind_x - ind_slot_w / 2 - 12 >= -face_w / 2 + 6, "No room for the scale left of the indicator");
-assert(sv_y[0] >= strip_y[1] + 0.5, "The servo runs into the strip");
-assert(sv_top + sv_body[2] <= ow[1] && (sv_top + sv_body[2] <= lw_r[0] - 0.5 || sv_y[0] >= wall_back + 0.5), "The servo runs into the pot's walls");
-assert(travel / 2 < arm_r * 0.97, "The arm too short for the travel");
-assert(arm_x[1] + pin_head[1] <= sv_top, "The pin's head runs into the servo");
-assert(arm_r * cos(a_max) - pin_head[0] / 2 >= sv_shaft_dx + 0.5, "The pin's head runs into the servo's body");
-assert(z_mid - arm_r * sin(a_max) - arm_w / 2 - 1 >= foot_t + nano_top_h + nano_usb.y + 0.5, "The arm runs into the Nano");
-assert(lever_z(40) - fin_h / 2 >= foot_t + nano_top_h + nano_usb.y + 0.5, "The fin runs into the Nano");
-assert(nano_c.x + nano_rail_hw <= rib_x[0] - 0.5, "The Nano runs into the servo's rib");
+assert(chan_z[0] >= foot_t + 3 && end_z[1][1] <= body.z - 0.5, "The carrier's channel off the body's height");
+assert(wall_z[1] <= body.z - 0.5 && wall_y[1] <= body.y, "The rod's walls out of the body");
+assert(ratio * t_max <= pot_angle - 30, "The pot turns too far");
+assert(pot_face - pot_body[1] >= -side, "The pot out of the cut-out");
+assert(pot_face + pot_shaft[2] >= pin_x[1], "The pot's shaft too short for the pinion");
+assert(lw[1] + pot_nut[1] <= pin_x[0] - 0.4 && lw[1] <= lever_xs[0] + hub_x[0] - 0.5, "The left wall's nut runs into the pinion or the lever");
+assert(rw[1] <= side, "The right wall out of the cut-out");
+assert(lev_spring[1] - 1 >= spring_min + J, "The lever's spring too short (no preload at the left)");
+assert(spring_min >= lev_spring[2] + 1, "The lever's spring solid at the right");
+assert(pin_c[1] - r_pin - 1 >= foot_t + 1 && pin_c[1] - pot_body[0] / 2 >= foot_t + 0.5, "The pinion or the pot runs into the foot");
+assert(pin_c[0] - pot_body[0] / 2 >= wall_y[0] + 2 && pin_c[0] + pot_body[0] / 2 <= wall_y[1], "The pot off the left wall");
+// the arm's lower edge at 40 over the pinion
+arm_low_at_pin = z_p - (y_p - pin_c[0]) * tan(t_max) - (stem / 2 + (arm_h - stem) / 2 * (pin_c[0] - y_a0) / (y_p - y_a0)) / cos(t_max);
+assert(arm_low_at_pin >= pin_c[1] + r_pin + gear_m + 1, "The lever's arm runs into the pinion at 40");
+assert(y_p + paddle_l <= 255 && r_pb + paddle_sock <= 200, "The lever too long");
+assert(x_s - sv_body[1] / 2 >= -side, "The servo out of the cut-out");
+assert(x_s + arm_r + arm_w / 2 + 0.5 <= lever_xs[0] - stem / 2, "The servo's arm runs into the lever");
+assert(x_s + sv_body[1] / 2 + 0.5 <= pot_face - pot_body[1] || sv_ty + sv_body[2] <= pin_c[0] - pot_body[0] / 2, "The servo runs into the pot");
+assert(yk_x[1] + 0.5 <= lever_xs[0] - stem / 2 - stem_clear, "The yoke runs into the lever");
+assert(ind_x >= yk_x[0] + 3 && ind_x <= yk_x[1] - 3, "The carrier's post off the yoke");
+assert(arm_y[1] + pin_head[1] + 0.5 <= wall_y0, "The servo arm's pin runs into the walls");
+assert(rib_z[0] >= foot_t + nano_top_h + nano_usb.y + 1, "The servo's rib runs into the Nano");
+assert(travel / 2 < arm_r * 0.97, "The servo arm too short for the travel");
+assert(z_mid - arm_r * sin(a_max) - arm_w / 2 - 1 >= foot_t + nano_top_h + nano_usb.y + 0.5, "The servo arm runs into the Nano");
+assert(lever_z(40) - yk_h / 2 >= foot_t + nano_top_h + nano_usb.y + 0.5, "The yoke runs into the Nano");
+assert(nano_c.x + nano_rail_hw <= lw[0] - 0.5, "The Nano runs into the left wall");
+assert(nano_c.x + usb_plug.x / 2 + 0.5 <= pot_face - pot_body[1] || usb_z + usb_plug.y / 2 + 0.5 <= pin_c[1] - pot_body[0] / 2, "The USB plug runs into the pot");
 assert(nano_c.y - nano_rail_end >= strip_y[1] + 0.5, "The Nano runs into the strip");
 assert(tie_y + tie_block.x / 2 <= body.y, "The USB tie block off the foot");
 for (b = foot_bolt_xs) {
-   assert(b - m5_head_d / 2 >= rib_x[1] + gusset.y + 0.5 && b + m5_head_d / 2 <= side, "A foot bolt's head runs into the rib or out of the foot");
+   assert(b - m5_head_d / 2 >= lw[1] + 0.5 && b + m5_head_d / 2 <= rw[0] - 0.5, "A foot bolt's head runs into the walls");
 }
-assert(bolt_y - m5_head_d / 2 >= wall_back + 0.5, "The foot bolts run into the pot's walls");
-assert(sv_ys - arm_r - max(arm_w, pin_head[0]) / 2 >= strip_y[1] + 0.5, "The arm or the pin runs into the strip");
+assert(ind_x - ind_slot_w / 2 - 12 >= -face_w / 2 + 6, "No room for the scale left of the indicator");
 
 // --- Helpers ---
 module along_y(y0, y1) {
    translate([0, y1, 0]) rotate([90, 0, 0]) linear_extrude(y1 - y0) children();
+}
+module along_x(x0, x1) {
+   translate([x0, 0, 0]) rotate([90, 0, 90]) linear_extrude(x1 - x0) children();
 }
 module stadium(c, w, hl) {
    hull() for (s = [-1, 1]) translate([c.x, c.y + s * (hl - w / 2)]) circle(d = w);
 }
 module box(x, y, z) {
    translate([x[0], y[0], z[0]]) cube([x[1] - x[0], y[1] - y[0], z[1] - z[0]]);
+}
+
+// Involute spur gear, 20 degree pressure angle; play thins the teeth (a
+// copy of instruments/instrument.inc.scad's gear_2d, keep them the same)
+module gear_2d(z, m = gear_m, play = gear_play) {
+   rp = m * z / 2;
+   rb = rp * cos(20);
+   ra = rp + m;
+   rf = rp - 1.25 * m;
+   tmax = sqrt(ra * ra / (rb * rb) - 1);
+   hb = 90 / z + (tan(20) - 20 * PI / 180) * 180 / PI - play / 2 / rp * 180 / PI;   // half tooth on the base circle
+   flank = [for (i = [0 : 12]) let(t = tmax * i / 12) [rb * sqrt(1 + t * t), hb - (t - atan(t) * PI / 180) * 180 / PI]];
+   circle(r = max(rf, rb - 0.01), $fn = 4 * z);
+   for (k = [0 : z - 1]) rotate(k * 360 / z)
+      polygon(concat([[0, 0]],
+                     [for (p = flank) p[0] * [cos(-p[1]), sin(-p[1])]],
+                     [for (i = [len(flank) - 1 : -1 : 0]) flank[i][0] * [cos(flank[i][1]), sin(flank[i][1])]]));
+}
+// a wedge from the origin between two angles
+module wedge_2d(a0, a1, r) {
+   polygon(concat([[0, 0]], [for (i = [0 : 16]) let(a = a0 + (a1 - a0) * i / 16) r * [cos(a), sin(a)]]));
 }
 
 // --- Front: outline, holes, slots ---
@@ -276,13 +319,15 @@ module front_outline() {
       translate([-face_w / 2, face_z[1] - 1]) square([face_w, 1]);
    }
 }
-// the lever's slot: wide from 0 to 10, a step at 10, narrower to 20, a step at 20, the stem's width to 40
+// the lever's slot: wide from 0 to 10, a step at 10, narrower to 20, a
+// step at 20, the stem's width to 40. The stem crosses it slanting, its
+// lowest edge at the face's front.
 sw = stem + 2 * stem_clear;
-function slot_bottom(d) = lever_z(d) - stem / 2 - stem_clear;
+function slot_bottom(d) = lever_z(d) - stem / 2 / cos(theta(d)) - stem_clear;
 module lever_slot() {
-   top = lever_z(0) + stem / 2 + stem_clear;
-   translate([lever_xs[0] - sw / 2, slot_bottom(10)]) square([lever_xs[2] - lever_xs[0] + sw, top - slot_bottom(10)]);
-   translate([lever_xs[1] - sw / 2, slot_bottom(20)]) square([lever_xs[2] - lever_xs[1] + sw, top - slot_bottom(20)]);
+   top = z_p + stem / 2 + stem_clear;
+   translate([lever_xs[0] - sw / 2, slot_bottom(10)]) square([J + sw, top - slot_bottom(10)]);
+   translate([lever_xs[1] - sw / 2, slot_bottom(20)]) square([jog[1] + sw, top - slot_bottom(20)]);
    translate([lever_xs[2] - sw / 2, slot_bottom(40)]) square([sw, top - slot_bottom(40)]);
 }
 ind_hl = travel / 2 + tab[1] / 2 + 1;
@@ -292,41 +337,22 @@ module front_holes() {
    stadium([ind_x, z_mid], ind_slot_w, ind_hl);
 }
 
-// --- Body: front plate, foot, the channels, the pot's pocket, the servo's rib, the Nano's rails ---
+// --- Body: front plate, foot, the carrier's channel, the rod's walls (the left one the pot's plate), the servo's rib, the Nano's rails ---
 module body() {
-   pz = [pot_z[0] - 0.5, pot_z[1] + 2.5];
    difference() {
       union() {
          along_y(y_pl, y_in) front_outline();
          translate([-body.x / 2, y_pl, 0]) cube([body.x, body.y - y_pl, foot_t]);
-         // the lever's channel: left wall, end blocks (the strip's screws)
-         box(lw_l, [y_in - 0.01, strip_y[0]], chan_z);
-         for (e = end_z) box([cw_l[0], lw_r[0] + 0.01], [y_in - 0.01, strip_y[0]], e);
-         // the carrier's channel
+         // the carrier's channel and its end blocks (the strip's screws)
          for (w = [cw_l, cw_r]) box(w, [y_in - 0.01, strip_y[0]], chan_z);
-         // the channel's right wall and the pot's outer wall, the pot's top end wall
-         box(lw_r, [y_in - 0.01, wall_back], [min(chan_z[0], pz[0]), max(chan_z[1], pz[1])]);
-         box(ow, [y_in - 0.01, wall_back], pz);
-         box([lw_r[0], ow[1]], [y_in - 0.01, pot_y[1]], [pot_z[1] + 0.3, pz[1]]);
-         // the pot's bottom stop (its solder tabs behind it) and the ledges under its end caps
-         box([lw_r[1] - 0.01, ow[0] + 0.01], [y_in - 0.01, pot_y[0] + 1.5], [pot_z[0] - 2.3, pot_z[0] - 0.3]);
-         for (z = [[pot_z[0] - 0.01, pot_z[0] + pot_cap / 2], [pot_z[1] - pot_cap / 2, pot_z[1] + 0.31]])
-            box([lw_r[1] - 0.01, ow[0] + 0.01], [y_in - 0.01, pot_y[0]], z);
-         // the snap lips over the pot's back at its end caps
-         for (z = [pot_z[0], pot_z[1] - pot_cap], s = [0, 1]) {
-            xs = s == 0 ? [lw_r[1] - 0.01, lw_r[1] + pot_lip + 0.3] : [ow[0] - pot_lip - 0.3, ow[0] + 0.01];
-            translate([0, 0, z]) hull() {
-               box(xs, [pot_y[1] + 0.2, pot_y[1] + 0.8], [0, pot_cap]);
-               box(s == 0 ? [xs[0], xs[0] + 0.01] : [xs[1] - 0.01, xs[1]], [pot_y[1] + 0.2, wall_back], [0, pot_cap]);
-            }
-         }
-         // the servo's rib on the foot, a window for its body, gussets at its ends
+         for (e = end_z) box([cw_l[0], cw_r[1]], [y_in - 0.01, strip_y[0]], e);
+         // the rod's walls
+         for (w = [lw, rw]) box(w, wall_y, wall_z);
+         // the servo's rib off the left wall, a window for its body
          difference() {
-            box(rib_x, rib_y, rib_z);
-            box([rib_x[0] - 1, rib_x[1] + 1], [sv_y[0] - play, sv_y[1] + play], [z_mid - sv_body[1] / 2 - play, z_mid + sv_body[1] / 2 + play]);
+            box([-side, lw[0] + 0.01], rib_y, rib_z);
+            box([x_s - sv_body[1] / 2 - play, x_s + sv_body[1] / 2 + play], [rib_y[0] - 1, rib_y[1] + 1], [sv_z[0] - play, sv_z[1] + play]);
          }
-         for (y = [rib_y[0], rib_y[1] - gusset.x]) translate([rib_x[1] - 0.01, y + gusset.x, foot_t - 0.01]) rotate([90, 0, 0])
-            linear_extrude(gusset.x) polygon([[0, 0], [gusset.y, 0], [0, gusset.z]]);
          // the Nano's rails and the USB cable's tie block
          translate([nano_c.x, nano_c.y, foot_t]) nano_rails(far_stop = true);
          translate([nano_c.x, tie_y, usb_z - tie_cable_h]) rotate(90) tie_block();
@@ -334,13 +360,15 @@ module body() {
             translate([nano_c.x - tie_block.y / 2, tie_y - tie_block.x / 2, foot_t - 0.01]) cube([tie_block.y, tie_block.x, usb_z - tie_cable_h - foot_t + 0.02]);
       }
       translate([0, y_pl - 1, 0]) along_y(0, plate_t + 2) front_holes();
-      // the right wall: open in front of the carriage's tab, and at the middle to put the carriage in
-      box([lw_r[0] - 1, lw_r[1] + 1], [y_in - 1, by[0] + fork_t + play], wall_gap);
-      box([lw_r[0] - 1, lw_r[1] + 1], [y_in - 1, wall_back + 1], notch);
+      // the rod: through the left wall, blind in the right one
+      translate([lw[0] - 1, y_p, z_p]) rotate([0, 90, 0]) cylinder(d = rod_hole, h = rw[0] + wall_t - 1 - lw[0] + 1);
+      // the pot's bushing and its tab
+      translate([lw[0] - 1, pin_c[0], pin_c[1]]) rotate([0, 90, 0]) cylinder(d = pot_bush[0] + 0.3, h = wall_t + 2);
+      translate([lw[0] - 1, pin_c[0] - pot_tab[2] / 2 - 0.2, pin_c[1] + pot_tab[0] - pot_tab[1] / 2 - 0.2]) cube([1 + 1.2, pot_tab[2] + 0.4, pot_tab[1] + 0.4]);
       // the strip's screws
-      for (e = end_z) translate([(cw_l[0] + lw_r[0]) / 2, strip_y[0] + 1, (e[0] + e[1]) / 2]) rotate([90, 0, 0]) cylinder(d = pilot_d, h = 9);
+      for (e = end_z) translate([ind_x, strip_y[0] + 1, (e[0] + e[1]) / 2]) rotate([90, 0, 0]) cylinder(d = pilot_d, h = 9);
       // the servo's screws
-      for (y = sv_holes) translate([rib_x[0] - 1, y, z_mid]) rotate([0, 90, 0]) cylinder(d = sv_pilot, h = rib_t + 2);
+      for (z = sv_holes) translate([x_s, rib_y[1] + 1, z]) rotate([90, 0, 0]) cylinder(d = sv_pilot, h = rib_t + 2);
       // the foot's bolts
       for (x = foot_bolt_xs) translate([x, bolt_y, -1]) cylinder(d = m5_d, h = foot_t + 2);
    }
@@ -356,7 +384,7 @@ module labels_2d() {
    letters = "WING FLAPS";
    step = (lever_z(0) - lever_z(40) + 4) / (len(letters) - 1);
    for (i = [0 : len(letters) - 1])
-      translate([-face_w / 2 + 6, lever_z(0) + 2 - i * step])
+      translate([ind_x - ind_slot_w / 2 - 17, lever_z(0) + 2 - i * step])
          text(letters[i], size = label_size, font = font, halign = "center", valign = "center");
    // under the slots
    for (l = [["AVOID SLIPS WITH", 0], ["FLAPS EXTENDED", 1]])
@@ -373,87 +401,99 @@ module labels_in_place() {
    translate([0, face_t, 0]) rotate([90, 0, 0]) translate([0, 0, face_t - 0.01]) linear_extrude(label_raise + 0.01) labels_2d();
 }
 
-// --- Carriage: the slider's pocket open to the front, the spring's bore in
-// its right wall, a slot in its back for the slider screw's head, the tab
-// over the pot's ear on its right side ---
-module carriage() {
+// --- Lever, at 0 (level), x from the stem's middle: hub, arm, stem, sector ---
+module lever() {
    difference() {
       union() {
-         box(bx, by, [-blk_h / 2, blk_h / 2]);
-         box(fork_x, [by[0], by[0] + fork_t], [-fork_h / 2, fork_h / 2]);
-      }
-      box([pocket_x[0], pocket_x[1]], [by[0] - 1, by[0] + sl.y + play], [-sl.z / 2 - play, sl.z / 2 + play]);
-      translate([pocket_x[1] - 0.01, by[0] + sl.y / 2, 0]) rotate([0, 90, 0]) cylinder(d = lev_spring[0] + 0.4, h = spring_bore + 0.01);
-      box([lever_xs[0] - screw_head[0] / 2 - play, lever_xs[2] + screw_head[0] / 2 + play], [by[0] + sl.y, by[1] + 1], [-screw_head[0] / 2 - play, screw_head[0] / 2 + play]);
-      box([pot_x - pot_ear.x / 2 - 0.3, pot_x + pot_ear.x / 2 + 0.3], [by[0] - 1, by[0] + fork_t + 1], [-pot_ear.y / 2 - 0.15, pot_ear.y / 2 + 0.15]);
-   }
-}
-module carriage_in_place(d = view_deg) {
-   translate([0, 0, lever_z(d)]) carriage();
-}
-
-// --- Slider: the stem's square socket in its front, the screw through its back ---
-module slider() {
-   difference() {
-      box([-sl.x / 2, sl.x / 2], [by[0], by[0] + sl.y], [-sl.z / 2, sl.z / 2]);
-      box([-stem / 2 - 0.15, stem / 2 + 0.15], [by[0] - 1, by[0] + sl_sock], [-stem / 2 - 0.15, stem / 2 + 0.15]);
-      translate([0, by[0] + sl_sock - 0.01, 0]) rotate([-90, 0, 0]) cylinder(d = clear_d, h = sl.y);
-   }
-}
-module slider_in_place(d = view_deg) {
-   translate([lever_x(d), 0, lever_z(d)]) slider();
-}
-
-// --- Handle: the stem, a flat paddle leaning down from it, its end cut square (it prints on it) ---
-module paddle_shape() {
-   t = paddle.z / 2 - paddle_r;
-   pl = paddle_out * 1.4;
-   hull() for (u = [0, pl], s = [-1, 1], w = [-t, t]) {
-      hw = (u == 0 ? paddle.x : paddle.y) / 2 - paddle_r;
-      translate([s * hw, -u, w]) sphere(r = paddle_r, $fn = 16);
-   }
-}
-module handle() {
-   y0 = -handle_gap;
-   difference() {
-      union() {
-         box([-stem / 2, stem / 2], [y0 - 1, by[0] + sl_sock - 0.3], [-stem / 2, stem / 2]);
-         intersection() {
-            translate([0, y0, 0]) rotate([paddle_tilt, 0, 0]) paddle_shape();
-            box([-paddle.y, paddle.y], [-paddle_out, y0 + 1], [-paddle_out, paddle_out]);
+         // the hub
+         translate([hub_x[0], y_p, z_p]) rotate([0, 90, 0]) cylinder(d = hub[0], h = hub[1]);
+         // the arm, from the stem's height behind the plate to arm_h at the hub
+         along_x(-stem / 2, stem / 2) hull() {
+            translate([y_a0, z_p - stem / 2]) square([0.01, stem]);
+            translate([y_p - hub[0] / 2, z_p - arm_h / 2]) square([0.01, arm_h]);
          }
+         // the stem through the slot into the paddle
+         box([-stem / 2, stem / 2], [y_pb - paddle_sock + 0.3, y_a0 + 0.01], [z_p - stem / 2, z_p + stem / 2]);
+         // the sector
+         along_x(sec_x[0], sec_x[1]) translate([y_p, z_p]) intersection() {
+            gear_2d(pin_z * ratio);
+            wedge_2d(sec_a[0], sec_a[1], r_sec + 2 * gear_m);
+         }
+         along_x(sec_x[0], sec_x[1]) translate([y_p, z_p]) wedge_2d(sec_a[0], sec_a[1], r_sec - 1.25 * gear_m);
       }
-      translate([0, by[0] + sl_sock - 0.3 + 0.01, 0]) rotate([90, 0, 0]) cylinder(d = pilot_d, h = 8);
+      translate([hub_x[0] - 1, y_p, z_p]) rotate([0, 90, 0]) cylinder(d = hub_bore, h = hub[1] + 2);
+      // the paddle's screw, across
+      translate([-stem / 2 - 1, y_pb - paddle_sock / 2, z_p]) rotate([0, 90, 0]) cylinder(d = pilot_d, h = stem + 2);
    }
 }
-module handle_in_place(d = view_deg) {
-   translate([lever_x(d), 0, lever_z(d)]) handle();
+module paddle() {
+   t = paddle.z;
+   module outline(o) offset(r = paddle_r - o) offset(delta = -paddle_r)
+      polygon([[-paddle.x / 2, y_pb], [paddle.x / 2, y_pb], [paddle.y / 2, y_pb - paddle_l], [-paddle.y / 2, y_pb - paddle_l]]);
+   difference() {
+      hull() {
+         translate([0, 0, z_p - t / 2]) linear_extrude(t - 1.2) outline(0);
+         translate([0, 0, z_p - t / 2]) linear_extrude(t) outline(1.2);
+      }
+      box([-stem / 2 - 0.15, stem / 2 + 0.15], [y_pb - paddle_sock, y_pb + 1], [z_p - stem / 2 - 0.15, z_p + stem / 2 + 0.15]);
+      translate([-paddle.x, y_pb - paddle_sock / 2, z_p]) rotate([0, 90, 0]) cylinder(d = clear_d, h = 2 * paddle.x);
+   }
 }
-assert(-handle_gap + (paddle.z / 2) * sin(paddle_tilt) <= -0.5, "The paddle runs into the face");
+module at_lever(d) {
+   translate([lever_x(d), 0, 0]) translate([0, y_p, z_p]) rotate([theta(d), 0, 0]) translate([0, -y_p, -z_p]) children();
+}
+assert(y_pb + paddle.z / 2 * sin(0) <= -paddle_clear, "The paddle runs into the face at 0");
 
-// --- Strip over both channels' backs (it keeps the carriage and the carrier in); a slot for the carrier's fin ---
+// --- Pinion on the pot's D shaft, as wide as the sector's sweep ---
+module pinion() {
+   difference() {
+      linear_extrude(pin_x[1] - pin_x[0]) gear_2d(pin_z);
+      translate([0, 0, -1]) linear_extrude(pin_x[1] - pin_x[0] + 2) intersection() {
+         circle(d = pot_shaft[0] + 0.2);
+         translate([-pot_shaft[0], -pot_shaft[0] / 2 - 0.1]) square([2 * pot_shaft[0], pot_shaft[1] + 0.2]);
+      }
+   }
+}
+module pinion_in_place(d = view_deg) {
+   translate([pin_x[0], pin_c[0], pin_c[1]]) rotate([0, 90, 0]) rotate(ratio * theta(d)) pinion();
+}
+
+// --- Strip over the carrier's channel (it keeps the carrier in), a slot for its post ---
 module strip() {
    difference() {
-      box([cw_l[0], lw_r[0] - 0.2], strip_y, [end_z[0][0], end_z[1][1]]);
-      box([fin_x[0] - 0.4, fin_x[1] + 0.4], [strip_y[0] - 1, strip_y[1] + 1], [z_mid - travel / 2 - fin_h / 2 - 0.5, z_mid + travel / 2 + fin_h / 2 + 0.5]);
-      for (e = end_z) translate([(cw_l[0] + lw_r[0]) / 2, strip_y[0] - 1, (e[0] + e[1]) / 2]) rotate([-90, 0, 0]) cylinder(d = clear_d, h = strip_t + 2);
+      box([cw_l[0], cw_r[1]], strip_y, [end_z[0][0], end_z[1][1]]);
+      box([cx[0] - 0.4, cx[1] + 0.4], [strip_y[0] - 1, strip_y[1] + 1], [z_mid - travel / 2 - post_h / 2 - 0.5, z_mid + travel / 2 + post_h / 2 + 0.5]);
+      for (e = end_z) translate([ind_x, strip_y[0] - 1, (e[0] + e[1]) / 2]) rotate([-90, 0, 0]) cylinder(d = clear_d, h = strip_t + 2);
    }
 }
 
-// --- Indicator carrier: the pointer on its front, the slotted fin on its back ---
+// --- Indicator carrier: the pointer on its front, the post on its back (the yoke's screw) ---
 module carrier() {
    difference() {
       union() {
-         translate([cx[0], cy[0], -car.y / 2]) cube([car.x, cy[1] - cy[0], car.y]);
-         translate([ind_x - tab[0] / 2, 0.4, -tab[1] / 2]) cube([tab[0], cy[0] - 0.4 + 0.01, tab[1]]);
-         translate([fin_x[0], fin_y[0], -fin_h / 2]) cube([fin_t, fin_y[1] - fin_y[0], fin_h]);
+         box(cx, cy, [-car.y / 2, car.y / 2]);
+         box([ind_x - tab[0] / 2, ind_x + tab[0] / 2], [0.4, cy[0] + 0.01], [-tab[1] / 2, tab[1] / 2]);
+         box(cx, [cy[1] - 0.01, yk_y[0]], [-post_h / 2, post_h / 2]);
       }
-      hull() for (y = [fin_slot[0] + pin_d / 2, fin_slot[1] - pin_d / 2])
-         translate([fin_x[0] - 1, y, 0]) rotate([0, 90, 0]) cylinder(d = pin_d + 0.3, h = fin_t + 2);
+      translate([ind_x, yk_y[0] + 0.01, 0]) rotate([90, 0, 0]) cylinder(d = pilot_d, h = 10);
    }
 }
 module carrier_in_place(d = view_deg) {
    translate([0, 0, lever_z(d)]) carrier();
+}
+
+// --- Yoke: screwed onto the carrier's post (countersunk), the pin's slot along x ---
+module yoke() {
+   difference() {
+      box(yk_x, yk_y, [-yk_h / 2, yk_h / 2]);
+      hull() for (x = [yk_slot[0] + pin_d / 2, yk_slot[1] - pin_d / 2])
+         translate([x, yk_y[0] - 1, 0]) rotate([-90, 0, 0]) cylinder(d = pin_d + 0.3, h = yoke_t + 2);
+      translate([ind_x, yk_y[0] - 1, 0]) rotate([-90, 0, 0]) cylinder(d = clear_d, h = yoke_t + 2);
+      translate([ind_x, yk_y[1] + 0.01, 0]) rotate([90, 0, 0]) cylinder(d1 = 6.2, d2 = clear_d - 0.01, h = 1.5);
+   }
+}
+module yoke_in_place(d = view_deg) {
+   translate([0, 0, lever_z(d)]) yoke();
 }
 
 // --- Servo arm: pressed on the spline, the pin (an M3 screw) at its end ---
@@ -467,9 +507,9 @@ module arm() {
       translate([arm_r, 0, -1]) cylinder(d = pilot_d, h = arm_t + 2);
    }
 }
-// in place: in the x plane, pointing forward (-y) turned up by a
+// in place: in the y plane, pointing right turned up by a
 module arm_in_place(d = view_deg) {
-   translate([arm_x[0], sv_ys, z_mid]) rotate([-arm_a(d), 0, 0]) rotate([0, 90, 0]) rotate(-90) arm();
+   translate([x_s, arm_y[1], z_mid]) rotate([90, 0, 0]) rotate(arm_a(d)) arm();
 }
 
 // --- View-only parts ---
@@ -478,31 +518,34 @@ c_face = "#2e2e2e";
 c_label = "#f4f4f4";
 c_print = "#d8d8d8";
 c_steel = "#b9c0c8";
-c_mech = "#3a3a3a";            // the carriage and the slider, printed black (seen through the slot)
+c_mech = "#3a3a3a";            // the lever, printed black (seen through the slot)
 
 module servo_part() {
    color("#1f5fbf") {
-      translate([sv_top, sv_y[0], z_mid - sv_body[1] / 2]) cube([sv_body[2], sv_body[0], sv_body[1]]);
-      translate([sv_top + sv_tab[2], sv_bc - sv_tab[0] / 2, z_mid - sv_body[1] / 2]) cube([sv_tab[1], sv_tab[0], sv_body[1]]);
-      translate([sv_top, sv_ys, z_mid]) rotate([0, -90, 0]) cylinder(d = sv_boss[0], h = sv_boss[1]);
+      box([x_s - sv_body[1] / 2, x_s + sv_body[1] / 2], [sv_ty, sv_ty + sv_body[2]], sv_z);
+      box([x_s - sv_body[1] / 2, x_s + sv_body[1] / 2], [sv_ty + sv_tab[2], sv_ty + sv_tab[2] + sv_tab[1]], [sv_bc - sv_tab[0] / 2, sv_bc + sv_tab[0] / 2]);
+      translate([x_s, sv_ty, z_mid]) rotate([90, 0, 0]) cylinder(d = sv_boss[0], h = sv_boss[1]);
    }
 }
 module pin_part(d = view_deg) {
-   color(c_steel) translate([0, sv_ys, z_mid]) rotate([-arm_a(d), 0, 0]) translate([0, -arm_r, 0]) {
-      translate([fin_x[0] - 1, 0, 0]) rotate([0, 90, 0]) cylinder(d = pin_d, h = arm_x[1] - fin_x[0] + 1);
-      translate([arm_x[1], 0, 0]) rotate([0, 90, 0]) cylinder(d = pin_head[0], h = pin_head[1]);
+   color(c_steel) translate([x_s, 0, z_mid]) rotate([0, -arm_a(d), 0]) translate([arm_r, 0, 0]) {
+      translate([0, yk_y[0] - 1, 0]) rotate([-90, 0, 0]) cylinder(d = pin_d, h = arm_y[1] - yk_y[0] + 1);
+      translate([0, arm_y[1], 0]) rotate([-90, 0, 0]) cylinder(d = pin_head[0], h = pin_head[1]);
    }
 }
-module pot_part(d = view_deg) {
-   color("#2a2a2a") box(px, pot_y, pot_z);
-   color("#bbb") translate([pot_x - 2, pot_y[1], pot_z[0] - pot_tabs]) cube([4, 0.5, pot_tabs]);
-   color("#ddd") box([pot_x - pot_ear.x / 2, pot_x + pot_ear.x / 2], [pot_y[0] - pot_ear.z, pot_y[0]], [lever_z(d) - pot_ear.y / 2, lever_z(d) + pot_ear.y / 2]);
+module pot_part() {
+   color("#2a2a2a") translate([pot_face, pin_c[0], pin_c[1]]) rotate([0, -90, 0]) cylinder(d = pot_body[0], h = pot_body[1]);
+   color(c_steel) {
+      translate([pot_face - 0.01, pin_c[0], pin_c[1]]) rotate([0, 90, 0]) cylinder(d = pot_bush[0], h = pot_bush[1]);
+      translate([lw[1], pin_c[0], pin_c[1]]) rotate([0, 90, 0]) cylinder(d = pot_nut[0], h = pot_nut[1], $fn = 6);
+      translate([pot_face, pin_c[0], pin_c[1]]) rotate([0, 90, 0]) cylinder(d = pot_shaft[0], h = pot_shaft[2]);
+   }
 }
-module spring_part(d = view_deg) {
-   x0 = lever_x(d) + sl.x / 2;
-   x1 = pocket_x[1] + spring_bore;
-   color(c_steel) translate([x0, by[0] + sl.y / 2, lever_z(d)]) rotate([0, 90, 0])
-      difference() { cylinder(d = lev_spring[0], h = x1 - x0); translate([0, 0, -1]) cylinder(d = lev_spring[0] - 1, h = x1 - x0 + 2); }
+module rod_part(d = view_deg) {
+   color(c_steel) translate([rod_x[0], y_p, z_p]) rotate([0, 90, 0]) cylinder(d = rod_d, h = rod_x[1] - rod_x[0]);
+   x1 = lever_x(d) + hub_x[1];
+   color(c_steel) translate([x1, y_p, z_p]) rotate([0, 90, 0])
+      difference() { cylinder(d = lev_spring[0], h = rw[0] - x1); translate([0, 0, -1]) cylinder(d = lev_spring[0] - 1.6, h = rw[0] - x1 + 2); }
 }
 module nano_view() {
    translate([nano_c.x, nano_c.y, foot_t]) nano_part();
@@ -522,20 +565,28 @@ module sheet_part() {
    }
 }
 
+module lever_parts(d = view_deg) {
+   color(c_mech) at_lever(d) lever();
+   color("#f0f0f0") at_lever(d) paddle();
+   color(c_print) pinion_in_place(d);
+   rod_part(d);
+   pot_part();
+}
+module indicator_parts(d = view_deg) {
+   color("#eeeeee") carrier_in_place(d);
+   color(c_print) yoke_in_place(d);
+   color(c_print) arm_in_place(d);
+   pin_part(d);
+   servo_part();
+}
+
 module assembled(d = view_deg, sheet = true) {
    color(c_body) body();
    color(c_face) face_in_place();
    color(c_label) labels_in_place();
-   color(c_mech) carriage_in_place(d);
-   color(c_mech) slider_in_place(d);
-   spring_part(d);
-   color("#f0f0f0") handle_in_place(d);
+   lever_parts(d);
    color(c_print) strip();
-   color("#eeeeee") carrier_in_place(d);
-   color(c_print) arm_in_place(d);
-   pin_part(d);
-   pot_part(d);
-   servo_part();
+   indicator_parts(d);
    nano_view();
    bolts_part();
    if (sheet) sheet_part();
@@ -545,42 +596,44 @@ module exploded_view(e = explode) {
    color(c_body) body();
    color(c_face) translate([0, -e, 0]) face_in_place();
    color(c_label) translate([0, -e, 0]) labels_in_place();
-   color("#f0f0f0") translate([0, -2 * e, 0]) handle_in_place(0);
-   color(c_print) translate([0, e, 0]) carriage_in_place(0);
-   color(c_print) translate([0, 0.5 * e, 0]) slider_in_place(0);
-   translate([0, 1.5 * e, 0]) pot_part(0);
-   color(c_print) translate([0, 2 * e, 0]) strip();
+   color("#f0f0f0") translate([0, -2 * e, 0]) at_lever(0) paddle();
+   color(c_mech) translate([0, 0, e]) at_lever(0) lever();
+   translate([e, 0, e]) rod_part(0);
+   color(c_print) translate([e, 0, 0]) pinion_in_place(0);
+   translate([-e, 0, 0]) pot_part();
    color("#eeeeee") translate([0, 0, 1.5 * e + travel]) carrier_in_place(0);
-   translate([0, e, 0]) { color(c_print) arm_in_place(0); pin_part(0); }
-   translate([e, e, 0]) servo_part();
+   color(c_print) translate([0, 1.5 * e, 0]) strip();
+   color(c_print) translate([0, 2 * e, 0]) yoke_in_place(0);
+   translate([0, 2.5 * e, 0]) { color(c_print) arm_in_place(0); pin_part(0); }
+   translate([0, 3 * e, 0]) servo_part();
    translate([-e, e, 0]) nano_view();
 }
 
-// from behind, the strip and the face off: carriage, slider, pot, carrier, arm
-module mechanism_view(d = view_deg) {
-   color(c_body) body();
-   color(c_mech) carriage_in_place(d);
-   color(c_mech) slider_in_place(d);
-   spring_part(d);
-   color("#eeeeee") carrier_in_place(d);
-   color(c_print) arm_in_place(d);
-   pin_part(d);
-   pot_part(d);
-   servo_part();
+// from the right, the right wall cut away: the lever at 0 and 40, the sector and the pinion
+module side_view() {
+   color(c_body) difference() { body(); box([rw[0] - 1, side + 1], [-1, body.y + 1], [-1, body.z + 1]); }
+   color(c_face) face_in_place();
+   for (d = [0, 40]) {
+      color(d == 0 ? c_mech : "#6a6a6a") at_lever(d) lever();
+      color("#f0f0f0") at_lever(d) paddle();
+   }
+   color(c_print) pinion_in_place(0);
+   pot_part();
 }
 
 // Print places
 translate([0, 0, -y_pl]) rotate([90, 0, 0]) body(); // Make module body
 face(); // Make module face
-translate([0, 0, paddle_out]) rotate([90, 0, 0]) handle(); // Make module handle
-translate([0, 0, -by[0]]) rotate([90, 0, 0]) carriage(); // Make module carriage
-translate([0, 0, by[0] + sl.y]) rotate([-90, 0, 0]) slider(); // Make module slider
-translate([0, 0, strip_y[1]]) rotate([-90, 0, 0]) strip(); // Make module strip
+translate([0, 0, stem / 2]) rotate([0, -90, 0]) translate([0, -y_p, -z_p]) lever(); // Make module lever
+translate([0, 0, paddle.z / 2 - z_p]) paddle(); // Make module paddle
+pinion(); // Make module pinion
 translate([0, 0, -cx[0]]) rotate([0, -90, 0]) carrier(); // Make module carrier
+translate([0, 0, yk_y[1]]) rotate([-90, 0, 0]) yoke(); // Make module yoke
+translate([0, 0, strip_y[1]]) rotate([-90, 0, 0]) strip(); // Make module strip
 arm(); // Make module arm
 
 //assembled(); // Make view main 70,0,-35
 //assembled(); // Make view front 90,0,0
 //assembled(sheet = false); // Make view back 60,0,150
-//mechanism_view(15); // Make view mechanism 90,0,180
+//side_view(); // Make view side 90,0,90
 //exploded_view(); // Make view exploded 65,0,150

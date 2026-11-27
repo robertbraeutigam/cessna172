@@ -208,8 +208,9 @@ one box, read by a Nano on its floor.
 
 ### [Flaps panel](flaps/README.md)
 
-The continuous wing flap lever in the 172N's stepped slot (stops at 10
-and 20, FULL at 40), read by a slide pot, and the flap position
+The continuous wing flap lever, an arm swinging on a rod behind the
+panel through the 172N's stepped slot (stops at 10 and 20, FULL at 40),
+read by a rotary pot through a gear sector, and the flap position
 indicator, its pointer moved by a servo through a scotch yoke.
 
 [![Flaps panel](https://robertbraeutigam.github.io/cessna172/flaps/flaps_montage.png)](https://robertbraeutigam.github.io/cessna172/flaps/flaps_montage.png)

@@ -23,29 +23,33 @@ lever to the left, against the steps, and as it comes back up it springs
 back left past them. The pointer shows where the flaps really are, so
 after you move the lever it follows as the flaps run.
 
-- **Lever**: the printed handle, a flat white paddle that leans down,
-  has a square stem. The stem goes through the slot into a slider. The
-  slider moves sideways in a pocket of a carriage, and a small spring in
-  the carriage's right wall pushes it to the left. The carriage slides up
-  and down in a channel on the back of the front plate. The stem rests
-  on the slot's edges, so the steps of the printed slot are the stops,
-  and the spring pressing the stem on the edge gives the lever its
-  friction.
-- **Lever sensing**: a 60 mm slide potentiometer (45 mm travel) stands
-  right of the channel, snapped into a pocket on the plate's back. Its
-  ear points forward into a slot in a tab on the carriage's right side,
-  so the pot's slider follows the lever. The wiper goes to the Nano's A0,
-  and MobiFlight turns the reading into the flap handle's position
-  through a table (`lever_table`, below).
-- **Indicator**: the pointer is on a carrier that slides in a channel of
-  its own beside the lever's. A strip screwed over both channels' backs
-  keeps the carriage and the carrier in. A fin on the carrier's back,
-  through a slot in the strip, has a slot along its length. A pin (an M3
-  screw) on the arm of a 9 g servo runs in that slot: a scotch yoke. As
-  the arm turns, the pointer moves straight up and down by `arm_r` ×
-  sin(angle), with no gears. 132 degrees of the servo cover the 42 mm
-  from 0 to 40°. The servo sits behind the strip, on a rib that stands on
-  the foot.
+- **Lever**: an arm swinging on a 6 mm steel rod 85 mm behind the face,
+  like the real one (its cam and switches turn on a pivot behind the
+  panel). The paddle, a flat white handle like the 172's, is level at 0°
+  and leans down as the lever goes down, 26° at 40°; as it swings it
+  comes closer to the face. The rod is fixed in two walls on the foot,
+  and the lever's hub turns and slides on it. A spring on the rod between
+  the hub and the right wall pushes the lever to the left, so the stem
+  rests on the slot's edges: the steps of the printed slot are the stops,
+  and the spring pressing the stem on the edge and on the hub gives the
+  lever its friction. The lever (hub, arm, stem and a gear sector) is one
+  print; the paddle is pushed onto the stem in front of the face and
+  screwed across.
+- **Lever sensing**: the gear sector under the hub turns a pinion on a
+  16 mm rotary potentiometer in the left wall, 5:1, so the lever's 26°
+  turn the pot 131° (about 450 steps from 0 to 40°). The pinion is wider
+  than the sector by the lever's sideways travel, so they stay in mesh
+  when the lever moves to the right. The wiper goes to the Nano's A0, and
+  MobiFlight turns the reading into the flap handle's position through a
+  table (`lever_table`, below).
+- **Indicator**: the pointer is on a carrier that slides in a channel
+  left of the lever slot, kept in by a strip screwed over it. Behind the
+  strip a yoke plate is screwed onto the carrier's post. A pin (an M3
+  screw) on the arm of a 9 g servo runs in the yoke's horizontal slot: a
+  scotch yoke. As the arm turns, the pointer moves straight up and down
+  by `arm_r` × sin(angle), with no gears. 132 degrees of the servo cover
+  the 42 mm from 0 to 40°. The servo, its shaft pointing at the plate,
+  sits on a rib off the left wall.
 
 There is no box: everything is behind the sheet. The front plate has a
 9 mm flange on the left, the right and the bottom, screwed onto the
@@ -60,53 +64,54 @@ does not load the sheet alone.
 
 | File | Parts |
 |------|-------|
-| `flaps.scad` | body (front plate and flange, foot, the lever's and the carrier's channels, the pot's pocket, the servo's rib, the Nano's rails), face, handle, slider, carriage, strip, carrier, servo arm |
+| `flaps.scad` | body (front plate and flange, foot, the carrier's channel, the rod's walls (the left one holds the pot), the servo's rib, the Nano's rails), face, lever, paddle, pinion, strip, carrier, yoke, servo arm |
 
-The build checks that the channels and the pot fit the body's height,
-the lever's travel is within the pot's, the carriage's tab clears the
-pot's end ledges and the ear stays in it, the slider's spring has a
-preload at the left and does not go solid at the right, the servo clears
-the strip and the pot's walls, the arm is long enough for the travel, the
-Nano clears the strip, the arm, the fin and the rib, the foot's bolts
-clear the rib and the pot, the paddle clears the face, and that the face
-fits the printer. It echoes the lever's and the servo's tables
+The build checks that the carrier's channel and the walls fit the body,
+the pot turns less than its range and its shaft reaches across the
+pinion, the lever's spring has a preload at the left and does not go
+solid at the right, the lever's arm clears the pinion at 40°, the paddle
+clears the face at 0° and at 40°, the servo, its arm and the yoke clear
+the lever and the pot, the Nano and its plug clear the walls, the pot,
+the servo's arm and the yoke, the foot's bolts clear the walls, and that
+the face fits the printer. It echoes the lever's and the servo's tables
 (`lever_table`, `indicator_table`).
 
 ## Hardware
 
 | Qty | Part | Use |
 |-----|------|-----|
-| 1 | slide potentiometer, 60 mm long, 45 mm travel, 10 kΩ linear (B10K), with solder tabs at one end (`pot_*`) | the lever's position |
-| 1 | compression spring, 4 mm OD, 16 mm long (`lev_spring`) | holds the lever to the left |
+| 1 | rotary potentiometer, 16 mm, 10 kΩ linear (B10K), M7 bushing, 6 mm D shaft 20 mm long (`pot_*`) | the lever's position |
+| 1 | steel rod, 6 mm, 35 mm long | the lever's pivot |
+| 1 | compression spring over the 6 mm rod, 9 mm OD, 20 mm long (`lev_spring`) | holds the lever to the left |
 | 1 | SG90 9 g servo, with its screws | the indicator |
 | 1 | 470 uF / 10 V electrolytic capacitor | across the servo's supply |
 | 1 | Arduino Nano (ATmega328P, 5 V, mini USB) | MobiFlight board of the panel |
 | 1 | mini USB cable, long enough to the powered USB hub | the Nano to the PC |
 | 1 | M3 x 10 socket head screw | the pin on the servo's arm |
-| 1 | M3 x 8 pan head screw | through the slider into the handle's stem |
+| 1 | M3 x 16 screw + nut | the paddle onto the stem, across |
+| 1 | M3 x 10 countersunk self tapping screw | the yoke onto the carrier |
 | 2 | M3 x 10 self tapping screw | the strip |
 | 4 | M3 x 12 pan head screw + nut | face and plate onto the cockpit sheet |
 | 1 | cable tie | the USB cable onto its block |
 | - | hookup wire, stranded | |
 | 2 | M5 x 10 button head screw + washer + T-nut | foot into the throttle bar (counted in the frame) |
 
-The pot's sizes (`pot_*`: length, width, thickness, travel, the ear's
-size and height, the end caps, the solder tabs) are guesses: measure the
-pot before printing the body and the carriage. So are the spring's
-(`lev_spring`); a stiffer or longer one makes the lever heavier. The
-servo's sizes (`sv_*`) are the same as the
+The pot's sizes (`pot_*`: body, bushing, nut, shaft length and flat,
+anti-rotation tab) are guesses: measure the pot before printing the body
+and the pinion; the shaft must be long enough to reach across the pinion
+(the build checks it). So are the spring's (`lev_spring`); a stiffer one
+makes the lever heavier. The servo's sizes (`sv_*`) are the same as the
 [NAV indicator's](../instruments/README.md).
 
 ## Print
 
-The body on its face (the front plate on the bed: the foot, the
-channels, the pot's pocket, the rib and the Nano's rails stand on it),
-the face front side up, the handle standing on the end of its paddle
-(the stem up), the carriage on its front, the slider on its back, the
-carrier on its left side, the strip and the arm flat. The face is dark
-grey; paint the lettering and the pointer's front white, print the
-handle white and the carriage and the slider black (they show through
-the slot).
+The body on its face (the front plate on the bed: the foot, the channel,
+the walls, the servo's rib and the Nano's rails stand on it), the face
+front side up, the lever on its left side, the paddle on its underside,
+the pinion on its end, the carrier on its left side, the yoke, the strip
+and the servo arm flat. The face is dark grey; paint the lettering and
+the pointer's front white, print the paddle white and the lever black (it
+shows through the slot).
 
 ## Wiring
 
@@ -120,14 +125,13 @@ the jack.
 
 | Nano pin | To |
 |----------|----|
-| A0 | pot wiper (middle tab) |
+| A0 | pot wiper (middle lug) |
 | D9 | servo signal (orange) |
-| 5V | pot end tab, servo red |
-| GND | pot other end tab, servo brown |
+| 5V | pot end lug, servo red |
+| GND | pot other end lug, servo brown |
 
-The `lever_table` assumes the pot reads 0 at its bottom end (the end
-with the tabs at the bottom, GND on that end's tab); if it reads the
-other way round, swap the two end wires or use 1023 minus each value.
+The `lever_table` assumes the reading rises as the lever goes down; if
+it falls, swap the pot's two end wires or use 1023 minus each value.
 Solder the 470 uF capacitor across the servo's red and brown wires near
 the servo.
 
@@ -137,26 +141,26 @@ about 25 mA, the servo 0.15-0.3 A while it moves, up to 0.7 A stalled
 
 ## Assembly
 
-1. Solder the pot's wires, snap it into its pocket from behind (its ear
-   forward, the tabs down), the lips over its back at its ends.
+1. Solder the pot's wires, put it into the left wall from the left (its
+   tab in the wall's slot), the nut on its bushing on the right, and press
+   the pinion onto its shaft. Turn the pot to its middle.
 2. Put the panel into the frame: the foot onto the throttle bar through
    the cut-out, the face on the plate, the M3 screws through both and the
    sheet, then the M5 bolts through the foot into the bar.
-3. From behind: the spring into its bore in the carriage's right wall,
-   the slider into the pocket against it. Put the carriage into its
-   channel at the middle of the travel (its tab through the notch in the
-   right wall, the pot's ear into the tab's slot), the slider against the
-   plate. The carrier into its channel, its pointer through the slot.
-4. The handle from the front: its stem through the lever slot into the
-   slider's socket. Screw the M3 pan head screw from behind through the
-   slider into the stem (through the slot in the carriage's back).
-5. Screw the strip on, the fin through its slot.
-6. The servo into its rib's window from the right, screwed onto the rib
-   with its own screws. Turn it to its middle (MobiFlight's servo test,
-   or 90 degrees) with the carrier half way, press the arm onto its
-   spline pointing straight forward, and screw the pin through the arm
-   into the fin's slot, its head on the servo's side. Keep the arm's horn
-   screw short (`sv_screw`), it passes the fin.
+3. From behind: the lever's stem through the lever slot, half way down
+   (the sector over the pinion, meshed), the rod from the left through the
+   left wall, the lever's hub and the spring into the right wall's blind
+   hole; a drop of glue at the left wall keeps it.
+4. The paddle onto the stem in front of the face, the M3 screw across
+   through both.
+5. The carrier into its channel, its pointer through the slot, the strip
+   screwed on over it, the yoke screwed onto the carrier's post through
+   the strip's slot (countersunk screw).
+6. The servo into its rib's window from behind, screwed onto the rib with
+   its own screws. Turn it to its middle (MobiFlight's servo test, or 90
+   degrees) with the carrier half way, press the arm onto its spline
+   pointing right, and screw the pin through the arm into the yoke's slot,
+   its head behind the arm.
 7. The Nano into its rails, the wires to it, the USB cable plugged in
    and tied onto its block.
 
@@ -168,20 +172,21 @@ name (*Flaps*). Add:
 - an *Analog Input* on A0 (the lever) that sets the dataref
   `sim/cockpit2/controls/flap_ratio` (0 up .. 1 = 40°) on change. The
   scale is not linear (0 to 10° is longer), so the reading goes through
-  the build's `lever_table`, raw reading to flap ratio:
+  the build's `lever_table`, raw reading to flap ratio (the pot's middle
+  at the lever's middle, 300° of travel):
 
   | Lever at | Pot | Flap ratio |
   |----------|-----|------------|
-  | 0° | 989 | 0 |
-  | 10° | 607 | 0.25 |
-  | 20° | 416 | 0.5 |
-  | 30° | 225 | 0.75 |
-  | 40° | 34 | 1 |
+  | 0° | 287 | 0 |
+  | 10° | 478 | 0.25 |
+  | 20° | 569 | 0.5 |
+  | 30° | 655 | 0.75 |
+  | 40° | 736 | 1 |
 
   As the value's expression (`@` is the reading):
 
   ```
-  Max(0, Min(1, if(@ > 607, (989 - @) / 382 * 0.25, if(@ > 416, 0.25 + (607 - @) / 191 * 0.25, if(@ > 225, 0.5 + (416 - @) / 191 * 0.25, 0.75 + (225 - @) / 191 * 0.25)))))
+  Max(0, Min(1, if(@ < 478, (@ - 287) / 191 * 0.25, if(@ < 569, 0.25 + (@ - 478) / 91 * 0.25, if(@ < 655, 0.5 + (@ - 569) / 86 * 0.25, 0.75 + (@ - 655) / 81 * 0.25)))))
   ```
 
   Check the readings with the lever on each step and at the ends (the
@@ -191,8 +196,8 @@ name (*Flaps*). Add:
   `sim/cockpit2/controls/flap_handle_deploy_ratio` (0 up .. 1 full),
   through an interpolation table: the scale is not linear, and a scotch
   yoke moves the pointer by the sine of the angle. The build echoes it
-  (`indicator_table`, flap ratio to servo degrees, 90 = arm straight
-  forward):
+  (`indicator_table`, flap ratio to servo degrees, 90 = arm pointing
+  right):
 
   | Flaps | Servo |
   |-------|-------|

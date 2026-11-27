@@ -31,20 +31,23 @@ its own top-level directory; new components should follow the same layout.
   `frame/frame.inc.scad` repeats `flaps_plate`, `flaps_body`,
   `flaps_face_t`, `flaps_bolt_xs`. Lever: continuous, no detents; the
   slot (`lever_slot`) steps right (`jog`) at 10 and 20, the stem rests on
-  the steps. The handle (a paddle leaning down) has a square stem into a
-  slider moving sideways in a carriage's pocket, a spring in the
-  carriage's right wall (`lev_spring`) holds it left (against the steps,
-  and its friction); the carriage slides in a channel. A 60 mm slide pot
-  (`pot_*`, MEASURE) stands right of the channel in a snap-in pocket, its
-  ear forward in a tab on the carriage; wiper on A0, `lever_table`
-  (echoed, in the README) maps it to `flap_ratio`. A screwed `strip`
-  keeps the carriage and the carrier in. Indicator: a carrier in its own
-  channel, its fin's slot driven by a pin on an SG90's arm (scotch yoke,
-  D9, `arm_r`), the servo behind the strip on a rib on the foot (window,
-  tabs screwed along x); the servo's interpolation table is echoed
-  (`indicator_table`) and in the README. Nano in rails on the foot behind
-  the strip at the left, jack back, `tie_block`. `sv_*` MEASURE (the NAV
-  indicator's).
+  the steps. The lever is an arm swinging on a fixed 6 mm rod (`y_p`
+  behind the face, at the 0 mark's height, so the paddle is level at 0
+  and leans down `theta(d)`) between two walls on the foot; one print
+  (hub turning and sliding on the rod, arm, square stem, gear sector),
+  the paddle separate on the stem in front of the face (it swings back
+  towards the face: `r_pb`). A spring on the rod (`lev_spring`) pushes it
+  left (against the steps, and its friction). The sector turns a wide
+  pinion (`ratio` 5:1, `pin_a`) on a 16 mm rotary pot (`pot_*`, MEASURE)
+  in the left wall; wiper on A0, `lever_table` (echoed, in the README)
+  maps it to `flap_ratio`. `gear_2d` is a copy of
+  `instruments/instrument.inc.scad`'s, keep them the same. Indicator: a
+  carrier in its own channel under a screwed `strip`, a `yoke` screwed
+  onto its post behind the strip, its horizontal slot driven by a pin on
+  an SG90's arm (scotch yoke, D9, `arm_r`), the servo's shaft along y, on
+  a rib off the left wall; the servo's interpolation table is echoed
+  (`indicator_table`) and in the README. Nano in rails on the foot at the
+  left, jack back, `tie_block`. `sv_*` MEASURE (the NAV indicator's).
 - `pedestal/` — `pedestal.scad`: the top of the pedestal under the
   throttle, the elevator trim wheel and the trim indicator, mounted like
   the throttle box but with no housing (it is behind the sheet): a front
