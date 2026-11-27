@@ -27,13 +27,17 @@
 //   sizes stay (y_bz) and the band is a little smaller (card_r) so the
 //   marks clear the side walls.
 // - The Nano lies in rails on the floor behind the motor, its USB jack at
-//   the back wall. A stop in front of it with hoods over the far end's
-//   corners, stops on the base beside the jack, in pockets in the back
-//   wall's foot (a plug pulled out pulls the board against them), and a
-//   shelf on the shell's back wall over
-//   the jack (in the notch's top) that holds the jack end down and keeps
-//   the wires away from the notch and out of sight through it. With the
-//   shell on, the Nano cannot move.
+//   the back wall, held by the base alone (the shell only clears it, so
+//   it is tested with the shell off). Beside the jack two stops (a plug
+//   pulled out pulls the board against them, they stand in pockets in the
+//   back wall's foot) with hooks over the board's corners; in front of it
+//   a stop (a plug pushed in pushes against it) and a printed keeper
+//   screwed down over the far end's corners (keeper_*). The board goes in
+//   jack end first under the hooks, then the far end down, then the
+//   keeper on. The hooks and the keeper are over the board by the shared
+//   rails' gap (nano_rail_gap), from print geometry only. A shelf on the
+//   shell's back wall over the jack (in the notch's top), clear of it,
+//   keeps the wires away from the notch and out of sight through it.
 // - The ULN2003 driver board stands behind a plate at the back, far enough
 //   in front of the back wall for the Dupont plugs on its pins
 //   (uln_plug_room). The plate fills the case's section (the shell
@@ -51,6 +55,7 @@
 // - Two colours: the marks, the bezel's lettering and the lubber line are
 //   separate white parts (*_white STLs) in pockets of the black ones.
 // - Parts: the base (floor with all of the above on it, printed flat),
+//   the Nano keeper (printed flat),
 //   the shell (sides, top and back, printed top down), the bezel (the
 //   front with the window, printed back side down, the N-S and E-W
 //   compensator screws as dummies, lettering for a paint pen; flat
@@ -68,8 +73,8 @@
 // - 28BYJ-48 stepper (5 V) with its ULN2003 driver board (motor_*, uln_*)
 // - Arduino Nano (ATmega328P, 5 V) and a USB cable (nano_*)
 // - A3144 hall sensor (sensor), 2 x disc magnet 5 x 1 mm, stacked (magnet)
-// - M3 self tapping screws: 2x 6 mm (motor ears), 4x 8 mm (ULN2003
-//   board), 4x 10 mm countersunk (bezel), 2x 10 mm countersunk (base into
+// - M3 self tapping screws: 2x 6 mm (motor ears), 6x 8 mm (ULN2003
+//   board, Nano keeper), 4x 10 mm countersunk (bezel), 2x 10 mm countersunk (base into
 //   the shell), 4x 10 mm countersunk (base onto the stand)
 // - 2x M5 x 10 button head + T-nut (stand onto the top bar)
 // - clear sheet 1 mm (glass_*), white filament (one colour: white acrylic paint)
@@ -77,7 +82,7 @@
 // Assembly (one colour: paint the white parts first): stand onto the base (screws
 // from inside), magnet into the drum's pad (check which face triggers the
 // sensor), sensor onto its post, motor onto its posts, Nano into its
-// rails (far end under the hoods, jack end down between the stops), ULN2003 board behind its plate, the motor's cable through the slot
+// rails (jack end under the hooks, far end down, the keeper screwed on), ULN2003 board behind its plate, the motor's cable through the slot
 // beside it; wire it (see the README), no wires over the USB jack. Press
 // the drum on. Shell over it (the USB cable through the notch), two
 // screws from below, the glass into the bezel back, the bezel over it,
@@ -167,16 +172,21 @@ gusset = [8, 16];            // the plate's gussets: reach in front of it, heigh
 plate_gap = 2;               // the plate to the card, at least
 plate_clear = 0.5;           // the plate to the shell's inside: it fills the section, so no LED light gets past it
 cable_slot = [8, 16];        // through the plate, right of the ULN2003 board: the motor's cable and plug
-// --- Shelf over the USB jack, on the shell's back wall: holds the jack down, keeps the wires off the notch ---
-// --- Hoods over the Nano's far end (its corners, the middle left free for an ICSP header) ---
+// --- Hooks over the Nano's jack end corners (on the base, beside the jack) and the keeper's hoods over its far end (the middle left free for an ICSP header) ---
 hood_reach = 3;              // over the board, from its end
-hood_x0 = 4.5;               // from the middle
-hood_t = 1.2;
+hood_x0 = 4.5;               // from the middle: clear of the jack
+hood_t = 1.2;                // the hooks
+keeper_t = 2;                // the keeper: a flat plate on the far stop and two bosses
+keeper_sx = 13.5;            // its two screws (M3 self tapping, from above), from the middle
+keeper_dy = 4;               // and behind the far stop's front
+keeper_boss_d = 5.5;         // the bosses, and the screws' pan heads
+keeper_hole = 6;             // pilot hole depth, from the boss top
+// --- Shelf over the USB jack, on the shell's back wall: keeps the wires off the notch (clear of the jack) ---
 usb_clear = 0.4;             // the plug's housing to the notch, sides and top
 shelf_hw = 6.4;              // half width: over the jack, between the pin rows, as wide as the notch
 shelf_len = 8;               // into the case from the back wall
 shelf_t = 1.5;               // at its front edge; its top rises 45 degrees to the wall (printed top down)
-shelf_gap = 0.3;             // over the jack
+shelf_gap = 1;               // over the jack: it does not hold it
 // --- Wire shield and vents (the coils stay on: the motor and the ULN2003 get warm) ---
 shield_t = 1.6;              // a wall under the drum, round its front half, the sensor post in it
 shield_over = 6;             // its top over the band's bottom edge, inside the drum
@@ -237,7 +247,12 @@ plate_w = uln_board.x + 2;
 z_plate1 = z_uln0 + uln_board.y + 1;      // the ULN2003 board's top, and a little
 cable_x0 = uln_board.x / 2 + 2;            // the cable slot, from the gusset out
 z_shelf0 = nano_top + shelf_gap;
-z_hood0 = z_floor + nano_top_h + nano_rail_gap;
+keeper_z = nano_top_h + nano_rail_gap;       // the keeper's and the hooks' underside, over the floor
+hook_z1 = keeper_z + hood_t;                 // the hooks' top, over the floor
+jack_stop_x = usb_plug.x / 2 + 0.5;          // the jack stops' inner faces (nano_rails' stop_x)
+keeper_sy = -nano_rail_end + keeper_dy;      // the keeper's screws, y from the Nano's middle
+keeper_y1 = -nano_board.y / 2 + hood_reach;  // the keeper's back edge, over the board
+pocket_h = hook_z1 + 0.5;                    // the shell's pockets for the jack stops, over the floor
 notch_top = usb_z + usb_plug.y / 2 + usb_clear;
 sx = xi - block / 2;                         // bezel screws, x and z
 back_screws = [for (s = [-1, 1]) [s * sx, y_bi - block / 2]];
@@ -302,9 +317,20 @@ assert(shelf_hw >= notch_hw && shelf_hw <= nano_row / 2 - nano_pad_d / 2 - 0.3, 
 assert(shelf_len <= nano_usb_len - nano_usb_out, "USB shelf longer than the jack");
 assert(notch_hw <= usb_plug.x / 2 + 0.5 - 0.1, "The plug's housing runs into the jack stops");
 assert(wall - stop_pocket >= 0.5, "Back wall too thin over the jack stops");
-assert(nano_board.y / 2 - (nano_row_pins - 1) / 2 * nano_pin_pitch - nano_pad_d / 2 >= hood_reach + 0.3, "Nano hoods reach onto the pin rows");
-assert(z_hood0 + hood_t <= z_motor0 - 1, "Nano hoods run into the motor");
-assert(hood_x0 <= nano_rail_in - 2, "Nano hoods too narrow");
+assert(nano_board.y / 2 - (nano_row_pins - 1) / 2 * nano_pin_pitch - nano_pad_d / 2 >= hood_reach + 0.3, "Nano hooks or keeper reach onto the pin rows");
+assert(hood_x0 <= nano_rail_in - 2, "Nano hooks or keeper's hoods too narrow");
+assert(hood_x0 >= nano_usb.x / 2 + 0.4, "Nano hooks run into the jack");
+assert(jack_stop_x <= nano_rail_in - 1.5, "Nano jack stops too narrow");
+assert(z_floor + hook_z1 <= z_shelf0 - 0.5, "Nano hooks run into the USB shelf");
+assert(wall - stop_pocket >= 0.5 && body_h / 2 - wall - z_floor >= pocket_h, "No room for the jack stops' pockets");
+assert(z_floor + keeper_z + keeper_t <= z_motor0 - 1, "Nano keeper runs into the motor");
+assert(keeper_sx - keeper_boss_d / 2 >= nano_rail_in + 0.3, "Nano keeper's bosses run into the rails' grooves");
+assert(nano_c.y + keeper_sy + keeper_boss_d / 2 <= y_plate0 - gusset[0]
+       || keeper_sx + keeper_boss_d / 2 + 0.2 <= plate_w / 2 - 2, "Nano keeper's screws run into the ULN2003 plate's gussets");
+assert(nano_c.y + keeper_sy + keeper_boss_d / 2 <= y_plate0 - 0.5, "Nano keeper runs into the ULN2003 plate");
+assert(norm([keeper_sx, nano_c.y + keeper_sy]) >= card_ro + 1.8, "Nano keeper's screws not reached past the drum");
+assert(keeper_dy >= nano_rail_stop / 2 && keeper_sy + keeper_boss_d / 2 >= keeper_y1, "Nano keeper's screws not beside its plate");
+assert(keeper_t + keeper_hole >= 8 && keeper_z + floor_t - keeper_hole >= 0.6, "Nano keeper's pilot holes: too short for 8 mm screws, or through the floor");
 assert(z_shelf0 + shelf_t <= notch_top, "USB shelf too thick under the notch's top");
 assert(window_h <= window_d - 6, "Window as high as round");
 assert(window_h / 2 >= band_h / 2, "Window smaller than the card");
@@ -458,14 +484,24 @@ module base() {
          translate([spost_c.x - spost / 2, spost_c.y - spost / 2, z_floor - 0.01])
             cube([spost, spost, z_spost - z_floor + 0.01]);
          // Nano rails (no lips), through the ULN2003 plate: the stop in front
-         // of it with hoods over its far end's corners, the stops beside the
-         // jack. The far end goes in under the hoods, the jack end drops in
-         // between the jack stops, the shell's shelf comes down over the jack.
+         // of it (up to the keeper's seat) and the keeper's bosses, the stops
+         // beside the jack with hooks over its corners. The jack end goes in
+         // under the hooks, the far end drops in, the keeper is screwed on.
          translate([nano_c.x, nano_c.y, z_floor]) {
             nano_rails(far_stop = true, jack_stop = true, plug_w = usb_plug.x, lips = false);
-            for (s = [-1, 1]) mirror([s > 0 ? 0 : 1, 0, 0])
-               translate([hood_x0, -nano_rail_end, nano_top_h - 0.01])
-                  cube([nano_rail_hw - hood_x0, nano_rail_stop + nano_rail_end_clear + hood_reach, nano_rail_gap + hood_t + 0.01]);
+            translate([-nano_rail_in, -nano_rail_end, 0]) cube([2 * nano_rail_in, nano_rail_stop, keeper_z]);
+            for (s = [-1, 1]) mirror([s > 0 ? 0 : 1, 0, 0]) {
+               // the hook, over the board beside the jack up to its end (the plug's housing is behind it)
+               translate([hood_x0, nano_board.y / 2 - hood_reach, keeper_z])
+                  cube([nano_rail_in - hood_x0 + 0.01, hood_reach + nano_rail_end_clear, hood_t]);
+               // the rail wall and the stop up to the hook's top
+               translate([nano_rail_in, nano_board.y / 2 - hood_reach, 0])
+                  cube([nano_rail_w, nano_rail_end - nano_board.y / 2 + hood_reach, hook_z1]);
+               translate([jack_stop_x, nano_rail_end - nano_rail_stop, 0])
+                  cube([nano_rail_in - jack_stop_x + 0.01, nano_rail_stop, hook_z1]);
+               // the keeper's boss
+               translate([keeper_sx, keeper_sy, 0]) cylinder(d = keeper_boss_d, h = keeper_z);
+            }
          }
          // wire shield round the drum's front half, under the band
          translate([0, 0, z_floor - 0.01]) linear_extrude(z_shield1 - z_floor + 0.01)
@@ -498,6 +534,9 @@ module base() {
       }
       // vent slots under the drum
       translate([0, 0, z_bot - 1]) linear_extrude(floor_t + 2) floor_vents_2d();
+      // the Nano keeper's screws
+      for (s = [-1, 1]) translate([nano_c.x + s * keeper_sx, nano_c.y + keeper_sy, z_floor + keeper_z - keeper_hole])
+         cylinder(d = pilot_d, h = keeper_hole + 1);
       // motor ear screws
       for (s = [-1, 1]) translate([s * motor_ear_dx, motor_y, z_ear0 - screw_depth])
          cylinder(d = pilot_d, h = screw_depth + 1);
@@ -521,6 +560,25 @@ module base() {
       translate([0, y_bz - 0.01, z_bot - 1]) linear_extrude(floor_t + 2)
          polygon([[-1.5, 0], [1.5, 0], [0, 2]]);
    }
+}
+
+// --- Nano keeper: a flat plate over the far stop and the board's far
+// corners (the middle free for an ICSP header), screwed onto two bosses ---
+module keeper_2d() {
+   difference() {
+      union() {
+         translate([-nano_rail_hw, -nano_rail_end]) square([2 * nano_rail_hw, keeper_y1 + nano_rail_end]);
+         for (s = [-1, 1]) hull() {
+            translate([s * keeper_sx, keeper_sy]) circle(d = keeper_boss_d);
+            translate([s > 0 ? nano_rail_in : -keeper_sx, -nano_rail_end]) square([keeper_sx - nano_rail_in, keeper_y1 + nano_rail_end]);
+         }
+      }
+      translate([-hood_x0, -nano_board.y / 2 - nano_rail_end_clear]) square([2 * hood_x0, nano_board.y]);
+      for (s = [-1, 1]) translate([s * keeper_sx, keeper_sy]) circle(d = clear_d);
+   }
+}
+module keeper() {
+   translate([nano_c.x, nano_c.y, z_floor + keeper_z]) linear_extrude(keeper_t) keeper_2d();
 }
 
 // the wire shield: half a ring in front (y <= 0), the sensor post in it
@@ -585,7 +643,7 @@ module shell() {
       // USB plug notch
       translate([-notch_hw, y_bi - 0.01, z_floor - 1]) cube([2 * notch_hw, wall + 1, notch_top - z_floor + 1]);
       // pockets for the base's jack stops and the rails' ends, in the back wall's foot
-      translate([-nano_rail_hw - 0.2, y_bi - 0.01, z_floor - 1]) cube([2 * nano_rail_hw + 0.4, stop_pocket + 0.01, nano_top_h + 1.2]);
+      translate([-nano_rail_hw - 0.2, y_bi - 0.01, z_floor - 1]) cube([2 * nano_rail_hw + 0.4, stop_pocket + 0.01, pocket_h + 1]);
    }
 }
 
@@ -720,6 +778,7 @@ module compass_parts(H, e = 0, with_shell = true) {
       color(c_body) base();
       motor_part();
       compass_nano_part();
+      translate([0, 0, e / 3]) color(c_body) keeper();
       compass_uln_part();
       sensor_part();
    }
@@ -765,6 +824,7 @@ module inside_view(H = view_heading) {
 // --- Printable parts, in print orientation ---
 translate([0, 0, -z_bot]) base(); // Make module base
 translate([0, 0, body_h / 2]) rotate([180, 0, 0]) shell(); // Make module shell
+translate([0, 0, -z_floor - keeper_z]) keeper(); // Make module keeper
 // Two colours: each part with white on it is two STLs in the same place,
 // <part> (black) and <part>_white; load both into the slicer at once as one
 // object with two parts and give each its filament

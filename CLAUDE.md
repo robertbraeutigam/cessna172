@@ -170,8 +170,9 @@ its own top-level directory; new components should follow the same layout.
   (drum marks, bezel lettering, lubber line) are `*_white` modules in the
   same print place, filling pockets in the black parts. MobiFlight on an
   Arduino Nano of its own (USB to the powered USB hub) drives the ULN2003 board;
-  the Nano slides into lipped rails from the back, the shell's back wall
-  closes them. The coils stay on, so the floor (under the drum) and the
+  the base alone holds the Nano (the shell only clears it): its jack end
+  under hooks on the jack stops, its far end under a printed keeper
+  (`keeper_*`) screwed onto the base. The coils stay on, so the floor (under the drum) and the
   shell's top have vent slots; a wall under the drum's front half (the
   wire shield, the sensor post in it) hides the wires from the window. Parts: base (everything is
   mounted on it), shell, bezel (window, dummy compensator screws, the

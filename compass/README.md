@@ -13,7 +13,7 @@ frame's right top bar, about where the windshield's middle is (see
 
 | File | Parts |
 |------|-------|
-| `compass.scad` | base (floor with the motor posts, sensor post, Nano rails and the ULN2003 plate), shell, bezel, bezel back, drum (the card), stand; the white parts of the bezel (lettering), the bezel back (lubber line) and the drum (marks) as `*_white` STLs |
+| `compass.scad` | base (floor with the motor posts, sensor post, Nano rails and the ULN2003 plate), Nano keeper, shell, bezel, bezel back, drum (the card), stand; the white parts of the bezel (lettering), the bezel back (lubber line) and the drum (marks) as `*_white` STLs |
 
 ## How it works
 
@@ -47,18 +47,24 @@ frame's right top bar, about where the windshield's middle is (see
   bezel back's window, just in front of the card; paint its front white.
   The N-S and E-W compensator screws under the window are dummies.
 - **Electronics**: the Nano lies in rails on the floor behind the motor,
-  its USB jack in a notch in the back wall. In front of it is a stop with
-  hoods over the far end's corners (3 mm over the board, `hood_reach`; the
-  middle is left free for an ICSP header), beside the jack two stops on
-  the base (in pockets in the back wall's foot) that take the pull of a
-  plug pulled out. The jack stays in the back wall, so the plug's bulky
+  its USB jack in a notch in the back wall, held by the base alone: the
+  shell only clears it, so the Nano stays put with the shell off too, on
+  the bench. Beside the jack are two stops (in pockets in the back wall's
+  foot) that take the pull of a plug pulled out, with hooks 3 mm over the
+  board's corners (`hood_reach`, beside the jack and short of the pin
+  rows). In front of it is a stop that takes the push of a plug pushed in,
+  and a small printed keeper screwed down onto two bosses over the far
+  end's corners (`keeper_*`; the middle is left free for an ICSP header).
+  The hooks and the keeper stand over the board by the shared rails' gap
+  (`nano_rail_gap`, fitted on the switch panel's carrier), so their fit
+  comes from the print alone, not from how the shell sits on the base.
+  The jack stays in the back wall, so the plug's bulky
   housing stops at the board's end and never comes into the case; the
   notch is 0.4 mm bigger than the housing at the sides and the top
   (`usb_clear`). A shelf on the shell's
-  back wall lies over the jack, in the top of the plug's notch: it holds
-  the jack end down, and keeps the wires away from the notch, so they are
-  not seen through it. With the shell on, the Nano cannot move when the
-  USB plug is pushed in or pulled out. The ULN2003 driver board is screwed behind a plate at
+  back wall lies over the jack, 1 mm clear of it (`shelf_gap`), in the top
+  of the plug's notch: it keeps the wires away from the notch, so they are
+  not seen through it. The ULN2003 driver board is screwed behind a plate at
   the back. The plate fills the case's whole section (0.5 mm from the
   shell, `plate_clear`), so no light of the board's LEDs or the Nano's
   gets past it to the window. The Nano goes through a notch under it,
@@ -101,6 +107,8 @@ ones of [`lib/nano.inc.scad`](../lib/nano.inc.scad)) and the window sheet's thic
 band clears the motor, its ears, wires and posts, the sensor post, and
 with its marks the side walls and the lubber line; that the pad clears
 the hub, the band and the ear screws; that the boards clear each other,
+the Nano's hooks and keeper clear the jack, the pin rows, the shelf, the
+motor and the plate's gussets, and its screws are reached past the drum;
 the card and the screw columns; that the stand's screws clear the
 posts and the Nano; that the wire shield clears the band, the magnet
 pad, the motor, its posts and the bezel's posts; and that the top slots
@@ -153,7 +161,7 @@ white acrylic across the raised marks, or use a white paint pen.
 | 1 | clear sheet 1 mm (PET or acrylic), 52 x 30 mm, no glue | window |
 | 1 | white filament, or white acrylic paint / a white paint pen with one colour | the card's marks, lubber line, lettering |
 | 2 | M3 x 6 self tapping screw | motor ears onto the posts |
-| 4 | M3 x 8 self tapping screw | ULN2003 board |
+| 6 | M3 x 8 self tapping screw | ULN2003 board (4), Nano keeper (2) |
 | 10 | M3 x 10 countersunk self tapping screw | bezel (4), base into the shell (2), base onto the stand (4) |
 | 2 | M5 x 10 button head screw + T-nut | stand onto the frame's right top bar |
 
@@ -165,11 +173,13 @@ white acrylic across the raised marks, or use a white paint pen.
    magnet). Sensor flat face up into the pocket on its post, legs bent down
    the groove.
 3. Motor onto its posts (wires to the back), Nano into its rails (USB to
-   the back): its far end in under the hoods, then the jack end down
-   between the two stops, ULN2003 board behind its plate (parts towards the back
+   the back): its jack end first, slid back under the two hooks against
+   the stops, then the far end down onto the rails, then the keeper over
+   the far end, two screws from above. ULN2003 board behind its plate (parts towards the back
    wall). Wire them (see [Wiring](#wiring)), the motor's cable through the
    slot right of the plate, coiled behind it and plugged in. Keep the
-   wires off the USB jack: the shell's shelf comes down over it.
+   wires off the USB jack: the shell's shelf comes down over it. To take
+   the Nano out, the keeper's screws out and the far end up.
 4. Push the drum onto the shaft until it stops, any way round, the flats
    lined up (one colour: paint its marks first, see
    [Two colours](#two-colours)). Do not force it: if it is tight, turn a
