@@ -170,6 +170,8 @@ gusset = [8, 16];            // the plate's gussets: reach in front of it, heigh
 plate_gap = 2;               // the plate to the card, at least
 plate_clear = 0.5;           // the plate to the shell's inside: it fills the section, so no LED light gets past it
 cable_slot = [8, 16];        // through the plate, right of the ULN2003 board: the motor's cable and plug
+nano_clear = 5.5;            // the plate's notch over the Nano's top (the jack): room for its wires
+uln_over = 4;                // the ULN2003 board's bottom over the notch's top
 // --- Hooks over the Nano's jack end corners (on the base, beside the jack) and the keeper's hoods over its far end (the middle left free for an ICSP header) ---
 hood_reach = 3;              // over the board, from its end
 hood_x0 = 4.5;               // from the middle: clear of the jack
@@ -232,7 +234,8 @@ depth = y_back - y_face;
 z_nano = z_floor + nano_under;               // Nano underside
 nano_top = z_nano + nano_t + nano_usb[1];
 usb_z = z_nano + nano_t + nano_usb[1] / 2;
-z_uln0 = nano_top + 1.5;                     // ULN2003 board bottom
+z_notch = nano_top + nano_clear;             // the plate's notch for the Nano, top
+z_uln0 = z_notch + uln_over;                 // ULN2003 board bottom
 y_plate1 = y_bi - uln_plug_room - uln_t - uln_standoff;   // plate back
 y_plate0 = y_plate1 - br_t;
 uln_c = [0, z_uln0 + uln_board.y / 2];     // the ULN2003 board's middle, [x, z]
@@ -504,7 +507,7 @@ module base() {
                translate([-body_w, y_plate0 - 1, z_floor - 0.01]) cube([2 * body_w, br_t + 2, body_h]);
             }
             translate([-nano_rail_hw - 0.5, y_plate0 - 1, z_floor - 1])
-               cube([2 * nano_rail_hw + 1, br_t + 2, z_uln0 - 1 - z_floor + 1]);
+               cube([2 * nano_rail_hw + 1, br_t + 2, z_notch - z_floor + 1]);
             translate([cable_x0, y_plate0 - 1, z_floor - 1])
                cube([cable_slot.x, br_t + 2, cable_slot.y + 1]);
          }
