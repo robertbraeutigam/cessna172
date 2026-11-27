@@ -22,23 +22,29 @@ its own top-level directory; new components should follow the same layout.
   - `carb_heat_knob.scad`, `clamp.scad`, `pin.scad` — small parts (knob,
     rod clamps, pot hold-down pins).
 - `flaps/` — `flaps.scad`: the flaps panel right of the throttle box,
-  like the X-Plane 172N's (WING FLAPS, scale UP/10/20/30 FULL, indicator
-  slot, lever slot). No housing, like the pedestal: front plate with a
+  like the 172N's placard (WING FLAPS down the left, 0/10/20/30/40, 0 to
+  10 twice as long as the others (`scale_at`), indicator slot, stepped
+  lever slot). No housing, like the pedestal: front plate with a
   flange left, right and bottom (none at the top: the waist bars), a
   separate face with raised lettering, a foot on the throttle bar (two
   M5, `foot_bolt_xs`), everything else on the plate's back within `body`;
   `frame/frame.inc.scad` repeats `flaps_plate`, `flaps_body`,
-  `flaps_face_t`, `flaps_bolt_xs`. Lever: the handle's stem into a
-  block sliding in a channel, a ball detent (notches in the right wall)
-  at each of the `n_pos` positions, a magnet in the block over an A3144
-  per position on a screwed `strip` (also keeps the block and the
-  carrier in); D2..D5 set `flap_ratio`. Indicator: a carrier in its own
+  `flaps_face_t`, `flaps_bolt_xs`. Lever: continuous, no detents; the
+  slot (`lever_slot`) steps right (`jog`) at 10 and 20, the stem rests on
+  the steps. The handle (a paddle leaning down) has a square stem into a
+  slider moving sideways in a carriage's pocket, a spring in the
+  carriage's right wall (`lev_spring`) holds it left (against the steps,
+  and its friction); the carriage slides in a channel. A 60 mm slide pot
+  (`pot_*`, MEASURE) stands right of the channel in a snap-in pocket, its
+  ear forward in a tab on the carriage; wiper on A0, `lever_table`
+  (echoed, in the README) maps it to `flap_ratio`. A screwed `strip`
+  keeps the carriage and the carrier in. Indicator: a carrier in its own
   channel, its fin's slot driven by a pin on an SG90's arm (scotch yoke,
-  D9, `arm_r`), the servo on a rib (window, tabs screwed along x); the
-  servo's interpolation table is echoed (`indicator_table`) and in the
-  README. Nano in rails on the foot behind the lever, jack back,
-  `tie_block`. `sv_*` MEASURE (the NAV indicator's), `sensor`/`magnet`
-  from `lib/stepper.inc.scad`.
+  D9, `arm_r`), the servo behind the strip on a rib on the foot (window,
+  tabs screwed along x); the servo's interpolation table is echoed
+  (`indicator_table`) and in the README. Nano in rails on the foot behind
+  the strip at the left, jack back, `tie_block`. `sv_*` MEASURE (the NAV
+  indicator's).
 - `pedestal/` — `pedestal.scad`: the top of the pedestal under the
   throttle, the elevator trim wheel and the trim indicator, mounted like
   the throttle box but with no housing (it is behind the sheet): a front
@@ -388,7 +394,7 @@ its own top-level directory; new components should follow the same layout.
     front of it for the female Dupont plugs on its pins `uln_plug_room`,
     which every board's clearance and depth counts, view model
     `uln_part` on a plate at z=0), the A3144 (`sensor`) and the magnet
-    (`magnet`; the flaps panel's lever sensors use them too), all MEASURE. The holders (motor posts and plates,
+    (`magnet`), all MEASURE. The holders (motor posts and plates,
     carriers, sensor pockets) stay in the components.
   - `usb.inc.scad` — the USB cable: plug (`usb_plug`), cable (`cable_d`)
     and tie (`tie`, `tie_slot`) sizes (MEASURE), and what it is tied onto:

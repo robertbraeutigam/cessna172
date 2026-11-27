@@ -170,7 +170,7 @@ throttle_bolt_y = 36;        // floor_bolt_y, from the face front
 flaps_plate = [78, 87.5];    // the face: width, height (from the flange's bottom to the cut-out's top)
 flaps_body = [60, 78, 112];  // behind the sheet: width, height (from the bar's top), depth from the face's front
 flaps_face_t = 5;            // face_t + plate_t
-flaps_bolt_xs = [-18, -4];   // foot_bolt_xs, from its middle
+flaps_bolt_xs = [10, 23];    // foot_bolt_xs, from its middle
 flaps_play = 0.5;            // body to its cut-out, sheet_cut_clear
 flaps_gap = 70;              // throttle box face to the flaps plate (172N)
 
