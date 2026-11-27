@@ -29,17 +29,19 @@ its own top-level directory; new components should follow the same layout.
   lettering in front of it; `frame/frame.inc.scad` repeats its sizes:
   `pedestal_size`, `under_face_t`, `pedestal_wheel`, `pedestal_ind`).
   Open back, printed on its face. The wheel (rim out of the face's slot)
-  is glued on a 6 mm rod turning in two cheeks (bearing slots open to the
-  back, closed by screwed `keeper`s); a cap on the rod's right end holds
-  a diametric magnet over an AS5600 (analog, A0) on the right cheek's
-  block, no gears. MobiFlight writes the raw angle to a dataref and
-  `trim.lua` (FlyWithLua) adds its changes to the elevator trim (wraps
-  at a turn, so the wheel turns endlessly and the yoke's rocker still
-  trims). The indicator: a rack in a channel on the front plate's back,
+  is glued on a 6 mm rod turning in the left cheek; a printed `coupler`
+  on its right end turns in the right cheek and takes the D shaft of an
+  EC11 encoder with detents (D2, D3; MobiFlight sends the pitch trim
+  up/down commands, so the yoke's rocker still trims), its bushing
+  clamped in a plate right of the cheek. The bearings and the plate's
+  slot are open to the back (wheel, rod, coupler and encoder go in as
+  one), closed by screwed keepers (`keeper_left`, `keeper_right`) whose
+  tongues press a felt pad (`pad_*`) for resistance. The indicator: a rack in a channel on the front plate's back,
   its pointer through the slot, driven by an SG90 (D9) on a `bracket`
   through a pinion (`sv_sweep` for the travel). The Nano in floor rails
-  under the servo, USB to the open back on a `tie_block`. The `as_*`
-  and `sv_*` values are MEASURE (the NAV indicator's); `gear_2d` is a
+  under the servo, USB to the open back on a `tie_block`. The `enc_*`
+  (the heading indicator's) and `sv_*` (the NAV indicator's) values are
+  MEASURE; `gear_2d` is a
   copy of `instruments/instrument.inc.scad`'s, keep them the same.
 - `switchpanel/` — the Cessna 172N lower-left switch panel (master, light
   switches, ...; the ignition key is its own component, `ignition/`).

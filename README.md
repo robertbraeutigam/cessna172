@@ -208,8 +208,8 @@ one box, read by a Nano on its floor.
 ### [Pedestal](pedestal/README.md)
 
 The elevator trim wheel and the trim indicator under the throttle: the
-wheel read by a magnetic angle sensor (a FlyWithLua script turns its
-angle into trim), the pointer on a rack moved by a servo.
+wheel on a rotary encoder sending trim commands, the pointer on a rack
+moved by a servo.
 
 [![Pedestal](https://robertbraeutigam.github.io/cessna172/pedestal/pedestal_montage.png)](https://robertbraeutigam.github.io/cessna172/pedestal/pedestal_montage.png)
 

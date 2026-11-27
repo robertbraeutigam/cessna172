@@ -16,12 +16,15 @@
 //   slot. The cheeks' bearings are slots open to the back (the wheel goes
 //   in from behind with its rod); a printed keeper screwed onto each
 //   cheek's back closes it, its tongue on the rod.
-// - The rod's right end carries a printed cap with a diametric magnet in
-//   its end, over an AS5600 magnetic angle sensor on the right cheek's
-//   block: no gears, no detents, any number of turns. Its analog output
-//   (A0) gives the wheel's angle in a turn; MobiFlight writes it into a
-//   dataref and trim.lua (FlyWithLua) adds every change to X-Plane's
-//   elevator trim, so the wheel and the yoke's trim rocker both trim.
+// - The rod's right end is glued into a printed coupler, which turns in
+//   the right cheek's bearing and takes the D shaft of an EC11 rotary
+//   encoder (with detents) in its other end. The encoder's bushing sits in
+//   a slot in a plate right of the cheek, open to the back like the
+//   bearings, clamped by its nut, so the wheel, the rod, the coupler and
+//   the encoder go in from behind as one. MobiFlight sends X-Plane's
+//   pitch trim up/down command for every click (D2, D3), so the wheel and
+//   the yoke's trim rocker both trim. Resistance: a felt (or rubber) pad
+//   in a keeper's tongue presses on the rod or the coupler.
 // - The indicator: a rack slides up and down in a channel on the front
 //   plate's back, its pointer through the indicator slot. An SG90 servo
 //   on a bracket behind it turns the pinion (sv_sweep for the full
@@ -37,11 +40,11 @@
 // Prints: the body on its face (front plate down, everything else stands
 // on it), the face front side up (lettering for a paint pen), the wheel
 // on its web, the rack on its side, the bracket on its front, the pinion,
-// cap and keepers flat.
+// the keepers flat, the coupler on its collar.
 //
-// Parts to buy (README.md): 6 mm rod (rod_len), AS5600 board with its
-// diametric magnet, SG90 servo, Arduino Nano, M3 screws (face, bracket,
-// keepers, AS5600), 2 M5 bolts + T-nuts (frame).
+// Parts to buy (README.md): 6 mm rod (rod_len), EC11 rotary encoder,
+// SG90 servo, Arduino Nano, felt pad, M3 screws (face, bracket, keepers),
+// 2 M5 bolts + T-nuts (frame).
 
 $fn = 60;
 
@@ -55,7 +58,7 @@ explode = 40;
 bed = [255, 255];
 
 // --- Body, the frame's pedestal_size and under_* (frame/frame.inc.scad) ---
-body = [90, 120, 150];       // width, depth from the face's front, height
+body = [110, 120, 150];      // width, depth from the face's front, height
 wall = 3;
 face_t = 2;                  // the separate face, in front of the front plate
 plate_t = 3;                 // the body's front plate with the flange
@@ -75,7 +78,7 @@ clear_d = 3.3;
 // --- Trim wheel ---
 wheel_d = 120;
 wheel_w = 12;                // the rim, across
-wheel_x = 8;                 // its middle, right of the body's middle
+wheel_x = -2;                // its middle, from the body's middle (the encoder needs the room on the right)
 wheel_out = 12;              // the rim out of the face's front
 rim_t = 5;
 web_t = 3;                   // the web on the wheel's left side
@@ -89,26 +92,28 @@ slot_clear = 1;              // the rim to the slot's ends
 // --- Rod and cheeks ---
 rod_d = 6;
 rod_hole = 6.2;              // the cheeks' bearings
-rod_glue = 6.1;              // the wheel's and the cap's bores, glued
+rod_glue = 6.1;              // the wheel's and the coupler's bores, glued
 cheek_t = 6;
 cheek_h = 14;                // the cheeks over and under the axle
 keeper = [cheek_t, 2 * 12, 3];   // its plate: across, high, thick
 keeper_screw = 9;            // its screws over and under the axle
-keeper_press = 0.1;          // its tongue onto the rod
+pad = [4, 4, 1.5];           // felt or rubber pad in a keeper's tongue: across, along z, thick (MEASURE)
+pad_pocket = 1;              // its pocket in the tongue
+pad_squeeze = 0.4;           // pressed onto the rod or the coupler (more: stiffer wheel)
 
-// --- AS5600 board, MEASURE (the NAV indicator's, instruments/cdi.scad) ---
-as_board = [23, 23];         // the chip in its middle
-as_t = 1.6;
-as_chip = 1.5;               // the chip and the parts on its front
-as_gap = 1;                  // the magnet to the chip (0.5 to 3)
-as_holes = [[-8.5, -8.5], [8.5, 8.5]];   // its holes from its middle
-as_hole_d = 3.2;
-as_rot = 45;                 // turned so its holes are over and under the axle
-as_mag = [6, 2.5];           // the diametric magnet: diameter, height
-as_wires = 5;                // behind the board for the soldered wires
-cap_d = 12;
-cap_rod = 5;                 // the rod in the cap
-cap_floor = 1;               // between the rod's end and the magnet
+// --- EC11 rotary encoder with detents, MEASURE (bare EC11, the heading indicator's, instruments/hi.scad) ---
+enc_body = [12.5, 6.5, 5];   // square body: side, depth, pins behind it
+enc_bush = [7, 7];           // threaded bushing M7: diameter, length
+enc_nut = [9.5, 2];          // its nut: across flats, height
+enc_shaft = [6, 4.5, 20];    // D shaft: diameter, across the flat, length from the mounting face
+enc_wires = 3;               // behind its pins for the soldered wires
+enc_in = 7;                  // the shaft in the coupler
+enc_plate = 2.5;             // the plate its bushing is clamped in
+// --- Coupler: the rod to the encoder's shaft ---
+coupler_d = 10;              // in the right cheek's bearing
+coupler_hole = 10.4;
+collar_d = 14;               // outside the right cheek, keeps the wheel from sliding
+rod_in = 6;                  // the rod in the coupler
 
 // --- SG90 servo, MEASURE (the NAV indicator's flag servo, instruments/cdi.scad) ---
 sv_body = [22.8, 12.2, 22.7];   // length, width, height (its top to its bottom)
@@ -159,14 +164,13 @@ slot_x = [wx[0] - wheel_gap, wx[1] + wheel_gap];
 slot_hl = sqrt(wheel_r * wheel_r - (y_ax - y_in) * (y_ax - y_in)) + slot_clear + (slot_x[1] - slot_x[0]) / 2;   // half its length, the round ends beyond the rim
 ch_l = [slot_x[0] - cheek_t, slot_x[0]];               // left cheek, x
 ch_r = [slot_x[1], slot_x[1] + cheek_t];               // right cheek, x
-cap_x = [ch_r[1] + 0.5, ch_r[1] + 0.5 + cap_rod + cap_floor + as_mag[1] + 0.1];
-as_x = cap_x[1] + as_gap + as_chip;                    // the board's front (chip side)
-blk_x = [ch_r[0], as_x];                               // the right cheek's block
-rod_x = [ch_l[0], cap_x[0] + cap_rod];
+cp_x = [wx[1], wx[1] + rod_in + 0.5 + enc_in];        // the coupler, from the hub
+collar_x0 = ch_r[1] + 0.3;
+enc_mount = cp_x[0] + rod_in + 0.5 + enc_shaft[2];      // the encoder's mounting face (x)
+enc_pl = [enc_mount - enc_plate, enc_mount];           // its plate
+rod_x = [ch_l[0], cp_x[0] + rod_in];
 rod_len = rod_x[1] - rod_x[0];
 cheek_back = y_ax + 8;
-as_hz = [for (h = as_holes) let(a = as_rot) [h.x * cos(a) - h.y * sin(a), h.x * sin(a) + h.y * cos(a)]];   // [y, z] from the axle
-blk_h = max([for (h = as_hz) abs(h[1])]) + pilot_d / 2 + 2;
 
 pin_r = gear_m * pin_z / 2;
 ind_travel = pin_r * sv_sweep * PI / 180;
@@ -194,7 +198,7 @@ br_x = [-wall_in + 0.5, ch_l[0] - 0.1];
 br_z = [chan_z[0], chan_z[1]];
 br_posts = [for (x = [-wall_in + 6, pin_c.x + 4], z = [br_z[0] + 6, br_z[1] - 6]) [x, z]];
 
-nano_c = [-20, 52];                                    // its middle on the floor, the jack at +y
+nano_c = [-33, 52];                                    // its middle on the floor, the jack at +y
 usb_z = wall + nano_top_h + nano_usb.y / 2;            // the jack's middle
 nano_jack_y = nano_c.y + nano_board.y / 2 + nano_usb_out;
 tie_y = nano_jack_y + usb_plug.z + tie_gap + tie_block.x / 2;
@@ -211,7 +215,11 @@ assert(mount_inset + mount_nut_r + 0.3 <= flange_w - sheet_cut_clear, "Mount nut
 assert(z_ax - wheel_r >= wall + 2, "The wheel runs into the floor");
 assert(z_ax + slot_hl <= top_in, "The wheel slot runs into the top wall");
 assert(ch_l[0] - chan_wall - 0.1 > rack_xr, "Rack channel runs into the left cheek");
-assert(as_x + as_t + as_wires <= wall_in, "The AS5600 board's wires run into the right wall");
+assert(enc_mount + enc_body[1] + enc_body[2] + enc_wires <= wall_in, "The encoder's wires run into the right wall");
+assert(cp_x[1] - collar_x0 >= 2, "The coupler's collar too short");
+assert(enc_pl[0] - enc_nut[1] >= cp_x[1] + 0.5, "The encoder's nut runs into the coupler");
+assert(enc_bush[1] >= enc_plate + enc_nut[1], "The encoder's bushing too short for its plate and nut");
+assert(keeper_screw - pilot_d / 2 >= coupler_hole / 2 + 1, "Keeper screws in the coupler's bearing");
 assert(pin_c.x - pin_ra >= -wall_in + 1, "The pinion runs into the left wall");
 assert(pin_c.x - sv_body[1] / 2 >= -wall_in + 0.5, "The servo runs into the left wall");
 assert(sv_bc - sv_tab[0] / 2 >= br_z[0] && sv_bc + sv_tab[0] / 2 <= br_z[1], "The servo's tabs off the bracket");
@@ -309,9 +317,10 @@ module body() {
             translate([-body.x / 2, y_pl, 0]) cube([body.x, body.y - y_pl, body.z]);
             translate([-wall_in, y_in - 0.01, wall]) cube([2 * wall_in, body.y, top_in - wall]);
          }
-         // cheeks: the left one, the right one with the AS5600's block
+         // cheeks: the left one (the rod), the right one (the coupler), the encoder's plate
          along_x(ch_l[0], ch_l[1]) cheek_2d(cheek_h);
-         along_x(blk_x[0], blk_x[1]) cheek_2d(blk_h);
+         along_x(ch_r[0], ch_r[1]) cheek_2d(cheek_h);
+         along_x(enc_pl[0], enc_pl[1]) cheek_2d(cheek_h);
          // the rack's channel: the right wall on the left cheek, the left one above and below the pinion
          translate([rack_xr + rack_play, y_in - 0.01, chan_z[0]]) cube([ch_l[0] - rack_xr - rack_play + 0.01, y_br[0] - y_in, chan_z[1] - chan_z[0]]);
          for (z = [[chan_z[0], pin_c.y - pin_ra - 1], [pin_c.y + pin_ra + 1, chan_z[1]]])
@@ -328,13 +337,13 @@ module body() {
       translate([0, y_pl - 1, 0]) along_y(0, y_in - y_pl + 2) front_holes();
       // the wheel's room between the cheeks
       translate([slot_x[0], y_in - 1, z_ax - wheel_r - 2]) cube([slot_x[1] - slot_x[0], body.y, wheel_d + 4]);
-      // bearings: the rod through both cheeks, the cap and the chip in the block
-      along_x(ch_l[0] - 1, ch_r[1] + 0.01) back_slot_2d(rod_hole);
-      along_x(ch_r[1], blk_x[1] + 1) back_slot_2d(cap_d + 1);
-      // keeper screws, the AS5600's screws
+      // bearings: the rod in the left cheek, the coupler in the right one, the encoder's bushing in its plate
+      along_x(ch_l[0] - 1, ch_l[1] + 0.01) back_slot_2d(rod_hole);
+      along_x(ch_r[0] - 0.01, ch_r[1] + 1) back_slot_2d(coupler_hole);
+      along_x(enc_pl[0] - 1, enc_pl[1] + 1) back_slot_2d(enc_bush[0] + 0.4);
+      // keeper screws
       for (x = [(ch_l[0] + ch_l[1]) / 2, (ch_r[0] + ch_r[1]) / 2], s = [-1, 1])
          translate([x, cheek_back + 1, z_ax + s * keeper_screw]) rotate([90, 0, 0]) cylinder(d = pilot_d, h = 9);
-      for (h = as_hz) translate([as_x + 1, y_ax + h[0], z_ax + h[1]]) rotate([0, -90, 0]) cylinder(d = pilot_d, h = 9);
       // the bracket's screws
       for (p = br_posts) translate([p.x, y_in + 1, p.y]) rotate([-90, 0, 0]) cylinder(d = pilot_d, h = 20);
       // floor bolts
@@ -390,32 +399,47 @@ module wheel_in_place(a = 0) {
    translate([wx[0], y_ax, z_ax]) rotate([a, 0, 0]) rotate([0, 90, 0]) wheel();
 }
 
-// --- Magnet cap on the rod's right end ---
-module cap() {
+// --- Coupler: the rod in one end, the encoder's D shaft in the other;
+// printed on its collar ---
+module coupler() {
+   l = cp_x[1] - cp_x[0];
    difference() {
-      cylinder(d = cap_d, h = cap_x[1] - cap_x[0]);
-      translate([0, 0, -1]) cylinder(d = rod_glue, h = cap_rod + 1);
-      translate([0, 0, cap_rod + cap_floor]) cylinder(d = as_mag[0] + 0.2, h = as_mag[1] + 1);
+      union() {
+         cylinder(d = coupler_d, h = l);
+         translate([0, 0, collar_x0 - cp_x[0]]) cylinder(d = collar_d, h = cp_x[1] - collar_x0);
+      }
+      translate([0, 0, -1]) cylinder(d = rod_glue, h = rod_in + 1);
+      translate([0, 0, l - enc_in]) intersection() {
+         cylinder(d = enc_shaft[0] + 0.15, h = enc_in + 1);
+         translate([-enc_shaft[0], -(enc_shaft[1] + 0.1) / 2, 0]) cube([2 * enc_shaft[0], enc_shaft[1] + 0.1, enc_in + 1]);
+      }
    }
 }
-module cap_in_place() {
-   translate([cap_x[0], y_ax, z_ax]) rotate([0, 90, 0]) cap();
+module coupler_in_place() {
+   translate([cp_x[0], y_ax, z_ax]) rotate([0, 90, 0]) coupler();
 }
 
-// --- Keeper: closes a cheek's bearing, its tongue on the rod ---
-tongue = cheek_back - (y_ax + rod_d / 2 - keeper_press);
-module keeper() {
+// --- Keeper: closes a cheek's bearing (w wide: the rod's, the coupler's),
+// its tongue pressing a pad onto what turns in it (r: its radius) ---
+function tongue(r) = cheek_back - (y_ax + r + pad[2] - pad_pocket - pad_squeeze);
+module keeper(w, r) {
+   t = tongue(r);
    difference() {
       union() {
          translate([-keeper.x / 2, -keeper.y / 2, 0]) cube(keeper);
-         translate([-keeper.x / 2, -(rod_hole - 0.3) / 2, 0]) cube([keeper.x, rod_hole - 0.3, keeper.z + tongue]);
+         translate([-keeper.x / 2, -(w - 0.3) / 2, 0]) cube([keeper.x, w - 0.3, keeper.z + t]);
       }
       for (s = [-1, 1]) translate([0, s * keeper_screw, -1]) cylinder(d = clear_d, h = keeper.z + 2);
+      translate([-(pad.x + 0.3) / 2, -(pad.y + 0.3) / 2, keeper.z + t - pad_pocket]) cube([pad.x + 0.3, pad.y + 0.3, pad_pocket + 1]);
    }
 }
 // printed on its plate; in place its plate on the cheek's back, the tongue forward
-module keeper_in_place(xc) {
-   translate([xc, cheek_back + keeper.z, z_ax]) rotate([90, 0, 0]) keeper();
+module keeper_in_place(xc, w, r) {
+   translate([xc, cheek_back + keeper.z, z_ax]) rotate([90, 0, 0]) keeper(w, r);
+}
+module keepers_in_place() {
+   keeper_in_place((ch_l[0] + ch_l[1]) / 2, rod_hole, rod_d / 2);
+   keeper_in_place((ch_r[0] + ch_r[1]) / 2, coupler_hole, coupler_d / 2);
 }
 
 // --- Rack: the pointer tab on its front, printed on its side ---
@@ -472,10 +496,16 @@ module servo_part(t = 0) {
       translate([pin_c.x, pin_y[1], pin_c.y]) rotate([-90, 0, 0]) cylinder(d = sv_boss[0], h = sv_boss[1]);
    }
 }
-module as_part() {
-   color("#1d4fa0") translate([as_x, y_ax, z_ax]) rotate([as_rot, 0, 0]) translate([0, -as_board.x / 2, -as_board.y / 2]) cube([as_t, as_board.x, as_board.y]);
-   color("#202020") translate([as_x - as_chip, y_ax - 2.5, z_ax - 2.5]) cube([as_chip, 5, 5]);
-   color("#888") translate([cap_x[1] - as_mag[1], y_ax, z_ax]) rotate([0, 90, 0]) cylinder(d = as_mag[0], h = as_mag[1]);
+module enc_part() {
+   translate([enc_mount, y_ax, z_ax]) {
+      color("#b9c0c8") {
+         rotate([0, -90, 0]) cylinder(d = enc_bush[0], h = enc_bush[1]);
+         translate([-enc_plate, 0, 0]) rotate([0, -90, 0]) cylinder(d = enc_nut[0] / cos(30), h = enc_nut[1], $fn = 6);
+         rotate([0, -90, 0]) cylinder(d = enc_shaft[0], h = enc_shaft[2]);
+      }
+      color("#2a2a2a") translate([0, -enc_body[0] / 2, -enc_body[0] / 2]) cube([enc_body[1], enc_body[0], enc_body[0]]);
+      color("#b9c0c8") for (k = [-1 : 1]) translate([enc_body[1], k * 5 - 0.4, -enc_body[0] / 2 + 1]) cube([enc_body[2], 0.8, 0.4]);
+   }
 }
 module rod_part() {
    color(c_steel) translate([rod_x[0], y_ax, z_ax]) rotate([0, 90, 0]) cylinder(d = rod_d, h = rod_len);
@@ -504,14 +534,14 @@ module assembled(t = view_trim, sheet = true) {
    color(c_face) face_in_place();
    color(c_label) translate([0, face_t, 0]) rotate([90, 0, 0]) translate([0, 0, face_t - 0.01]) linear_extrude(label_raise + 0.01) labels_2d();
    color(c_wheel) wheel_in_place();
-   color(c_print) cap_in_place();
-   color(c_print) for (x = [ch_l, ch_r]) keeper_in_place((x[0] + x[1]) / 2);
+   color(c_print) coupler_in_place();
+   color(c_print) keepers_in_place();
    color("#eeeeee") rack_in_place(t);
    color(c_print) pinion_in_place(t);
    color("#555") bracket_in_place();
    rod_part();
    servo_part();
-   as_part();
+   enc_part();
    nano_view();
    bolts_part();
    if (sheet) sheet_part();
@@ -524,10 +554,10 @@ module exploded_view(e = explode) {
    translate([0, 2 * e, 0]) {
       color(c_wheel) wheel_in_place();
       rod_part();
-      color(c_print) cap_in_place();
+      color(c_print) coupler_in_place();
+      enc_part();
    }
-   translate([0, 3 * e, 0]) color(c_print) for (x = [ch_l, ch_r]) keeper_in_place((x[0] + x[1]) / 2);
-   translate([e, 3 * e, 0]) as_part();
+   translate([0, 3 * e, 0]) color(c_print) keepers_in_place();
    translate([0, 1.2 * e, 0]) color("#eeeeee") rack_in_place(0);
    translate([0, 2.2 * e, 0]) {
       color(c_print) pinion_in_place(0);
@@ -565,8 +595,9 @@ module indicator_view(t = view_trim) {
 translate([0, 0, -y_pl]) rotate([90, 0, 0]) body(); // Make module body
 translate([0, face_h + 10, 0]) face(); // Make module face
 wheel(); // Make module wheel
-cap(); // Make module cap
-keeper(); // Make module keeper
+translate([0, 0, cp_x[1] - cp_x[0]]) rotate([180, 0, 0]) coupler(); // Make module coupler
+keeper(rod_hole, rod_d / 2); // Make module keeper_left
+keeper(coupler_hole, coupler_d / 2); // Make module keeper_right
 translate([0, 0, rack_xr]) rotate([0, 90, 0]) rack(); // Make module rack
 rotate([90, 0, 0]) bracket(); // Make module bracket
 pinion(); // Make module pinion

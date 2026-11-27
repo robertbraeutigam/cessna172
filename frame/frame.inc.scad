@@ -227,9 +227,9 @@ under_face_t = 5;            // the face (face_t) and the body's front plate (pl
 under_flange = 10;
 under_play = 1;              // body to its cut-out
 under_bolt_y = 18;           // floor bolts from the face front, over the lower bar's slot
-pedestal_size = [90, 120, 150];   // body
-pedestal_wheel = [8, 48, 85, 120, 12];   // the trim wheel: x from the middle, axle behind the face front and over the floor, diameter, width
-pedestal_ind = [-8.8, 62, 4, 38.5];      // the indicator slot: x from the middle, middle over the floor, width, length
+pedestal_size = [110, 120, 150];  // body
+pedestal_wheel = [-2, 48, 85, 120, 12];   // the trim wheel: x from the middle, axle behind the face front and over the floor, diameter, width
+pedestal_ind = [-18.8, 62, 4, 38.5];      // the indicator slot: x from the middle, middle over the floor, width, length
 // Parking brake: a thin body (width x depth x height) on the bottom bar,
 // under the yoke column, two M5 into the bar's top slot; its T-handle
 // comes through a small hole in the sheet: released, it is almost flush
