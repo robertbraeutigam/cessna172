@@ -61,10 +61,7 @@ frame's right top bar, about where the windshield's middle is (see
   The jack stays in the back wall, so the plug's bulky
   housing stops at the board's end and never comes into the case; the
   notch is 0.4 mm bigger than the housing at the sides and the top
-  (`usb_clear`). A shelf on the shell's
-  back wall lies over the jack, 1 mm clear of it (`shelf_gap`), in the top
-  of the plug's notch: it keeps the wires away from the notch, so they are
-  not seen through it. The ULN2003 driver board is screwed behind a plate at
+  (`usb_clear`). The ULN2003 driver board is screwed behind a plate at
   the back. The plate fills the case's whole section (0.5 mm from the
   shell, `plate_clear`), so no light of the board's LEDs or the Nano's
   gets past it to the window. The Nano goes through a notch under it,
@@ -107,7 +104,7 @@ ones of [`lib/nano.inc.scad`](../lib/nano.inc.scad)) and the window sheet's thic
 band clears the motor, its ears, wires and posts, the sensor post, and
 with its marks the side walls and the lubber line; that the pad clears
 the hub, the band and the ear screws; that the boards clear each other,
-the Nano's hooks and keeper clear the jack, the pin rows, the shelf, the
+the Nano's hooks and keeper clear the jack, the pin rows, the
 motor and the plate's gussets, and its screws are reached past the drum;
 the card and the screw columns; that the stand's screws clear the
 posts and the Nano; that the wire shield clears the band, the magnet
@@ -178,7 +175,7 @@ white acrylic across the raised marks, or use a white paint pen.
    the far end, two screws from above. ULN2003 board behind its plate (parts towards the back
    wall). Wire them (see [Wiring](#wiring)), the motor's cable through the
    slot right of the plate, coiled behind it and plugged in. Keep the
-   wires off the USB jack: the shell's shelf comes down over it. To take
+   wires off the USB jack and away from its notch. To take
    the Nano out, the keeper's screws out and the far end up.
 4. Push the drum onto the shaft until it stops, any way round, the flats
    lined up (one colour: paint its marks first, see

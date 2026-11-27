@@ -35,9 +35,7 @@
 //   screwed down over the far end's corners (keeper_*). The board goes in
 //   jack end first under the hooks, then the far end down, then the
 //   keeper on. The hooks and the keeper are over the board by the shared
-//   rails' gap (nano_rail_gap), from print geometry only. A shelf on the
-//   shell's back wall over the jack (in the notch's top), clear of it,
-//   keeps the wires away from the notch and out of sight through it.
+//   rails' gap (nano_rail_gap), from print geometry only.
 // - The ULN2003 driver board stands behind a plate at the back, far enough
 //   in front of the back wall for the Dupont plugs on its pins
 //   (uln_plug_room). The plate fills the case's section (the shell
@@ -181,12 +179,8 @@ keeper_sx = 13.5;            // its two screws (M3 self tapping, from above), fr
 keeper_dy = 4;               // and behind the far stop's front
 keeper_boss_d = 5.5;         // the bosses, and the screws' pan heads
 keeper_hole = 6;             // pilot hole depth, from the boss top
-// --- Shelf over the USB jack, on the shell's back wall: keeps the wires off the notch (clear of the jack) ---
+// --- The USB plug's notch in the back wall ---
 usb_clear = 0.4;             // the plug's housing to the notch, sides and top
-shelf_hw = 6.4;              // half width: over the jack, between the pin rows, as wide as the notch
-shelf_len = 8;               // into the case from the back wall
-shelf_t = 1.5;               // at its front edge; its top rises 45 degrees to the wall (printed top down)
-shelf_gap = 1;               // over the jack: it does not hold it
 // --- Wire shield and vents (the coils stay on: the motor and the ULN2003 get warm) ---
 shield_t = 1.6;              // a wall under the drum, round its front half, the sensor post in it
 shield_over = 6;             // its top over the band's bottom edge, inside the drum
@@ -246,7 +240,6 @@ uln_holes = [for (h = uln_hole_xy) uln_c + h];
 plate_w = uln_board.x + 2;
 z_plate1 = z_uln0 + uln_board.y + 1;      // the ULN2003 board's top, and a little
 cable_x0 = uln_board.x / 2 + 2;            // the cable slot, from the gusset out
-z_shelf0 = nano_top + shelf_gap;
 keeper_z = nano_top_h + nano_rail_gap;       // the keeper's and the hooks' underside, over the floor
 hook_z1 = keeper_z + hood_t;                 // the hooks' top, over the floor
 jack_stop_x = usb_plug.x / 2 + 0.5;          // the jack stops' inner faces (nano_rails' stop_x)
@@ -313,15 +306,12 @@ assert(y_plate1 <= y_bi - block - 0.5, "ULN2003 plate runs into the back columns
 assert(cable_x0 + cable_slot.x <= xi - plate_clear - 1, "Cable slot runs out of the plate");
 assert(z_floor + cable_slot.y <= z_band0 - 1, "Cable slot not hidden under the drum");
 assert(cable_x0 - 1 >= plate_w / 2, "Cable slot runs into the gusset");
-assert(shelf_hw >= notch_hw && shelf_hw <= nano_row / 2 - nano_pad_d / 2 - 0.3, "USB shelf: not over the notch, or over the pin rows");
-assert(shelf_len <= nano_usb_len - nano_usb_out, "USB shelf longer than the jack");
 assert(notch_hw <= usb_plug.x / 2 + 0.5 - 0.1, "The plug's housing runs into the jack stops");
 assert(wall - stop_pocket >= 0.5, "Back wall too thin over the jack stops");
 assert(nano_board.y / 2 - (nano_row_pins - 1) / 2 * nano_pin_pitch - nano_pad_d / 2 >= hood_reach + 0.3, "Nano hooks or keeper reach onto the pin rows");
 assert(hood_x0 <= nano_rail_in - 2, "Nano hooks or keeper's hoods too narrow");
 assert(hood_x0 >= nano_usb.x / 2 + 0.4, "Nano hooks run into the jack");
 assert(jack_stop_x <= nano_rail_in - 1.5, "Nano jack stops too narrow");
-assert(z_floor + hook_z1 <= z_shelf0 - 0.5, "Nano hooks run into the USB shelf");
 assert(wall - stop_pocket >= 0.5 && body_h / 2 - wall - z_floor >= pocket_h, "No room for the jack stops' pockets");
 assert(z_floor + keeper_z + keeper_t <= z_motor0 - 1, "Nano keeper runs into the motor");
 assert(keeper_sx - keeper_boss_d / 2 >= nano_rail_in + 0.3, "Nano keeper's bosses run into the rails' grooves");
@@ -331,7 +321,6 @@ assert(nano_c.y + keeper_sy + keeper_boss_d / 2 <= y_plate0 - 0.5, "Nano keeper 
 assert(norm([keeper_sx, nano_c.y + keeper_sy]) >= card_ro + 1.8, "Nano keeper's screws not reached past the drum");
 assert(keeper_dy >= nano_rail_stop / 2 && keeper_sy + keeper_boss_d / 2 >= keeper_y1, "Nano keeper's screws not beside its plate");
 assert(keeper_t + keeper_hole >= 8 && keeper_z + floor_t - keeper_hole >= 0.6, "Nano keeper's pilot holes: too short for 8 mm screws, or through the floor");
-assert(z_shelf0 + shelf_t <= notch_top, "USB shelf too thick under the notch's top");
 assert(window_h <= window_d - 6, "Window as high as round");
 assert(window_h / 2 >= band_h / 2, "Window smaller than the card");
 assert(norm([glass.x / 2, glass.y / 2]) + 0.2 <= norm([sx, sx]) - csk_d / 2 - 1, "Bezel screws run into the glass");
@@ -623,10 +612,6 @@ module shell() {
             translate([s * sx - block / 2, y_bz, sx - block / 2]) cube([block, block + 1, z_ceil - sx + block / 2 + 0.01]);
             along_y(y_bz, y_back) section(wall - 0.01);
          }
-         // shelf over the USB jack, its top sloping up to the back wall
-         translate([-shelf_hw, 0, 0]) rotate([90, 0, 90]) linear_extrude(2 * shelf_hw)
-            polygon([[y_bi - shelf_len, z_shelf0], [y_bi + 0.01, z_shelf0],
-                     [y_bi + 0.01, z_shelf0 + shelf_t + shelf_len], [y_bi - shelf_len, z_shelf0 + shelf_t]]);
          // back columns: the base's screws
          for (b = back_screws) intersection() {
             translate([b.x - block / 2, b.y - block / 2, z_floor]) cube([block, block + 0.01, z_ceil - z_floor + 0.01]);
